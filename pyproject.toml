@@ -1,0 +1,44 @@
+[project]
+name = "farmwise"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+
+dependencies = [
+    "dotenv~=0.9.9",
+    "fastapi~=0.115.8",
+    "openai~=1.63.0",
+    "langgraph~=0.2.74",
+    "langchain~=0.3.19",
+    "langchain-openai~=0.3.6",
+    "pydantic~=2.10.6",
+    "typing_extensions~=4.12.2",
+    "python-dotenv~=1.0.1",
+    "langchain-core~=0.3.37",
+    "streamlit>=1.42.2",
+    "uvicorn>=0.34.0",
+]
+
+[dependency-groups]
+dev = [
+    "jupyter",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "pytest-env",
+    "pytest-asyncio",
+    "ruff",
+    "openapi-python-client"
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+extend-select = ["I", "U"]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

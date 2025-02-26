@@ -1,0 +1,21 @@
+[project]
+name = "farmbase"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+#    "postmodern-greeter",
+]
+
+[dependency-groups]
+dev = [
+#    "basedpyright>0",
+    "poethepoet>0",
+    "pytest>0",
+    "ruff>0",
+]
+
+[tool.uv.sources]
+#postmodern-greeter = { workspace = true }
+#
