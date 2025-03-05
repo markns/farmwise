@@ -9,7 +9,7 @@ from ..tools import tools
 from .tool import FarmwiseTool
 
 
-class FarmwiseAgentToolkit:
+class FarmbaseAgentToolkit:
     _tools: List = PrivateAttr(default=[])
 
     def __init__(self,

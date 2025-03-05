@@ -1,9 +1,9 @@
-import farmstore_client
-from agent_toolkit.configuration import Context
-from farmstore.assets import SexEnum
-from farmstore_client.api.animals import animals_create_animal
-from farmstore_client.models import Animal
+from farmbase_agent_toolkit.configuration import Context
+from farmbase_client import APIConfig
+from farmbase_client.models import Animal, SexEnum
+from farmbase_client.services.animals_service import animals_create_animal
 
+api_config = APIConfig(base_path = "http://127.0.0.1:8000")
 
 def create_animal(context: Context, **kwargs):
     """
@@ -17,12 +17,7 @@ def create_animal(context: Context, **kwargs):
         stripe.Customer: The created customer.
     """
 
-    client = farmstore_client.Client(base_url="http://localhost:8000")
-
-    with client as client:
-        my_data = animals_create_animal.sync(client=client, body=Animal(**kwargs))
-        # or if you need more info (e.g. status_code)
-        # response: Response[MyDataModel] = get_my_data_model.sync_detailed(client=client)
+    my_data = animals_create_animal(Animal(**kwargs), api_config_override=api_config)
 
     return my_data
 

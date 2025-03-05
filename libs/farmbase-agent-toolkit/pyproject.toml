@@ -1,11 +1,11 @@
 [project]
-name = "farmbase-client"
+name = "farmbase-agent-toolkit"
 version = "0.1.0"
 description = ""
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-#    "postmodern-greeter",
+    "farmbase-client",
 ]
 
 [dependency-groups]
@@ -17,5 +17,9 @@ dev = [
 ]
 
 [tool.uv.sources]
-#postmodern-greeter = { workspace = true }
-#
+farmbase-client = { workspace = true }
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

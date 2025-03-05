@@ -1,7 +1,6 @@
 from typing import Dict, List
 
-from farmstore.assets import Animal
-
+from farmbase_client.models import Animal
 from .prompts import CREATE_ANIMAL_PROMPT
 
 tools: List[Dict] = [

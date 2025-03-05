@@ -1,5 +1,5 @@
 [project]
-name = "farmwise"
+name = "farmwise-parent"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -8,37 +8,63 @@ requires-python = ">=3.13"
 dependencies = [
     "dotenv~=0.9.9",
     "fastapi~=0.115.8",
-    "openai~=1.63.0",
-    "langgraph~=0.2.74",
-    "langchain~=0.3.19",
-    "langchain-openai~=0.3.6",
     "pydantic~=2.10.6",
+    "pydantic-settings ~=2.6.1",
     "typing_extensions~=4.12.2",
     "python-dotenv~=1.0.1",
-    "langchain-core~=0.3.37",
-    "streamlit>=1.42.2",
     "uvicorn>=0.34.0",
 ]
 
 [dependency-groups]
 dev = [
+    "ruff",
     "jupyter",
-    "pre-commit",
     "pytest",
     "pytest-cov",
     "pytest-env",
     "pytest-asyncio",
-    "ruff",
-    "openapi-python-client"
+    "openapi-python-client",
+    "poethepoet>=0.32.2",
 ]
 
 [tool.ruff]
-line-length = 100
-target-version = "py311"
+# if this is a library, enter the _minimum_ version you
+# want to support, otherwise do py313
+target-version = "py313"
+line-length = 120  # use whatever number makes you happy
 
 [tool.ruff.lint]
-extend-select = ["I", "U"]
+# you can see the looong list of rules here:
+# https://docs.astral.sh/ruff/rules/
+# here's a couple to start with
+select = [
+    "A", # warn about shadowing built-ins
+    "E", # style stuff, whitespaces
+    "F", # important pyflakes lints
+    "I", # import sorting
+    "N", # naming
+    "T100", # breakpoints (probably don't want these in prod!)
+]
+# if you're feeling confident you can do:
+# select = ["ALL"]
+# and then manually ignore annoying ones:
+# ignore = [...]
 
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+[tool.ruff.lint.isort]
+# so it knows to group first-party stuff last
+known-first-party = ["farmwise"]
+
+
+[tool.poe.tasks]
+# run with eg `uv run poe fmt`
+fmt = "ruff format"
+lint = "ruff check --fix"
+check = "pyright"
+test = "pytest"
+client-gen = " uvx --from git+https://github.com/markns/openapi-python-generator openapi-python-generator  --use-orjson http://0.0.0.0:8000/openapi.json libs/farmbase-client/src/farmbase_client/"
+# run all the above
+all = [{ ref = "fmt" }, { ref = "lint" }, { ref = "check" }, { ref = "test" }]
+
+
+[tool.uv.workspace]
+members = ["libs/*", "apps/*"]

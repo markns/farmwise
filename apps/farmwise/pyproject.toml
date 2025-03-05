@@ -1,11 +1,26 @@
 [project]
-name = "farmwise-service"
+name = "farmwise"
 version = "0.1.0"
 description = ""
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-#    "postmodern-greeter",
+    "farmbase-agent-toolkit",
+    "farmwise-schema",
+    "langchain-core ~=0.3.33",
+    "langchain-community ~=0.3.16",
+    "langchain-openai~=0.3.6",
+    "langchain-anthropic ~= 0.3.0",
+    "langchain-google-genai ~=2.0.11",
+    "langchain-groq ~=0.2.1",
+    "langchain-aws ~=0.2.14",
+    "langchain-ollama ~=0.2.3",
+    "langgraph ~=0.2.68",
+    "langgraph-checkpoint-sqlite ~=2.0.1",
+    "langgraph-checkpoint-postgres ~=2.0.13",
+    "langsmith ~=0.1.145",
+    "numexpr ~=2.10.1",
+    "duckduckgo-search>=7.5.0",
 ]
 
 [dependency-groups]
@@ -17,5 +32,9 @@ dev = [
 ]
 
 [tool.uv.sources]
-#postmodern-greeter = { workspace = true }
-#
+farmbase-agent-toolkit = { workspace = true }
+farmwise-schema = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

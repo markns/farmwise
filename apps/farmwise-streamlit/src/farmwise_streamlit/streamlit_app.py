@@ -4,11 +4,11 @@ import urllib.parse
 from collections.abc import AsyncGenerator
 
 import streamlit as st
-from client import AgentClient, AgentClientError
+from farmwise_client import AgentClient, AgentClientError
 from dotenv import load_dotenv
 from pydantic import ValidationError
-from schema import ChatHistory, ChatMessage
-from schema.task_data import TaskData, TaskDataStatus
+from farmwise_schema.schema import ChatHistory, ChatMessage
+from farmwise_schema.task_data import TaskData, TaskDataStatus
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 
 # A Streamlit app for interacting with the langgraph agent via a simple chat interface.
@@ -200,7 +200,7 @@ async def draw_messages(
     drawing the feedback widget in the latest chat message.
 
     Args:
-        messages_aiter: An async iterator over messages to draw.
+        messages_agen: An async iterator over messages to draw.
         is_new: Whether the messages are new or not.
     """
 
