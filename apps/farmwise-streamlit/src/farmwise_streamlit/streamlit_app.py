@@ -22,8 +22,8 @@ from streamlit.runtime.scriptrunner import get_script_run_ctx
 # The app heavily uses AgentClient to interact with the agent's FastAPI endpoints.
 
 
-APP_TITLE = "Agent Service Toolkit"
-APP_ICON = "🧰"
+APP_TITLE = "FarmWise"
+APP_ICON = "🐮"
 
 
 async def main() -> None:
@@ -131,16 +131,11 @@ async def main() -> None:
         if st.button(":material/upload: Share/resume chat", use_container_width=True):
             share_chat_dialog()
 
-        "[View the source code](https://github.com/JoshuaC215/agent-service-toolkit)"
-        st.caption(
-            "Made with :material/favorite: by [Joshua](https://www.linkedin.com/in/joshua-k-carroll/) in Oakland"
-        )
-
     # Draw existing messages
     messages: list[ChatMessage] = st.session_state.messages
 
     if len(messages) == 0:
-        WELCOME = "Hello! I'm an AI-powered research assistant with web search and a calculator. Ask me anything!"
+        WELCOME = "Hello! I'm an AI-powered farm assistant. Ask me anything!"
         with st.chat_message("ai"):
             st.write(WELCOME)
 
