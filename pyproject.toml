@@ -67,4 +67,4 @@ all = [{ ref = "fmt" }, { ref = "lint" }, { ref = "check" }, { ref = "test" }]
 
 
 [tool.uv.workspace]
-members = ["libs/*", "apps/*"]
+members = ["libs/*", "apps/*", "farmwise-whatsapp"]
