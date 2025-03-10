@@ -24,6 +24,7 @@ def parse_cors(v: Any) -> list[str] | str:
     raise ValueError(v)
 
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./FARMBASE/)

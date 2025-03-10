@@ -69,13 +69,12 @@ services:
       - /workspace/apps/farmbase/src/farmbase/main.py
     develop:
       watch:
-        - path: apps/farmbase/src
+        - path: apps/farmbase
           action: sync
-          target: /workspace
+          target: /workspace/apps/farmbase
           ignore:
-            - ./backend/.venv
             - .venv
-        - path: ./apps/farmbase/pyproject.toml
+        - path: apps/farmbase/pyproject.toml
           action: rebuild
     # TODO: remove once coverage is done locally
 #    volumes:

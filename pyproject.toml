@@ -61,7 +61,7 @@ fmt = "ruff format"
 lint = "ruff check --fix"
 check = "pyright"
 test = "pytest"
-client-gen = " uvx --from git+https://github.com/markns/openapi-python-generator openapi-python-generator  --use-orjson http://0.0.0.0:8000/openapi.json libs/farmbase-client/src/farmbase_client/"
+client-gen = "uvx --from git+https://github.com/markns/openapi-python-generator openapi-python-generator  --use-orjson http://0.0.0.0:8000/openapi.json libs/farmbase-client/src/farmbase_client/"
 # run all the above
 all = [{ ref = "fmt" }, { ref = "lint" }, { ref = "check" }, { ref = "test" }]
 
