@@ -48,34 +48,16 @@ agent_client = AgentClient(base_url=settings.AGENT_URL)
 # )
 # print(wa.get_flow(flow_id))
 
-@wa.on_message
-async def handle_message(client: WhatsApp, msg: types.Message):
-    response = await agent_client.ainvoke(
-        message=msg.text,
-        model="gpt-4o-mini",
-        thread_id=msg.metadata.phone_number_id,
-    )
-    await msg.reply_text(response.content)
-
-@wa.on_message(filters.command(Commands.REGISTER_FIELD.value.name))
-async def register_field(client: WhatsApp, msg: types.Message):
-    print("In register field handler")
-    # await msg.reply_text('Registering your field!')
-    response = await agent_client.ainvoke(
-        message=msg.text,
-        model="gpt-4o-mini",
-        thread_id=msg.metadata.phone_number_id,
-    )
-    await msg.reply_text(response.content)
 
 
-
-@wa.on_message(filters.location)
-async def location(client: WhatsApp, msg: types.Message):
+@wa.on_message(filters.matches("Hello", "Hi"))
+async def hello(_: WhatsApp, msg: types.Message):
+    print(f"Handling hello")
+    await msg.mark_as_read()
+    await msg.react("👋")
     await msg.reply_text(
-        text=f"Hello {msg}!",
+        text=f"Hello {msg.from_user.name}!",
         buttons=[
-            # types.Location(),
             types.Button(
                 title="Click me!",
                 callback_data="id:123"
@@ -84,8 +66,37 @@ async def location(client: WhatsApp, msg: types.Message):
     )
 
 
+
+@wa.on_message(filters.command(Commands.REGISTER_FIELD.value.name))
+async def register_field(_: WhatsApp, msg: types.Message):
+    print("In register field handler")
+    await msg.reply_location_request("Please share your location")
+
+
+@wa.on_message(filters.location)
+async def location(_: WhatsApp, msg: types.Message):
+    print(f"In location handler {msg}")
+    response = await agent_client.ainvoke(
+        message=f"My location is {msg.location}, can you tell me something about what crops I can grow here?",
+        model="gpt-4o-mini",
+        thread_id=msg.metadata.phone_number_id,
+    )
+    await msg.reply_text(response.content)
+
+
+@wa.on_message
+async def handle_message(_: WhatsApp, msg: types.Message):
+    response = await agent_client.ainvoke(
+        message=msg.text,
+        model="gpt-4o-mini",
+        thread_id=msg.metadata.phone_number_id,
+    )
+    await msg.reply_text(response.content)
+
+
+
 @wa.on_message(filters.command(Commands.SELECT_COLOUR.value.name))
-async def select_colour(client: WhatsApp, msg: types.Message):
+async def select_colour(_: WhatsApp, msg: types.Message):
     print("In select colour handler")
     await msg.reply_text(header='Select your favorite color',
                 text='Tap a button to select your favorite color:',
@@ -139,21 +150,7 @@ async def select_colour(client: WhatsApp, msg: types.Message):
 
 
 
-@wa.on_message(filters.matches("Hello", "Hi"))
-async def hello(client: WhatsApp, msg: types.Message):
-    await msg.react("👋")
-    await msg.reply_text(
-        text=f"Hello {msg.from_user.name}!",
-        buttons=[
-            types.Button(
-                title="Click me!",
-                callback_data="id:123"
-            )
-        ]
-    )
-
-
 
 @wa.on_callback_button(filters.startswith("id"))
-async def click_me(client: WhatsApp, clb: types.CallbackButton):
+async def click_me(_: WhatsApp, clb: types.CallbackButton):
     await clb.reply_text("You clicked me!")
