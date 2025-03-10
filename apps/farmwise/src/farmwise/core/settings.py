@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     MODE: str | None = None
 
     HOST: str = "0.0.0.0"
-    PORT: int = 8080
+    PORT: int = 8082
 
     AUTH_SECRET: SecretStr | None = None
 
