@@ -1,7 +1,8 @@
 services:
 
   db:
-    image: postgres:12
+    # postgis/postgis isn't build for arm processors
+    image: ghcr.io/baosystems/postgis:17
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
