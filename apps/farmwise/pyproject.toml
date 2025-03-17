@@ -21,6 +21,7 @@ dependencies = [
     "langsmith ~=0.1.145",
     "numexpr ~=2.10.1",
     "duckduckgo-search>=7.5.0",
+    "openai>=1.66.3",
 ]
 
 [dependency-groups]
