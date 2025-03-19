@@ -5,7 +5,8 @@ description = ""
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-#    "postmodern-greeter",
+    #    "postmodern-greeter",
+    "geojson-pydantic>=1.2.0",
 ]
 
 [dependency-groups]

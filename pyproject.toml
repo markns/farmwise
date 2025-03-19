@@ -13,6 +13,7 @@ dependencies = [
     "typing_extensions~=4.12.2",
     "python-dotenv~=1.0.1",
     "uvicorn>=0.34.0",
+    "httpx>=0.28.1",
 ]
 
 [dependency-groups]
@@ -61,7 +62,7 @@ fmt = "ruff format"
 lint = "ruff check --fix"
 check = "pyright"
 test = "pytest"
-client-gen = "uvx --from git+https://github.com/markns/openapi-python-generator openapi-python-generator  --use-orjson http://0.0.0.0:8000/openapi.json libs/farmbase-client/src/farmbase_client/"
+client-gen = "libs/farmbase-client/gen-client.sh"
 # run all the above
 all = [{ ref = "fmt" }, { ref = "lint" }, { ref = "check" }, { ref = "test" }]
 

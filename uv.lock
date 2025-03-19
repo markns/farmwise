@@ -680,6 +680,7 @@ version = "0.1.0"
 source = { editable = "apps/farmbase" }
 dependencies = [
     { name = "alembic" },
+    { name = "email-validator" },
     { name = "emails" },
     { name = "fastapi", extra = ["standard"] },
     { name = "geoalchemy2" },
@@ -701,6 +702,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "alembic", specifier = ">=1.15.1" },
+    { name = "email-validator", specifier = ">=2.2.0" },
     { name = "emails", specifier = ">=0.6" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.8" },
     { name = "geoalchemy2", specifier = ">=0.17.1" },
@@ -748,6 +750,9 @@ dev = [
 name = "farmbase-client"
 version = "0.1.0"
 source = { editable = "libs/farmbase-client" }
+dependencies = [
+    { name = "geojson-pydantic" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -757,6 +762,7 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "geojson-pydantic", specifier = ">=1.2.0" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -856,6 +862,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "dotenv" },
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
@@ -879,6 +886,7 @@ dev = [
 requires-dist = [
     { name = "dotenv", specifier = "~=0.9.9" },
     { name = "fastapi", specifier = "~=0.115.8" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "pydantic", specifier = "~=2.10.6" },
     { name = "pydantic-settings", specifier = "~=2.6.1" },
     { name = "python-dotenv", specifier = "~=1.0.1" },
