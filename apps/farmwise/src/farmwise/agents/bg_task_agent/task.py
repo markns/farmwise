@@ -1,11 +1,11 @@
 from typing import Literal
 from uuid import uuid4
 
+from farmwise_schema.task_data import TaskData
 from langchain_core.messages import BaseMessage
 from langchain_core.runnables import RunnableConfig
 
 from farmwise.agents.utils import CustomData
-from farmwise_schema.task_data import TaskData
 
 
 class Task:
@@ -38,9 +38,7 @@ class Task:
         task_message = await self._generate_and_dispatch_message(config, data)
         return task_message
 
-    async def finish(
-        self, result: Literal["success", "error"], config: RunnableConfig, data: dict = {}
-    ) -> BaseMessage:
+    async def finish(self, result: Literal["success", "error"], config: RunnableConfig, data: dict = {}) -> BaseMessage:
         self.state = "complete"
         self.result = result
         task_message = await self._generate_and_dispatch_message(config, data)

@@ -3,16 +3,6 @@ from json import loads
 from typing import Annotated, Any
 
 from dotenv import find_dotenv
-from pydantic import (
-    BeforeValidator,
-    Field,
-    HttpUrl,
-    SecretStr,
-    TypeAdapter,
-    computed_field,
-)
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
 from farmwise_schema.models import (
     AllModelEnum,
     AnthropicModelName,
@@ -26,6 +16,15 @@ from farmwise_schema.models import (
     OpenAIModelName,
     Provider,
 )
+from pydantic import (
+    BeforeValidator,
+    Field,
+    HttpUrl,
+    SecretStr,
+    TypeAdapter,
+    computed_field,
+)
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class DatabaseType(StrEnum):
@@ -71,15 +70,11 @@ class Settings(BaseSettings):
 
     LANGCHAIN_TRACING_V2: bool = False
     LANGCHAIN_PROJECT: str = "default"
-    LANGCHAIN_ENDPOINT: Annotated[str, BeforeValidator(check_str_is_http)] = (
-        "https://api.smith.langchain.com"
-    )
+    LANGCHAIN_ENDPOINT: Annotated[str, BeforeValidator(check_str_is_http)] = "https://api.smith.langchain.com"
     LANGCHAIN_API_KEY: SecretStr | None = None
 
     # Database Configuration
-    DATABASE_TYPE: DatabaseType = (
-        DatabaseType.SQLITE
-    )  # Options: DatabaseType.SQLITE or DatabaseType.POSTGRES
+    DATABASE_TYPE: DatabaseType = DatabaseType.SQLITE  # Options: DatabaseType.SQLITE or DatabaseType.POSTGRES
     SQLITE_DB_PATH: str = "checkpoints.db"
 
     # PostgreSQL Configuration
@@ -88,12 +83,8 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str | None = None
     POSTGRES_PORT: int | None = None
     POSTGRES_DB: str | None = None
-    POSTGRES_POOL_SIZE: int = Field(
-        default=10, description="Maximum number of connections in the pool"
-    )
-    POSTGRES_MIN_SIZE: int = Field(
-        default=3, description="Minimum number of connections in the pool"
-    )
+    POSTGRES_POOL_SIZE: int = Field(default=10, description="Maximum number of connections in the pool")
+    POSTGRES_MIN_SIZE: int = Field(default=3, description="Minimum number of connections in the pool")
     POSTGRES_MAX_IDLE: int = Field(default=5, description="Maximum number of idle connections")
 
     # Azure OpenAI Settings
@@ -169,9 +160,7 @@ class Settings(BaseSettings):
                     # Parse deployment map if it's a string
                     if isinstance(self.AZURE_OPENAI_DEPLOYMENT_MAP, str):
                         try:
-                            self.AZURE_OPENAI_DEPLOYMENT_MAP = loads(
-                                self.AZURE_OPENAI_DEPLOYMENT_MAP
-                            )
+                            self.AZURE_OPENAI_DEPLOYMENT_MAP = loads(self.AZURE_OPENAI_DEPLOYMENT_MAP)
                         except Exception as e:
                             raise ValueError(f"Invalid AZURE_OPENAI_DEPLOYMENT_MAP JSON: {e}")
 

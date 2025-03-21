@@ -1,11 +1,11 @@
 from enum import Enum
 
+from farmwise_schema.models import GroqModelName
 from langchain_core.messages import AIMessage, AnyMessage, HumanMessage
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel, Field
 
 from farmwise.core import get_model, settings
-from farmwise_schema.models import GroqModelName
 
 
 class SafetyAssessment(Enum):
@@ -16,9 +16,7 @@ class SafetyAssessment(Enum):
 
 class LlamaGuardOutput(BaseModel):
     safety_assessment: SafetyAssessment = Field(description="The safety assessment of the content.")
-    unsafe_categories: list[str] = Field(
-        description="If content is unsafe, the list of unsafe categories.", default=[]
-    )
+    unsafe_categories: list[str] = Field(description="If content is unsafe, the list of unsafe categories.", default=[])
 
 
 unsafe_content_categories = {
@@ -86,9 +84,7 @@ class LlamaGuard:
 
     def _compile_prompt(self, role: str, messages: list[AnyMessage]) -> str:
         role_mapping = {"ai": "Agent", "human": "User"}
-        messages_str = [
-            f"{role_mapping[m.type]}: {m.content}" for m in messages if m.type in ["ai", "human"]
-        ]
+        messages_str = [f"{role_mapping[m.type]}: {m.content}" for m in messages if m.type in ["ai", "human"]]
         conversation_history = "\n\n".join(messages_str)
         return self.prompt.format(role=role, conversation_history=conversation_history)
 

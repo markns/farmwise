@@ -6,6 +6,16 @@ from contextlib import asynccontextmanager
 from typing import Annotated, Any
 from uuid import UUID, uuid4
 
+from farmwise_schema.schema import (
+    ChatHistory,
+    ChatHistoryInput,
+    ChatMessage,
+    Feedback,
+    FeedbackResponse,
+    ServiceMetadata,
+    StreamInput,
+    UserInput,
+)
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, status
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -19,16 +29,6 @@ from langsmith import Client as LangsmithClient
 from farmwise.agents import DEFAULT_AGENT, get_agent, get_all_agent_info
 from farmwise.core import settings
 from farmwise.memory import initialize_database
-from farmwise_schema.schema import (
-    ChatHistory,
-    ChatHistoryInput,
-    ChatMessage,
-    Feedback,
-    FeedbackResponse,
-    ServiceMetadata,
-    StreamInput,
-    UserInput,
-)
 from farmwise.service.utils import (
     convert_message_content_to_string,
     langchain_to_chat_message,
@@ -132,9 +132,7 @@ async def invoke(user_input: UserInput, agent_id: str = DEFAULT_AGENT) -> ChatMe
         raise HTTPException(status_code=500, detail="Unexpected error")
 
 
-async def message_generator(
-    user_input: StreamInput, agent_id: str = DEFAULT_AGENT
-) -> AsyncGenerator[str, None]:
+async def message_generator(user_input: StreamInput, agent_id: str = DEFAULT_AGENT) -> AsyncGenerator[str, None]:
     """
     Generate a stream of messages from the agent.
 

@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Literal
 
+from farmbase_agent_toolkit.configuration import Actions, Configuration, Context, Permission
+from farmbase_agent_toolkit.langchain.toolkit import FarmbaseAgentToolkit
 from langchain_community.tools import DuckDuckGoSearchResults, OpenWeatherMapQueryRun
 from langchain_community.utilities import OpenWeatherMapAPIWrapper
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -11,7 +13,6 @@ from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.managed import RemainingSteps
 from langgraph.prebuilt import ToolNode
 
-from farmbase_agent_toolkit.langchain.toolkit import FarmbaseAgentToolkit
 from farmwise.agents.llama_guard import LlamaGuard, LlamaGuardOutput, SafetyAssessment
 from farmwise.agents.tools import calculator
 from farmwise.core import get_model, settings
@@ -30,31 +31,30 @@ class AgentState(MessagesState, total=False):
 web_search = DuckDuckGoSearchResults(name="WebSearch")
 
 farmbase = FarmbaseAgentToolkit(
-    secret_key="fdsfsdfdsfds",
-    configuration={
-        "actions": {
-            "animals": {
-                "create": True,
-            },
-        }
-    },
+    secret_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDMwODE4MDAsInN1YiI6IjkzZjI1MjViLWQ0OTQtNDk5Ny05YTA5LTgxZjdjNjRiYWZjZiJ9.HD2IKsnIf2vTZu1e8NJKF6_qQK6v6hYI9KjReLLrpfw",
+    configuration=Configuration(
+        actions=Actions(
+            farms=Permission(create=True),
+            fields=Permission(create=True),
+        ),
+        context=Context(account="some account"),
+    ),
 )
 
-
 tools = [web_search, calculator] + farmbase.get_tools()
+
+print(tools)
 
 # Add weather tool if API key is set
 # Register for an API key at https://openweathermap.org/api/
 if settings.OPENWEATHERMAP_API_KEY:
-    wrapper = OpenWeatherMapAPIWrapper(
-        openweathermap_api_key=settings.OPENWEATHERMAP_API_KEY.get_secret_value()
-    )
+    wrapper = OpenWeatherMapAPIWrapper(openweathermap_api_key=settings.OPENWEATHERMAP_API_KEY.get_secret_value())
     tools.append(OpenWeatherMapQueryRun(name="Weather", api_wrapper=wrapper))
 
 current_date = datetime.now().strftime("%B %d, %Y")
 instructions = f"""
     You are a helpful agronomy advisor with the ability to search the web and use other tools.
-    You are designed to help farmers in Sub sahara Africa with their farming needs.
+    You are designed to help farmers in Sub saharan Africa with their farming needs.
     Your name is FarmWise
     Today's date is {current_date}.
 
@@ -78,9 +78,7 @@ def wrap_model(model: BaseChatModel) -> RunnableSerializable[AgentState, AIMessa
 
 
 def format_safety_message(safety: LlamaGuardOutput) -> AIMessage:
-    content = (
-        f"This conversation was flagged for unsafe content: {', '.join(safety.unsafe_categories)}"
-    )
+    content = f"This conversation was flagged for unsafe content: {', '.join(safety.unsafe_categories)}"
     return AIMessage(content=content)
 
 
@@ -138,9 +136,7 @@ def check_safety(state: AgentState) -> Literal["unsafe", "safe"]:
             return "safe"
 
 
-agent.add_conditional_edges(
-    "guard_input", check_safety, {"unsafe": "block_unsafe_content", "safe": "model"}
-)
+agent.add_conditional_edges("guard_input", check_safety, {"unsafe": "block_unsafe_content", "safe": "model"})
 
 # Always END after blocking unsafe content
 agent.add_edge("block_unsafe_content", END)

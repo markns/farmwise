@@ -1,15 +1,6 @@
 from functools import cache
 from typing import TypeAlias
 
-from langchain_anthropic import ChatAnthropic
-from langchain_aws import ChatBedrock
-from langchain_community.chat_models import FakeListChatModel
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_groq import ChatGroq
-from langchain_ollama import ChatOllama
-from langchain_openai import AzureChatOpenAI, ChatOpenAI
-
-from farmwise.core.settings import settings
 from farmwise_schema.models import (
     AllModelEnum,
     AnthropicModelName,
@@ -22,13 +13,20 @@ from farmwise_schema.models import (
     OllamaModelName,
     OpenAIModelName,
 )
+from langchain_anthropic import ChatAnthropic
+from langchain_aws import ChatBedrock
+from langchain_community.chat_models import FakeListChatModel
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
+from langchain_ollama import ChatOllama
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
+
+from farmwise.core.settings import settings
 
 _MODEL_TABLE = {
     OpenAIModelName.GPT_4O_MINI: "gpt-4o-mini",
     OpenAIModelName.GPT_4O: "gpt-4o",
-    AzureOpenAIModelName.AZURE_GPT_4O_MINI: settings.AZURE_OPENAI_DEPLOYMENT_MAP.get(
-        "gpt-4o-mini", ""
-    ),
+    AzureOpenAIModelName.AZURE_GPT_4O_MINI: settings.AZURE_OPENAI_DEPLOYMENT_MAP.get("gpt-4o-mini", ""),
     AzureOpenAIModelName.AZURE_GPT_4O: settings.AZURE_OPENAI_DEPLOYMENT_MAP.get("gpt-4o", ""),
     DeepseekModelName.DEEPSEEK_CHAT: "deepseek-chat",
     AnthropicModelName.HAIKU_3: "claude-3-haiku-20240307",
@@ -44,9 +42,7 @@ _MODEL_TABLE = {
     FakeModelName.FAKE: "fake",
 }
 
-ModelT: TypeAlias = (
-    ChatOpenAI | ChatAnthropic | ChatGoogleGenerativeAI | ChatGroq | ChatBedrock | ChatOllama
-)
+ModelT: TypeAlias = ChatOpenAI | ChatAnthropic | ChatGoogleGenerativeAI | ChatGroq | ChatBedrock | ChatOllama
 
 
 @cache
@@ -92,9 +88,7 @@ def get_model(model_name: AllModelEnum, /) -> ModelT:
     #     return ChatBedrock(model=api_model_name, temperature=0.5)
     if model_name in OllamaModelName:
         if settings.OLLAMA_BASE_URL:
-            chat_ollama = ChatOllama(
-                model=settings.OLLAMA_MODEL, temperature=0.5, base_url=settings.OLLAMA_BASE_URL
-            )
+            chat_ollama = ChatOllama(model=settings.OLLAMA_MODEL, temperature=0.5, base_url=settings.OLLAMA_BASE_URL)
         else:
             chat_ollama = ChatOllama(model=settings.OLLAMA_MODEL, temperature=0.5)
         return chat_ollama

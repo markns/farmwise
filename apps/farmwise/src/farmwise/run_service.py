@@ -2,9 +2,8 @@ import asyncio
 import sys
 
 import uvicorn
-from dotenv import load_dotenv
-
 from core import settings
+from dotenv import load_dotenv
 
 load_dotenv()
 
