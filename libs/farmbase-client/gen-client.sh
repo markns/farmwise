@@ -26,7 +26,7 @@ uvx --from git+https://github.com/koxudaxi/datamodel-code-generator[http] \
   --output-model-type pydantic_v2.BaseModel \
   --strict-nullable --snake-case-field --capitalize-enum-members \
   --use-union-operator --use-standard-collections \
-  --additional-imports "geojson_pydantic.Feature" \
+  --additional-imports "geojson_pydantic.LineString,geojson_pydantic.Polygon" \
   > $OUTPUT/models/__init__.py
 
 # Remove the generated GeoJSON classes as we rely on geojson_pydantic
