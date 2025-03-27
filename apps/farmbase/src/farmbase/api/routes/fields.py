@@ -5,14 +5,13 @@ from typing import Any
 import geoalchemy2 as ga
 import sqlalchemy
 from fastapi import APIRouter, HTTPException
-from geoalchemy2.functions import ST_GeomFromGeoJSON, ST_SetSRID
-from geojson_pydantic import Feature
-from geojson_pydantic.geometries import parse_geometry_obj
+from geoalchemy2.functions import ST_GeomFromGeoJSON
+from geojson_pydantic.geometries import Polygon, parse_geometry_obj
 from sqlalchemy import func
 from sqlmodel import select
 
 from farmbase.api.deps import CurrentUser, SessionDep
-from farmbase.models import Field, FieldCreate, FieldPublic, FieldsPublic, Message, FieldUpdate
+from farmbase.models import Field, FieldCreate, FieldPublic, FieldsPublic, FieldUpdate, Message
 
 router = APIRouter(prefix="/farms/{farm_id}/fields", tags=["fields"])
 
@@ -24,18 +23,9 @@ def read_fields(
     """
     Retrieve fields.
     """
-    count_statement = (
-        select(func.count())
-        .select_from(Field)
-        .where(Field.farm_id == farm_id)
-    )
+    count_statement = select(func.count()).select_from(Field).where(Field.farm_id == farm_id)
     count = session.exec(count_statement).one()
-    statement = (
-        select(Field)
-        .where(Field.farm_id == farm_id)
-        .offset(skip)
-        .limit(limit)
-    )
+    statement = select(Field).where(Field.farm_id == farm_id).offset(skip).limit(limit)
     fields = session.exec(statement).all()
 
     return FieldsPublic(data=fields, count=count)
@@ -47,11 +37,11 @@ def read_field(session: SessionDep, current_user: CurrentUser, farm_id: uuid.UUI
     Get field by ID.
     """
 
-    stmt = (select(Field.id,
-                   ga.functions.ST_AsGeoJSON(Field.geometry).label("geometry"),
-                   Field.properties)
-            .where(Field.id == id)
-            .where("farm_id" == farm_id))
+    stmt = (
+        select(Field.id, Field.name, Field.area, ga.functions.ST_AsGeoJSON(Field.boundary).label("boundary"))
+        .where(Field.id == id)
+        .where("farm_id" == farm_id)
+    )
 
     try:
         result = session.exec(stmt).one()
@@ -64,46 +54,49 @@ def read_field(session: SessionDep, current_user: CurrentUser, farm_id: uuid.UUI
     field = FieldPublic(
         id=result.id,
         farm_id=farm_id,
-        feature=Feature(
-            type="Feature",
-            geometry=parse_geometry_obj(json.loads(result.geometry)),
-            properties=result.properties
-        ),
+        name=result.name,
+        boundary=parse_geometry_obj(json.loads(result.boundary)),
     )
 
     return field
 
 
 @router.post("/", response_model=FieldPublic)
-def create_field(
-    *, session: SessionDep, current_user: CurrentUser, farm_id: uuid.UUID, field_in: FieldCreate
-) -> Any:
+def create_field(*, session: SessionDep, current_user: CurrentUser, farm_id: uuid.UUID, field_in: FieldCreate) -> Any:
     """
     Create new field.
     """
+
+    linestring = field_in.boundary
+
+    # Ensure the LineString is closed by adding the first coordinate at the end
+    if linestring.coordinates[0] != linestring.coordinates[-1]:
+        closed_coords = linestring.coordinates + [linestring.coordinates[0]]
+    else:
+        closed_coords = linestring.coordinates  # Already closed
+
+    # Convert to Polygon
+    polygon = Polygon(type="Polygon", coordinates=[closed_coords])
+
     field = Field(
         name=field_in.name,
         farm_id=farm_id,
-        geometry=ST_SetSRID(ST_GeomFromGeoJSON(field_in.feature.geometry.model_dump_json()), 4326),
-        properties=field_in.feature.properties,
+        linestring=ST_GeomFromGeoJSON(linestring.model_dump_json()),
+        boundary=ST_GeomFromGeoJSON(polygon.model_dump_json()),
     )
     session.add(field)
     session.commit()
     session.refresh(field)
 
-    geometry_json = session.exec(
-        select(ga.functions.ST_AsGeoJSON(field.geometry))
-    ).one()
-
-    geometry_json = json.loads(geometry_json)
+    geometry_json = session.exec(select(ga.functions.ST_AsGeoJSON(field.boundary))).one()
+    boundary = parse_geometry_obj(json.loads(geometry_json))
     response = FieldPublic(
         id=field.id,
-        name=field.name,
         farm_id=farm_id,
-        feature=Feature(type="Feature",
-                        geometry=parse_geometry_obj(geometry_json),
-                        properties=field.properties),
+        name=field.name,
+        boundary=boundary,
     )
+
     return response
 
 
@@ -133,10 +126,7 @@ def update_field(
 
 
 @router.delete("/{id}")
-def delete_field(
-    session: SessionDep, current_user: CurrentUser,
-    farm_id: uuid.UUID, id: uuid.UUID
-) -> Message:
+def delete_field(session: SessionDep, current_user: CurrentUser, farm_id: uuid.UUID, id: uuid.UUID) -> Message:
     """
     Delete a field.
     """

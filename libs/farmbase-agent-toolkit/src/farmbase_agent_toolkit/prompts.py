@@ -1,14 +1,17 @@
-from farmbase_client.models import Animal
+from farmbase_client.models import FarmCreate, FieldCreate
 
-CREATE_ANIMAL_PROMPT = f"""
-This tool creates an animal asset in Farmwise
+CREATE_FARM_PROMPT = f"""
+This tool creates a new farm in Farmbase
 
 It has the following arguments:
-    animal_type: str = Field(..., description="Species/breed of the animal. Required field.")
-    birthdate: Optional[datetime] = Field(None, description="Birthdate provided as a Unix timestamp or ISO date string.")
-    is_castrated: Optional[bool] = Field(False, description="Indicates if the animal has been castrated.")
-    nickname: List[str] = Field(description="List of nicknames for the animal.") # todo:, default_factory=list)
-    sex: SexEnum = Field(..., description="Sex of the animal: 'F' for Female or 'M' for Male.")
+{FarmCreate.model_json_schema()}
+"""
+
+CREATE_FIELD_PROMPT = f"""
+This tool creates a new field in Farmbase
+
+It has the following arguments:
+{FieldCreate.model_json_schema()}
 """
 # https://github.com/langroid/langroid/blob/main/langroid/utils/pydantic_utils.py#L48
 

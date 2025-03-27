@@ -1,31 +1,31 @@
 from typing import Dict, List
 
-from farmbase_client.models import Animal
-from .prompts import CREATE_ANIMAL_PROMPT
+from farmbase_client.models import FarmCreate, FieldCreate
+from .prompts import CREATE_FARM_PROMPT, CREATE_FIELD_PROMPT
 
 tools: List[Dict] = [
     {
-        "method": "create_animal",
-        "name": "Create Animal",
-        "description": CREATE_ANIMAL_PROMPT,
-        "args_schema": Animal,
+        "method": "create_farm",
+        "name": "Create Farm",
+        "description": CREATE_FARM_PROMPT,
+        "args_schema": FarmCreate,
         "actions": {
-            "animals": {
+            "farms": {
                 "create": True,
             }
         },
     },
-    # {
-    #     "method": "create_customer",
-    #     "name": "Create Customer",
-    #     "description": CREATE_CUSTOMER_PROMPT,
-    #     "args_schema": CreateCustomer,
-    #     "actions": {
-    #         "customers": {
-    #             "create": True,
-    #         }
-    #     },
-    # },
+    {
+        "method": "create_field",
+        "name": "Create Field",
+        "description": CREATE_FIELD_PROMPT,
+        "args_schema": FieldCreate,
+        "actions": {
+            "fields": {
+                "create": True,
+            }
+        },
+    },
     # {
     #     "method": "list_customers",
     #     "name": "List Customers",

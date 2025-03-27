@@ -4,22 +4,21 @@ This tool allows agents to interact with the Farmwise API.
 
 from __future__ import annotations
 
-from typing import Any, Optional, Type
+from typing import Any, Optional
 
 from langchain.tools import BaseTool
-from pydantic import BaseModel
+from langchain_core.tools import ArgsSchema
 
-from ..api import FarmwiseAPI
+from ..api import FarmbaseAPI
 
 
-class FarmwiseTool(BaseTool):
-    """Tool for interacting with the Farmwise API."""
+class FarmbaseTool(BaseTool):
+    """Tool for interacting with the Farmbase API."""
 
-    farmwise_api: FarmwiseAPI
-    method: str
+    farmbase_api: FarmbaseAPI
     name: str = ""
     description: str = ""
-    args_schema: Optional[Type[BaseModel]] = None
+    args_schema: Optional[ArgsSchema] = None
 
     def _run(
         self,
@@ -27,4 +26,4 @@ class FarmwiseTool(BaseTool):
         **kwargs: Any,
     ) -> str:
         """Use the Farmwise API to run an operation."""
-        return self.farmwise_api.run(self.method, *args, **kwargs)
+        return self.farmbase_api.run(self.name, *args, **kwargs)

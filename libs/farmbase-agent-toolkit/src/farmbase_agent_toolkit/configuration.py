@@ -29,7 +29,8 @@ class BalancePermission(TypedDict, total=False):
 
 # Define Actions type
 class Actions(TypedDict, total=False):
-    animals: Optional[Permission]
+    farms: Optional[Permission]
+    fields: Optional[Permission]
 
 
 
