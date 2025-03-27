@@ -5,7 +5,7 @@ from agents import (
     function_tool,
 )
 
-from farmwise.context import AirlineAgentContext
+from farmwise.context import UserContext
 
 
 @function_tool(name_override="faq_lookup_tool", description_override="Lookup frequently asked questions.")
@@ -28,7 +28,7 @@ async def faq_lookup_tool(question: str) -> str:
 
 
 @function_tool
-async def update_seat(context: RunContextWrapper[AirlineAgentContext], confirmation_number: str, new_seat: str) -> str:
+async def update_seat(context: RunContextWrapper[UserContext], confirmation_number: str, new_seat: str) -> str:
     """
     Update the seat for a given confirmation number.
 

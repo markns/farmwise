@@ -9,7 +9,7 @@ from sqlalchemy import Column
 from sqlmodel import JSON, Field, Session, SQLModel, create_engine, select
 
 from farmwise.agents import AGENTS, triage_agent
-from farmwise.context import AirlineAgentContext
+from farmwise.context import UserContext
 from farmwise.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class Message(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     uid: str
     item: dict = Field(default_factory=dict, sa_column=Column(JSON))
-    context: AirlineAgentContext | None = Field(sa_column=Column(JSON))
+    context: UserContext | None = Field(sa_column=Column(JSON))
     agent: str | None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -52,9 +52,9 @@ async def invoke(user_input: UserInput):
         if results and results[-1].agent in AGENTS:
             agent = AGENTS[results[-1].agent]
         if results:
-            context = AirlineAgentContext.model_validate(results[-1].context)
+            context = UserContext.model_validate(results[-1].context)
         else:
-            context = AirlineAgentContext()
+            context = UserContext()
 
     input_items = ItemHelpers.input_to_new_input_list(user_input.message)
 
