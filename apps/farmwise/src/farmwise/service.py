@@ -83,7 +83,7 @@ async def invoke(
     input_item = EasyInputMessageParam(content=user_input.message, role="user")
 
     trace_id = gen_trace_id()
-    with trace(agent.name, trace_id=trace_id, group_id=user_input.user_id):
+    with trace("FarmWise", trace_id=trace_id, group_id=user_input.user_id):
         result: RunResult = await Runner.run(agent, history + [input_item], context=context)
 
     with Session(engine) as session:
