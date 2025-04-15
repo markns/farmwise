@@ -1,15 +1,17 @@
 import logging
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Annotated, Any, Optional
 
-from agents import ItemHelpers, Runner, RunResult, set_default_openai_key
-from fastapi import APIRouter, FastAPI
-from pydantic import BaseModel
+from agents import Agent, ItemHelpers, Runner, RunResult, set_default_openai_key
+from farmwise_schema.schema import ChatHistory, ChatHistoryInput, ChatMessage, ServiceMetadata, UserInput
+from fastapi import APIRouter, Depends, FastAPI
+from openai.types.responses import EasyInputMessageParam
 from sqlalchemy import Column
+from sqlalchemy.exc import NoResultFound
 from sqlmodel import JSON, Field, Session, SQLModel, create_engine, select
 
-from farmwise.agents import AGENTS, triage_agent
-from farmwise.context import UserContext
+from farmwise.agents import DEFAULT_AGENT, agents, get_all_agent_info
+from farmwise.context import UserContext, UserContextDep
 from farmwise.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -21,18 +23,23 @@ app = FastAPI(debug=settings.is_dev())
 router = APIRouter()
 
 
-class UserInput(BaseModel):
-    message: str
-    uid: str
+@app.get("/health")
+async def health_check():
+    """Health check endpoint."""
+    return {"status": "ok"}
+
+
+@router.get("/info")
+async def info() -> ServiceMetadata:
+    return ServiceMetadata(agents=get_all_agent_info(), default_agent=DEFAULT_AGENT)
 
 
 class Message(SQLModel, table=True):
     __tablename__ = "messages"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    uid: str
+    user_id: str
     item: dict = Field(default_factory=dict, sa_column=Column(JSON))
-    context: UserContext | None = Field(sa_column=Column(JSON))
     agent: str | None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -41,38 +48,72 @@ engine = create_engine("sqlite:///farmwise.db")
 SQLModel.metadata.create_all(engine)
 
 
-@router.post("/invoke")
-async def invoke(user_input: UserInput):
+def get_session():
     with Session(engine) as session:
-        statement = select(Message).where(Message.uid == user_input.uid).order_by(Message.id.desc()).limit(20)
-        results = list(reversed(session.exec(statement).all()))
-        previous_items = [row.item for row in results]
+        yield session
 
-        agent = triage_agent
-        if results and results[-1].agent in AGENTS:
-            agent = AGENTS[results[-1].agent]
-        if results:
-            context = UserContext.model_validate(results[-1].context)
-        else:
-            context = UserContext()
 
-    input_items = ItemHelpers.input_to_new_input_list(user_input.message)
+def chat_history(user_input: UserInput, session: Session = Depends(get_session)):
+    statement = select(Message.item).where(Message.user_id == user_input.user_id).order_by(Message.id.desc())
+    results = list(reversed(session.exec(statement).all()))
+    return results
 
-    result: RunResult = await Runner.run(agent, previous_items + input_items, context=context)
+
+def current_agent(user_input: UserInput, session: Session = Depends(get_session)):
+    statement = select(Message.agent).where(Message.user_id == user_input.user_id).order_by(Message.id.desc()).limit(1)
+
+    try:
+        return agents[session.exec(statement).one()]
+    except NoResultFound:
+        return agents[DEFAULT_AGENT]
+
+
+@router.post("/invoke", response_model=ChatMessage)
+async def invoke(
+    user_input: UserInput,
+    context: UserContextDep,
+    previous_items: Annotated[Any, Depends(chat_history)],
+    agent: Annotated[Agent[UserContext], Depends(current_agent)],
+):
+    input_item = {"content": user_input.message, "role": "user"}
+
+    result: RunResult = await Runner.run(agent, previous_items + [input_item], context=context)
 
     with Session(engine) as session:
-        for item in input_items:
-            session.add(Message(uid=user_input.uid, item=item))
-        for item in result.new_items:
-            session.add(
-                Message(
-                    uid=user_input.uid, item=item.to_input_item(), agent=item.agent.name, context=context.model_dump()
-                )
+        session.add(Message(user_id=user_input.user_id, item=input_item))
+        session.add(
+            Message(
+                user_id=user_input.user_id,
+                item=EasyInputMessageParam(
+                    content=ItemHelpers.text_message_outputs(result.new_items), role="assistant"
+                ),
+                agent=result.new_items[-1].agent.name,
             )
+        )
         session.commit()
 
-    # return result.new_items
-    return result.final_output
+    return ChatMessage(type="assistant", content=result.final_output)
+
+
+@router.post("/history")
+def history(input: ChatHistoryInput) -> ChatHistory:
+    """
+    Get chat history.
+    """
+    try:
+        with Session(engine) as session:
+            statement = (
+                select(Message)
+                .where(Message.user_id == input.user_id, Message.thread_id == input.thread_id)
+                .order_by(Message.id.desc())
+            )
+            results = list(reversed(session.exec(statement).all()))
+            previous_items = [row.item for row in results]
+
+        return ChatHistory(messages=chat_messages)
+    except Exception as e:
+        logger.error(f"An exception occurred: {e}")
+        raise HTTPException(status_code=500, detail="Unexpected error")
 
 
 app.include_router(router)
