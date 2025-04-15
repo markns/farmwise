@@ -4,7 +4,6 @@ from collections.abc import AsyncGenerator, Generator
 from typing import Any
 
 import httpx
-
 from farmwise_schema.schema import (
     ChatHistory,
     ChatHistoryInput,
@@ -78,16 +77,13 @@ class AgentClient:
                 self.retrieve_info()
             agent_keys = [a.key for a in self.info.agents]
             if agent not in agent_keys:
-                raise AgentClientError(
-                    f"Agent {agent} not found in available agents: {', '.join(agent_keys)}"
-                )
+                raise AgentClientError(f"Agent {agent} not found in available agents: {', '.join(agent_keys)}")
         self.agent = agent
 
     async def ainvoke(
         self,
         message: str,
-        model: str | None = None,
-        thread_id: str | None = None,
+        user_id: str,
         agent_config: dict[str, Any] | None = None,
     ) -> ChatMessage:
         """
@@ -96,7 +92,7 @@ class AgentClient:
         Args:
             message (str): The message to send to the agent
             model (str, optional): LLM model to use for the agent
-            thread_id (str, optional): Thread ID for continuing a conversation
+            user_id (str, optional): user ID for continuing a conversation
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
 
         Returns:
@@ -104,17 +100,14 @@ class AgentClient:
         """
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
-        request = UserInput(message=message)
-        if thread_id:
-            request.thread_id = thread_id
-        if model:
-            request.model = model
+        request = UserInput(message=message, user_id=user_id)
+
         if agent_config:
             request.agent_config = agent_config
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
-                    f"{self.base_url}/{self.agent}/invoke",
+                    f"{self.base_url}/invoke",
                     json=request.model_dump(),
                     headers=self._headers,
                     timeout=self.timeout,
@@ -129,7 +122,7 @@ class AgentClient:
         self,
         message: str,
         model: str | None = None,
-        thread_id: str | None = None,
+        user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
     ) -> ChatMessage:
         """
@@ -138,7 +131,7 @@ class AgentClient:
         Args:
             message (str): The message to send to the agent
             model (str, optional): LLM model to use for the agent
-            thread_id (str, optional): Thread ID for continuing a conversation
+            user_id (str, optional): user ID for continuing a conversation
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
 
         Returns:
@@ -147,8 +140,8 @@ class AgentClient:
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
         request = UserInput(message=message)
-        if thread_id:
-            request.thread_id = thread_id
+        if user_id:
+            request.user_id = user_id
         if model:
             request.model = model
         if agent_config:
@@ -194,7 +187,7 @@ class AgentClient:
         self,
         message: str,
         model: str | None = None,
-        thread_id: str | None = None,
+        user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
         stream_tokens: bool = True,
     ) -> Generator[ChatMessage | str, None, None]:
@@ -208,7 +201,7 @@ class AgentClient:
         Args:
             message (str): The message to send to the agent
             model (str, optional): LLM model to use for the agent
-            thread_id (str, optional): Thread ID for continuing a conversation
+            user_id (str, optional): user ID for continuing a conversation
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
             stream_tokens (bool, optional): Stream tokens as they are generated
                 Default: True
@@ -219,8 +212,8 @@ class AgentClient:
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
         request = StreamInput(message=message, stream_tokens=stream_tokens)
-        if thread_id:
-            request.thread_id = thread_id
+        if user_id:
+            request.user_id = user_id
         if model:
             request.model = model
         if agent_config:
@@ -247,7 +240,7 @@ class AgentClient:
         self,
         message: str,
         model: str | None = None,
-        thread_id: str | None = None,
+        user_id: str | None = None,
         agent_config: dict[str, Any] | None = None,
         stream_tokens: bool = True,
     ) -> AsyncGenerator[ChatMessage | str, None]:
@@ -261,7 +254,7 @@ class AgentClient:
         Args:
             message (str): The message to send to the agent
             model (str, optional): LLM model to use for the agent
-            thread_id (str, optional): Thread ID for continuing a conversation
+            user_id (str, optional): user ID for continuing a conversation
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
             stream_tokens (bool, optional): Stream tokens as they are generated
                 Default: True
@@ -272,8 +265,8 @@ class AgentClient:
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
         request = StreamInput(message=message, stream_tokens=stream_tokens)
-        if thread_id:
-            request.thread_id = thread_id
+        if user_id:
+            request.user_id = user_id
         if model:
             request.model = model
         if agent_config:
@@ -297,9 +290,7 @@ class AgentClient:
             except httpx.HTTPError as e:
                 raise AgentClientError(f"Error: {e}")
 
-    async def acreate_feedback(
-        self, run_id: str, key: str, score: float, kwargs: dict[str, Any] = {}
-    ) -> None:
+    async def acreate_feedback(self, run_id: str, key: str, score: float, kwargs: dict[str, Any] = {}) -> None:
         """
         Create a feedback record for a run.
 
@@ -323,15 +314,15 @@ class AgentClient:
 
     def get_history(
         self,
-        thread_id: str,
+        user_id: str,
     ) -> ChatHistory:
         """
         Get chat history.
 
         Args:
-            thread_id (str, optional): Thread ID for identifying a conversation
+            user_id (str, optional): user ID for identifying a conversation
         """
-        request = ChatHistoryInput(thread_id=thread_id)
+        request = ChatHistoryInput(user_id=user_id)
         try:
             response = httpx.post(
                 f"{self.base_url}/history",

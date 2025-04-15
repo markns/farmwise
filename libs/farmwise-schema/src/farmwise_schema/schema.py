@@ -22,19 +22,20 @@ class AgentInfo(BaseModel):
 class ServiceMetadata(BaseModel):
     """Metadata about the service including available agents and models."""
 
+    ...
     agents: list[AgentInfo] = Field(
         description="List of available agents.",
     )
-    models: list[AllModelEnum] = Field(
-        description="List of available LLMs.",
-    )
+    # models: list[AllModelEnum] = Field(
+    #     description="List of available LLMs.",
+    # )
     default_agent: str = Field(
         description="Default agent used when none is specified.",
         examples=["research-assistant"],
     )
-    default_model: AllModelEnum = Field(
-        description="Default model used when none is specified.",
-    )
+    # default_model: AllModelEnum = Field(
+    #     description="Default model used when none is specified.",
+    # )
 
 
 class UserInput(BaseModel):
@@ -50,10 +51,10 @@ class UserInput(BaseModel):
         default=OpenAIModelName.GPT_4O_MINI,
         examples=[OpenAIModelName.GPT_4O_MINI, AnthropicModelName.HAIKU_35],
     )
-    thread_id: str | None = Field(
-        description="Thread ID to persist and continue a multi-turn conversation.",
+    user_id: str | None = Field(
+        description="User ID to persist and continue a multi-turn conversation.",
         default=None,
-        examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
+        examples=["+254748256530", "847c6285-8fc9-4560-a83f-4e6285809254"],
     )
     agent_config: dict[str, Any] = Field(
         description="Additional configuration to pass through to the agent",
@@ -86,9 +87,9 @@ class ToolCall(TypedDict):
 class ChatMessage(BaseModel):
     """Message in a chat."""
 
-    type: Literal["human", "ai", "tool", "custom"] = Field(
+    type: Literal["user", "assistant", "system", "developer"] = Field(
         description="Role of the message.",
-        examples=["human", "ai", "tool", "custom"],
+        examples=["user", "assistant", "system", "developer"],
     )
     content: str = Field(
         description="Content of the message.",
@@ -160,6 +161,11 @@ class FeedbackResponse(BaseModel):
 class ChatHistoryInput(BaseModel):
     """Input for retrieving chat history."""
 
+    user_id: str | None = Field(
+        description="User ID to persist and continue a multi-turn conversation.",
+        default=None,
+        examples=["+254748256530", "847c6285-8fc9-4560-a83f-4e6285809254"],
+    )
     thread_id: str = Field(
         description="Thread ID to persist and continue a multi-turn conversation.",
         examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
