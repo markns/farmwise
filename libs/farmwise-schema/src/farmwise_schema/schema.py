@@ -1,9 +1,8 @@
+from datetime import UTC, datetime
 from typing import Any, Literal, NotRequired
 
-from pydantic import BaseModel, Field, SerializeAsAny
+from pydantic import BaseModel, Field
 from typing_extensions import TypedDict
-
-from .models import AllModelEnum, AnthropicModelName, OpenAIModelName
 
 
 class AgentInfo(BaseModel):
@@ -45,16 +44,20 @@ class UserInput(BaseModel):
         description="User input to the agent.",
         examples=["What is the weather in Tokyo?"],
     )
-    model: SerializeAsAny[AllModelEnum] | None = Field(
-        title="Model",
-        description="LLM Model to use for the agent.",
-        default=OpenAIModelName.GPT_4O_MINI,
-        examples=[OpenAIModelName.GPT_4O_MINI, AnthropicModelName.HAIKU_35],
-    )
     user_id: str | None = Field(
         description="User ID to persist and continue a multi-turn conversation.",
-        default=None,
+        # default=None,
         examples=["+254748256530", "847c6285-8fc9-4560-a83f-4e6285809254"],
+    )
+    timestamp: datetime = Field(
+        description="Timestamp of the user input.",
+        default_factory=lambda: datetime.now(UTC),
+        examples=[datetime.now(UTC).isoformat()],
+    )
+    user_name: str | None = Field(
+        description="User ID to persist and continue a multi-turn conversation.",
+        default=None,
+        examples=["Mark Nuttall-Smith"],
     )
     agent_config: dict[str, Any] = Field(
         description="Additional configuration to pass through to the agent",

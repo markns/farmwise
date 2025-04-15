@@ -31,7 +31,7 @@ wa = WhatsApp(
     phone_id=settings.WHATSAPP_PHONE_ID,  # The phone id you got from the API Setup
     token=settings.WHATSAPP_TOKEN,  # The token you got from the API Setup
     server=app,
-    callback_url="https://8a17-105-163-1-4.ngrok-free.app",
+    callback_url="https://63d6-105-163-1-4.ngrok-free.app",
     verify_token="xyz123",
     app_id=1392339421934377,
     app_secret="b8a5543a9bf425a0e87676641569b2b4",
@@ -69,8 +69,8 @@ async def location(_: WhatsApp, msg: types.Message):
     print(f"In location handler {msg}")
     response = await agent_client.ainvoke(
         message=f"My location is {msg.location}, can you tell me something about what crops I can grow here?",
-        model="gpt-4o-mini",
-        thread_id=msg.metadata.phone_number_id,
+        user_id=msg.from_user.wa_id,
+        user_name=msg.from_user.name,
     )
     await msg.reply_text(response.content)
 
@@ -79,8 +79,9 @@ async def location(_: WhatsApp, msg: types.Message):
 async def handle_message(_: WhatsApp, msg: types.Message):
     response = await agent_client.ainvoke(
         message=msg.text,
-        model="gpt-4o-mini",
-        thread_id=msg.metadata.phone_number_id,
+        user_id=msg.from_user.wa_id,
+        user_name=msg.from_user.name,
+        timestamp=msg.timestamp,
     )
     await msg.reply_text(response.content)
 

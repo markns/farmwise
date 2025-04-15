@@ -84,6 +84,7 @@ class AgentClient:
         self,
         message: str,
         user_id: str,
+        user_name: str | None = None,
         agent_config: dict[str, Any] | None = None,
     ) -> ChatMessage:
         """
@@ -91,8 +92,9 @@ class AgentClient:
 
         Args:
             message (str): The message to send to the agent
-            model (str, optional): LLM model to use for the agent
-            user_id (str, optional): user ID for continuing a conversation
+            user_id (str): user ID for continuing a conversation
+            timestamp:
+            user_name:
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
 
         Returns:
@@ -100,7 +102,7 @@ class AgentClient:
         """
         if not self.agent:
             raise AgentClientError("No agent selected. Use update_agent() to select an agent.")
-        request = UserInput(message=message, user_id=user_id)
+        request = UserInput(message=message, user_id=user_id, user_name=user_name)
 
         if agent_config:
             request.agent_config = agent_config
@@ -108,7 +110,7 @@ class AgentClient:
             try:
                 response = await client.post(
                     f"{self.base_url}/invoke",
-                    json=request.model_dump(),
+                    json=request.model_dump(mode="json"),
                     headers=self._headers,
                     timeout=self.timeout,
                 )

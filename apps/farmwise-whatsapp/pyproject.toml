@@ -8,11 +8,15 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "farmwise-client",
     "pywa[cryptography,fastapi]>=2.7.0",
 ]
 
 [project.scripts]
 farmwise-whatsapp = "farmwise_whatsapp:main"
+
+[tool.uv.sources]
+farmwise-client = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
