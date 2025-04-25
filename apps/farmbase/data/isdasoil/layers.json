@@ -1,0 +1,504 @@
+{
+  "property": {
+    "aluminium_extractable": {
+      "description": "Aluminium, extractable",
+      "theme": "Soil chemical properties",
+      "unit": "ppm",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "bulk_density": {
+      "description": "Bulk density, <2mm fraction",
+      "theme": "Soil physical properties and landscape",
+      "unit": "g/cc",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "calcium_extractable": {
+      "description": "Calcium, extractable",
+      "theme": "Soil nutrients",
+      "unit": "ppm",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "carbon_organic": {
+      "description": "Carbon, organic",
+      "theme": "Soil chemical properties",
+      "unit": "g/kg",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "carbon_total": {
+      "description": "Carbon, total",
+      "theme": "Soil chemical properties",
+      "unit": "g/kg",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "clay_content": {
+      "description": "Clay content",
+      "theme": "Soil physical properties and landscape",
+      "unit": "%",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "crop_cover_2015": {
+      "description": "Cropland (2015)",
+      "theme": "Agronomy information",
+      "unit": "%",
+      "uncertainty": false,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    "crop_cover_2016": {
+      "description": "Cropland (2016)",
+      "theme": "Agronomy information",
+      "unit": "%",
+      "uncertainty": false,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    "crop_cover_2017": {
+      "description": "Cropland (2017)",
+      "theme": "Agronomy information",
+      "unit": "%",
+      "uncertainty": false,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    "crop_cover_2018": {
+      "description": "Cropland (2018)",
+      "theme": "Agronomy information",
+      "unit": "%",
+      "uncertainty": false,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    "crop_cover_2019": {
+      "description": "Cropland (2019)",
+      "theme": "Agronomy information",
+      "unit": "%",
+      "uncertainty": false,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    "bedrock_depth": {
+      "description": "Depth to bedrock",
+      "theme": "Soil physical properties and landscape",
+      "unit": "cm",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-200",
+          "0-200"
+        ]
+      }
+    },
+    "cation_exchange_capacity": {
+      "description": "Effective Cation Exchange Capacity",
+      "theme": "Soil chemical properties",
+      "unit": "cmol(+)/kg",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "fcc": {
+      "description": "Fertility Capability Classification",
+      "theme": "Agronomy information",
+      "unit": null,
+      "uncertainty": false,
+      "value": {
+        "type": "string"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-50"
+        ]
+      }
+    },
+    "iron_extractable": {
+      "description": "Iron, extractable",
+      "theme": "Soil nutrients",
+      "unit": "ppm",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "land_cover_2015": {
+      "description": "Land Cover (2015)",
+      "theme": "Agronomy information",
+      "unit": null,
+      "uncertainty": false,
+      "value": {
+        "type": "string"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    "land_cover_2016": {
+      "description": "Land Cover (2016)",
+      "theme": "Agronomy information",
+      "unit": null,
+      "uncertainty": false,
+      "value": {
+        "type": "string"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    "land_cover_2017": {
+      "description": "Land Cover (2017)",
+      "theme": "Agronomy information",
+      "unit": null,
+      "uncertainty": false,
+      "value": {
+        "type": "string"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    "land_cover_2018": {
+      "description": "Land Cover (2018)",
+      "theme": "Agronomy information",
+      "unit": null,
+      "uncertainty": false,
+      "value": {
+        "type": "string"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    "land_cover_2019": {
+      "description": "Land Cover (2019)",
+      "theme": "Agronomy information",
+      "unit": null,
+      "uncertainty": false,
+      "value": {
+        "type": "string"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    "magnesium_extractable": {
+      "description": "Magnesium, extractable",
+      "theme": "Soil nutrients",
+      "unit": "ppm",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "nitrogen_total": {
+      "description": "Nitrogen, total",
+      "theme": "Soil chemical properties",
+      "unit": "g/kg",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "phosphorous_extractable": {
+      "description": "Phosphorus, extractable",
+      "theme": "Soil nutrients",
+      "unit": "ppm",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "potassium_extractable": {
+      "description": "Potassium, extractable",
+      "theme": "Soil nutrients",
+      "unit": "ppm",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "sand_content": {
+      "description": "Sand content",
+      "theme": "Soil physical properties and landscape",
+      "unit": "%",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "silt_content": {
+      "description": "Silt content",
+      "theme": "Soil physical properties and landscape",
+      "unit": "%",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "slope_angle": {
+      "description": "Slope Angle",
+      "theme": "Soil physical properties and landscape",
+      "unit": "°",
+      "uncertainty": false,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0"
+        ]
+      }
+    },
+    "stone_content": {
+      "description": "Stone content",
+      "theme": "Soil physical properties and landscape",
+      "unit": "%",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "sulphur_extractable": {
+      "description": "Sulphur, extractable",
+      "theme": "Soil nutrients",
+      "unit": "ppm",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "texture_class": {
+      "description": "USDA Texture Class",
+      "theme": "Soil physical properties and landscape",
+      "unit": null,
+      "uncertainty": false,
+      "value": {
+        "type": "string"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "zinc_extractable": {
+      "description": "Zinc, extractable",
+      "theme": "Soil nutrients",
+      "unit": "ppm",
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    },
+    "ph": {
+      "description": "pH",
+      "theme": "Soil chemical properties",
+      "unit": null,
+      "uncertainty": true,
+      "value": {
+        "type": "float"
+      },
+      "depths": {
+        "unit": "cm",
+        "values": [
+          "0-20",
+          "20-50"
+        ]
+      }
+    }
+  }
+}

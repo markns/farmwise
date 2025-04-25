@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Annotated, Any, Optional
 
 from agents import Agent, ItemHelpers, MessageOutputItem, Runner, RunResult, gen_trace_id, set_default_openai_key, trace
-from farmwise_schema.schema import ChatHistory, ChatHistoryInput, ChatMessage, ServiceMetadata, UserInput
+from farmwise_schema.schema import ServiceMetadata, UserInput, WhatsappResponse
 from fastapi import APIRouter, Depends, FastAPI
 from openai.types.responses import EasyInputMessageParam
 from sqlmodel import Field, Session, SQLModel, create_engine, select
@@ -12,6 +12,7 @@ from farmwise.agents import DEFAULT_AGENT, agents, get_all_agent_info
 from farmwise.context import UserContext, UserContextDep
 from farmwise.settings import settings
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 set_default_openai_key(settings.OPENAI_API_KEY.get_secret_value())
@@ -73,13 +74,14 @@ def current_agent(user_input: UserInput, session: Session = Depends(get_session)
         return agents[DEFAULT_AGENT]
 
 
-@router.post("/invoke", response_model=ChatMessage)
+@router.post("/invoke", response_model=WhatsappResponse)
 async def invoke(
     user_input: UserInput,
     context: UserContextDep,
     history: Annotated[Any, Depends(chat_history)],
     agent: Annotated[Agent[UserContext], Depends(current_agent)],
 ):
+    logger.info(f"USER: {user_input.message}")
     input_item = EasyInputMessageParam(content=user_input.message, role="user")
 
     trace_id = gen_trace_id()
@@ -110,28 +112,38 @@ async def invoke(
                 )
         session.commit()
 
-    return ChatMessage(type="assistant", content=result.final_output)
+    logger.info(f"ASSISTANT: {result.final_output}")
+    return result.final_output
+    # if isinstance(result.final_output, WhatsappResponse):
+    #     return ChatMessage(
+    #         type="assistant",
+    #         content=result.final_output.response,
+    #         actions=result.final_output.actions,
+    #         buttons=result.final_output.buttons,
+    #     )
+    # else:
+    #     return ChatMessage(type="assistant", content=result.final_output)
 
 
-@router.post("/history")
-def history(input: ChatHistoryInput) -> ChatHistory:
-    """
-    Get chat history.
-    """
-    try:
-        with Session(engine) as session:
-            statement = (
-                select(Message)
-                .where(Message.user_id == input.user_id, Message.thread_id == input.thread_id)
-                .order_by(Message.id.desc())
-            )
-            results = list(reversed(session.exec(statement).all()))
-            previous_items = [row.item for row in results]
-
-        return ChatHistory(messages=chat_messages)
-    except Exception as e:
-        logger.error(f"An exception occurred: {e}")
-        raise HTTPException(status_code=500, detail="Unexpected error")
+# @router.post("/history")
+# def history(input: ChatHistoryInput) -> ChatHistory:
+#     """
+#     Get chat history.
+#     """
+#     try:
+#         with Session(engine) as session:
+#             statement = (
+#                 select(Message)
+#                 .where(Message.user_id == input.user_id, Message.thread_id == input.thread_id)
+#                 .order_by(Message.id.desc())
+#             )
+#             results = list(reversed(session.exec(statement).all()))
+#             previous_items = [row.item for row in results]
+#
+#         return ChatHistory(messages=chat_messages)
+#     except Exception as e:
+#         logger.error(f"An exception occurred: {e}")
+#         raise HTTPException(status_code=500, detail="Unexpected error")
 
 
 app.include_router(router)

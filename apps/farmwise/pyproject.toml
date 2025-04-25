@@ -3,11 +3,10 @@ name = "farmwise"
 version = "0.1.0"
 description = ""
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = "<=3.13"
 dependencies = [
     "farmbase-agent-toolkit",
     "farmwise-schema",
-    "numexpr ~=2.10.1",
     "openai>=1.66.3",
     "openai-agents>=0.0.10",
     "sqlmodel>=0.0.24",

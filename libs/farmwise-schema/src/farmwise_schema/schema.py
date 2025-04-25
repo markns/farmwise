@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from enum import Enum
 from typing import Any, Literal, NotRequired
 
 from pydantic import BaseModel, Field
@@ -87,52 +88,65 @@ class ToolCall(TypedDict):
     type: NotRequired[Literal["tool_call"]]
 
 
-class ChatMessage(BaseModel):
-    """Message in a chat."""
+class Action(Enum):
+    request_location = "request_location"
 
-    type: Literal["user", "assistant", "system", "developer"] = Field(
-        description="Role of the message.",
-        examples=["user", "assistant", "system", "developer"],
+
+class Button(BaseModel):
+    title: str
+    callback_data: str
+
+
+class SectionRow(BaseModel):
+    title: str
+    callback_data: str
+
+
+class Section(BaseModel):
+    title: str
+    rows: list[SectionRow]
+
+
+class SectionList(BaseModel):
+    button_title: str
+    sections: list[Section]
+
+
+class WhatsappResponse(BaseModel):
+    content: str | None = Field(description="Content of the response.")
+    actions: list[Action] = Field(
+        description="Actions that can be requested from the client. May be empty",
     )
-    content: str = Field(
-        description="Content of the message.",
-        examples=["Hello, world!"],
+    buttons: list[Button] = Field(
+        description="Buttons that can be added to the response. May be empty.",
     )
-    tool_calls: list[ToolCall] = Field(
-        description="Tool calls in the message.",
-        default=[],
-    )
-    tool_call_id: str | None = Field(
-        description="Tool call that this message is responding to.",
-        default=None,
-        examples=["call_Jja7J89XsjrOLA5r!MEOW!SL"],
-    )
-    run_id: str | None = Field(
-        description="Run ID of the message.",
-        default=None,
-        examples=["847c6285-8fc9-4560-a83f-4e6285809254"],
-    )
-    response_metadata: dict[str, Any] = Field(
-        description="Response metadata. For example: response headers, logprobs, token counts.",
-        default={},
-    )
-    custom_data: dict[str, Any] = Field(
-        description="Custom message data.",
-        default={},
+    section_list: SectionList | None = Field(
+        description="Section list with multiple choice options. Should be left null unless specified."
     )
 
-    def pretty_repr(self) -> str:
-        """Get a pretty representation of the message."""
-        base_title = self.type.title() + " Message"
-        padded = " " + base_title + " "
-        sep_len = (80 - len(padded)) // 2
-        sep = "=" * sep_len
-        second_sep = sep + "=" if len(padded) % 2 else sep
-        title = f"{sep}{padded}{second_sep}"
-        return f"{title}\n\n{self.content}"
 
-    def pretty_print(self) -> None:
-        print(self.pretty_repr())  # noqa: T201
+# class ChatMessage(BaseModel):
+#     """Message in a chat."""
+#
+
+#     content: str = Field(
+#         description="Content of the message.",
+#         examples=["Hello, world!"],
+#     )
+#     actions: list[Action] = Field(description="Actions requested of user", default=[], examples=["request_location"])
+#
+#     def pretty_repr(self) -> str:
+#         """Get a pretty representation of the message."""
+#         base_title = self.type.title() + " Message"
+#         padded = " " + base_title + " "
+#         sep_len = (80 - len(padded)) // 2
+#         sep = "=" * sep_len
+#         second_sep = sep + "=" if len(padded) % 2 else sep
+#         title = f"{sep}{padded}{second_sep}"
+#         return f"{title}\n\n{self.content}"
+#
+#     def pretty_print(self) -> None:
+#         print(self.pretty_repr())  # noqa: T201
 
 
 class Feedback(BaseModel):
@@ -176,4 +190,5 @@ class ChatHistoryInput(BaseModel):
 
 
 class ChatHistory(BaseModel):
-    messages: list[ChatMessage]
+    ...
+    # messages: list[ChatMessage]

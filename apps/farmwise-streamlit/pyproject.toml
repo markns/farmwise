@@ -3,7 +3,7 @@ name = "farmwise-streamlit"
 version = "0.1.0"
 description = ""
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = "<=3.13"
 dependencies = [
         "farmwise-client",
     "streamlit>=1.43.0",

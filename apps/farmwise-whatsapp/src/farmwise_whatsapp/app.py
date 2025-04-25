@@ -1,17 +1,23 @@
+import logging
 from contextlib import asynccontextmanager
 from enum import Enum
 
 from farmwise_client import AgentClient
+from farmwise_schema.schema import Action, WhatsappResponse
 from fastapi import FastAPI
 from pywa.types import Command, Section, SectionList, SectionRow
 from pywa_async import WhatsApp, filters, types
+from pywa_async.types.base_update import BaseUserUpdateAsync
 
 from farmwise_whatsapp.core.config import settings  # Import settings
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class Commands(Enum):
     REGISTER_FIELD = Command(name="Register a field", description="Register a new field")
-    SELECT_COLOUR = Command(name="Select your favorite color", description="Select your favorite color")
+    CHOOSE_MAIZE_SEED = Command(name="Select a maize seed variety", description="Select a maize seed variety")
 
 
 @asynccontextmanager
@@ -31,8 +37,8 @@ wa = WhatsApp(
     phone_id=settings.WHATSAPP_PHONE_ID,  # The phone id you got from the API Setup
     token=settings.WHATSAPP_TOKEN,  # The token you got from the API Setup
     server=app,
-    callback_url="https://63d6-105-163-1-4.ngrok-free.app",
-    verify_token="xyz123",
+    callback_url="https://421e-105-163-1-38.ngrok-free.app",
+    verify_token="xyz123fdsfds",
     app_id=1392339421934377,
     app_secret="b8a5543a9bf425a0e87676641569b2b4",
 )
@@ -41,106 +47,197 @@ wa = WhatsApp(
 agent_client = AgentClient(base_url=settings.AGENT_URL)
 
 
-# flow_id = wa.create_flow(
-#     name="My New Flow",
-#     categories=[FlowCategory.CUSTOMER_SUPPORT, FlowCategory.SURVEY]
-# )
-# print(wa.get_flow(flow_id))
-
-
-@wa.on_message(filters.matches("Hello", "Hi"))
-async def hello(_: WhatsApp, msg: types.Message):
-    print("Handling hello")
-    await msg.mark_as_read()
-    await msg.react("👋")
-    await msg.reply_text(
-        text=f"Hello {msg.from_user.name}!", buttons=[types.Button(title="Click me!", callback_data="id:123")]
-    )
-
-
-@wa.on_message(filters.command(Commands.REGISTER_FIELD.value.name))
-async def register_field(_: WhatsApp, msg: types.Message):
-    print("In register field handler")
-    await msg.reply_location_request("Please share your location")
+async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
+    if Action.request_location in response.actions:
+        await msg.reply_location_request(response.content)
+    elif response.section_list:
+        await msg.reply_text(
+            response.content,
+            # todo: use pywa types directly in WhatsappResponse to prevent this reconstruction?
+            buttons=SectionList(
+                response.section_list.button_title[:20],
+                sections=[
+                    Section(
+                        title=section.title[:24],
+                        rows=[
+                            SectionRow(title=row.title[:24], callback_data=row.callback_data) for row in section.rows
+                        ],
+                    )
+                    for section in response.section_list.sections
+                ],
+            ),
+        )
+    else:
+        await msg.reply_text(response.content)
 
 
 @wa.on_message(filters.location)
-async def location(_: WhatsApp, msg: types.Message):
-    print(f"In location handler {msg}")
+async def location_handler(_: WhatsApp, msg: types.Message):
+    logger.info(f"LOCATION USER: {msg}")
+    await msg.mark_as_read()
     response = await agent_client.ainvoke(
-        message=f"My location is {msg.location}, can you tell me something about what crops I can grow here?",
+        message=f"My location is {msg.location}",
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
     )
-    await msg.reply_text(response.content)
+    logger.info(f"AGENT: {response}")
+    await _send_response(response, msg)
+
+
+@wa.on_raw_update
+async def raw_update_handler(_: WhatsApp, update: dict):
+    logger.warning(f"RAW UPDATE: {update}")
 
 
 @wa.on_message
-async def handle_message(_: WhatsApp, msg: types.Message):
+async def message_handler(_: WhatsApp, msg: types.Message):
+    logger.info(f"MESSAGE USER: {msg}")
+    await msg.mark_as_read()
     response = await agent_client.ainvoke(
         message=msg.text,
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
-        timestamp=msg.timestamp,
     )
-    await msg.reply_text(response.content)
+    logger.info(f"AGENT: {response}")
+    await _send_response(response, msg)
 
 
-@wa.on_message(filters.command(Commands.SELECT_COLOUR.value.name))
-async def select_colour(_: WhatsApp, msg: types.Message):
-    print("In select colour handler")
-    await msg.reply_text(
-        header="Select your favorite color",
-        text="Tap a button to select your favorite color:",
-        # footer='⚡ Powered by PyWa',
-        buttons=SectionList(
-            button_title="Colors",
-            sections=[
-                Section(
-                    title="Popular Colors",
-                    rows=[
-                        SectionRow(
-                            title="🟥 Red",
-                            callback_data="color:red",
-                            description="The color of blood",
-                        ),
-                        SectionRow(
-                            title="🟩 Green",
-                            callback_data="color:green",
-                            description="The color of grass",
-                        ),
-                        SectionRow(
-                            title="🟦 Blue",
-                            callback_data="color:blue",
-                            description="The color of the sky",
-                        ),
-                    ],
-                ),
-                Section(
-                    title="Other Colors",
-                    rows=[
-                        SectionRow(
-                            title="🟧 Orange",
-                            callback_data="color:orange",
-                            description="The color of an orange",
-                        ),
-                        SectionRow(
-                            title="🟪 Purple",
-                            callback_data="color:purple",
-                            description="The color of a grape",
-                        ),
-                        SectionRow(
-                            title="🟨 Yellow",
-                            callback_data="color:yellow",
-                            description="The color of the sun",
-                        ),
-                    ],
-                ),
-            ],
-        ),
+@wa.on_callback_selection
+async def callback_handler(_: WhatsApp, sel: types.CallbackSelection):
+    logger.info(f"CALLBACK SELECTION USER: {sel}")
+    await sel.mark_as_read()
+    response = await agent_client.ainvoke(
+        message=sel.data,
+        user_id=sel.from_user.wa_id,
+        user_name=sel.from_user.name,
     )
+    logger.info(f"AGENT: {response}")
+    await _send_response(response, sel)
 
 
-@wa.on_callback_button(filters.startswith("id"))
-async def click_me(_: WhatsApp, clb: types.CallbackButton):
-    await clb.reply_text("You clicked me!")
+#
+#
+# MESSAGE_ID_TO_TEXT: dict[str, str] = {}  # msg_id -> text
+# POPULAR_LANGUAGES = {"en": ("English", "🇺🇸"), "es": ("Español", "🇪🇸"), "fr": ("Français", "🇫🇷")}
+# OTHER_LANGUAGES = {
+#     "iw": ("עברית", "🇮🇱"),
+#     "ar": ("العربية", "🇸🇦"),
+#     "ru": ("Русский", "🇷🇺"),
+#     "de": ("Deutsch", "🇩🇪"),
+#     "it": ("Italiano", "🇮🇹"),
+#     "pt": ("Português", "🇵🇹"),
+#     "ja": ("日本語", "🇯🇵"),
+# }
+#
+#
+# # @wa.on_message(filters.text)
+# @wa.on_message(filters=filters.contains("translate"))
+# async def offer_translation(_: WhatsApp, msg: types.Message):
+#     msg_id = await msg.reply_text(
+#         text="Choose language to translate to:",
+#         buttons=types.SectionList(
+#             button_title="🌐 Choose Language",
+#             sections=[
+#                 types.Section(
+#                     title="🌟 Popular languages",
+#                     rows=[
+#                         types.SectionRow(
+#                             title=f"{flag} {name}",
+#                             callback_data=f"translate:{code}",
+#                         )
+#                         for code, (name, flag) in POPULAR_LANGUAGES.items()
+#                     ],
+#                 ),
+#                 types.Section(
+#                     title="🌐 Other languages",
+#                     rows=[
+#                         types.SectionRow(
+#                             title=f"{flag} {name}",
+#                             callback_data=f"translate:{code}",
+#                         )
+#                         for code, (name, flag) in OTHER_LANGUAGES.items()
+#                     ],
+#                 ),
+#             ],
+#         ),
+#     )
+#     # Save the message ID so we can use it later to get the original text.
+#     MESSAGE_ID_TO_TEXT[msg_id.id] = msg.text
+#
+#
+# @wa.on_callback_selection(filters.startswith("translate:"))
+# async def translate(_: WhatsApp, sel: types.CallbackSelection):
+#     logger.warn(MESSAGE_ID_TO_TEXT)
+#     logger.warn(sel.reply_to_message.message_id)
+#     lang_code = sel.data.split(":")[-1]
+#     try:
+#         # every CallbackSelection has a reference to the original message (the selection's message)
+#         original_text = MESSAGE_ID_TO_TEXT[sel.reply_to_message.message_id]
+#     except KeyError:  # If the bot was restarted, the message ID is no longer valid.
+#         await sel.react("❌")
+#         await sel.reply_text(text="Original message not found. Please send a new message.")
+#         return
+#     try:
+#         translated = await translator.translate(original_text, dest=lang_code)
+#     except Exception as e:
+#         await sel.react("❌")
+#         await sel.reply_text(text="An error occurred. Please try again.")
+#         logger.exception(e)
+#         return
+#
+#     await sel.reply_text(text=f"Translated to {translated.dest}:\n{translated.text}")
+#
+#
+# @wa.on_message(filters.command(Commands.SELECT_COLOUR.value.name))
+# async def select_colour(_: WhatsApp, msg: types.Message):
+#     print("In select colour handler")
+#     await msg.reply_text(
+#         header="Select your favorite color",
+#         text="Tap a button to select your favorite color:",
+#         # footer='⚡ Powered by PyWa',
+#         buttons=SectionList(
+#             button_title="Colors",
+#             sections=[
+#                 Section(
+#                     title="Popular Colors",
+#                     rows=[
+#                         SectionRow(
+#                             title="🟥 Red",
+#                             callback_data="color:red",
+#                             description="The color of blood",
+#                         ),
+#                         SectionRow(
+#                             title="🟩 Green",
+#                             callback_data="color:green",
+#                             description="The color of grass",
+#                         ),
+#                         SectionRow(
+#                             title="🟦 Blue",
+#                             callback_data="color:blue",
+#                             description="The color of the sky",
+#                         ),
+#                     ],
+#                 ),
+#                 Section(
+#                     title="Other Colors",
+#                     rows=[
+#                         SectionRow(
+#                             title="🟧 Orange",
+#                             callback_data="color:orange",
+#                             description="The color of an orange",
+#                         ),
+#                         SectionRow(
+#                             title="🟪 Purple",
+#                             callback_data="color:purple",
+#                             description="The color of a grape",
+#                         ),
+#                         SectionRow(
+#                             title="🟨 Yellow",
+#                             callback_data="color:yellow",
+#                             description="The color of the sun",
+#                         ),
+#                     ],
+#                 ),
+#             ],
+#         ),
+#     )

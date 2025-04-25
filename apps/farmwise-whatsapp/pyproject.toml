@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "Mark Nuttall-Smith" }
 ]
-requires-python = ">=3.13"
+requires-python = "<=3.13"
 dependencies = [
     "farmwise-client",
     "pywa[cryptography,fastapi]>=2.7.0",

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from farmbase.api.routes import items, login, private, users, utils, farms, fields
+from farmbase.api.routes import items, login, private, users, utils, farms, fields, crop_varieties, gaez
 from farmbase.core.config import settings
 
 api_router = APIRouter()
@@ -10,6 +10,8 @@ api_router.include_router(utils.router, include_in_schema=False)
 api_router.include_router(items.router)
 api_router.include_router(farms.router)
 api_router.include_router(fields.router)
+api_router.include_router(crop_varieties.router)
+api_router.include_router(gaez.router)
 
 
 if settings.ENVIRONMENT == "local":
