@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic.networks import EmailStr
 from slugify import slugify
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
@@ -10,8 +10,9 @@ from sqlalchemy.sql import false
 from sqlalchemy_utils import TSVectorType
 
 from farmbase.database.core import Base
-from farmbase.models import FarmbaseBase, NameStr, Pagination, PrimaryKey
+from farmbase.models import FarmbaseBase, Pagination, PrimaryKey
 from farmbase.organization.models import Organization, OrganizationRead
+from farmbase.validators import must_not_be_blank
 
 # from farmbase.incident.priority.models import (
 #     IncidentPriority,
@@ -91,13 +92,18 @@ class Service(FarmbaseBase):
     description: Optional[str] = Field(None, nullable=True)
     external_id: str
     is_active: Optional[bool] = None
-    name: NameStr
+    name: str
     type: Optional[str] = Field(None, nullable=True)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v):
+        return must_not_be_blank(v)
 
 
 class ProjectBase(FarmbaseBase):
     id: Optional[PrimaryKey]
-    name: NameStr
+    name: str
     display_name: Optional[str] = Field("", nullable=False)
     owner_email: Optional[EmailStr] = Field(None, nullable=True)
     owner_conversation: Optional[str] = Field(None, nullable=True)
@@ -121,6 +127,10 @@ class ProjectBase(FarmbaseBase):
     report_incident_description_hint: Optional[str] = Field(None, nullable=True)
     snooze_extension_oncall_service: Optional[Service]
 
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v):
+        return must_not_be_blank(v)
 
 class ProjectCreate(ProjectBase):
     organization: OrganizationRead

@@ -5,7 +5,7 @@ from urllib import parse
 
 from pydantic import BaseModel
 from starlette.config import Config
-from starlette.datastructures import Secret
+from starlette.datastructures import CommaSeparatedStrings, Secret
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +34,8 @@ config = Config(".env")
 LOG_LEVEL = config("LOG_LEVEL", default=logging.WARNING)
 ENV = config("ENV", default="local")
 
+ENV_TAG_LIST = config("ENV_TAGS", cast=CommaSeparatedStrings, default="")
+ENV_TAGS = get_env_tags(ENV_TAG_LIST)
 
 FARMBASE_UI_URL = config("FARMBASE_UI_URL", default="http://localhost:8080")
 FARMBASE_ENCRYPTION_KEY = config("FARMBASE_ENCRYPTION_KEY", cast=Secret)
@@ -71,6 +73,11 @@ DEFAULT_STATIC_DIR = os.path.join(
 )
 STATIC_DIR = config("STATIC_DIR", default=DEFAULT_STATIC_DIR)
 
+# sentry middleware
+SENTRY_ENABLED = config("SENTRY_ENABLED", default="")
+SENTRY_DSN = config("SENTRY_DSN", default="")
+SENTRY_APP_KEY = config("SENTRY_APP_KEY", default="")
+SENTRY_TAGS = config("SENTRY_TAGS", default="")
 
 # database
 DATABASE_HOSTNAME = config("DATABASE_HOSTNAME")

@@ -1,6 +1,3 @@
-from pydantic.errors import PydanticValueError
-
-
 class FarmbaseException(Exception):
     pass
 
@@ -9,41 +6,41 @@ class FarmbasePluginException(FarmbaseException):
     pass
 
 
-class NotFoundError(PydanticValueError):
+class NotFoundError(ValueError):
     code = "not_found"
     msg_template = "{msg}"
 
 
-class FieldNotFoundError(PydanticValueError):
+class FieldNotFoundError(ValueError):
     code = "not_found.field"
     msg_template = "{msg}"
 
 
-class ModelNotFoundError(PydanticValueError):
+class ModelNotFoundError(ValueError):
     code = "not_found.model"
     msg_template = "{msg}"
 
 
-class ExistsError(PydanticValueError):
+class ExistsError(ValueError):
     code = "exists"
     msg_template = "{msg}"
 
 
-class InvalidConfigurationError(PydanticValueError):
+class InvalidConfigurationError(ValueError):
     code = "invalid.configuration"
     msg_template = "{msg}"
 
 
-class InvalidFilterError(PydanticValueError):
+class InvalidFilterError(ValueError):
     code = "invalid.filter"
     msg_template = "{msg}"
 
 
-class InvalidUsernameError(PydanticValueError):
+class InvalidUsernameError(ValueError):
     code = "invalid.username"
     msg_template = "{msg}"
 
 
-class InvalidPasswordError(PydanticValueError):
+class InvalidPasswordError(ValueError):
     code = "invalid.password"
     msg_template = "{msg}"

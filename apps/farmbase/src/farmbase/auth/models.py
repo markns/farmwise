@@ -6,7 +6,7 @@ from uuid import uuid4
 
 import bcrypt
 from jose import jwt
-from pydantic import Field, validator
+from pydantic import Field, field_validator
 from pydantic.networks import EmailStr
 from sqlalchemy import Boolean, Column, DateTime, Integer, LargeBinary, String
 from sqlalchemy.dialects.postgresql import UUID
@@ -135,7 +135,8 @@ class UserBase(FarmbaseBase):
     projects: Optional[List[UserProject]] = []
     organizations: Optional[List[UserOrganization]] = []
 
-    @validator("email")
+    @field_validator("email")
+    @classmethod
     def email_required(cls, v):
         if not v:
             raise ValueError("Must not be empty string and must be a email")
@@ -145,7 +146,8 @@ class UserBase(FarmbaseBase):
 class UserLogin(UserBase):
     password: str
 
-    @validator("password")
+    @field_validator("password")
+    @classmethod
     def password_required(cls, v):
         if not v:
             raise ValueError("Must not be empty string")
@@ -155,7 +157,8 @@ class UserLogin(UserBase):
 class UserRegister(UserLogin):
     password: Optional[str] = Field(None, nullable=True)
 
-    @validator("password", pre=True, always=True)
+    @field_validator("password", mode="before")
+    @classmethod
     def password_required(cls, v):
         # we generate a password for those that don't have one
         password = v or generate_password()
@@ -187,7 +190,8 @@ class UserPasswordUpdate(FarmbaseBase):
     current_password: str
     new_password: str
 
-    @validator("new_password")
+    @field_validator("new_password")
+    @classmethod
     def validate_password(cls, v):
         if not v or len(v) < 8:
             raise ValueError("Password must be at least 8 characters long")
@@ -199,7 +203,8 @@ class UserPasswordUpdate(FarmbaseBase):
             raise ValueError("Password must contain both uppercase and lowercase characters")
         return v
 
-    @validator("current_password")
+    @field_validator("current_password")
+    @classmethod
     def password_required(cls, v):
         if not v:
             raise ValueError("Current password is required")
@@ -211,7 +216,8 @@ class AdminPasswordReset(FarmbaseBase):
 
     new_password: str
 
-    @validator("new_password")
+    @field_validator("new_password")
+    @classmethod
     def validate_password(cls, v):
         if not v or len(v) < 8:
             raise ValueError("Password must be at least 8 characters long")
@@ -231,7 +237,8 @@ class UserCreate(FarmbaseBase):
     organizations: Optional[List[UserOrganization]]
     role: Optional[str] = Field(None, nullable=True)
 
-    @validator("password", pre=True)
+    @field_validator("password", mode="before")
+    @classmethod
     def hash(cls, v):
         return hash_password(str(v))
 
