@@ -1,0 +1,1395 @@
+Crop,Variety name/code,Year of release,Owner(s),Maintainer and seed source,Optimal production altitude range (Masl),Duration to maturity (months),Tuber yield (t ha-1),Special attributes
+IRISH_POTATO,"1. Roslin Eburu
+(B53)",1953,KARI,KARI-Tigoni,2000-2800,4 - 4.8,25-35, Very good storability
+IRISH_POTATO,2. Dutch Robijn,1960’s,KARI,KARI-Tigoni,1600-2600,4-5,35-40," Good storage and
+crisping quality"
+IRISH_POTATO,3. Kerr’s Pink,1960’s,KARI,KARI-Tigoni,1400-2700,2-3,25-30," Tolerant to drought,
+Good mashing and
+roasting quality"
+IRISH_POTATO,4. Anett,1972,KARI,KARI-Tigoni,1400-2400,2.5 – 3,30-35," Fairly tolerant to late
+blight"
+IRISH_POTATO,5. Desiree,1972,KARI,KARI-Tigoni,1800-2600,4 - 4.8,35-40, Good storage
+IRISH_POTATO,6. Kenya Baraka,1973,KARI,KARI-Tigoni,1600-2700,2.6 – 4,30-35," Fairly tolerant to
+drought
+ Good storage quality"
+IRISH_POTATO,7. Roslin Tana,1974,KARI,KARI-Tigoni,1800-2600,2-3,35-45, Good chipping quality
+IRISH_POTATO,"8. Roslin
+Bvumbwe",1974,KARI,KARI-Tigoni,1800-2600,2-3,35-45, Good chipping quality
+IRISH_POTATO,"9. Kenya
+Dhamana",1988,KARI,KARI-Tigoni,1800-2600,2-3,30-40, Good mashing quality
+IRISH_POTATO,10. Kenya Chaguo,1988,KARI,KARI-Tigoni,1800-2600,2-3,30-40, Good mashing quality
+IRISH_POTATO,11. Tigoni,1998,KARI,"KARI-Tigoni
+(Limuru)",1800-2600,3-4,35-45," Good chipping, boiling
+& mashing quality
+ Tolerant to late blight"
+IRISH_POTATO,12. Asante,1998,KARI,KARI-Tigoni,1800-2600,3-4,35-45," Good chipping, boiling
+and mashing quality
+ Fairly tolerant to late
+blight."
+IRISH_POTATO,13. Purple Gold.,2010,KARI/CIP,"KARI-
+Tigoni/PQS",1800-3000,4.0-4.5,20-35," Round tubers
+ Dark purple skin
+colour
+ Shallow eye depth
+ White flesh colour
+ Moderately resistant
+to late blight
+ Good
+storability/resistant to
+greening
+ High tuber uniformity
+(80%)
+ Long dormancy
+ Very good crisping
+qualities
+ Also good for table ,
+mashing and roasting"
+IRISH_POTATO,14. Kenya Mpya.,2010,KARI/CIP,"KARI-
+Tigoni/PQS",1400-3000,3.0-3.5,35-45," Oval /round tubers,
+Early tuberization:
+large size tubers
+ Cream white skin
+colour with pink eyes
+ Shallow eye depth
+ Cream white flesh
+colour
+ Resistant to late blight
+ Good storability
+ Short dormancy
+ Good for table ,chips
+and mashing
+ Wide adaptability"
+IRISH_POTATO,15. Sherekea,2010,KARI/CIP,"KARI-
+Tigoni/PQS",1800-3000,3.5-4.0,40-50," Oblong/round tubers
+ High number of
+tubers per plant
+ Red skin colour
+ Medium eye depth
+ Cream flesh colour
+ Highly resistant to late
+blight and viruses
+ Good storability
+ Intermediate
+dormancy
+ Good for table ,crisp
+and mashing"
+IRISH_POTATO,16. Arnova,2013,"Agrico
+U.A.","Agrico East
+Africa Ltd.","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production.",3-3.5,40," Skin colour yellow
+ Flesh colour yellow
+ Tuber shape oval-long
+ Drymatter content
+18.2%."
+IRISH_POTATO,17. Arizona,2013,"Agrico
+U.A.","Agrico East
+Africa Ltd.","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production.",3-3.5,45," Skin colour yellow
+ Flesh colour yellow
+ Tuber shape oval
+ Drymatter content
+17.2%."
+IRISH_POTATO,18. Rudolph,2013,"Agrico
+U.A.","Agrico East
+Africa Ltd.","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production.",4,40," Skin colour red
+ Flesh colour is white
+ The tuber shape oval
+round
+ Dry matter content
+20%."
+IRISH_POTATO,19. Connect,2013,"Aardapp
+elkweek-
+en
+selectieb
+edrijf
+IJsselmee
+rpolders
+BV","Den Hartigh
+BV","All Regions
+suitable for
+potato
+production",3.5-4,40-60," Phytophthora
+resistant
+ No flowering
+ Not sensitive to day
+length
+ Short cooking time,
+Suitable to make
+home French fries."
+IRISH_POTATO,20. SARPO MIRA,2014,"Danespo
+A/S",Africalla,"Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production",4,45," Extreme good
+resistance to late
+blight in foliage
+ Drought tolerance"
+IRISH_POTATO,21. MANITOU,2014,"Agrico
+U.A","Agrico East
+Africa Ltd.","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production",4,45," Red skin, Crème flesh
+ Dry matter content
+20%
+ Good resistance to
+scab, erwinia, and
+tuber blight
+ Suitable for home-
+made French fries,
+and fresh potatoes"
+IRISH_POTATO,22. SAVIOLA,2014,"Agrico
+U.A","Agrico East
+Africa Ltd.","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production",4,42.5," Long oval-shaped big
+size tuber
+ High yielding medium
+early variety
+ White skin and crème
+flesh tubers
+ Fresh potatoes"
+IRISH_POTATO,"23. TOLUCA (AR97-
+1385)",2014,"Agrico
+U.A.","Agrico East
+Africa Ltd.","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production.",4,25-30," Late blight resistance
+ High dry matter
+content
+ Suitable for French
+fries and crisps
+ Shallow eyes
+ Medium term storage
+ Excellent cooking
+quality- rather firm"
+IRISH_POTATO,24. MAYAN GOLD,2014,"Greenval
+e plc,
+Agree to
+not for
+profit
+release
+to
+Kenyan
+farmers","MMUST/KA
+RI-Tigoni","Meru,
+Embu, Molo
+Mt. Elgon,
+Kiambu
+Njabin and
+other potato
+growing
+areas areas",4,20-30," Tubers have smooth
+skin, yellow flesh,
+eyes medium depth,
+no skin pigment
+ Fairly resistant to late
+blight on foliage
+(phytophthora
+infestans) and
+powdery
+scab(spongospora
+subterranean)
+ Fairly resistant to PVY
+and PLRV
+ Good cooking quality."
+IRISH_POTATO,25. CARUSO,2014,"Saka-
+Ragis",Den Hartigh,"Narok,
+Molo,
+Kibirichia,
+Tigoni,
+Timau and
+other potato
+growing
+areas",3.5-4,25-30," High yielding crisping
+variety
+ Low content of
+reducing sugars
+ Round shape with
+shallow eyes
+ Resistant to PCN Ro1-
+4
+ High resistance to late
+blight, tuber blight,
+common scab and
+internal rust spot."
+IRISH_POTATO,"26. DESTINY (SL99-
+4005)",2015,"Agrico
+U.A","Agrico East
+Africa Ltd.","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production.",6,50," Multi-purpose, table,
+crisp."
+IRISH_POTATO,27. SHANGI,2015,KALRO,"KALRO
+NPRC-
+TIGONI","Mid- to high
+altitude
+areas.
+(1500-2800
+masl) of
+Nyandarua,
+Nakuru,
+Kiambu,
+Narok,
+Meru.",3-4,30-40," Early maturity
+ Short dormancy
+ Highly prolific
+ Fast cooking
+ Versatile use i.e. can
+be used for domestic
+consumption and
+processing into chips
+and crisps."
+IRISH_POTATO,28. RUMBA,2015,"Owner-
+Böhm-
+nordkart
+offel
+agrarpro
+duktion;
+Licencee-
+Europlan
+t
+Pflanzenz
+ucht ;","Bioplant
+GmbH,
+GERMANY","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production.",4- 5,50," Resistant to PCN
+ Resistance to
+common scab ,
+spraing, mechanical
+damage"
+IRISH_POTATO,29. CIP393077.159,2015,CIP,"CIP SSA &
+KALRO
+TIGONI","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production.",3-3.5,17," Moderate resistance
+to late blight
+ Resistance to Potato
+Leaf Roll Virus and
+Potato Virus-X"
+IRISH_POTATO,30. CAROLUS,2015,"AGRICO
+U.A","AGRICO
+EAST AFRICA
+LTD.","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production.",4,18," Table, French fries."
+IRISH_POTATO,31. LAURA,2016,"Owner:
+BÖHM-
+NORDKA
+RTOFFEL
+AGRARP
+RODUKTI
+ON
+GmbH &
+Co.
+Licensee
+EUROPLA
+NT
+PFLANZE
+NZUCHT
+GmbH","Bioplant
+GmbH,","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production.",4-5,15-19," Processing variety:
+French Fries
+ Medium cooking (B)
+ Short dormancy"
+IRISH_POTATO,32. Lady Amarilla,2016,"C. Meijer
+B.V.","C. Meijer
+B.V.","Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production.",3,12-18," Processing, Long
+storage"
+IRISH_POTATO,33. UNICA,2016,CIP,CIP & KALRO,"Lowlands
+and
+highlands
+tropics,
+1200-m asl",3-4,40-45," Resistance to PVX,
+PVY and PLRV
+ Moderately resistance
+to Root Knot
+Nematode
+ Good processing and
+also table variety
+ Moderately light
+chipping colour
+ Rich in vitamins C,
+Iron and Zinc"
+IRISH_POTATO,34. Lenana,2017,CIP SSA,"CIP SSA &
+KALRO","Upper
+Highlands to
+Upper
+Midland",3-4,40-50," Tolerant to; - Late
+Blight, Potato Virus X
+& Potato Leaf Roll
+Virus
+ Dry Matter 22%
+ Good for French Fries
+& crisps;"
+IRISH_POTATO,35. Wanjiku,2017,CIP SSA,"CIP SSA &
+KALRO","Upper
+Highlands to
+Upper
+Midland",3.5-4,50-60," Tolerant to; - Late
+Blight, Potato Virus X
+& Extremely Tolerant
+to Potato Virus Y
+ Dry Matter 21%
+ Good for French Fries
+& crisps."
+IRISH_POTATO,36. Nyota,2017,CIP SSA,"CIP SSA &
+KALRO","Upper
+Highlands to
+Upper
+Midland",3-4,35-45," Tolerant to Late Blight
+ Tolerant to heat
+ Dry Matter 20%
+ Table variety."
+IRISH_POTATO,37. Chulu,2017,CIP SSA,"CIP SSA &
+KALRO","Upper
+Highlands,
+Upper
+Midland &
+parts of
+Lower
+midlands",3.5-4,35-45," Tolerant to; - Late
+Blight & Potato Virus
+X
+ Tolerant to heat
+ Dry Matter 24%
+ Table and processing
+variety."
+IRISH_POTATO,38. Acoustic,2017,"C. Meijer
+BV",C. Meijer BV,"Timau,
+Tigoni,
+Molo,
+Narok,
+Bomet,
+Timboroa
+and all
+regions
+suitable for
+potato
+production",4-5,60," Resistance toward
+late blight, wart
+disease fysio
+1,Globodera
+rostochiensis
+pathotype 1"
+IRISH_POTATO,39. Rams,2020,"Narayani
+Ramnath
+an","Narayani
+Ramnathan
+and ADC","Altitude:
+1000-3000
+masl.
+AEZ: UH 2-
+3,UM 1-2,
+LH 1-2.
+Sites:Kajiado
+,Kiambu,
+Limuru,
+Molo,Timau,
+Kamae,Isiny
+a,Cherangan
+y,Nyandarua
+and Narok",3-4,25-30," High Dry Mater
+content (24% )
+ It is suitable for chips
+and Crips
+ Oil consumption is
+optimum
+ Outcome of crisp
+color will be whitish
+cream
+ It is the processing
+variety
+ Tolerant to blight and
+bacterial wilt
+ Good tuber setting."
+IRISH_POTATO,40. ELDO IP1,2023,"Universit
+y of
+Eldoret","University of
+Eldoret","Altitude:
+from 2100 to
+2700 masl.
+AEZ: UH 1-
+3,UM 1-3, LH
+13.
+Sites:Marak
+wet,Laikapia
+, and Uasin
+Gishu
+Counties",3-3.5,20-30," One month dormancy
+ White skin
+ White flesh
+ Early maturing
+ Good for chopping"
+IRISH_POTATO,41. ELDO IP2,2023,"Universit
+y of
+Eldoret","University of
+Eldoret","Altitude:
+from 2300 to
+3000 masl.
+AEZ: UH 1-
+3,UM 1-3, LH
+13.
+Sites:Marak
+wet,Laikapia
+, and Uasin
+Gishu
+Counties",4-4.5,20-30," Long dormancy
+ Deep red skin
+ White flesh
+ Good for table"
+IRISH_POTATO,1. MUSICA,2014,C. Meijer BV,C. Meijer BV,"Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production",4,60," Resistance
+toward wart
+disease fysio 1,
+G. rostochiensis
+pathotype 1 and
+2/3
+ Partial resistance
+towards G.
+pallida
+pathotype 2"
+IRISH_POTATO,2. ROYAL,2014,C. Meijer BV,Africalla,"Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",4,60-80," High dry matter
+content and low
+sugar content
+ Very suitable for
+French fries
+(chips) , Crisps,
+flakes and
+granulate"
+IRISH_POTATO,3. JELLY,2014,Danespo A/S,"EUROPLANT
+Pflanzenzuch
+t GmbH","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production",5,55," Purpose: French
+Fries, ware
+potato
+ Medium cooking
+(B)
+ Very low
+discoloration
+after boiling
+ Yellow skin,
+yellow flesh
+ Late blight,
+bacterial wilt,
+virus resistance
+ Good Drought
+and heat
+tolerance
+ Short dormancy
+ High marketable
+yields
+ Medium sized to
+large sized
+tubers
+ Uniform grading"
+IRISH_POTATO,"4. EL
+MUNDO",2014,"Kartoffelzuc
+ht Böhm
+GmbH & Co.
+KG",Africalla,"Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production",4-5,80," Drought
+tolerance
+ Late blight
+tolerance"
+IRISH_POTATO,5. FALUKA,2014,"KWS Potato
+B.V","Agrico East
+Africa Ltd.","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",3.5-4,42.5," long shape
+Tubers
+ White skin with
+white flesh
+tubers
+ Utilization -Fresh
+potatoes"
+IRISH_POTATO,"6. MARKIE
+S",2014,Agrico U.A,"Agrico East
+Africa Ltd.","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",4,40," Long oval shape,
+White skin
+ Crème flesh
+tubers
+ Strong canopy
+ Tolerant to
+drought stress
+ High dry matter
+ Good storability
+ Good for French
+fries, crisps,
+chips and fresh
+consumption,
+multipurpose
+variety"
+IRISH_POTATO,7. SAGITTA,2014,"HZPC
+Holland B.V.","HZPC
+Holland B.V.,
+Field and in-
+vitro
+maintenance","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",3.5-4,65-70," Multipurpose
+variety: French
+Fries, Fresh,
+Crisps
+ Good dry matter
+content
+ Medium long
+dormancy
+ Suitable for
+second crop
+ Medium early
+ Resistant to
+viruses and cyst
+nematodes"
+IRISH_POTATO,8. DERBY,2014,"HZPC
+Holland B.V.","HZPC
+Holland B.V.,
+Field and in-
+vitro
+maintenance","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",3.5-4,70-75," Early maturing
+ Good resistance
+to Late Blight
+ Multipurpose
+variety: Crisps,
+French fries,
+fresh
+ Short dormancy
+ Good dry matter
+content
+ Good scab and
+virus resistance
+ Resistant to cyst
+nematodes"
+IRISH_POTATO,"9. AMBITIO
+N (AR
+96-
+0010)",2014,Agrico U.A.,"Agrico East
+Africa Ltd.","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",4.5-5,65-70," Good for French
+fries
+ Easy to grow
+ Vigorous plants
+ Large uniform
+oval/long big
+tubers
+ Shallow eyes
+ Moderate dry
+matter content
+ Good resistance
+to Fusarium,
+Erwinia,
+PotatoCyst
+Nematode Ro
+1and 4, Yntn-
+virus"
+IRISH_POTATO,10. TAURUS,2015,"HZPC
+Holland B.V.
+The
+Netherlands","HZPC
+Holland B.V.
+department
+HZPC R&D","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",4,40," Variety is
+suitable for
+processing,
+especially for the
+production of
+crisps."
+IRISH_POTATO,11. KURODA,2015,AGRICO U.A.,"AGRICO
+EAST AFRICA
+LTD.","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",6,50," Fresh table
+consumption"
+IRISH_POTATO,12. ZAFIRA,2015,AGRICO U.A.,"AGRICO
+EAST AFRICA
+LTD.","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",6,51," Fresh table
+consumption"
+IRISH_POTATO,13. MILVA,2015,"Saatzucht
+Berding, Am
+Jadebusen36
+, D-26345
+Bockhorn-
+Petersgrode
+n, GERMANY","EUROPLANT
+PFLANZENZU
+CHT GmbH,
+P.O. Box 13
+80, D-21303
+Lüneburg,
+GERMANY","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",3-4,44," Fresh market
+potato variety
+ Good resistance
+to Potato Cyst
+Nematode, late
+blight, Black
+legand common
+Scab"
+IRISH_POTATO,"14. CHALLE
+NGER",2015,"HZPC
+Holland B.V.
+The
+Netherlands","HZPC
+Holland B.V","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",4.5,42.4," Very suitable for
+the processing
+industry (french
+fries) and fresh
+market
+ Good resistance
+to Alternaria and
+Common scab."
+IRISH_POTATO,"15. 15.
+EVORA",2015,"HZPC
+Holland B.V.
+The
+Netherlands","HZPC
+Holland B.V","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",3.5-4,46.4," Fresh market
+variety
+ Early maturing"
+IRISH_POTATO,"16. PANAM
+ERA",2015,"HZPC
+Holland B.V.
+The
+Netherlands","HZPC
+Holland B.V","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",4.5-5,59.2," Highly tolerant
+to climatic stress
+ Good Late blight
+and scab
+resistance
+ Good dry matter
+content
+ Fresh market
+variety"
+IRISH_POTATO,17. RODEO,2015,"HZPC
+Holland B.V.
+The
+Netherlands","HZPC
+Holland B.V","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",4.5,49.6," Fresh market
+variety with
+good dry matter
+content
+ Moderate
+resistance to
+Common scab"
+IRISH_POTATO,18. SIFRA,2015,"HZPC
+Holland B.V.
+The
+Netherlands","HZPC
+Holland B.V","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",4.5,49.5," Big size tubers
+ Resistant to cyst
+nematodes and
+Wart disease
+ Good resistance
+to Common scab
+ Good dry matter
+content
+ Fresh market
+variety"
+IRISH_POTATO,"19. VOYAGE
+R",2015,"HZPC
+Holland B.V.
+The
+Netherlands","HZPC
+Holland B.V","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production.",4.5,49.5," Good yield
+ Good late blight
+resistance
+ Suitable for fresh
+market and
+French Fries
+ Good Common
+scab resistance."
+IRISH_POTATO,20. Farida,2018,"HZPC
+Holland B.V.
+The
+Netherlands","HZPC
+Holland B.V.
+department
+HZPC R&D,
+The
+Netherlands","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production",4,22," Variety is
+suitable for fresh
+market
+ Has a good
+consumption
+quality
+ Variety has a
+good resistance
+to Alternaria
+Common scab
+and Late Blight."
+IRISH_POTATO,21. Rock,2018,C. Meijer BV,C. Meijer BV,"Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production",4,18," Resistance
+toward wart
+disease fysio 1,
+G. rostochiensis
+pathotype 1 and
+pathotype 2/3,
+Resistance
+toward G. Pallida
+fysio 2."
+IRISH_POTATO,"22. Lady
+Terra",2018,C. Meijer BV,C. Meijer BV,"Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production",4,23," Resistance
+toward wart
+disease fysio 1
+and G.
+rostochiensis
+pathotype 1."
+IRISH_POTATO,23. ZARINA,2018,"IPR B.V. The
+Netherlands","IPR B.V.
+Maintenance
+in the field
+and in-vitro","Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa and all
+regions suitable
+for potato
+production",4,45," Variety is
+suitable for fresh
+market
+ Has a good
+consumption
+quality
+ Also suitable for
+home & fries
+ Variety has an
+attractive skin
+and regular
+shape."
+IRISH_POTATO,"24. Lady
+Balfour",2019,"James
+Hutton Ltd","Greenvale
+AP","Altitude: 1800-
+2600 masl,
+Examples:
+Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa,
+Nyandarua and
+Naivasha",3-4,53-74," Table variety;
+grown as organic
+in UK (low input
+variety)
+ Exceptional
+vigour under low
+fertility
+ Highly resistant
+to late blight,
+powdery scab,
+blackleg and
+potato virus Y
+ Moderately
+drought tolerant"
+IRISH_POTATO,25. Gemson,2019,"James
+Hutton Ltd","Grampian
+Growers","Altitude: 1800-
+2600 masl,
+Examples:
+Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa,
+Nyandarua and
+Naivasha",3-4,42-48," Table, salad
+variety
+ Consistently
+produces white
+flesh tubers
+ Resistant to
+potato leafroll
+virus and
+blackleg"
+IRISH_POTATO,26. Sorrento,2019,"James
+Hutton Ltd","Greenvale
+AP","Altitude: 1800-
+2600 masl,
+Examples:
+Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa,
+Nyandarua and
+Naivasha",3-4,41-53," Table and
+chipping variety
+ Good resistance
+to late blight and
+powdery scab
+ Moderately
+drought tolerant"
+IRISH_POTATO,27. Reiver,2019,"James
+Hutton Ltd",SASA,"Altitude: 1800-
+2600 masl,
+Examples:
+Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa,
+Nyandarua and
+Naivasha",3-4,46-49," Resistant to PCN
+(G
+rostochiensis),
+and tuber
+blemish diseases"
+IRISH_POTATO,28. Cara,2019,"Irish Potato
+Marketing","Irish Potato
+Marketing","Altitude: 1800-
+2600 masl,
+Examples:
+Timau, Tigoni,
+Molo, Narok,
+Bomet,
+Timboroa,
+Nyandarua and
+Naivasha",3-4,47-64," All-rounder
+including chips
+ Resistant to PCN
+(G
+rostochiensis),
+late blight,
+blackleg and
+potato virus Y
+ Moderately
+drought tolerant"
+IRISH_POTATO,29. Java,2021,"Owner:
+Teagasc,
+Global
+Licensee:
+IPM Potato,
+Group
+Limited, Sub-
+licensee,
+Kenya:
+Kirinyaga,
+Seeds
+Limited","SASA
+Edinburgh,sc
+otland , UK
+Stokman
+Rozen,Naiva
+sha, Kenya","Altitude:1000 —
+3000, m.a.s.1,
+AEZ: UH 1-3, LH-
+1-3, UM1-3,
+Sites:
+Nyandarua,
+Meru, Bomet,
+Narok, Nakuru,
+Kericho, Laikipia,
+Kiambu,
+Kirinyaga, West
+Pokot, Trans
+Nzoia, Bungoma,
+Uasin Gishu,
+Nyeri, Elgeyo-
+Marakwet",3-4,40-50," Very high
+resistance to
+Phytophthora
+ Suitable for
+making
+ Suitable for long
+storage
+ Resistant to
+tuber blight,
+foliage blight,
+common"
+IRISH_POTATO,30. Buffalo,2023,"Teagasc
+Global
+licensee:
+IPM Potato
+Group Ltd
+Sub -licensee
+Kenya:Kiriny
+aga seeds
+Ltd","SASA
+Edinburgh,sc
+otland , UK
+Stokman
+Rozen,Naiva
+sha, Kenya","Altitude:
+from1000 to
+3000 masl. AEZ:
+UH 1-3,UM 1-3,
+LH 13.
+Sites:Nyandarua,
+Meru, Bomet,
+Narok,Nakuru,Ke
+richo,Laikipia,
+Kiambu,
+Kirinyaga, West
+Pokot, Trans
+nzoia, Bungoma,
+Uasin Gishu,
+Nyeri, Elgeyo-
+Marakwet",3-4,30-50," Table market
+variety with
+large round
+tubers and
+attractive skin
+finish
+ Suitable for
+cooking
+ Good for storage"
+IRISH_POTATO,"31. Maveric
+k",2023,"Teagasc
+Global
+licensee:
+IPM Potato
+Group Ltd
+Sub -licensee
+Kenya:Kiriny
+aga seeds
+Ltd","SASA
+Edinburgh,sc
+otland , UK
+Stokman
+Rozen,Naiva
+sha, Kenya","Altitude:
+from1000 to
+3000 masl. AEZ:
+UH 1-3,UM 1-3,
+LH 13.
+Sites:Nyandarua,
+Meru, Bomet,
+Narok,Nakuru,Ke
+richo,Laikipia,
+Kiambu,
+Kirinyaga, West
+Pokot, Trans
+nzoia, Bungoma,
+Uasin Gishu,
+Nyeri, Elgeyo-
+Marakwet",3-4,30-50," Suitable for
+french fries"
+IRISH_POTATO,"32. CAYMA
+N",2023,HZPC,HZPC,"Altitude: 1300-
+3000 m.a.s.l
+AEZ: UH1-3, LH1-
+3,UM1-3
+Sites:Nyandarua,
+Meru, Bomet,
+Narok, Nakuru,
+Kericho, Laikipia,
+Kiambu, Uasin
+Gishu,
+Nyeri,Elgeyo-
+Marakwet",3-4,50-80," Stable for french
+fries and crips
+(Dry matter
+content of
+21.5%)"
+IRISH_POTATO,"33. ELDO
+IP1",2023,"University of
+Eldoret","University of
+Eldoret","Altitude: from
+2100 to 2700
+masl.
+AEZ: UH 1-3,UM
+1-3, LH 13.
+Sites:Marakwet,L
+aikapia, and
+Uasin Gishu
+Counties",3-3.5,20-30," One month
+dormancy
+ White skin
+ White flesh
+ Early maturing
+ Good for
+chopping"
+IRISH_POTATO,"34. ELDO
+IP2",2023,"University of
+Eldoret","University of
+Eldoret","Altitude: from
+2300 to 3000
+masl.
+AEZ: UH 1-3,UM
+1-3, LH 13.
+Sites:Marakwet,L
+aikapia, and
+Uasin Gishu
+Counties",4-4.5,20-30," Long dormancy
+ Deep red skin
+ White flesh
+ Good for table"
+IRISH_POTATO,"35. SOLHY0
+07",2024,"Agventure
+BV,
+Dreijenlaan
+2, 6703
+HA,Wagenin
+gen, the
+Netherlands
+Doing
+business as:
+Solynta","Agventure
+BV,
+Dreijenlaan
+2, 6703
+HA,Wagenin
+gen, the
+Netherlands
+Doing
+business as:
+Solynta","Altitude: 1300-
+3000 m.a.s.l
+AEZ: UH1-3, LH1-
+3,UM1-3
+Sites:Nyandarua,
+Meru, Bomet,
+Narok, Nakuru,
+Kericho, Laikipia,
+Kiambu, Uasin
+Gishu,
+Nyeri,Elgeyo-
+Marakwet",3-4,20-30," Delivered as
+True Potato
+Seeds
+ Round- oval
+potato with
+yellow skin and
+medium yellow
+flesh that is well
+suited for the
+fresh market
+ Shallow eyes
+ Cooking type:
+fairly- firm
+ Dry matter: 18%"
+IRISH_POTATO,"36. SOLYHY
+012",2024,"Agventure
+BV,
+Dreijenlaan
+2, 6703
+HA,Wagenin
+gen, the
+Netherlands
+Doing
+business as:
+Solynta","Agventure
+BV,
+Dreijenlaan
+2, 6703
+HA,Wagenin
+gen, the
+Netherlands","Altitude: 1300-
+3000 m.a.s.l
+AEZ: UH1-3, LH1-
+3,UM1-3
+Sites:Nyandarua,
+Meru, Bomet,
+Narok, Nakuru,
+Kericho, Laikipia,
+Kiambu, Uasin
+Gishu,
+Nyeri,Elgeyo-
+Marakwet",3-4,20-30," Delivered as
+True Potato
+Seeds
+ Oval potato with
+yellow skin and
+yellow flesh that
+is well suited for
+the fresh market
+ Shallow eyes
+ Cooking type:
+fairly- firm
+ Dry matter: 20%"
+IRISH_POTATO,"37. SOLHY0
+15",2024,"Agventure
+BV,
+Dreijenlaan
+2, 6703
+HA,Wagenin
+gen, the
+Netherlands
+Doing
+business as:
+Solynta","Agventure
+BV,
+Dreijenlaan
+2, 6703
+HA,Wagenin
+gen, the
+Netherlands
+Doing
+business as:
+Solynta","Altitude: 1300-
+3000 m.a.s.l
+AEZ: UH1-3, LH1-
+3,UM1-3
+Sites:Nyandarua,
+Meru, Bomet,
+Narok, Nakuru,
+Kericho, Laikipia,
+Kiambu, Uasin
+Gishu,
+Nyeri,Elgeyo-
+Marakwet",3-4,30-40," Delivered as
+True Potato
+Seeds
+ Highly resistant
+to Late Blight
+ Oval potato with
+yellow skin and
+medium yellow
+flesh that is well
+suited for the
+fresh market
+ Medium eyes
+ Cooking type:
+fairly- firm
+ Dry matter: 20%"
+IRISH_POTATO,"38. NAPOLE
+ON",2024,Agrico U.A,"Agrico East
+Africa Ltd.","Altitude: 1300-
+3000 m.a.s.l
+AEZ: UH1-3, LH1-
+3,UM1-3
+Sites:Nyandarua,
+Meru, Bomet,
+Narok, Nakuru,
+Kericho, Laikipia,
+Kiambu, Uasin
+Gishu,
+Nyeri,Elgeyo-
+Marakwet",3.5-4,52-72," Processing:crisps
+ High dry matter
+24%
+ Processing
+quality also after
+long storage
+Strong canopy
+ Round oval tuber
+shape with
+shallow eyes"

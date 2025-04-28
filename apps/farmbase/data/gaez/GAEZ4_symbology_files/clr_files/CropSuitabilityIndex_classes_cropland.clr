@@ -1,0 +1,11 @@
+0 255 255 255 255 0
+1 0 112 0 255 SI > 75 : Very high
+2 21 174 17 255 SI > 63 : High     
+3 172 225 94 255 SI > 50 : Good
+4 254 216 1 255 SI > 35 : Medium  
+5 206 157 83 255 SI > 20 : Moderate
+6 205 108 1 255 SI > 10 : Marginal     
+7 128 128 128 255 SI >  0 : Very marginal
+8 207 207 207 255 Not suitable
+9 230 230 230 255 No cultivation
+10 32 32 255 255 Water

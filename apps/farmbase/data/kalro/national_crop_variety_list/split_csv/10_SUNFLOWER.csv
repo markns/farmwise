@@ -1,0 +1,172 @@
+Crop,Variety name/code,Year of relea se,Owner(s),Maintainer and seed source,Optimal production altitude range (Masl),Duration to maturity (month s),Seed yield(t ha- 1),Special attributes
+SUNFLOWER,1. H067,1974,"KARI/Kenya Seed
+Co.","KARI/Kenya
+Seed Co.",1500-2400,4-5,(2-3), High oil content
+SUNFLOWER,"2. Kenya
+White",1957,"KARI/Kenya Seed
+Co.","KARI/Kenya
+Seed Co.",1500-2300,5-6,(2-3)," Average oil
+content"
+SUNFLOWER,"3. Kenya
+Fedha",1981,"KARI/Kenya Seed
+Co.","KARI/Kenya
+Seed Co.",1000-2300,4-5,(3-4), High oil content
+SUNFLOWER,"4. Kenya
+Shaba",1981,"KARI/Kenya Seed
+Co.","KARI/Kenya
+Seed Co.",1000-2300,4-5,(3-4)," Average oil
+content"
+SUNFLOWER,5. H.894,1988,Kenya Seed Co.,Kenya Seed Co.,1500-2400,4-5,(2-3)," Combines high
+yield with high oil
+content"
+SUNFLOWER,6. H893,1988,Kenya Seed Co,Kenya Seed Co.,1500-2400,4-5,(2-3), High oil content
+SUNFLOWER,7. H001,1989,Kenya Seed Co,Kenya Seed Co.,1500-2400,4-5,(2-3), Early
+SUNFLOWER,8. H.898,1989,Kenya Seed Co.,Kenya Seed Co.,1500-2200,4-5,(2-3), High oil content
+SUNFLOWER,9. H8998,1992,Kenya Seed Co.,Kenya Seed Co.,900-2200,4-5,(3-4)," Early, High oil
+content"
+SUNFLOWER,10. PAN 7352,1994,Pannar Seed,Pannar Seed (K),1000-2200,4-5,"1.9-
+2.5"," High oil content
+Black seeds"
+SUNFLOWER,11. PAN 7369,1994,Pannar Seed,Pannar Seed (K),1000-2200,4-5,1.2-2," Black seeds 44%
+oil content
+ Tolerant to bird
+attacks"
+SUNFLOWER,"12. Kenya
+Almasi",2008,KARI,KARI,0-2500,4-5,"1.5–
+2.5",
+SUNFLOWER,13. KS-H4038,2008,Kenya Seed Co.,Kenya Seed Co.,1500-2300,3-4,3-3.6," High yield
+ High oil content
+(41%)"
+SUNFLOWER,14. KS-H4088,2008,Kenya Seed Co.,Kenya Seed Co.,1500-2300,3-4,3.6-4," High yield
+ High oil content
+(43%)"
+SUNFLOWER,15. Hysun 33,2021,"Advanta Seed
+International","Advanta Seed
+International","Altitude: 900
+—2200 m asl
+AEZ: LH 1-4,
+UM 1-4, LM 1-
+4 Sites:
+Nakuru,
+Kakamega,
+Bungoma,
+TransNzoia,
+Busia, Timau,
+Embu, Taveta,
+Medium",3-4,"2.5-
+3.0"," High oil content
+(45% -48%)
+ Wide adaptability
+ Drought tolerant
+ Tolerant to
+Alternaria, albugo
+and sclerotinia
+diseases Large
+head"
+SUNFLOWER,16. KAJ 037,2010,KARI,KAR-Njoro,1800-2400,4-5,1-3.0, High yielding
+SUNFLOWER,17. KAJ 001,2010,KARI,KAR-Njoro,1000-2000,3-4,1-2.0, Early maturity
+SUNFLOWER,18. PAN 7031,2010,Pannar Seed (K),Pannar Seed (K),900-2200,3-4,1.5-2," Very high oil
+content (45%)
+ Wide adaptability
+ Very uniform
+ Excellent
+standability"
+SUNFLOWER,19. PAN 7033,2010,Pannar Seed (K),Pannar Seed (K),1000-2400,2-3,2-3.0," Resistant to
+common rust
+ Good on downy
+mildew and
+sclerotinia
+ High oil
+content(41%),
+excellent
+standabilty"
+SUNFLOWER,20. PAN 7034,2010,Pannar Seed (K),Pannar Seed (K),900-2200,3-4,1.5-2," Good standability
+ High oil content
+(43%)
+ Excellent stability"
+SUNFLOWER,21. PAN 7043,2010,Pannar Seed (K),Pannar Seed (K),1000-2400,4-5,2-3.0," Very uniform, very
+high oil content
+(47%)
+ Excellent
+standability
+ Good on
+sclerotinia"
+SUNFLOWER,22. PAN 7351,2012,Pannar,Pannar,900-2200,3-4,2-3.0," Very high oil
+content (41%)
+ Widely adaptable
+ Uniform and
+excellent
+standability
+therefore ideal for
+combined
+harvesting"
+SUNFLOWER,"23. NK
+ADAGIO",2016,Syngante E.A Ltd,"Maintainer
+syngenta CH,
+source of
+varieties
+syngenta
+private
+breeding
+program.",900-2200 mid,3-4,2-3.0," High oil content
+(47.3%)
+ Good drought
+tolerance
+ Tolerant toto
+sclerotinia wilt"
+SUNFLOWER,24. NK KONDI,2016,Syngante E.A Ltd,"Maintainer
+syngenta CH,
+source of
+varieties
+syngenta
+private
+breeding
+program.","1000-2400
+Mid- Early",3-4,2-3.0," Good
+homogeneity
+ Very good oil
+content
+ Low susceptibity
+to
+Phoma,macr9oph
+oma & botrytis
+ Resisstant to
+Brome Rape race
+E"
+SUNFLOWER,25. NK DELFI,2016,Syngante E.A Ltd,"Maintainer
+syngenta CH,
+source of
+varieties
+syngenta
+private
+breeding
+program.","1000-2400
+Early",3-4,2-3.0," Good
+homogeneity
+ Very good oil
+content
+ Tolerant to
+promophosis
+ Resisstant to
+Brome Rape race
+E"
+SUNFLOWER,"26. NX
+55010(NK
+NEOMA)",2018,"Syngante
+Ag,Basel,Switzerlan
+d","Syngante
+Ag,Basel,Switzer
+land","Transitional to
+medium and
+medium
+altitude",3-4,3," A conventional
+linoleic oil type
+with high quality
+oil content of upto
+55%
+ Stability 8/9
+ Drought
+resistance7/9
+ A clearfield hybrid
+tolerant to IMI
+herbicides"

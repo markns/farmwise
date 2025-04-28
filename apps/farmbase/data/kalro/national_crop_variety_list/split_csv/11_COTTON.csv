@@ -1,0 +1,995 @@
+Crop,Variety name/code,Official variety release Name,Year of release in Kenya,Owner(s)/ Licensee,Maintainer and seed source,Optimal production altitude range (Masl),Duration to maturity (months),Lint yield (t ha-1),Special attributes
+COTTON,1. KSA 81 M,,1998,KARI,KARI-Kibos,0-1300,4-5,2-5, Fine fibre lint
+COTTON,2. AF0903,"IRMA
+L457",2012,"CIRAD/IRA
+D/SODECO
+TON*",IRAD,0 - 1650,"2.5 at 0 -
+500m
+2.5-3 at
+1000-1650m",2," Tolerance to
+Bacterial blight"
+COTTON,3. AF0904,"IRMA
+L484",2012,"CIRAD/IRA
+D/SODECO
+TON*",IRAD,0 - 1650,"2.5 at 0 -
+500m
+2.5-3 at
+1000-1650m",2," Tolerance to
+Bacterial blight"
+COTTON,4. 06K486,DP 486,2012,"Monsanto
+(K) Limited","Monsanto
+Inc.",0 - 1300,4-5,3-5," High GOT
+ Long , strong lint"
+COTTON,5. 06K485,DP485,2015,"MONSANT
+O (K) LTD","MONSANT
+O (K) LTD","0-1300 m
+ASL",4-5,"1.1
+5"," High yield
+ Long fiber length
+ Good leaf
+pubescence
+(hairiness)."
+COTTON,"6. HA-211 /
+Intercott
+211",HA - 211,2017,"Hazera
+Seeds","Hazera
+Seeds","Medium
+Altitude",1 ys,1.9," Lint Quality
+ Values Strength
+(gr/tex): 34 – 36
+ Elongation %: 7.5
+- 8.0
+ Fineness (micr.):
+3.6 - 3.8
+ Length (inch):
+1.36 - 1.37"
+COTTON,"7. HA-701 /
+Intercott
+701",HA - 701,2017,"Hazera
+Seeds","Hazera
+Seeds","Medium
+Altitude",1 ys,1.9," Lint Quality
+Values
+ Strength
+(gr/tex): 33 – 35
+ Elongation %: 6.5
+- 7.5
+ Fineness (micr.):
+3.6 - 3.8
+ Length (inch):
+1.33 – 1.34"
+COTTON,8. C 567,"MAHYCO
+C 567",2020,"Mahyco
+Kenya
+Private
+Limited","Mahyco,
+India","Altitude: 1
+to 1500,
+AEZ: LM 3,
+LM 4,LM 5,
+L3, L4,
+Sites:Mwe
+a,Perkerra,
+Kibos,Barw
+essa,Matu
+ga, Bura
+and Alupe",5-6,"1.9
+6 -
+2.2
+9"," Medium
+Maturity
+ Tolerant to
+sucking pests
+such as jassids
+and aphids
+ Medium hairy
+leaves
+ Long staple
+length with high
+fibre strength"
+COTTON,9. C 569,"MAHYCO
+C 569",2020,"Mahyco
+Kenya
+Private
+Limited","Mahyco,
+India","Altitude: 1
+to 1500,
+AEZ: LM 3,
+LM 4,LM 5,
+L3, L4,
+Sites:Mwe
+a,Perkerra,
+Kibos,Barw
+essa,Matu
+ga, Bura
+and Alupe",5-6,"1.5
+5-
+2.8
+9"," Medium
+Maturity
+ Tolerant to
+sucking pests
+such as jassids
+and aphids Large
+Boll Size
+ Long staple
+length with high
+fibre strength
+ Large Boll size"
+COTTON,10. C 570,"MAHYCO
+C 570",2020,"Mahyco
+Kenya
+Private
+Limited","Mahyco,
+India","Altitude: 1
+to 1500,
+AEZ: LM 3,
+LM 4,LM 5,
+L3, L4,
+Sites:Mwe
+a,Perkerra,
+Kibos,Barw
+essa,Matu
+ga, Bura
+and Alupe",5-6,"1.5
+5-
+1.9
+3"," Early Maturity,
+Large Boll Size
+ Tolerant to
+sucking pests
+such as jassids
+and aphids
+ Long staple
+length with high
+fibre strength"
+COTTON,11. C 571,"MAHYCO
+C 571",2020,"Mahyco
+Kenya
+Private
+Limited","Mahyco,
+India","Altitude: 1
+to 1500,
+AEZ: LM 3,
+LM 4,LM 5,
+L3, L4,
+Sites:Mwe
+a,Perkerra,
+Kibos,Barw
+essa,Matu
+ga, Bura
+and Alupe",5-6,"1.8
+9-
+2.5
+0"," Early Maturity
+ Tolerant to
+sucking pests
+such as jassids
+and aphids
+ Long staple
+length with high
+fibre strength"
+COTTON,"12. MRC 7017
+BG-II","MAHYCO
+C 570
+BGII",2020,"Mahyco
+Kenya
+Private
+Limited","Mahyco,
+India","Altitude: 1
+to 1500,
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4,
+Sites:
+Mwea,
+Perkerra,
+Kibos,
+Barwessa,
+Matuga,
+Bura and
+Alupe",5-6,"2.2-
+3.0"," Tolerant to
+Bollworm
+Complex
+ Early Maturity,
+Large Boll Size
+ Tolerant to
+sucking pests
+such as jassids
+and aphids
+ Long staple
+length with high
+fibre strength"
+COTTON,"13. MRC 7031
+BG-II Bt.
+Cotton","MAHYCO
+C 569
+BGII",2020,"Mahyco
+Kenya
+Private
+Limited","Mahyco,
+India","Altitude: 1
+to 1500,
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4,
+Sites:
+Mwea,
+Perkerra,
+Kibos,
+Barwessa,
+Matuga,
+Bura and
+Alupe",5-6,"2.7-
+3.1"," Tolerant to
+Bollworm
+Complex
+ Medium
+Maturity
+ Tolerant to
+sucking pest
+such as jassids
+and aphids
+ Long staple
+length with high
+fibre strength
+ Large Boll Size"
+COTTON,"14. MRC 7361
+BG-II Bt.
+Cotton","MAHYCO
+C 571
+BGII",2020,"Mahyco
+Kenya
+Private
+Limited","Mahyco,
+India","Altitude: 1
+to 1500,
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4,
+Sites:
+Mwea,
+Perkerra,
+Kibos,
+Barwessa,
+Matuga,
+Bura and
+Alupe",5-6,"2.5-
+2.6"," Tolerant to
+Bollworm
+Complex
+ Medium
+Maturity
+ Tolerant to
+sucking pest
+such as jassids
+and aphids
+ Long staple
+length with high
+fibre strength
+ Long staple
+length with high
+fibre strength"
+COTTON,"15. MRC 7377
+BG-II Bt.
+Cotton","MAHYCO
+C 567
+BGII",2020,"Mahyco
+Kenya
+Private
+Limited","Mahyco,
+India","Altitude: 1
+to 1500,
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4,
+Sites:
+Mwea,
+Perkerra,
+Kibos,
+Barwessa,
+Matuga,
+Bura and
+Alupe",5-6,"2.3-
+4.8"," Tolerant to
+Bollworm
+Complex
+ Medium
+Maturity
+ Tolerant to
+sucking pest
+such as jassids
+and aphids
+ Long staple
+length with high
+fibre strength
+ Long staple
+length with high
+fibre strength"
+COTTON,"16. US 401
+Non Bt","US 401
+Non Bt",2023,"Seedswork
+s
+Internatio
+nal Private
+Limited
+India","Seedswork
+s
+Internation
+al Private
+Limited,
+India","Altitude:
+50 to 2600
+AEZ: LM 1-
+4 Sites:
+Mwea,
+Kitui,
+Homabay,
+Bura,Kisu
+mu,Hola
+and Alupe",5-6,"2.4-
+2.6"," Med-Late
+maturity
+ Very Big bolls
+High boll
+retention
+ Highly tolerant
+to sucking
+insects
+pests(Jassids,
+Whitefly,Aphids,
+Thrips)
+ Drought Tolerant
+Rejuvenation
+capacity"
+COTTON,"17. US 402
+Non Bt","US 402
+Non Bt",2023,"Seedswork
+s
+Internatio
+nal Private
+Limited
+India","Seedswork
+s
+Internation
+al Private
+Limited,
+India","Altitude:
+50 to 2600
+AEZ: LM 1-
+4 Sites:
+Mwea,
+Kitui,
+Homabay,
+Bura,Kisu
+mu,Hola
+and Alupe",5-6,"2.2
+-2.4"," Medium
+maturity
+ Big bolls
+ Highly tolerant
+to sucking
+insects
+pests(Jassids,
+Whitefly,Aphids,
+Thrips)
+ Drought Tolerant
+suitable for dual
+cropping"
+COTTON,"18. US 406
+Non Bt","US 406
+Non Bt",2023,"Seedswork
+s
+Internatio
+nal Private
+Limited
+India","Seedswork
+s
+Internation
+al Private
+Limited,
+India","Altitude:
+50 to 2600
+AEZ: LM 1-
+4 Sites:
+Mwea,
+Kitui,
+Homabay,
+Bura,Kisu
+mu,Hola
+and Alupe",5-6,"2.4
+-2.6"," Medium
+maturity
+ Medium bolls
+Good boll
+retention
+ Highly tolerant
+to sucking
+insects
+pests(Jassids,
+Whitefly,Aphids,
+Thrips)
+ Drought Tolerant"
+COTTON,"19. US 408
+Non Bt","US 408
+Non Bt",2023,"Seedswork
+s
+Internatio
+nal Private
+Limited
+India","Seedswork
+s
+Internation
+al Private
+Limited,
+India","Altitude:
+50 to 2600
+AEZ: LM 1-
+4 Sites:
+Mwea,
+Kitui,
+Homabay,
+Bura,Kisu
+mu,Hola
+and Alupe",5-6,"2.2
+-2.4"," Mid-Early
+maturity
+ Medium big bolls
+ Highly tolerant
+to sucking
+insects
+pests(Jassids,
+Whitefly,Aphids,
+Thrips)
+ Drought Tolerant
+Tolerant to
+moisture stress"
+COTTON,"20. US 409
+Non Bt","US 409
+Non Bt",2023,"Seedswork
+s
+Internatio
+nal Private
+Limited
+India","Seedswork
+s
+Internation
+al Private
+Limited,
+India","Altitude:
+50 to 2600
+AEZ: LM 1-
+4 Sites:
+Mwea,
+Kitui,
+Homabay,
+Bura,Kisu
+mu,Hola
+and Alupe",5-6,"2.2-
+2.4"," Medium
+maturity
+ Medium big bolls
+ Highly tolerant
+to sucking
+insects
+pests(Jassids,
+Whitefly,Aphids,
+Thrips)
+ Drought Tolerant"
+COTTON,"21. US 410
+Non Bt","US 410
+Non Bt",2023,"Seedswork
+s
+Internatio
+nal Private
+Limited
+India","Seedswork
+s
+Internation
+al Private
+Limited,
+India","Altitude:
+50 to 2600
+AEZ: LM 1-
+4 Sites:
+Mwea,
+Kitui,
+Homabay,
+Bura,Kisu
+mu,Hola
+and Alupe",5-6,"2.3
+-2.4"," Mid-Late
+maturity
+ Very Big bolls
+Open plant type
+ Highly tolerant
+to sucking
+insects
+pests(Jassids,
+Whitefly,Aphids,
+Thrips)
+ Drought Tolerant"
+COTTON,22. MIC 563,MIC 563,2024,"Mahyco
+Kenya
+Private
+Limited","Mahyco
+Private
+Limited,
+India","Altitude: 1
+to 1500
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4,
+Sites:
+Mwea,
+Perkerra,
+Kibos, and
+Alupe",4-5,"2-
+2.5"," Early Maturity
+Long Staple
+length &
+medium fibre
+strength"
+COTTON,23. MIC 561,MIC 561,2024,"Mahyco
+Kenya
+Private
+Limited","Mahyco
+Private
+Limited,
+India","Altitude: 1
+to 1500
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4,
+Sites:
+Mwea,
+Perkerra,
+Kibos, and
+Alupe",5-6,"2.5
+-3"," Medium
+Maturity
+ Large boll size
+ Long Staple
+length
+ Medium fibre
+strength"
+COTTON,24. MIC 562,MIC 562,2024,"Mahyco
+Kenya
+Private
+Limited","Mahyco
+Private
+Limited,
+India","Altitude: 1
+to 1500
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4,
+Sites:
+Mwea,
+Perkerra,
+Kibos, and
+Alupe",5-6,"2.5-
+3"," Medium
+Maturity
+ Large boll size
+Long Staple
+length
+ Medium fibre
+strength"
+COTTON,"25. MAHYCO
+C577","MAHYCO
+C577",2024,"Mahyco
+Kenya
+Private
+Limited","Mahyco
+Private
+Limited,
+India","Altitude: 1
+to 1500
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4,
+Sites:
+Mwea,
+Perkerra,
+Kibos, and
+Alupe",5-6,"2.2
+-2.7"," Early Maturity
+with good plant
+type
+ Good Fibre
+percentage
+ Long staple
+length with
+excellent fibre
+strength"
+COTTON,"26. MAHYCO
+C577 BGII","MAHYCO
+C577
+BGII",2025,"Mahyco
+Kenya
+Private
+Limited","Mahyco
+Private
+Limited,
+India","Altitude:
+1-1500
+m.a.s.l
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4
+Sites
+where
+testing
+was done:
+Bura,
+Perkerra,
+Kitui,
+Mwea,
+Kibos,
+Homa bay",4-5,"2-
+2.5"," Early Maturity with
+Good plant type
+ Resistant to
+Bollworms
+ Tolerance to
+Sucking Pest such as
+Jassids and Aphids
+ Good Fibre
+Percentage, Long
+staple length with
+excellent fibre
+strength"
+COTTON,"27. MIC 561
+BGII","MIC 561
+BGII",2025,"Mahyco
+Kenya
+Private
+Limited","Mahyco
+Private
+Limited,
+India","Altitude:
+1-1500
+m.a.s.l
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4
+Sites
+where
+testing
+was done:
+Bura,
+Perkerra,
+Kitui,
+Mwea,
+Kibos,
+Homa bay",5-6,"2-
+2.5"," Medium Maturity
+ Large Boll Size
+ Resistant to
+Bollworms
+ Tolerance to
+Sucking Pest such as
+Jassids and Aphids
+ Long staple length &
+Medium fibre
+strength"
+COTTON,"28. MIC 562
+BGII","MIC 562
+BGII",2025,"Mahyco
+Kenya
+Private
+Limited","Mahyco
+Private
+Limited,
+India","Altitude:
+1-1500
+m.a.s.l
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4
+Sites
+where
+testing
+was done:
+Bura,
+Perkerra,
+Kitui,
+Mwea,
+Kibos,
+Homa bay",5-6,"2-
+2.5"," Medium Maturity
+ Large Boll Size
+ Resistant to
+Bollworms
+ Tolerance to
+Sucking Pest such as
+Jassids and Aphids
+ Long staple length &
+Medium fibre
+strength"
+COTTON,"29. MIC 563
+BGII","MIC 563
+BGII",2025,"Mahyco
+Kenya
+Private
+Limited","Mahyco
+Private
+Limited,
+India","Altitude:
+1-1500
+m.a.s.l
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4
+Sites
+where
+testing
+was done:
+Bura,
+Perkerra,
+Kitui,
+Mwea,
+Kibos,
+Homa bay",4-5,"2-
+2.5"," Early Maturity
+ Resistant to
+Bollworms
+ Medium Tolerance
+to Sucking Pest such
+as Jassids and
+Aphids
+ Long staple length &
+Medium fibre
+strength"
+COTTON,"30. US 406
+BGII","US 133
+BG2",2025,"SEEDWOR
+KS
+INTERNATI
+ONAL
+PRIVATE
+LIMITED,
+INDIA","SeedWork
+s
+Internation
+al Pvt Ltd,
+India","Altitude:
+1 to 1500
+m.a.s.l
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4
+Sites
+where
+testing
+was done:
+Bura,
+Perkerra,
+Kitui,
+Mwea,
+Kibos,
+Homa bay",4-5,"2.4-
+2.6"," Open plant type
+ Early maturity
+ Medium big bolls
+ Good boll retention
+ Tolerant to sucking
+insect pests (Jassids,
+Whitefly, Aphids,
+Thrips)
+ Tolerant to
+bollworms
+ Long staple length
+with strong fibre
+strength"
+COTTON,"31. US 408
+BGII","US 244
+BG2",2025,"SEEDWOR
+KS
+INTERNATI
+ONAL
+PRIVATE
+LIMITED,
+INDIA","SeedWork
+s
+Internation
+al Pvt Ltd,
+India","Altitude:
+1 to 1500
+m.a.s.l
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4
+Sites
+where
+testing
+was done:
+Bura,
+Perkerra,
+Kitui,
+Mwea,
+Kibos,
+Homa bay",5-6,"2.2-
+2.4"," Open plant type
+ Mid-early maturity
+ Medium big bolls
+ Tolerant to sucking
+insect pests (Jassids,
+Whitefly, Aphids,
+Thrips)
+ Tolerant to
+moisture stress
+ Tolerant to
+bollworms
+ Long staple length
+with strong fibre
+strength"
+COTTON,"32. US 402
+BGII","US 111
+BG2",2025,"SEEDWOR
+KS
+INTERNATI
+ONAL
+PRIVATE
+LIMITED,
+INDIA","SeedWork
+s
+Internation
+al Pvt Ltd,
+India","Altitude:
+1 to 1500
+m.a.s.l
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4
+Sites
+where
+testing
+was done:
+Bura,
+Perkerra,
+Kitui,
+Mwea,
+Kibos,
+Homa bay",4-5,"2.2-
+2.4"," Early maturity
+ Suitable for dual
+cropping
+ Big bolls
+ Higher yield
+potential, quicker &
+faster
+ Tolerant to sucking
+insect pests (Jassids,
+Whitefly, Aphids,
+Thrips)
+ Potential to escape
+late dry spell
+situations"
+COTTON,"33. US 401
+BGII","US 222
+BG2",2025,"SEEDWOR
+KS
+INTERNATI
+ONAL
+PRIVATE
+LIMITED,
+INDIA","SeedWork
+s
+Internation
+al Pvt Ltd,
+India","Altitude:
+1 to 1500
+m.a.s.l
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4
+Sites
+where
+testing
+was done:
+Bura,
+Perkerra,
+Kitui,
+Mwea,
+Kibos,
+Homa bay",5-6,"2.4-
+2.6"," Med-Late maturity
+ Very Big bolls
+ Chain boll bearing
+ Highly tolerant to
+sucking insect pests
+(Jassids, Whitefly,
+Aphids, Thrips)
+ Tolerant to water
+stress
+ Rejuvenation
+capacity
+ Tolerant to
+bollworms
+ Long staple length
+with strong fibre
+strength"
+COTTON,"34. US 409
+BGII","US 266
+BG2",2025,"SEEDWOR
+KS
+INTERNATI
+ONAL
+PRIVATE
+LIMITED,
+INDIA","SeedWork
+s
+Internation
+al Pvt Ltd,
+India","Altitude:
+1 to 1500
+m.a.s.l
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4
+Sites
+where
+testing
+was done:
+Bura,
+Perkerra,
+Kitui,
+Mwea,
+Kibos,
+Homa bay",5-6,"2.2-
+2.4"," Medium maturity
+ Medium big bolls
+ Tolerant to sucking
+insect pests (Jassids,
+Whitefly, Aphids,
+Thrips)
+ Tolerant to
+bollworms
+ Long staple length
+with strong fibre
+strength"
+COTTON,"35. US 410
+BGII","US 255
+BG2",2025,"SEEDWOR
+KS
+INTERNATI
+ONAL
+PRIVATE
+LIMITED,
+INDIA","SeedWork
+s
+Internation
+al Pvt Ltd,
+India","Altitude:
+1 to 1500
+m.a.s.l
+AEZ: LM 3,
+LM 4, LM
+5, L3, L4
+Sites
+where
+testing
+was done:
+Bura,
+Perkerra,
+Kitui,
+Mwea,
+Kibos,
+Homa bay",5-6,"2.3-
+2.5"," Mid-late maturity
+ Open plant type
+ Big bolls
+ Tolerant to sucking
+insect pests (Jassids,
+Whitefly, Aphids,
+Thrips)
+ Tolerant to
+moisture stress
+ Tolerant to
+bollworms
+ Long staple length
+with strong fibre
+strength"

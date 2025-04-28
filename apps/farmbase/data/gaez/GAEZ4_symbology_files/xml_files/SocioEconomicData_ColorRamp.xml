@@ -1,0 +1,15 @@
+<!DOCTYPE qgis_style>
+<qgis_style version="2">
+  <symbols/>
+  <colorramps>
+    <colorramp tags="GAEZ" type="gradient" name="SocioEconomicData_ColorRamp">
+      <prop k="color1" v="255,245,235,255"/>
+      <prop k="color2" v="127,39,4,255"/>
+      <prop k="discrete" v="0"/>
+      <prop k="rampType" v="gradient"/>
+      <prop k="stops" v="0.13;254,230,206,255:0.26;253,208,162,255:0.39;253,174,107,255:0.52;253,141,60,255:0.65;241,105,19,255:0.78;217,72,1,255:0.9;166,54,3,255"/>
+    </colorramp>
+  </colorramps>
+  <textformats/>
+  <labelsettings/>
+</qgis_style>

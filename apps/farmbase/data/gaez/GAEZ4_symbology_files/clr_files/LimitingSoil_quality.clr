@@ -1,0 +1,13 @@
+0 255 255 255 255 0
+1 0 147 0 255 No or slight constraints
+2 167 83 20 255 Nutrient availability and retention
+3 255 136 17 255 Nutrient retention capacity
+4 255 0 128 255 Rooting conditions
+5 147 147 255 255 Oxygen availability
+6 255 128 192 255 Salinity and sodicity
+7 255 248 155 255 Calcium carbonate and gypsum toxicity
+8 225 208 0 255 Soil workability
+9 119 0 0 255 Terrain slopes
+10 191 197 213 255 Permafrost
+11 221 221 221 255 No data or Evaluation not applicable
+12 0 0 255 255 Water

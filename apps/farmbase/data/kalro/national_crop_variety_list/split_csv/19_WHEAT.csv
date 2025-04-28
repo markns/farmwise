@@ -1,0 +1,613 @@
+Crop,Variety name/code,Official Release Name,Year of release in Kenya,Owner(s)/ Licensee,Maintainer and seed source,Optimal production altitude range (Masl),Duration to maturity (month s),Grain yield (t ha-1),Special attributes
+WHEAT,"1. Kenya
+Temb
+o","Kenya
+Tembo",1975,"KARI/Keny
+a Seed Co.","KARI/Keny
+a Seed Co.",1800-2100,4-5,1.3 -1.8, Lodging resistance
+WHEAT,"2. Kenya
+Kong
+oni","Kenya
+Kongoni",1975,"KARI/Keny
+a Seed Co.","KARI/Keny
+a Seed Co.",1800-2700,4-5,1.3 -1.6, Acid soil tolerant
+WHEAT,"3. Kenya
+Fahari","Kenya
+Fahari",1977,"KARI/Keny
+a Seed Co.","KARI/Keny
+a Seed Co.",1800-2400,3-5,1.1-1.6," Resistant to Russian
+wheat aphid"
+WHEAT,"4. Kenya
+Nyum
+bu","Kenya
+Nyumbu",1982,"KARI/Keny
+a Seed Co.",KARI,1800-2100,4-5,1.3 -1.8, Resistant to stem rust
+WHEAT,"5. Kenya
+Mbun
+i","Kenya
+Mbuni",1987,"KARI/Keny
+a Seed Co.","KARI/Keny
+a Seed Co.",1800-2400,4-5,2.8-6.0, High yielding
+WHEAT,"6. Kenya
+Kwale","Kenya
+Kwale",1987,"KARI/Keny
+a Seed Co.","KARI/Keny
+a Seed Co.",2100 - 2400,4-5,2.8 -6.7," High yielding
+ Tolerant to sprout"
+WHEAT,"7. Kenya
+Pasa","Kenya
+Pasa",1989,"KARI/Keny
+a Seed Co.","KARI/Keny
+a Seed Co.",1800-2400,4-5,2.3-6.7," High yield
+ Resistant to lodging"
+WHEAT,"8. Kenya
+Chirik
+u","Kenya
+Chiriku",1989,"KARI/Keny
+a Seed Co.","KARI/Keny
+a Seed Co.",1800-2400,4-5,2.6-6.0, Resistant to rust
+WHEAT,"9. Kenya
+Duma","Kenya
+Duma",1998,KARI,KARI Njoro,<1800,2-3,2.0 - 3.4," Drought tolerant &
+Early maturity"
+WHEAT,"10. Kenya
+Mbeg
+a","Kenya
+Mbega",1998,KARI,KARI,1800-2100,4-5,3.0 -6.8," High yielding
+ Resistant to leaf rust"
+WHEAT,"11. Ngam
+ia",Ngamia,1998,KARI,KARI,1800-2400,3-4,1.8 -3.6, Drought tolerant
+WHEAT,"12. Kenya
+Chozi","Kenya
+Chozi",1999,KARI,KARI,1500-1800,4-5,2.3 -5.6, Drought tolerant
+WHEAT,"13. Kenya
+Heroe","Kenya
+Heroe",1999,KARI,KARI,2100-2400,4-5,3.5 - 7.2, High yielding
+WHEAT,"14. Kenya
+Yomb
+i","Kenya
+Yombi",1999,KARI,KARI,1800-2100,3-4,3.3 -7.0, High yielding
+WHEAT,"15. KS
+Mwa
+mba","KS
+Mwamba",2001,"Kenya
+Seed Co.","Kenya
+Seed Co.",1500-2400,3-4,2.0-5.6," Wide adaptation
+ High yield"
+WHEAT,"16. Njoro
+BW1","Njoro
+BW1",2001,KARI,KARI,1800-2400,3-4,2.2-4.7," Drought tolerant
+ High protein content"
+WHEAT,"17. Njoro
+BW2","Njoro
+BW2",2001,KARI,KARI Njoro,1800-2400,3-4,3.7-8.0," Tolerant to acid soil
+ Resistant to lodging"
+WHEAT,"18. KS
+Simba",KS Simba,2007,"Kenya
+Seed Co.","Kenya
+Seed Co.",1500-2400,3-4,2.5-5.0," Suitable for both
+marginal and high
+potential areas
+ Good baking quality"
+WHEAT,19. Farasi,Farasi,2007,"Kenya
+Seed Co.","Kenya
+Seed Co.",1800-2400,4,2.5-5.0," Resistant to most
+foliar diseases
+ Good baking quality"
+WHEAT,"20. Kenya
+Ibis",Kenya Ibis,2008,KARI,KARI Njoro,1500-1800,"3.5 -
+4.0",6-Mar," Drought tolerant
+ Tolerant to stem rust
+ Good baking qualities"
+WHEAT,"21. KS-
+Chui",KS-Chui,2008,"Kenya
+Seed Co.","Kenya
+Seed Co.",1800-2400,4,1.5 - 3.0," Adapted to high
+potential and
+marginal areas
+ Good tolerance to
+foliar diseases"
+WHEAT,"22. KSRR
+2","Kenya
+Robin",2011,KARI,"KARI-
+NJORO","1800-
+2700m",3.5,7.0-8.0," Bred for adult plant
+resistance to stem
+rust (Ug99 strain)
+ Early maturing and
+widely adopted
+ Does well in low to
+high altitude (lower
+Narok, Timau and
+Mau Narok
+ Large grains with a
+test weight of
+48g/1000kennels
+ High protein content
+(12.5) and good
+milling and baking
+qualities"
+WHEAT,"23. KSRR
+4",Eagle 10,2011,KARI,"KARI-
+NJORO","1800.2100
+m",3.5,6.0-7.0," Good resistance to
+stem rust (Ug99
+strain)
+ Very early maturing
+hence suitable for
+drought prone areas
+like Mweiga, lower
+Narok and Rongai
+ Long grained with
+high protein content
+of 13%
+ Very good baking
+quality"
+WHEAT,"24. KSRR
+10","Kenya
+Hawk12",2012,KARI,KARI-Njoro,2100-2400,4-5,7.5," Red hard grain with
+resistance to both
+lodging and sprout
+ High test weight and
+baking qualities
+ May be good for areas
+that receive rain
+during harvesting like
+Mau Narok and Timau
+ Resistant to both
+stem rust and yellow
+rust"
+WHEAT,"25. KSRR
+5",Kenya Tae,2012,KARI,KARI-Njoro,1800-2100,3-4,6.5," Resistant to both
+stem rust and yellow
+rust
+ Red hard grain with
+heavy biomass
+ May be well adopted
+by farmers who use
+straw for livestock
+feed."
+WHEAT,"26. KSRR
+6","Kenya
+Sunbird",2012,KARI,KARI-Njoro,1800-2100,3-4,6.8," Resistance to both
+yellow and stem rust
+ High biomass
+ High protein content
+ Suitable for whole
+grain chapatis and
+baking."
+WHEAT,"27. KSRR
+7","Kenya
+Wren",2012,KARI,KARI-Njoro,2100-2400,4-5,8.1," Has adult plant
+resistance to both
+yellow and stem rust
+diseases
+ Large red hard grain
+with excellent flour
+conversion
+ High protein content,
+good for home baking
+and chapattis
+ Tolerant to acidic soils"
+WHEAT,"28. KSRR
+8","Kenya
+Korongo",2012,KARI,KARI-Njoro,Below 1800,3-4,7," White hard grain
+ Very high flour
+conversion with good
+baking qualities
+ Recommended for dry
+areas like Rongai and
+Naivasha"
+WHEAT,"29. KSRR
+11","Kenya
+Kingbird",2012,KARI,KARI-Njoro,Below 1800,3-4,6," Developed for Adult
+plant resistance to
+both stem rust and
+yellow rus
+ A good parent in
+breeding especially
+for rust diseases
+ White grain with very
+high test weight and
+flour conversion"
+WHEAT,30. 09B4,KS-Kanga,2013,"Kenya
+Seed Co.","Kenya
+Seed Co.","1800-2500
+Narok,
+Nanyuki,
+Uasin
+Gishu,
+Njoro",3-4.5,1.8-3.8," Tolerant to glume
+blotch, ear-rot, stem
+rust
+ Good tillering ability
+ Good baking quality
+ Slow rusting"
+WHEAT,"31. 08B4
+2",KS-Nyota,2013,"Kenya
+Seed Co.","Kenya
+Seed Co.","1800-2500
+m.a.s.l
+- Narok,
+Rumuruti,
+Rongai,
+Lanet, Uasin
+Gishu",3-4,1.8-3.5," High yield
+ Good tilling ability
+ 72.35 extraction test
+ Medium sprouting
+ Stable dough"
+WHEAT,"32. CHEP
+BW2","Eldo
+Baraka",2014,"University
+of Eldoret","University
+of Eldoret","1500-2700
+And as
+rotation
+crop in
+bimodal
+rainfall
+areas",3-5,3.2- 4.5," Resistant to stem rust
+of wheat Ug99
+ Moderately Drought
+tolerant
+ Medium maturing
+ Erect and non lodging
+suitable for combine
+harvesting
+ Tolerant to Fusarium
+wilt and high acidity
+ Red seeded"
+WHEAT,"33. CHEP
+BW4","Eldo
+Mavuno",2014,"University
+of Eldoret","University
+of Eldoret","Medium to
+high rainfall
+,areas such
+as Eldoret,
+Kitale,
+Nakuru and
+Narok.",4-5,4.5-5.5," Stem rust resistant
+ Good baking quality
+ High gluten
+ Resistant to lodging"
+WHEAT,"34. R123
+8","Kenya
+Hornbill",2016,KALRO,"KALRO
+Njoro","1800 – 2100
+MASL
+Examples of
+optimal
+growing
+areas:
+Njoro,
+Rongai,
+Endebees,
+Kinamba,
+Moiben",3-4,7.5," White hard grain
+ high grain protein
+content
+ Good for home baking
+(e.g. Chapatis)
+ High adult plant
+resistance to yellow
+rust and moderate
+resistance to stem
+rust
+ Tolerant to soil acidity"
+WHEAT,"35. R124
+4","Kenya
+Deer",2016,KALRO,"KALRO
+Njoro","Below 1800
+MASL
+Examples of
+optimal
+growing
+areas:
+Lower
+Narok,
+Lanet,
+Naivasha",3-4,7.8," White hard grain
+ Good for home baking
+(e.g. Chapatis)
+ High adult plant
+resistance to stem
+and yellow rusts
+ Early maturity"
+WHEAT,"36. R127
+1","Kenya
+Weaverbi
+rd",2016,KALRO,"KALRO
+Njoro","1800 – 2100
+MASL
+Examples of
+optimal
+growing
+areas:
+Njoro,
+Rongai,
+Endebees,
+Kinamba",3-4,8," Amber –to – red
+colored hard grain
+ Good bread making
+quality
+ High adult plant
+resistance to stem
+rusts
+ Moderate to high
+tillering ability with
+well filled spikes
+ Good ability to
+tolerate drought,
+partly due to the
+variety’s high foliage
+glaucosity/waxiness"
+WHEAT,"37. R128
+6","Kenya
+Peacock",2016,KALRO,"KALRO
+Njoro","2100 – 2400
+MASL
+Examples of
+optimal
+growing
+areas: Mau
+Narok,
+Timau",4-5,8.2," Amber –to – red
+colored hard grain
+ High grain protein
+ Excellent bread
+making quality
+ High Adult Plant
+Resistance to both
+Stem and Yellow
+Rusts"
+WHEAT,"38. R130
+1","Kenya
+Falcon",2016,KALRO,"KALRO
+Njoro","2100 – 2400
+MASL
+Examples of
+optimal
+growing
+areas: Mau
+Narok,
+Timau",3-4,8," Red colored hard
+grain
+ Good bread making
+quality
+ Excellent seedling and
+adult plant resistance
+to stem rust
+ Highly resistant to
+yellow rust
+ Long, well filled spikes
+ Medium Maturity"
+WHEAT,"39. R130
+2","Kenya
+Songbird",2016,KALRO,"KALRO
+Njoro","1800 – 2100
+MASL
+Examples of
+optimal
+growing
+areas:
+Njoro,
+Rongai,
+Endebees,
+Kinamba,
+Upper
+Narok",3-4,8.2," Amber –to – red
+colored hard grain
+ High grain protein
+ Good bread making
+quality
+ Moderate Adult Plant
+Resistance to both
+Stem and yellow rusts
+ Medium maturity"
+WHEAT,"40. R130
+5","Kenya
+Pelican",2016,KALRO,"KALRO
+Njoro","2100 – 2400
+MASL
+Examples of
+optimal
+growing
+areas: Mau
+Narok,
+Timau",4-5,8.5," Red colored hard
+grain; good bread
+making quality
+ High adult plant
+resistance to stem
+and yellow rusts"
+WHEAT,"41. 013B
+31","KS Wheat
+04",2018,KSCo,KSCo,"1800 - 2500
+m.a.s.l.
+(Timau,
+Narok,
+Nanyuki,
+Nakuru,
+Uasin
+Gishu, Trans
+Nzoia)",3-4,3.85," Spring type; >7 Tillers
+per plant hence good
+tillering ability
+ Average height 90cm
+ Good stem rust
+resistance 2/5 (APR to
+Sr & Yr)
+ Rred-coloured hard
+grains
+ Good milling and for
+bread baking (i.e.
+whole grain bread)
+ Resistant to lodging"
+WHEAT,42. R1494,"Kenya
+Kasuku",2019,KALRO,"KALRO-
+NJORO","Altitude:800
+– 2400 masl
+AEZ: LH2,
+LH3, UH2,
+UH3
+Examples:
+Njoro, Mau-
+Narok, Upper
+Narok,
+Timau,
+Oljororok,
+Kinamba,
+Moiben","3-4,
+(Mediu
+m)",7.0 – 8.0," Red hard grain
+ Good milling and
+baking qualities
+ Moderately resistant
+to original Ug99 races
+ In warmer weather,
+susceptible to “isolate
+TTKTT” and integrated
+management will be
+required
+ Long well filled spikes
+ Semi dwarf; resistant
+to lodging"
+WHEAT,43. R1495,"Kenya
+Jacana",2019,KALRO,"KALRO-
+NJORO","Altitude:80
+0 – 2400
+masl AEZ:
+LH2, LH3,
+UH2, UH3
+Examples:
+Njoro, Mau-
+Narok,
+Upper
+Narok,
+Timau,
+Oljororok,
+Kinamba,
+Moiben","3-
+5(Medi
+um-
+slightly
+late)",6.5 - 8.0," Red hard grain
+ Good milling and
+baking qualities
+ Moderately resistant
+to original Ug99 races
+ In warmer weather,
+susceptible to “isolate
+TTKTT” and integrated
+management will be
+required
+ High tillering ability
+ Semi dwarf; resistant
+to lodging"
+WHEAT,44. R1573,"Kenya
+Impala
+Impala",2020,KALRO,"KALRO-
+NJORO","Altitude:
+1800 -2400
+masl AEZ:
+LH2, LH3,
+UH2, UH3
+Example of
+Sites: Njoro,
+Moiben,
+Lower
+Narok,
+Timau,
+Oljororok)","3-4
+(Early)",7.0 – 8.0," White Hard Grain
+ Good milling and
+baking qualities
+ Resistant to yellow
+rust
+ Moderate to high
+resistance to stem
+rust subject to
+seasonal disease
+pressure
+ Resistant to lodging
+ Well filled and closed
+spikes"
+WHEAT,45. R1575,"Kenya
+Hyrax",2020,KALRO,"KALRO-
+NJORO","Altitude:
+1800 -2400
+masl AEZ:
+LH2, LH3,
+UH2, UH3
+Example of
+Sites: Njoro,
+Moiben,
+Narok,
+Timau,
+Oljororok)","3-
+4(Slight
+ly
+Early-
+Mediu
+m)",6.5 - 7.5," Red Hard Grain
+ Good milling and
+baking qualities
+ Resistant to yellow
+rust
+ Moderate to high
+resistance to stem
+rust subject to
+seasonal disease
+pressure
+ High tillering ability"
+WHEAT,46. R1585,"Kenya
+Pweza",2021,KALRO,"KALRO
+NJORO","Altitude:
+1800-2400
+m.a.s.l AEZ:
+LH2, LH3,
+UH2, UH3
+Site:
+Njoro,Moib
+en,Lower
+Narok,
+Kinamba,
+Oljororok","3-
+4(Ealy)",6.5-7.5," Red hard grain
+ Early maturity,
+Moderate resistance
+to “Ug99” races of
+stem rust
+ High tillering ability
+ Good milling and
+baking qualities
+ Semi dwarf ; tolerant
+to lodging"
+WHEAT,47. R1601,"Kenya
+Turaco",2021,KALRO,"KALRO
+Njoro","Altitude:
+1800-2400
+m.a.s.l AEZ:
+LH2, LH3,
+UH2, UH3
+Sites: Njoro,
+Mau Narok,
+Upper
+Narok,
+Kinamba,
+Timaug","3-4
+(Mediu
+m)",6.0-8.0," White Hard Grain
+ Medium maturity
+ Moderate resistance
+to “Ug99” races of
+stem rust
+ High biomass- suitable
+source of straw for
+hay
+ Good milling and
+baking qualities
+ Semi-dwarf; tolerant
+to lodging"

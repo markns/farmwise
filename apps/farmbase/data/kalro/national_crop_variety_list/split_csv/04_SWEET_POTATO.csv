@@ -1,0 +1,427 @@
+Crop,Variety name/code,Official Release Name,Year of relea se,Owner(s),Maintain er,Optimal production altitude range (Masl),Duration to maturity (months),Root yield (tha-1 y- 1),Special attributes
+SWEET_POTATO,"1. Mtwap
+a 8",Mtwapa 8,1998,KARI,"KARI
+(Mtwapa
+)",1-1500,3.5,10-20," Low fibre
+ High beta
+carotene"
+SWEET_POTATO,2. Jayalo,Jayalo,1998,KARI,KARI,1-200,4,10-15," Good for piece
+meal
+harvesting"
+SWEET_POTATO,3. 22/77,22/77,1998,KARI,KARI,1-800,3.5,10-20," Good for piece
+meal
+harvesting"
+SWEET_POTATO,"4. KSP 20
+(Wanju
+gu)","KSP
+20(Wanjug
+u)",2000,KARI,"KARI
+(Katuma
+ni)",250-1750,3-4,20," High carotene
+levels
+ Red skinned"
+SWEET_POTATO,5. SPK 004,SPK 004,2001,KARI,"KARI-
+Kakameg
+a",1300-2000,3-4,13-20," High beta
+carotene"
+SWEET_POTATO,"6. Kemb
+10",Kemb 10,2001,KARI,"KARI-
+Kakameg
+a",1300-2000,3-4,16-25, High yielding
+SWEET_POTATO,7. SPK 013,SPK 013,2001,KARI,"KARI-
+Kakameg
+a",1200 - 1400,4-5,21-35," Low
+underground
+stability"
+SWEET_POTATO,"8. Mugan
+de",Mugande,2001,KARI,"KARI-
+Kakameg
+a",1300-2000,4-5,15-25, Early maturing
+SWEET_POTATO,"9. Ksp004
+7",Ksp0047,2010,KARI,"KARI
+KATUMA
+NI","Warm, Semi-arid
+areas, 800 –
+1000 m.a.s.l.,
+Good for hill
+masses of Taita,
+and makueni
+districts",3-4,25," Light orange
+fleshed
+ High ß
+carotene
+content"
+SWEET_POTATO,"10. Ksp007
+2",Ksp0072,2010,KARI,"KARI
+KATUMA
+NI","central.Warm,
+Semi-arid areas,
+600 –1400
+m.a.s.l. Yield
+well in coffee
+zone of eastern
+and",3-4,22," Light orange
+fleshed
+ High ß
+carotene
+content"
+SWEET_POTATO,"11. Ksp008
+4",Ksp0084,2010,KARI,"KARI
+KATUMA
+NI","Warm, Semi-arid
+areas, 600 –
+1800 m.a.s.l.
+Recommended
+for the coffee
+and lower areas",3-4,20," Light orange
+fleshed
+ High ß
+carotene
+content
+ Duo purpose"
+SWEET_POTATO,"12. Ksp015
+4",Ksp0154,2010,KARI,"KARI
+KATUMA
+NI","Warm, Semi-arid
+areas, 800 –
+1800 m.a.s.l.
+Good for the
+Coffee zone
+(Thika, muranga
+South, Kandara,
+Kangundo)",3-4,23," Light orange
+fleshed
+ High ß
+carotene
+content"
+SWEET_POTATO,"13. Mwavul
+i",Mwavuli-1,2011,"KARI-
+Kakameg
+a","KARI-
+Kakameg
+a",1200-1800,4-5,"22.0
+(40.0)"," High root yield
+ High DM
+ Dual purpose"
+SWEET_POTATO,14. 91-218,Limara,2011,"KARI-
+Kakameg
+a","KARI-
+Kakameg
+a",1200-1700,4-5,15.4-25," Very Resistant
+to virus disease"
+SWEET_POTATO,"15. 292-H-
+12",Rachar,2011,"KARI-
+Kakameg
+a","KARI-
+Kakameg
+a",1200-1680,4-5,"14.2
+(34.0)*", Virus resistant
+SWEET_POTATO,"16. 56682-
+03",Haraka,2011,"KARI-
+Kakameg
+a","KARI-
+Kakameg
+a",1300-1600,4-5,16.3," Orange-fleshed
+ High DM"
+SWEET_POTATO,17. K117,Lisamu-DP,2011,"KARI-
+Kakameg
+a","KARI-
+Kakameg
+a",1200-1600,5-6,"15.1-
+34.4"," Orange-fleshed
+ High DM"
+SWEET_POTATO,18. Kabode,Kabode,2013,KARI,"KARI-
+Kakameg
+a","1,200-1,800",4-5,16-25," High β-
+carotene
+content
+ Tolerant to
+sweet-potato
+viruses"
+SWEET_POTATO,19. VITAA,Vitamu,2013,KARI,"KARI-
+Kakameg
+a","1,200-1,800",4-5,15-22," High carotene
+ High dry
+content
+ Tolerance to
+virus diseases"
+SWEET_POTATO,"20. KNSP
+013","Kenspot-
+1(Nyawo)",2013,KARI,"KARI-
+Njoro","1,700-2,300
+metres in
+Eldama-Ravine,
+Lare, Njoro, and
+Kakamega",6-7,15-25," Fairly High Dry
+Matter
+ Yellow fleshed
+ Average
+acceptability"
+SWEET_POTATO,"21. KNSP
+016",Kenspot-2,2013,KARI,"KARI-
+Njoro","1700-1900
+metres in the
+highlands of
+Kakamega, Lanet
+and Kabianga",6-7,15-46," Moderate Dry
+Matter
+ White-fleshed
+ High
+acceptability
+rating"
+SWEET_POTATO,"22. KNSP01
+0/6 (1)",Kenspot-3,2013,KARI,"KARI-
+Njoro","1,900-23,00
+metres in
+Njoro,Eldama-
+Ravine,
+Kakamega",7-6,10-27," High Dry
+Matter content
+ Orange-fleshed
+(avg.β-
+carotene
+content
+ Average
+acceptability"
+SWEET_POTATO,"23. KNSP
+06/1-2",Kenspot-4,2013,KARI,"KARI-
+Njoro","1,700-2,300
+metres in
+Eldama-Ravine,
+Kakamega,
+Njoro,Kabianga",6-7,10-27," High Dry
+Matter content
+ Orange-fleshed
+(avg.β-
+carotene
+content
+ Average
+acceptability"
+SWEET_POTATO,"24. KNSP02
+/16 (1)",Kenspot-5,2013,KARI,"KARI-
+Njoro","1,700-2,100
+metres in
+Eldama-Ravine,
+Kabianga and
+Kakamega",7-6,10-23," Moderate Dry
+Matter content
+ Orange-fleshed
+(avg.βcarotene
+content
+ Average
+acceptability
+ Moderately
+resistant to
+sweet-potato
+viral
+disease,SPVD"
+SWEET_POTATO,"25. NASPO
+T-1","DOUBLE-
+DOUBLE",2015,KALRO,"KALRO
+Kakameg
+a","Western ,
+Eastern
+Kenya,North Rift
+region",3-4,27," Dual purpose
+variety-roots
+for human
+consumption
+and vines for
+livestock
+ Moderately
+resistant to
+SPVD"
+SWEET_POTATO,26. CUNY,CUNY,2015,KALRO,"KALRO
+Kakameg
+a",Western Kenya,4-5,28," High dry
+matter content
+and yellow
+fleshed
+ Has average
+levels of sugar
+ Tolerant to
+altanaria"
+SWEET_POTATO,"27. K/KA/2
+004/21
+5",JANKAROTI,2015,KALRO,"KALRO
+Kakameg
+a",Western Kenya,3-4,28," Orange-
+fleshed-rich in
+beta carotene
+ Acceptable
+levels of dry
+matter content
+ Moderately
+tolerant to
+SPVD"
+SWEET_POTATO,"28. NAMNY
+EKERA","NAMNYEK
+ERA",2015,KALRO,"KALRO
+Kakameg
+a",Western Kenya,4-5,25," Yellow-fleshed
+with
+moderately
+resistannce to
+weevil attack
+due to its deep
+rooting
+characteristic
+ Resistance to
+alternaria"
+SWEET_POTATO,"29. Silklow
+6",Silklow 6,2019,KALRO,"KALRO-
+KATUMA
+NI","Altitude: 1200-
+1800
+masl,Examples:
+Bungoma,
+Kakmega
+Homabay , Kisii
+Tharaka
+Nithi,Kiambu,
+Embu,
+Meru,Nyeri,
+Muranga,Taita
+Taveta-
+Wundamyi,
+Machakos",5,14-18," Resistance to
+potato weevils
+Resistance to
+potato
+diseases
+ Tolerant to
+viral diseases
+ Flesh
+oroange(29A/2
+3)(CIP chart)
+β-carotene
+1500 µg/100g
+fwb content
+ Taste sweet
+Moderate
+tolerance to
+low cool
+temperatures"
+SWEET_POTATO,30. Shock 5,"Shock 5
+Kyembadul
+a 6",2019,KALRO,"KALRO-
+KATUMA
+NI","sAltitude: 1200-
+1800
+masl,Examples:B
+ungoma,Kakmeg
+a Homabay , Kisii
+Tharaka
+Nithi,Kiambu,
+Embu,
+Meru,Nyeri,
+Muranga,Taita
+Taveta-",5,11-17," Dual purpose
+variety
+ Resistance
+potato weevils,
+potato
+diseases
+ Tolerant to
+virus disease
+ Moderate to
+low
+temperatures
+ Dry matter
+28.50%
+ Flesh colour
+yellow cream -
+(9D/3)
+ Resistance to
+pest
+ β-carotene
+1500 µg/100g
+fwb content,"
+SWEET_POTATO,"31. Kyemb
+adula 6",,,,"KALRO-
+KATUMA
+NI","Altitude: 1200-
+1800
+masl,Examples:K
+akamega
+Homabay , Kisii
+Tharaka Nyeri,
+Muranga,Taita
+Taveta-
+Wundamyi,
+Machakos",,," Resistance to
+potato weevils
+Resistance to
+potato
+diseases
+ Tolerant to
+viral diseases
+ Flesh
+oroange(29A/2
+3)(CIP chart)
+β-carotene
+1500 µg/100g
+fwb content
+ Taste sweet
+Moderate
+tolerance to
+low cool
+temperatures"
+SWEET_POTATO,32. Irene,Irene,2019,KALRO,"KALRO-
+KATUMA
+NI","Altitude: 1200-
+1800masl,Examp
+les:Bungoma,Ka
+kmega Homabay
+, Kisii Tharaka
+Nithi,Kiambu,
+Embu,
+Meru,Nyeri,
+Muranga,Taita
+Taveta-
+Wundamyi,
+Machakos",4-5,9-15," Resistance to
+potato weevils
+ Resistance to
+potato
+diseases
+ Tolerant to
+viral diseases
+ Shape oblong
+Skin Purple red
+ Dry matter
+28.8%
+ Flesh colour
+Orange with
+yellow (28
+C:18B) (CIP
+colour chart)
+ β-carotene
+8300 µg/100g
+fwbcontent
+ Taste is
+moderately
+sweet"
+SWEET_POTATO,"33. TU-
+PURPLE","KC-SWEET
+PURPLE",2023,"KALRO
+and CIP","KALRO
+and CIP","Altitude: 1200-
+1800
+AEZ: LM1-6
+Sites : Makueni,
+Machakos, Kitui,
+Tharaka nithi",4-5,15-16," Adaptability;wi
+dely spread
+ Resistance to
+pests
+ Moderate to
+sweet potato
+weevils and
+diseases
+ Root
+characteristic:
+Dry matter
+27.9% and
+flesh color dark
+purple"

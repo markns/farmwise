@@ -1,0 +1,234 @@
+0 255 255 255 255 0
+1 76 222 167 255 Gulf of Mexico, North Atlantic Coast
+2 0 125 221 255 United States, North Atlantic Coast
+3 225 191 0 255 Mississippi - Missouri
+4 229 0 0 255 Gulf Coast
+5 0 56 163 255 California
+6 45 162 38 255 Great Basin
+7 239 236 138 255 North America, Colorado
+8 232 109 85 255 Columbia and Northwestern United States
+9 0 222 226 255 Fraser
+10 186 0 101 255 Pacific and Arctic Coast
+11 47 81 8 255 Saskatchewan - Nelson
+12 185 137 12 255 Northwest Territories
+13 0 230 0 255 Hudson Bay Coast
+14 158 12 210 255 Atlantic Ocean Seaboard
+15 255 171 198 255 Churchill
+16 223 223 0 255 St Lawrence
+17 182 57 57 255 St John
+18 55 61 117 255 Mackenzie
+19 117 153 201 255 Rio Grande - Bravo
+20 235 138 4 255 Mexico, Northwest Coast
+21 119 193 52 255 Baja California
+22 255 44 101 255 Mexico, Interior
+23 20 4 223 255 North Gulf
+24 156 0 126 255 Rio Verde
+25 198 174 250 255 Rio Lerma
+26 4 138 125 255 Pacific Central Coast
+27 101 90 85 255 Rio Balsas
+28 255 206 142 255 Papaloapan
+29 55 182 243 255 Isthmus of Tehuantepec
+30 109 28 0 255 Grijalva - Usumacinta
+31 252 254 188 255 Yucatan Peninsula
+32 169 0 148 255 Southern Central America
+33 0 93 162 255 Caribbean
+34 49 194 28 255 Caribbean Coast
+35 255 255 0 255 Magdalena
+36 77 24 81 255 Orinoco
+37 73 159 146 255 Northeast South America, South Atlantic Coast
+38 49 162 255 255 Amazon
+39 20 4 255 255 Tocantins
+40 251 61 190 255 North Brazil, South Atlantic Coast
+41 93 73 81 255 Parnaiba
+42 152 97 255 255 East Brazil, South Atlantic Coast
+43 182 134 113 255 Sao Francisco
+44 61 239 162 255 Uruguay - Brazil, South Atlantic Coast
+45 172 61 38 255 La Plata
+46 219 194 32 255 North Argentina, South Atlantic Coast
+47 89 182 77 255 North Argentina, South Atlantic Coast
+48 178 25 0 255 South America, Colorado
+49 146 255 8 255 Negro
+50 93 73 81 255 South Argentina, South Atlantic Coast
+51 25 154 206 255 Central Patagonia Highlands
+52 20 53 190 255 Colombia - Ecuador, Pacific Coast
+53 117 97 63 255 Colombia - Ecuador, Pacific Coast
+54 194 45 174 255 Peru, Pacific Coast
+55 65 97 186 255 North Chile, Pacific Coast
+56 194 113 121 255 South Chile, Pacific Coast
+57 77 24 105 255 La Puna Region
+58 4 138 125 255 Salinas Grandes
+59 229 114 4 255 Mar Chiquita
+60 28 243 152 255 Pampas Region
+61 0 105 255 255 Spain - Portugal, Atlantic Coast
+62 105 194 158 255 Douro
+63 255 255 179 255 Tagus
+64 0 20 174 255 Guadiana
+65 210 166 219 255 Spain, South and East Coast
+66 0 95 158 255 Guadalquivir
+67 255 95 239 255 Ebro
+68 182 114 97 255 Gironde
+69 255 229 57 255 France, West Coast
+70 146 174 101 255 Loire
+71 36 255 210 255 Seine
+72 99 83 233 255 Rhine
+73 36 81 8 255 France, South Coast
+74 101 198 235 255 England and Wales
+75 97 109 138 255 Ireland
+76 101 69 97 255 Scotland
+77 255 12 172 255 Scheldt
+78 20 219 101 255 Rhine
+79 223 215 162 255 Maas
+80 215 20 142 255 Ems - Weser
+81 166 215 231 255 Po
+82 243 191 53 255 Italy, West Coast
+83 45 186 243 255 Tiber
+84 55 190 37 255 Italy, East Coast
+85 102 114 76 255 Danube
+86 204 235 0 255 Elbe
+87 239 190 243 255 Denmark - Germany Coast
+88 89 186 165 255 Sweden
+89 73 40 150 255 Wisla
+90 219 105 114 255 Oder
+91 40 251 162 255 Adriatic Sea - Greece - Black Sea Coast
+92 138 85 97 255 Dnieper
+93 146 255 255 255 Poland Coast
+94 203 0 74 255 Neman
+95 251 138 4 255 Dniester
+96 42 58 0 255 Don
+97 81 6 76 255 Volga
+98 182 97 78 255 Ural
+99 12 69 125 255 Daugava
+100 158 225 85 255 Narva
+101 255 102 81 255 Black Sea, North Coast
+102 53 202 170 255 Caspian Sea Coast
+103 125 134 206 255 Baltic Sea Coast
+104 255 191 81 255 Neva
+105 174 0 190 255 Mediterranean Sea Islands
+106 70 146 180 255 Scandinavia, North Coast
+107 0 89 89 255 Finland
+108 182 57 57 255 Russia, Barents Sea Coast
+109 242 255 178 255 Arctic Ocean Islands
+110 65 182 239 255 Northern Dvina
+111 170 170 121 255 Iceland
+112 174 210 231 255 Amur
+113 215 130 65 255 Bo Hai - Korean Bay, North Coast
+114 93 73 81 255 Russia, South East Coast
+115 76 166 170 255 Gobi Interior
+116 227 202 150 255 Ziya He, Interior
+117 8 206 65 255 Huang He
+118 186 0 101 255 Tarim Interior
+119 49 45 134 255 Plateau of Tibet Interior
+120 242 223 40 255 Yangtze
+121 57 219 174 255 China Coast
+122 174 61 49 255 Xun Jiang
+123 28 210 255 255 South China Sea Coast
+124 89 113 142 255 Kiribati - Nauru
+125 0 108 0 255 North and South Korea
+126 40 20 146 255 Andaman - Nicobar Islands
+127 8 89 117 255 Hong (Red River)
+128 216 0 0 255 Viet Nam, Coast
+129 69 45 16 255 Mekong
+130 113 202 24 255 Gulf of Thailand Coast
+131 231 109 85 255 Chao Phraya
+132 178 194 174 255 Peninsula Malaysia
+133 210 63 127 255 Salween
+134 255 251 166 255 Sittang
+135 179 174 251 255 Irrawaddy
+136 28 24 219 255 Bay of Bengal, North East Coast
+137 247 243 57 255 Hainan
+138 36 239 210 255 Sumatra
+139 69 8 81 255 Java - Timor
+140 140 70 255 255 Irian Jaya Coast
+141 255 206 142 255 Taiwan
+142 32 85 97 255 Sulawesi
+143 241 93 0 255 Kalimantan
+144 130 121 197 255 North Borneo Coast
+145 8 219 206 255 Philippines
+146 235 24 81 255 Ganges - Bramaputra
+147 121 109 109 255 Yasai
+148 76 114 178 255 Brahamani
+149 194 255 69 255 Mahandi
+150 182 223 231 255 India North East Coast
+151 12 20 4 255 Godavari
+152 85 198 16 255 Krishna
+153 235 76 57 255 Pennar
+154 243 174 243 255 India East Coast
+155 24 45 243 255 Cauvery
+156 154 8 73 255 India South Coast
+157 89 53 117 255 India West Coast
+158 69 130 40 255 Tapti
+159 109 28 0 255 Narmada
+160 109 57 204 255 Mahi
+161 57 121 154 255 Sabarmati
+162 243 24 28 255 Indus
+163 223 121 255 255 Sri Lanka
+164 206 109 12 255 Fly
+165 73 246 246 255 Papua New Guinea Coast
+166 53 251 131 255 Wake - Marshall Islands
+167 255 255 198 255 Japan
+168 235 178 146 255 Palau and East Indonesia
+169 0 0 239 255 North Marina Islands and Guam
+170 20 134 227 255 Sepik
+171 255 231 36 255 Micronesia
+172 82 251 12 255 Tuvalu
+173 178 97 166 255 Solomon Islands
+174 0 152 57 255 Lena
+175 190 202 158 255 Siberia, North Coast
+176 231 57 146 255 Yenisey
+177 235 159 113 255 Kara Sea Coast
+178 20 0 40 255 Ob
+179 186 255 247 255 Siberia, West Coast
+180 255 77 25 255 Black Sea, South Coast
+181 227 242 31 255 Mediterranean Sea, East Coast
+182 142 247 182 255 Caspian Sea, South West Coast
+183 166 16 130 255 Tigris - Euphrates
+184 53 178 251 255 Eastern Jordan - Syria
+185 227 235 138 255 Dead Sea
+186 178 97 4 255 Sinai Peninsula
+187 32 73 16 255 Red Sea, East Coast
+188 113 4 65 255 Arabian Peninsula
+189 77 227 93 255 Persian Gulf Coast
+190 31 89 114 255 Central Iran
+191 223 81 113 255 Arabian Sea Coast
+192 215 93 8 255 Hamun-i-Mashkel
+193 117 125 243 255 Helmand
+194 138 138 125 255 Farahrud
+195 0 0 0 255 Caspian Sea, East Coast
+196 166 20 202 255 Amu Darya
+197 20 40 194 255 Syr Darya
+198 154 73 85 255 Lake Balkash
+199 121 102 191 255 Senegal
+200 142 81 73 255 Niger
+201 65 56 85 255 Nile
+202 20 98 117 255 Shebelli - Juba
+203 130 239 0 255 Congo
+204 231 24 95 255 Zambezi
+205 12 239 49 255 Limpopo
+206 156 162 57 255 Orange
+207 4 130 247 255 Lake Chad
+208 255 174 239 255 Rift Valley
+209 227 186 40 255 Africa, South Interior
+210 53 61 16 255 Africa, North Interior
+211 223 73 53 255 Madasgacar
+212 65 202 101 255 South Africa, South Coast
+213 130 93 36 255 Africa, Indian Ocean Coast
+214 0 105 45 255 Africa, East Central Coast
+215 65 38 142 255 Africa, Red Sea - Gulf of Aden Coast
+216 28 186 138 255 Mediterranean South Coast
+217 53 77 101 255 Africa, West Coast
+218 198 16 105 255 Gulf of Guinea
+219 149 231 192 255 Angola, Coast
+220 255 191 109 255 South Africa, West Coast
+221 105 40 235 255 Namibia, Coast
+222 194 204 0 255 Africa, North West Coast
+223 182 24 168 255 Volta
+224 148 19 31 255 Australia, West Coast
+225 255 255 44 255 Australia, North Coast
+226 194 165 105 255 Australia, Interior
+227 95 0 216 255 Australia, South Coast
+228 255 165 0 255 Australia, East Coast
+229 45 203 73 255 Murray - Darling
+230 97 49 53 255 South Pacific Islands
+231 65 97 227 255 New Zealand
+232 93 4 91 255 Tasmania
+233 154 206 251 255 Antarctica

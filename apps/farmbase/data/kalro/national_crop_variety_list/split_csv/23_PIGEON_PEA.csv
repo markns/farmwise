@@ -1,0 +1,162 @@
+Crop,Variety name/code,Official Release Name,Year of release in Kenya,Owne r(s),Maintain er and seed source,Optimal production altitude range (Masl),Duration to maturity (months),Grain yield (t ha-1),Special attributes
+PIGEON_PEA,"1. Kat
+777",Kat 777,1981,KARI,"KARI-
+Katumani",600-1500,5-6,"1.5-
+2.2t/ha"," Tolerant to
+fusarium wilt"
+PIGEON_PEA,"2. Kat81/
+3/3",Kat81/3/3,1981,KARI,"KARI-
+Katumani",900-1800,5.5 - 6,2.0-2.5," Tolerant to
+fusarium wilt"
+PIGEON_PEA,"3. ICEAP
+00040",ICEAP00040,1995,KARI,ND,900-1800,4-6,2.0-2.5," Tolerant to insect
+pest, wilt."
+PIGEON_PEA,"4. (Kat/
+Mbaaz
+i 2)",(Kat/Mbaazi 2),,,,,,, medium maturity
+PIGEON_PEA,"5. Mbaaz
+i - 1",Mbaazi - 1,1998,KARI,"KARI-
+Katumani",600-900,3-4,1.8-2.2," Short
+duration,(single
+season)"
+PIGEON_PEA,"6. Katum
+ani
+60/8",Katumani 60/8,1998,KARI,"KARI-
+Katumani",10-1800,4-5,2.0-2.5," Short duration,
+Ratoons well"
+PIGEON_PEA,"7. Kat/M
+baazi 3",Kat/Mbaazi 3,ND,KARI,"KARI-
+Katumani",10- 1500,3-3.5,1.5-2.0," Extra early, Short
+duration"
+PIGEON_PEA,"8. ICEA
+P0006
+8",ICEA P00068,ND,KARI,"KARI-
+Katumani",10 – 1500,4-6,2-2.5, Medium maturity
+PIGEON_PEA,"9. ICEAP
+00850",Peacock,2011,"LELDE
+T",LELDET,800-1500M,4,1.5," Short duration
+ Drought tolerant,
+Good market
+value"
+PIGEON_PEA,"10. ICEAP
+00936",Karai,2011,"LELDE
+T",LELDET,"1000-
+1800M",6,2," Firewood
+ Ratoons
+ Drought tolerant
+ Nitrogen fixing,
+Soil improving
+ Cattle fodder"
+PIGEON_PEA,"11. EUMD
+PV001
+04","Egerton Mbaazi
+M 1",2012,"Egert
+on
+Unive
+rsity","Egerton
+University","Recommen
+d e d f o r l o w
+to medium-
+dry altitude
+zones
+(800-1500
+m.a.s.l) of
+Marigat,
+Machakos,
+Kerio
+valley,
+Kambi ya
+Mawe,
+Coastal
+areas,
+Mbeere,
+Kitui,
+Mwea,
+Kisumu",4-5,"1.4-2.8
+t o n s / h a"," Drought tolerant
+ T o l e r a n t t o
+Fusarium wilt
+ Tolerant to pest
+ Tough seeded
+ Cream color of
+grain"
+PIGEON_PEA,"12. PP080
+06",KALCc-OP1- 04,2018,"Kenya
+Agric
+ultura
+l and
+Livest
+ock
+Resea
+rch
+Organ
+izatio
+n
+(KARL
+O)","KALRO-
+Katumani","Makueni,
+Kitui,
+Mwingi,
+Mbeere,
+Tharaka,
+Meru
+Machakos",4-5,1.5 - 3.2," Large pod size
+ Large grain size
+ Fusarium wilt
+tolerant"
+PIGEON_PEA,"13. PP080
+08",KALCc-OP1- 05,2018,"Kenya
+Agric
+ultura
+l and
+Livest
+ock
+Resea
+rch
+Organ
+izatio
+n
+(KARL
+O)","KALRO-
+Katumani","Makueni,
+Kitui,
+Mwingi,Mb
+eere,Thara
+ka,
+Meru,Mach
+akos",4-5,1.2 – 3.0," Large pod size
+ Large grain size
+ Fusarium wilt
+tolerant"
+PIGEON_PEA,"14. EUMDB
+3",Egerton Mbaazi 3,2019,"Egerto
+n
+Univer
+sity","Egerton
+University","Altitude:
+800-1600
+masl
+Examples:
+Baringo and
+Kerio valley",4-5,1.5-2," Medium seed size
+ Adaptable to sandy
+clay soil and loamy
+soil
+ Medium maturing
+ Good ratoonability"
+PIGEON_PEA,"15. EUMDB
+4",Egerton Mbaazi 4,2019,"Egerto
+n
+Univer
+sity","Egerton
+University","Altitude:
+800-1600
+masl
+Examples:
+Baringo and
+Kerio valley",4-5,1.5-2," Medium seed size
+ Adaptable to sandy
+clay soil and loamy
+soil
+ Medium maturing
+ Good ratoonability"
