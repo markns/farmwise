@@ -1,1 +1,1 @@
-DISPATCH_ORGANIZATION_SCHEMA_PREFIX = "dispatch_organization"
+FARMBASE_ORGANIZATION_SCHEMA_PREFIX = "farmbase_organization"

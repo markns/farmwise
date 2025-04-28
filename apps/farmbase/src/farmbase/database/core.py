@@ -1,5 +1,5 @@
 """
-.. module: dispatch.database.core
+.. module: farmbase.database.core
     :platform: Unix
     :copyright: (c) 2019 by Netflix Inc., see AUTHORS for more
     :license: Apache, see LICENSE for more details.
@@ -21,10 +21,9 @@ from sqlalchemy.sql.expression import true
 from sqlalchemy_utils import get_mapper
 from starlette.requests import Request
 
-from dispatch import config
-from dispatch.exceptions import NotFoundError
-from dispatch.search.fulltext import make_searchable
-from dispatch.database.logging import SessionTracker
+from farmbase import config
+from farmbase.database.logging import SessionTracker
+from farmbase.exceptions import NotFoundError
 
 
 def create_db_engine(connection_string: str):
@@ -124,9 +123,7 @@ class CustomBase:
         single = len(self.__repr_attrs__) == 1
         for key in self.__repr_attrs__:
             if not hasattr(self, key):
-                raise KeyError(
-                    "{} has incorrect attribute '{}' in __repr__attrs__".format(self.__class__, key)
-                )
+                raise KeyError("{} has incorrect attribute '{}' in __repr__attrs__".format(self.__class__, key))
             value = getattr(self, key)
             wrap_in_quote = isinstance(value, str)
 
@@ -152,16 +149,14 @@ class CustomBase:
 
 
 Base = declarative_base(cls=CustomBase)
-make_searchable(Base.metadata)
+# make_searchable(Base.metadata)
 
 
 def get_db(request: Request) -> Session:
     """Get database session from request state."""
     session = request.state.db
-    if not hasattr(session, "_dispatch_session_id"):
-        session._dispatch_session_id = SessionTracker.track_session(
-            session, context="fastapi_request"
-        )
+    if not hasattr(session, "_farmbase_session_id"):
+        session._farmbase_session_id = SessionTracker.track_session(session, context="fastapi_request")
     return session
 
 
@@ -185,9 +180,9 @@ def get_class_by_tablename(table_fullname: str) -> Any:
     mapped_name = resolve_table_name(table_fullname)
     mapped_class = _find_class(mapped_name)
 
-    # try looking in the 'dispatch_core' schema
+    # try looking in the 'farmbase_core' schema
     if not mapped_class:
-        mapped_class = _find_class(f"dispatch_core.{mapped_name}")
+        mapped_class = _find_class(f"farmbase_core.{mapped_name}")
 
     if not mapped_class:
         raise ValidationError(
@@ -234,13 +229,11 @@ def refetch_db_session(organization_slug: str) -> Session:
     """Create a new database session for a specific organization."""
     schema_engine = engine.execution_options(
         schema_translate_map={
-            None: f"dispatch_organization_{organization_slug}",
+            None: f"farmbase_organization_{organization_slug}",
         }
     )
     session = sessionmaker(bind=schema_engine)()
-    session._dispatch_session_id = SessionTracker.track_session(
-        session, context=f"organization_{organization_slug}"
-    )
+    session._farmbase_session_id = SessionTracker.track_session(session, context=f"organization_{organization_slug}")
     return session
 
 
@@ -271,6 +264,6 @@ def get_organization_session(organization_slug: str) -> Session:
         session.rollback()
         raise
     finally:
-        if hasattr(session, "_dispatch_session_id"):
-            SessionTracker.untrack_session(session._dispatch_session_id)
+        if hasattr(session, "_farmbase_session_id"):
+            SessionTracker.untrack_session(session._farmbase_session_id)
         session.close()

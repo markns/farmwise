@@ -1,25 +1,16 @@
-import os
 import logging
 
 from alembic import command as alembic_command
 from alembic.config import Config as AlembicConfig
-
-from sqlalchemy import text
 from sqlalchemy.schema import CreateSchema
 from sqlalchemy_utils import create_database, database_exists
 
-from dispatch import config
-from dispatch.organization.models import Organization
-from dispatch.project.models import Project
-from dispatch.plugin.models import Plugin
-from dispatch.search import fulltext
-from dispatch.search.fulltext import (
-    sync_trigger,
-)
+from farmbase import config
+from farmbase.organization.models import Organization
+from farmbase.project.models import Project
 
 from .core import Base, sessionmaker
-from .enums import DISPATCH_ORGANIZATION_SCHEMA_PREFIX
-
+from .enums import FARMBASE_ORGANIZATION_SCHEMA_PREFIX
 
 log = logging.getLogger(__file__)
 
@@ -34,10 +25,10 @@ def version_schema(script_location: str):
 
 
 def get_core_tables():
-    """Fetches tables that belong to the 'dispatch_core' schema."""
+    """Fetches tables that belong to the 'farmbase_core' schema."""
     core_tables = []
     for _, table in Base.metadata.tables.items():
-        if table.schema == "dispatch_core":
+        if table.schema == "farmbase_core":
             core_tables.append(table)
     return core_tables
 
@@ -56,7 +47,7 @@ def init_database(engine):
     if not database_exists(str(config.SQLALCHEMY_DATABASE_URI)):
         create_database(str(config.SQLALCHEMY_DATABASE_URI))
 
-    schema_name = "dispatch_core"
+    schema_name = "farmbase_core"
     if not engine.dialect.has_schema(engine, schema_name):
         with engine.connect() as connection:
             connection.execute(CreateSchema(schema_name))
@@ -66,23 +57,21 @@ def init_database(engine):
     Base.metadata.create_all(engine, tables=tables)
 
     version_schema(script_location=config.ALEMBIC_CORE_REVISION_PATH)
-    setup_fulltext_search(engine, tables)
+    # setup_fulltext_search(engine, tables)
 
     # setup an required database functions
     session = sessionmaker(bind=engine)
     db_session = session()
 
     # we create the default organization if it doesn't exist
-    organization = (
-        db_session.query(Organization).filter(Organization.name == "default").one_or_none()
-    )
+    organization = db_session.query(Organization).filter(Organization.name == "default").one_or_none()
     if not organization:
         print("Creating default organization...")
         organization = Organization(
             name="default",
             slug="default",
             default=True,
-            description="Default Dispatch organization.",
+            description="Default Farmbase organization.",
         )
 
         db_session.add(organization)
@@ -92,24 +81,24 @@ def init_database(engine):
     init_schema(engine=engine, organization=organization)
 
     # we install all plugins
-    from dispatch.common.utils.cli import install_plugins
-    from dispatch.plugins.base import plugins
+    # from farmbase.common.utils.cli import install_plugins
+    # from farmbase.plugins.base import plugins
 
-    install_plugins()
+    # install_plugins()
 
-    for p in plugins.all():
-        plugin = Plugin(
-            title=p.title,
-            slug=p.slug,
-            type=p.type,
-            version=p.version,
-            author=p.author,
-            author_url=p.author_url,
-            multiple=p.multiple,
-            description=p.description,
-        )
-        db_session.add(plugin)
-    db_session.commit()
+    # for p in plugins.all():
+    #     plugin = Plugin(
+    #         title=p.title,
+    #         slug=p.slug,
+    #         type=p.type,
+    #         version=p.version,
+    #         author=p.author,
+    #         author_url=p.author_url,
+    #         multiple=p.multiple,
+    #         description=p.description,
+    #     )
+    #     db_session.add(plugin)
+    # db_session.commit()
 
     # we create the default project if it doesn't exist
     project = db_session.query(Project).filter(Project.name == "default").one_or_none()
@@ -118,14 +107,14 @@ def init_database(engine):
         project = Project(
             name="default",
             default=True,
-            description="Default Dispatch project.",
+            description="Default Farmbase project.",
             organization=organization,
         )
         db_session.add(project)
         db_session.commit()
 
         # we initialize the project with defaults
-        from dispatch.project import flows as project_flows
+        from farmbase.project import flows as project_flows
 
         print("Initializing default project...")
         project_flows.project_init_flow(
@@ -135,7 +124,7 @@ def init_database(engine):
 
 def init_schema(*, engine, organization: Organization):
     """Initializes a new schema."""
-    schema_name = f"{DISPATCH_ORGANIZATION_SCHEMA_PREFIX}_{organization.slug}"
+    schema_name = f"{FARMBASE_ORGANIZATION_SCHEMA_PREFIX}_{organization.slug}"
 
     if not engine.dialect.has_schema(engine, schema_name):
         with engine.connect() as connection:
@@ -155,13 +144,13 @@ def init_schema(*, engine, organization: Organization):
     # put schema under version control
     version_schema(script_location=config.ALEMBIC_TENANT_REVISION_PATH)
 
-    with engine.connect() as connection:
-        # we need to map this for full text search as it uses sql literal strings
-        # and schema translate map does not apply
-        for t in tables:
-            t.schema = schema_name
-
-        setup_fulltext_search(connection, tables)
+    # with engine.connect() as connection:
+    #     # we need to map this for full text search as it uses sql literal strings
+    #     # and schema translate map does not apply
+    #     for t in tables:
+    #         t.schema = schema_name
+    #
+    #     setup_fulltext_search(connection, tables)
 
     session = sessionmaker(bind=schema_engine)
     db_session = session()
@@ -172,31 +161,31 @@ def init_schema(*, engine, organization: Organization):
     return organization
 
 
-def setup_fulltext_search(connection, tables):
-    """Syncs any required fulltext table triggers and functions."""
-    # parsing functions
-    function_path = os.path.join(
-        os.path.dirname(os.path.abspath(fulltext.__file__)), "expressions.sql"
-    )
-    connection.execute(text(open(function_path).read()))
-
-    for table in tables:
-        table_triggers = []
-        for column in table.columns:
-            if column.name.endswith("search_vector"):
-                if hasattr(column.type, "columns"):
-                    table_triggers.append(
-                        {
-                            "conn": connection,
-                            "table": table,
-                            "tsvector_column": "search_vector",
-                            "indexed_columns": column.type.columns,
-                        }
-                    )
-                else:
-                    log.warning(
-                        f"Column search_vector defined but no index columns found. Table: {table.name}"
-                    )
-
-        for trigger in table_triggers:
-            sync_trigger(**trigger)
+# def setup_fulltext_search(connection, tables):
+#     """Syncs any required fulltext table triggers and functions."""
+#     # parsing functions
+#     function_path = os.path.join(
+#         os.path.dirname(os.path.abspath(fulltext.__file__)), "expressions.sql"
+#     )
+#     connection.execute(text(open(function_path).read()))
+#
+#     for table in tables:
+#         table_triggers = []
+#         for column in table.columns:
+#             if column.name.endswith("search_vector"):
+#                 if hasattr(column.type, "columns"):
+#                     table_triggers.append(
+#                         {
+#                             "conn": connection,
+#                             "table": table,
+#                             "tsvector_column": "search_vector",
+#                             "indexed_columns": column.type.columns,
+#                         }
+#                     )
+#                 else:
+#                     log.warning(
+#                         f"Column search_vector defined but no index columns found. Table: {table.name}"
+#                     )
+#
+#         for trigger in table_triggers:
+#             sync_trigger(**trigger)

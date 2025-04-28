@@ -1,45 +1,43 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic.error_wrappers import ErrorWrapper, ValidationError
+from pydantic.error_wrappers import ValidationError
 
-from dispatch.config import DISPATCH_AUTH_REGISTRATION_ENABLED
-
-from dispatch.auth.permissions import (
+from farmbase.auth.permissions import (
     OrganizationMemberPermission,
     PermissionsDependency,
 )
-from dispatch.auth.service import CurrentUser
-from dispatch.exceptions import (
+from farmbase.auth.service import CurrentUser
+from farmbase.config import FARMBASE_AUTH_REGISTRATION_ENABLED
+from farmbase.database.core import DbSession
+from farmbase.database.service import CommonParameters, search_filter_sort_paginate
+from farmbase.enums import UserRoles
+from farmbase.exceptions import (
     InvalidConfigurationError,
     InvalidPasswordError,
     InvalidUsernameError,
 )
-from dispatch.database.core import DbSession
-from dispatch.database.service import CommonParameters, search_filter_sort_paginate
-from dispatch.enums import UserRoles
-from dispatch.models import OrganizationSlug, PrimaryKey
-from dispatch.plugin import service as plugin_service
-from dispatch.plugins.dispatch_core.exceptions import MfaException
-from dispatch.organization.models import OrganizationRead
+from farmbase.models import OrganizationSlug, PrimaryKey
+from farmbase.organization.models import OrganizationRead
+from farmbase.plugin import service as plugin_service
+from farmbase.plugins.farmbase_core.exceptions import MfaException
 
 from .models import (
+    AdminPasswordReset,
     MfaPayload,
     MfaPayloadResponse,
+    UserCreate,
     UserLogin,
     UserLoginResponse,
     UserOrganization,
     UserPagination,
+    UserPasswordUpdate,
     UserRead,
     UserRegister,
     UserRegisterResponse,
-    UserCreate,
     UserUpdate,
-    UserPasswordUpdate,
-    AdminPasswordReset,
 )
-from .service import get, get_by_email, update, create
-
+from .service import create, get, get_by_email, update
 
 log = logging.getLogger(__name__)
 
@@ -62,11 +60,9 @@ user_router = APIRouter()
 )
 def get_users(organization: OrganizationSlug, common: CommonParameters):
     """Gets all organization users."""
-    common["filter_spec"] = {
-        "and": [{"model": "Organization", "op": "==", "field": "slug", "value": organization}]
-    }
+    common["filter_spec"] = {"and": [{"model": "Organization", "op": "==", "field": "slug", "value": organization}]}
 
-    items = search_filter_sort_paginate(model="DispatchUser", **common)
+    items = search_filter_sort_paginate(model="FarmbaseUser", **common)
 
     return {
         "items": [
@@ -178,9 +174,7 @@ def update_user(
                 )
 
     # add organization information
-    user_in.organizations = [
-        UserOrganization(role=user_in.role, organization=OrganizationRead(name=organization))
-    ]
+    user_in.organizations = [UserOrganization(role=user_in.role, organization=OrganizationRead(name=organization))]
 
     return update(db_session=db_session, user=user, user_in=user_in)
 
@@ -355,9 +349,7 @@ def mfa_check(
 
         if not mfa_auth_plugin:
             log.error(f"MFA plugin not enabled for project: {payload_in.project_id}")
-            raise HTTPException(
-                status_code=400, detail="MFA plugin is not enabled for the project."
-            )
+            raise HTTPException(status_code=400, detail="MFA plugin is not enabled for the project.")
 
         log.info(f"MFA plugin found: {mfa_auth_plugin.__class__.__name__}")
 
@@ -381,7 +373,5 @@ def mfa_check(
         log.info("MFA check completed")
 
 
-if DISPATCH_AUTH_REGISTRATION_ENABLED:
-    register_user = auth_router.post("/register", response_model=UserRegisterResponse)(
-        register_user
-    )
+if FARMBASE_AUTH_REGISTRATION_ENABLED:
+    register_user = auth_router.post("/register", response_model=UserRegisterResponse)(register_user)

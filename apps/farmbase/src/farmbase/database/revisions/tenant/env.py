@@ -1,11 +1,8 @@
 from alembic import context
-from sqlalchemy import engine_from_config, pool, inspect
-
-
-from dispatch.logging import logging
-from dispatch.config import SQLALCHEMY_DATABASE_URI
-from dispatch.database.core import Base
-
+from farmbase.config import SQLALCHEMY_DATABASE_URI
+from farmbase.database.core import Base
+from farmbase.logging import logging
+from sqlalchemy import engine_from_config, inspect, pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -23,7 +20,7 @@ target_metadata = Base.metadata
 def get_tenant_schemas(connection):
     tenant_schemas = []
     for s in inspect(connection).get_schema_names():
-        if s.startswith("dispatch_organization_"):
+        if s.startswith("farmbase_organization_"):
             tenant_schemas.append(s)
     return tenant_schemas
 

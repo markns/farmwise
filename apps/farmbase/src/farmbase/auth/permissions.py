@@ -5,17 +5,10 @@ from fastapi import HTTPException
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 
-from dispatch.auth.service import get_current_user
-from dispatch.case import service as case_service
-from dispatch.case.models import Case
-from dispatch.incident.models import Incident
-from dispatch.enums import UserRoles, Visibility
-from dispatch.incident import service as incident_service
-from dispatch.individual import service as individual_contact_service
-from dispatch.models import PrimaryKeyModel
-from dispatch.organization import service as organization_service
-from dispatch.organization.models import OrganizationRead
-from dispatch.participant_role.enums import ParticipantRoleType
+from farmbase.auth.service import get_current_user
+from farmbase.enums import UserRoles
+from farmbase.organization import service as organization_service
+from farmbase.organization.models import OrganizationRead
 
 log = logging.getLogger(__name__)
 
@@ -50,15 +43,15 @@ class BasePermission(ABC):
 
     """
 
-    org_error_msg = [{"msg": "Organization not found. Please, contact your Dispatch admin."}]
+    org_error_msg = [{"msg": "Organization not found. Please, contact your Farmbase admin."}]
     org_error_code = HTTP_404_NOT_FOUND
 
-    user_error_msg = [{"msg": "User not found. Please, contact your Dispatch admin"}]
+    user_error_msg = [{"msg": "User not found. Please, contact your Farmbase admin"}]
     user_error_code = HTTP_404_NOT_FOUND
 
     user_role_error_msg = [
         {
-            "msg": "Your user doesn't have permissions to create, update, or delete this resource. Please, contact your Dispatch admin."
+            "msg": "Your user doesn't have permissions to create, update, or delete this resource. Please, contact your Farmbase admin."
         }
     ]
     user_role_error_code = HTTP_403_FORBIDDEN
@@ -86,9 +79,7 @@ class BasePermission(ABC):
         if not organization:
             raise HTTPException(status_code=self.org_error_code, detail=self.org_error_msg)
 
-        org_check = organization_service.get_by_slug(
-            db_session=request.state.db, slug=organization.slug
-        )
+        org_check = organization_service.get_by_slug(db_session=request.state.db, slug=organization.slug)
 
         if not org_check or org_check.id != organization.id:
             raise HTTPException(status_code=self.org_error_code, detail=self.org_error_msg)
@@ -99,9 +90,7 @@ class BasePermission(ABC):
 
         self.role = user.get_organization_role(organization.slug)
         if not self.has_required_permissions(request):
-            raise HTTPException(
-                status_code=self.user_role_error_code, detail=self.user_role_error_msg
-            )
+            raise HTTPException(status_code=self.user_role_error_code, detail=self.user_role_error_msg)
 
 
 class PermissionsDependency(object):
@@ -200,31 +189,31 @@ class SensitiveProjectActionPermission(BasePermission):
         )
 
 
-class IndividualContactUpdatePermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        permission = any_permission(
-            permissions=[
-                SensitiveProjectActionPermission,
-            ],
-            request=request,
-        )
-        if not permission:
-            pk = PrimaryKeyModel(id=request.path_params["individual_contact_id"])
-            individual_contact = individual_contact_service.get(
-                db_session=request.state.db, individual_contact_id=pk.id
-            )
-
-            if not individual_contact:
-                return False
-
-            current_user = get_current_user(request=request)
-            if individual_contact.email == current_user.email:
-                return True
-
-        return permission
+# class IndividualContactUpdatePermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         permission = any_permission(
+#             permissions=[
+#                 SensitiveProjectActionPermission,
+#             ],
+#             request=request,
+#         )
+#         if not permission:
+#             pk = PrimaryKeyModel(id=request.path_params["individual_contact_id"])
+#             individual_contact = individual_contact_service.get(
+#                 db_session=request.state.db, individual_contact_id=pk.id
+#             )
+#
+#             if not individual_contact:
+#                 return False
+#
+#             current_user = get_current_user(request=request)
+#             if individual_contact.email == current_user.email:
+#                 return True
+#
+#         return permission
 
 
 class ProjectCreatePermission(BasePermission):
@@ -253,251 +242,252 @@ class ProjectUpdatePermission(BasePermission):
         )
 
 
-class IncidentJoinOrSubscribePermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        pk = PrimaryKeyModel(id=request.path_params["incident_id"])
-        current_incident = incident_service.get(db_session=request.state.db, incident_id=pk.id)
-
-        if current_incident.visibility == Visibility.restricted:
-            return OrganizationAdminPermission(request=request)
-
-        return True
-
-
-class IncidentViewPermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        pk = PrimaryKeyModel(id=request.path_params["incident_id"])
-        current_incident = incident_service.get(db_session=request.state.db, incident_id=pk.id)
-
-        if not current_incident:
-            return False
-
-        if current_incident.visibility == Visibility.restricted:
-            return any_permission(
-                permissions=[
-                    OrganizationAdminPermission,
-                    IncidentCommanderPermission,
-                    IncidentReporterPermission,
-                    IncidentParticipantPermission,
-                ],
-                request=request,
-            )
-        return True
+#
+# class IncidentJoinOrSubscribePermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         pk = PrimaryKeyModel(id=request.path_params["incident_id"])
+#         current_incident = incident_service.get(db_session=request.state.db, incident_id=pk.id)
+#
+#         if current_incident.visibility == Visibility.restricted:
+#             return OrganizationAdminPermission(request=request)
+#
+#         return True
 
 
-class IncidentEditPermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        return any_permission(
-            permissions=[
-                OrganizationAdminPermission,
-                IncidentCommanderPermission,
-                IncidentReporterPermission,
-            ],
-            request=request,
-        )
-
-
-class IncidentEventPermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        return any_permission(
-            permissions=[
-                OrganizationAdminPermission,
-                IncidentCommanderOrScribePermission,
-                IncidentReporterPermission,
-            ],
-            request=request,
-        )
-
-
-class IncidentReporterPermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        current_user = get_current_user(request=request)
-        pk = PrimaryKeyModel(id=request.path_params["incident_id"])
-        current_incident = incident_service.get(db_session=request.state.db, incident_id=pk.id)
-
-        if not current_incident:
-            return False
-
-        if current_incident.reporter:
-            if current_incident.reporter.individual.email == current_user.email:
-                return True
-
-        return False
-
-
-class IncidentCommanderPermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        current_user = get_current_user(request=request)
-        pk = PrimaryKeyModel(id=request.path_params["incident_id"])
-        current_incident = incident_service.get(db_session=request.state.db, incident_id=pk.id)
-        if not current_incident:
-            return False
-
-        if current_incident.commander:
-            if current_incident.commander.individual.email == current_user.email:
-                return True
-
-        return False
-
-
-class IncidentCommanderOrScribePermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        current_user = get_current_user(request=request)
-        pk = PrimaryKeyModel(id=request.path_params["incident_id"])
-        current_incident = incident_service.get(db_session=request.state.db, incident_id=pk.id)
-        if not current_incident:
-            return False
-
-        if (
-            current_incident.commander
-            and current_incident.commander.individual.email == current_user.email
-        ):
-            return True
-
-        scribes = [
-            participant.individual.email
-            for participant in current_incident.participants
-            if ParticipantRoleType.scribe in [role.role for role in participant.participant_roles]
-        ]
-        if current_user.email in scribes:
-            return True
-
-        return False
-
-
-class IncidentParticipantPermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        current_user = get_current_user(request=request)
-        pk = PrimaryKeyModel(id=request.path_params["incident_id"])
-        current_incident: Incident = incident_service.get(
-            db_session=request.state.db, incident_id=pk.id
-        )
-        if not current_incident:
-            return False
-
-        participant_emails: list[str] = [
-            participant.individual.email for participant in current_incident.participants
-        ]
-        return current_user.email in participant_emails
-
-
-# Cases
-
-
-class CaseViewPermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        pk = PrimaryKeyModel(id=request.path_params["case_id"])
-
-        current_case = case_service.get(db_session=request.state.db, case_id=pk.id)
-
-        if not current_case:
-            return False
-
-        if current_case.visibility == Visibility.restricted:
-            return any_permission(
-                permissions=[
-                    OrganizationAdminPermission,
-                    CaseParticipantPermission,
-                ],
-                request=request,
-            )
-        return True
-
-
-class CaseEditPermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        return any_permission(
-            permissions=[
-                OrganizationAdminPermission,
-                CaseParticipantPermission,
-            ],
-            request=request,
-        )
-
-
-class CaseParticipantPermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        current_user = get_current_user(request=request)
-        pk = PrimaryKeyModel(id=request.path_params["case_id"])
-        current_case: Case = case_service.get(db_session=request.state.db, case_id=pk.id)
-        participant_emails: list[str] = [
-            participant.individual.email for participant in current_case.participants
-        ]
-        return current_user.email in participant_emails
-
-
-class CaseJoinPermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        pk = PrimaryKeyModel(id=request.path_params["case_id"])
-        current_case = case_service.get(db_session=request.state.db, case_id=pk.id)
-
-        if current_case.visibility == Visibility.restricted:
-            return OrganizationAdminPermission(request=request)
-
-        return True
-
-
-class FeedbackDeletePermission(BasePermission):
-    def has_required_permissions(
-        self,
-        request: Request,
-    ) -> bool:
-        permission = any_permission(
-            permissions=[
-                SensitiveProjectActionPermission,
-            ],
-            request=request,
-        )
-        if not permission:
-            individual_contact_id = request.path_params.get("individual_contact_id", "0")
-            # "0" is passed if the feedback is anonymous
-            if individual_contact_id != "0":
-                pk = PrimaryKeyModel(id=individual_contact_id)
-                individual_contact = individual_contact_service.get(
-                    db_session=request.state.db, individual_contact_id=pk.id
-                )
-
-                if not individual_contact:
-                    return False
-
-                current_user = get_current_user(request=request)
-                if individual_contact.email == current_user.email:
-                    return True
-
-        return permission
+# class IncidentViewPermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         pk = PrimaryKeyModel(id=request.path_params["incident_id"])
+#         current_incident = incident_service.get(db_session=request.state.db, incident_id=pk.id)
+#
+#         if not current_incident:
+#             return False
+#
+#         if current_incident.visibility == Visibility.restricted:
+#             return any_permission(
+#                 permissions=[
+#                     OrganizationAdminPermission,
+#                     IncidentCommanderPermission,
+#                     IncidentReporterPermission,
+#                     IncidentParticipantPermission,
+#                 ],
+#                 request=request,
+#             )
+#         return True
+#
+#
+# class IncidentEditPermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         return any_permission(
+#             permissions=[
+#                 OrganizationAdminPermission,
+#                 IncidentCommanderPermission,
+#                 IncidentReporterPermission,
+#             ],
+#             request=request,
+#         )
+#
+#
+# class IncidentEventPermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         return any_permission(
+#             permissions=[
+#                 OrganizationAdminPermission,
+#                 IncidentCommanderOrScribePermission,
+#                 IncidentReporterPermission,
+#             ],
+#             request=request,
+#         )
+#
+#
+# class IncidentReporterPermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         current_user = get_current_user(request=request)
+#         pk = PrimaryKeyModel(id=request.path_params["incident_id"])
+#         current_incident = incident_service.get(db_session=request.state.db, incident_id=pk.id)
+#
+#         if not current_incident:
+#             return False
+#
+#         if current_incident.reporter:
+#             if current_incident.reporter.individual.email == current_user.email:
+#                 return True
+#
+#         return False
+#
+#
+# class IncidentCommanderPermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         current_user = get_current_user(request=request)
+#         pk = PrimaryKeyModel(id=request.path_params["incident_id"])
+#         current_incident = incident_service.get(db_session=request.state.db, incident_id=pk.id)
+#         if not current_incident:
+#             return False
+#
+#         if current_incident.commander:
+#             if current_incident.commander.individual.email == current_user.email:
+#                 return True
+#
+#         return False
+#
+#
+# class IncidentCommanderOrScribePermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         current_user = get_current_user(request=request)
+#         pk = PrimaryKeyModel(id=request.path_params["incident_id"])
+#         current_incident = incident_service.get(db_session=request.state.db, incident_id=pk.id)
+#         if not current_incident:
+#             return False
+#
+#         if (
+#             current_incident.commander
+#             and current_incident.commander.individual.email == current_user.email
+#         ):
+#             return True
+#
+#         scribes = [
+#             participant.individual.email
+#             for participant in current_incident.participants
+#             if ParticipantRoleType.scribe in [role.role for role in participant.participant_roles]
+#         ]
+#         if current_user.email in scribes:
+#             return True
+#
+#         return False
+#
+#
+# class IncidentParticipantPermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         current_user = get_current_user(request=request)
+#         pk = PrimaryKeyModel(id=request.path_params["incident_id"])
+#         current_incident: Incident = incident_service.get(
+#             db_session=request.state.db, incident_id=pk.id
+#         )
+#         if not current_incident:
+#             return False
+#
+#         participant_emails: list[str] = [
+#             participant.individual.email for participant in current_incident.participants
+#         ]
+#         return current_user.email in participant_emails
+#
+#
+# # Cases
+#
+#
+# class CaseViewPermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         pk = PrimaryKeyModel(id=request.path_params["case_id"])
+#
+#         current_case = case_service.get(db_session=request.state.db, case_id=pk.id)
+#
+#         if not current_case:
+#             return False
+#
+#         if current_case.visibility == Visibility.restricted:
+#             return any_permission(
+#                 permissions=[
+#                     OrganizationAdminPermission,
+#                     CaseParticipantPermission,
+#                 ],
+#                 request=request,
+#             )
+#         return True
+#
+#
+# class CaseEditPermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         return any_permission(
+#             permissions=[
+#                 OrganizationAdminPermission,
+#                 CaseParticipantPermission,
+#             ],
+#             request=request,
+#         )
+#
+#
+# class CaseParticipantPermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         current_user = get_current_user(request=request)
+#         pk = PrimaryKeyModel(id=request.path_params["case_id"])
+#         current_case: Case = case_service.get(db_session=request.state.db, case_id=pk.id)
+#         participant_emails: list[str] = [
+#             participant.individual.email for participant in current_case.participants
+#         ]
+#         return current_user.email in participant_emails
+#
+#
+# class CaseJoinPermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         pk = PrimaryKeyModel(id=request.path_params["case_id"])
+#         current_case = case_service.get(db_session=request.state.db, case_id=pk.id)
+#
+#         if current_case.visibility == Visibility.restricted:
+#             return OrganizationAdminPermission(request=request)
+#
+#         return True
+#
+#
+# class FeedbackDeletePermission(BasePermission):
+#     def has_required_permissions(
+#         self,
+#         request: Request,
+#     ) -> bool:
+#         permission = any_permission(
+#             permissions=[
+#                 SensitiveProjectActionPermission,
+#             ],
+#             request=request,
+#         )
+#         if not permission:
+#             individual_contact_id = request.path_params.get("individual_contact_id", "0")
+#             # "0" is passed if the feedback is anonymous
+#             if individual_contact_id != "0":
+#                 pk = PrimaryKeyModel(id=individual_contact_id)
+#                 individual_contact = individual_contact_service.get(
+#                     db_session=request.state.db, individual_contact_id=pk.id
+#                 )
+#
+#                 if not individual_contact:
+#                     return False
+#
+#                 current_user = get_current_user(request=request)
+#                 if individual_contact.email == current_user.email:
+#                     return True
+#
+#         return permission

@@ -1,20 +1,18 @@
-from slugify import slugify
-from pydantic import Field
-from pydantic.color import Color
-
 from typing import List, Optional
 
+from pydantic import Field
+from pydantic.color import Color
+from slugify import slugify
+from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.event import listen
-from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy_utils import TSVectorType
 
-
-from dispatch.database.core import Base
-from dispatch.models import DispatchBase, NameStr, OrganizationSlug, PrimaryKey, Pagination
+from farmbase.database.core import Base
+from farmbase.models import FarmbaseBase, NameStr, OrganizationSlug, Pagination, PrimaryKey
 
 
 class Organization(Base):
-    __table_args__ = {"schema": "dispatch_core"}
+    __table_args__ = {"schema": "farmbase_core"}
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
@@ -25,9 +23,7 @@ class Organization(Base):
     banner_color = Column(String)
     banner_text = Column(String)
 
-    search_vector = Column(
-        TSVectorType("name", "description", weights={"name": "A", "description": "B"})
-    )
+    search_vector = Column(TSVectorType("name", "description", weights={"name": "A", "description": "B"}))
 
 
 def generate_slug(target, value, oldvalue, initiator):
@@ -39,7 +35,7 @@ def generate_slug(target, value, oldvalue, initiator):
 listen(Organization.name, "set", generate_slug)
 
 
-class OrganizationBase(DispatchBase):
+class OrganizationBase(FarmbaseBase):
     id: Optional[PrimaryKey]
     name: NameStr
     description: Optional[str] = Field(None, nullable=True)
@@ -53,7 +49,7 @@ class OrganizationCreate(OrganizationBase):
     pass
 
 
-class OrganizationUpdate(DispatchBase):
+class OrganizationUpdate(FarmbaseBase):
     id: Optional[PrimaryKey]
     description: Optional[str] = Field(None, nullable=True)
     default: Optional[bool] = Field(False, nullable=True)

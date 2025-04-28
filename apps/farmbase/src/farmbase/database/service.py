@@ -19,24 +19,11 @@ from sqlalchemy_filters import apply_pagination, apply_sort
 from sqlalchemy_filters.exceptions import BadFilterFormat, FieldNotFound
 from sqlalchemy_filters.models import Field, get_model_from_spec
 
-from dispatch.auth.models import DispatchUser
-from dispatch.auth.service import CurrentUser, get_current_role
-from dispatch.case.models import Case
-from dispatch.data.query.models import Query as QueryModel
-from dispatch.data.source.models import Source
-from dispatch.database.core import DbSession
-from dispatch.enums import UserRoles, Visibility
-from dispatch.exceptions import FieldNotFoundError, InvalidFilterError
-from dispatch.feedback.incident.models import Feedback
-from dispatch.incident.models import Incident
-from dispatch.incident.type.models import IncidentType
-from dispatch.individual.models import IndividualContact
-from dispatch.participant.models import Participant
-from dispatch.plugin.models import Plugin, PluginInstance
-from dispatch.search.fulltext.composite_search import CompositeSearch
-from dispatch.signal.models import Signal, SignalInstance
-from dispatch.tag.models import Tag
-from dispatch.task.models import Task
+from farmbase.auth.models import FarmbaseUser
+from farmbase.auth.service import CurrentUser, get_current_role
+from farmbase.database.core import DbSession
+from farmbase.enums import UserRoles
+from farmbase.exceptions import FieldNotFoundError, InvalidFilterError
 
 from .core import Base, get_class_by_tablename, get_model_name_by_tablename
 
@@ -99,9 +86,7 @@ class Filter(object):
         except KeyError:
             raise BadFilterFormat("`field` is a mandatory filter attribute.") from None
         except TypeError:
-            raise BadFilterFormat(
-                "Filter spec `{}` should be a dictionary.".format(filter_spec)
-            ) from None
+            raise BadFilterFormat("Filter spec `{}` should be a dictionary.".format(filter_spec)) from None
 
         self.operator = Operator(filter_spec.get("op"))
         self.value = filter_spec.get("value")
@@ -160,9 +145,7 @@ class BooleanFilter(object):
         return models
 
     def format_for_sqlalchemy(self, query, default_model):
-        return self.function(
-            *[filter.format_for_sqlalchemy(query, default_model) for filter in self.filters]
-        )
+        return self.function(*[filter.format_for_sqlalchemy(query, default_model) for filter in self.filters])
 
 
 def _is_iterable_filter(filter_spec):
@@ -185,17 +168,12 @@ def build_filters(filter_spec):
 
                 if not _is_iterable_filter(fn_args):
                     raise BadFilterFormat(
-                        "`{}` value must be an iterable across the function "
-                        "arguments".format(boolean_function.key)
+                        "`{}` value must be an iterable across the function arguments".format(boolean_function.key)
                     )
                 if boolean_function.only_one_arg and len(fn_args) != 1:
-                    raise BadFilterFormat(
-                        "`{}` must have one argument".format(boolean_function.key)
-                    )
+                    raise BadFilterFormat("`{}` must have one argument".format(boolean_function.key))
                 if not boolean_function.only_one_arg and len(fn_args) < 1:
-                    raise BadFilterFormat(
-                        "`{}` must have one or more arguments".format(boolean_function.key)
-                    )
+                    raise BadFilterFormat("`{}` must have one or more arguments".format(boolean_function.key))
                 return [BooleanFilter(boolean_function.sqlalchemy_fn, *build_filters(fn_args))]
 
     return [Filter(filter_spec)]
@@ -270,13 +248,11 @@ def auto_join(query, model_names):
     return query
 
 
-def apply_model_specific_filters(
-    model: Base, query: orm.Query, current_user: DispatchUser, role: UserRoles
-):
+def apply_model_specific_filters(model: Base, query: orm.Query, current_user: FarmbaseUser, role: UserRoles):
     """Applies any model specific filter as it pertains to the given user."""
     model_map = {
-        Incident: [restricted_incident_filter],
-        Case: [restricted_case_filter],
+        # Incident: [restricted_incident_filter],
+        # Case: [restricted_case_filter],
         # IncidentType: [restricted_incident_type_filter],
     }
 
@@ -346,38 +322,38 @@ def apply_filter_specific_joins(model: Base, filter_spec: dict, query: orm.query
     # this is required because by default sqlalchemy-filter's auto-join
     # knows nothing about how to join many-many relationships.
     model_map = {
-        (Feedback, "Incident"): (Incident, False),
-        (Feedback, "Case"): (Case, False),
-        (Task, "Project"): (Incident, False),
-        (Task, "Incident"): (Incident, False),
-        (Task, "IncidentPriority"): (Incident, False),
-        (Task, "IncidentType"): (Incident, False),
-        (PluginInstance, "Plugin"): (Plugin, False),
-        (Source, "Tag"): (Source.tags, True),
-        (Source, "TagType"): (Source.tags, True),
-        (QueryModel, "Tag"): (QueryModel.tags, True),
-        (QueryModel, "TagType"): (QueryModel.tags, True),
-        (DispatchUser, "Organization"): (DispatchUser.organizations, True),
-        (Case, "Tag"): (Case.tags, True),
-        (Case, "TagType"): (Case.tags, True),
-        (Case, "IndividualContact"): (Case.participants, True),
-        (Incident, "Tag"): (Incident.tags, True),
-        (Incident, "TagType"): (Incident.tags, True),
-        (Incident, "IndividualContact"): (Incident.participants, True),
-        (Incident, "Term"): (Incident.terms, True),
-        (Signal, "Tag"): (Signal.tags, True),
-        (Signal, "TagType"): {Signal.tags, True},
-        (SignalInstance, "Entity"): (SignalInstance.entities, True),
-        (SignalInstance, "EntityType"): (SignalInstance.entities, True),
-        (Tag, "TagType"): (Tag.tag_type, False),
+        # (Feedback, "Incident"): (Incident, False),
+        # (Feedback, "Case"): (Case, False),
+        # (Task, "Project"): (Incident, False),
+        # (Task, "Incident"): (Incident, False),
+        # (Task, "IncidentPriority"): (Incident, False),
+        # (Task, "IncidentType"): (Incident, False),
+        # (PluginInstance, "Plugin"): (Plugin, False),
+        # (Source, "Tag"): (Source.tags, True),
+        # (Source, "TagType"): (Source.tags, True),
+        # (QueryModel, "Tag"): (QueryModel.tags, True),
+        # (QueryModel, "TagType"): (QueryModel.tags, True),
+        # (FarmbaseUser, "Organization"): (FarmbaseUser.organizations, True),
+        # (Case, "Tag"): (Case.tags, True),
+        # (Case, "TagType"): (Case.tags, True),
+        # (Case, "IndividualContact"): (Case.participants, True),
+        # (Incident, "Tag"): (Incident.tags, True),
+        # (Incident, "TagType"): (Incident.tags, True),
+        # (Incident, "IndividualContact"): (Incident.participants, True),
+        # (Incident, "Term"): (Incident.terms, True),
+        # (Signal, "Tag"): (Signal.tags, True),
+        # (Signal, "TagType"): {Signal.tags, True},
+        # (SignalInstance, "Entity"): (SignalInstance.entities, True),
+        # (SignalInstance, "EntityType"): (SignalInstance.entities, True),
+        # (Tag, "TagType"): (Tag.tag_type, False),
     }
     filters = build_filters(filter_spec)
 
     # Replace mapping if looking for commander
-    if "Commander" in str(filter_spec):
-        model_map.update({(Incident, "IndividualContact"): (Incident.commander, True)})
-    if "Assignee" in str(filter_spec):
-        model_map.update({(Case, "IndividualContact"): (Case.assignee, True)})
+    # if "Commander" in str(filter_spec):
+    #     model_map.update({(Incident, "IndividualContact"): (Incident.commander, True)})
+    # if "Assignee" in str(filter_spec):
+    #     model_map.update({(Case, "IndividualContact"): (Case.assignee, True)})
 
     filter_models = get_named_models(filters)
     joined_models = []
@@ -394,16 +370,16 @@ def apply_filter_specific_joins(model: Base, filter_spec: dict, query: orm.query
     return query
 
 
-def composite_search(*, db_session, query_str: str, models: List[Base], current_user: DispatchUser):
-    """Perform a multi-table search based on the supplied query."""
-    s = CompositeSearch(db_session, models)
-    query = s.build_query(query_str, sort=True)
-
-    # TODO can we do this with composite filtering?
-    # for model in models:
-    #    query = apply_model_specific_filters(model, query, current_user)
-
-    return s.search(query=query)
+# def composite_search(*, db_session, query_str: str, models: List[Base], current_user: FarmbaseUser):
+#     """Perform a multi-table search based on the supplied query."""
+#     s = CompositeSearch(db_session, models)
+#     query = s.build_query(query_str, sort=True)
+#
+#     # TODO can we do this with composite filtering?
+#     # for model in models:
+#     #    query = apply_model_specific_filters(model, query, current_user)
+#
+#     return s.search(query=query)
 
 
 def search(*, query_str: str, query: Query, model: str, sort=False):
@@ -541,7 +517,7 @@ def search_filter_sort_paginate(
     items_per_page: int = 5,
     sort_by: List[str] = None,
     descending: List[bool] = None,
-    current_user: DispatchUser = None,
+    current_user: FarmbaseUser = None,
     role: UserRoles = UserRoles.member,
 ):
     """Common functionality for searching, filtering, sorting, and pagination."""
@@ -596,9 +572,7 @@ def search_filter_sort_paginate(
             model=BaseModel,
         ) from None
     except BadFilterFormat as e:
-        raise ValidationError(
-            [ErrorWrapper(InvalidFilterError(msg=str(e)), loc="filter")], model=BaseModel
-        ) from None
+        raise ValidationError([ErrorWrapper(InvalidFilterError(msg=str(e)), loc="filter")], model=BaseModel) from None
 
     if items_per_page == -1:
         items_per_page = None
@@ -626,42 +600,42 @@ def search_filter_sort_paginate(
     }
 
 
-def restricted_incident_filter(query: orm.Query, current_user: DispatchUser, role: UserRoles):
-    """Adds additional incident filters to query (usually for permissions)."""
-    if role == UserRoles.member:
-        # We filter out restricted incidents for users with a member role if the user is not an incident participant
-        query = (
-            query.join(Participant, Incident.id == Participant.incident_id)
-            .join(IndividualContact)
-            .filter(
-                or_(
-                    Incident.visibility == Visibility.open,
-                    IndividualContact.email == current_user.email,
-                )
-            )
-        )
-    return query.distinct()
+# def restricted_incident_filter(query: orm.Query, current_user: FarmbaseUser, role: UserRoles):
+#     """Adds additional incident filters to query (usually for permissions)."""
+#     if role == UserRoles.member:
+#         # We filter out restricted incidents for users with a member role if the user is not an incident participant
+#         query = (
+#             query.join(Participant, Incident.id == Participant.incident_id)
+#             .join(IndividualContact)
+#             .filter(
+#                 or_(
+#                     Incident.visibility == Visibility.open,
+#                     IndividualContact.email == current_user.email,
+#                 )
+#             )
+#         )
+#     return query.distinct()
 
 
-def restricted_case_filter(query: orm.Query, current_user: DispatchUser, role: UserRoles):
-    """Adds additional case filters to query (usually for permissions)."""
-    if role == UserRoles.member:
-        # We filter out restricted cases for users with a member role if the user is not a case participant
-        query = (
-            query.join(Participant, Case.id == Participant.case_id)
-            .join(IndividualContact)
-            .filter(
-                or_(
-                    Case.visibility == Visibility.open,
-                    IndividualContact.email == current_user.email,
-                )
-            )
-        )
-    return query.distinct()
+# def restricted_case_filter(query: orm.Query, current_user: FarmbaseUser, role: UserRoles):
+#     """Adds additional case filters to query (usually for permissions)."""
+#     if role == UserRoles.member:
+#         # We filter out restricted cases for users with a member role if the user is not a case participant
+#         query = (
+#             query.join(Participant, Case.id == Participant.case_id)
+#             .join(IndividualContact)
+#             .filter(
+#                 or_(
+#                     Case.visibility == Visibility.open,
+#                     IndividualContact.email == current_user.email,
+#                 )
+#             )
+#         )
+#     return query.distinct()
 
 
-def restricted_incident_type_filter(query: orm.Query, current_user: DispatchUser):
-    """Adds additional incident type filters to query (usually for permissions)."""
-    if current_user:
-        query = query.filter(IncidentType.visibility == Visibility.open)
-    return query
+# def restricted_incident_type_filter(query: orm.Query, current_user: FarmbaseUser):
+#     """Adds additional incident type filters to query (usually for permissions)."""
+#     if current_user:
+#         query = query.filter(IncidentType.visibility == Visibility.open)
+#     return query

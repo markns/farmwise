@@ -1,9 +1,9 @@
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from dispatch.logging import logging
-from dispatch.config import SQLALCHEMY_DATABASE_URI
-from dispatch.database.core import Base
+from farmbase.logging import logging
+from farmbase.config import SQLALCHEMY_DATABASE_URI
+from farmbase.database.core import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -18,7 +18,7 @@ config.set_main_option("sqlalchemy.url", str(SQLALCHEMY_DATABASE_URI))
 
 target_metadata = Base.metadata  # noqa
 
-CORE_SCHEMA_NAME = "dispatch_core"
+CORE_SCHEMA_NAME = "farmbase_core"
 
 
 def include_object(object, name, type_, reflected, compare_to):
@@ -48,7 +48,7 @@ def run_migrations_online():
         config.get_section(config.config_ini_section), prefix="sqlalchemy.", poolclass=pool.NullPool
     )
 
-    log.info("Migrating dispatch core schema...")
+    log.info("Migrating farmbase core schema...")
     # migrate common tables
     with connectable.connect() as connection:
         connection.execute(f'set search_path to "{CORE_SCHEMA_NAME}"')

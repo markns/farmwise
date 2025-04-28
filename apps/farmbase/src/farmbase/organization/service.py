@@ -1,13 +1,12 @@
 from typing import List, Optional
 
-from pydantic.error_wrappers import ErrorWrapper, ValidationError
+from pydantic.error_wrappers import ValidationError
 from sqlalchemy.sql.expression import true
 
-from dispatch.auth.models import DispatchUser, DispatchUserOrganization
-from dispatch.database.core import engine
-from dispatch.database.manage import init_schema
-from dispatch.enums import UserRoles
-from dispatch.exceptions import NotFoundError
+from farmbase.auth.models import FarmbaseUser, FarmbaseUserOrganization
+from farmbase.database.core import engine
+from farmbase.database.manage import init_schema
+from farmbase.enums import UserRoles
 
 from .models import Organization, OrganizationCreate, OrganizationRead, OrganizationUpdate
 
@@ -27,14 +26,15 @@ def get_default_or_raise(*, db_session) -> Organization:
     organization = get_default(db_session=db_session)
 
     if not organization:
-        raise ValidationError(
+        raise ValidationError.from_exception_data(
+            "OrganizationRead",
             [
-                ErrorWrapper(
-                    NotFoundError(msg="No default organization defined."),
-                    loc="organization",
-                )
+                {
+                    "loc": ("organization",),
+                    "msg": "No default organization defined.",
+                    "type": "value_error.not_found",
+                }
             ],
-            model=OrganizationRead,
         )
     return organization
 
@@ -49,14 +49,15 @@ def get_by_name_or_raise(*, db_session, organization_in: OrganizationRead) -> Or
     organization = get_by_name(db_session=db_session, name=organization_in.name)
 
     if not organization:
-        raise ValidationError(
+        raise ValidationError.from_exception_data(
+            "OrganizationRead",
             [
-                ErrorWrapper(
-                    NotFoundError(msg="Organization not found.", organization=organization_in.name),
-                    loc="organization",
-                )
+                {
+                    "loc": ("organization",),
+                    "msg": f"Organization '{organization_in.name}' not found.",
+                    "type": "value_error.not_found",
+                }
             ],
-            model=OrganizationRead,
         )
 
     return organization
@@ -72,14 +73,15 @@ def get_by_slug_or_raise(*, db_session, organization_in: OrganizationRead) -> Or
     organization = get_by_slug(db_session=db_session, slug=organization_in.slug)
 
     if not organization:
-        raise ValidationError(
+        raise ValidationError.from_exception_data(
+            "OrganizationRead",
             [
-                ErrorWrapper(
-                    NotFoundError(msg="Organization not found.", organization=organization_in.name),
-                    loc="organization",
-                )
+                {
+                    "loc": ("organization",),
+                    "msg": f"Organization '{organization_in.slug}' not found.",
+                    "type": "value_error.not_found",
+                }
             ],
-            model=OrganizationRead,
         )
 
     return organization
@@ -126,9 +128,7 @@ def get_or_create(*, db_session, organization_in: OrganizationCreate) -> Organiz
     return create(db_session=db_session, organization_in=organization_in)
 
 
-def update(
-    *, db_session, organization: Organization, organization_in: OrganizationUpdate
-) -> Organization:
+def update(*, db_session, organization: Organization, organization_in: OrganizationUpdate) -> Organization:
     """Updates an organization."""
     organization_data = organization.dict()
 
@@ -155,14 +155,10 @@ def delete(*, db_session, organization_id: int):
 def add_user(
     *,
     db_session,
-    user: DispatchUser,
+    user: FarmbaseUser,
     organization: Organization,
     role: UserRoles = UserRoles.member,
 ):
     """Adds a user to an organization."""
-    db_session.add(
-        DispatchUserOrganization(
-            dispatch_user_id=user.id, organization_id=organization.id, role=role
-        )
-    )
+    db_session.add(FarmbaseUserOrganization(farmbase_user_id=user.id, organization_id=organization.id, role=role))
     db_session.commit()
