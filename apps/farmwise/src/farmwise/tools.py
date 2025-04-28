@@ -46,14 +46,11 @@ from farmwise.context import UserContext
 
 
 @function_tool
-async def crop_suitability(
-    context: RunContextWrapper[UserContext], crop_type: str, latitude: float, longitude: float
-) -> str:
+async def suitability_index(context: RunContextWrapper[UserContext], latitude: float, longitude: float) -> str:
     #  TODO: use farmbase-client / farmbase_agent_toolkit
     async with httpx.AsyncClient() as client:
         r = await client.get(
-            f"http://127.0.0.1:8000/api/v1/crop-varieties/suitability?crop_type={crop_type}"
-            f"&latitude={latitude}&longitude={longitude}"
+            "http://127.0.0.1:8000/api/v1/gaez/suitability_index", params={"latitude": latitude, "longitude": longitude}
         )
         return r.json()
 
@@ -67,6 +64,17 @@ async def aez_classification(context: RunContextWrapper[UserContext], latitude: 
             params={"latitude": latitude, "longitude": longitude},
         )
         return r.json()
+
+
+# Refining the Spatial Scale for Maize Crop Agro-Climatological Suitability Conditions in a Region
+# with Complex Topography towards a Smart and Sustainable Agriculture. Case Study: Central Romania (Cluj Count
+
+# Maturity Hybrid,growing season length (days/y)
+# Extremely early,76–85
+# Early,86–112
+# Intermediate,113–129
+# Late,130–145
+# Very late,>150
 
 
 @function_tool

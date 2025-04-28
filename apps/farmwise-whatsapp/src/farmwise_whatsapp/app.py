@@ -15,9 +15,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+# TODO: load these commands from the FarmWise service
 class Commands(Enum):
     REGISTER_FIELD = Command(name="Register a field", description="Register a new field")
-    CHOOSE_MAIZE_SEED = Command(name="Select a maize seed variety", description="Select a maize seed variety")
+    SELECT_MAIZE_VARIETY = Command(name="Select a maize seed variety", description="Select a maize seed variety")
+    SHOW_SUITABLE_CROPS = Command(name="Show suitable crops", description="Show suitable crops for a location")
 
 
 @asynccontextmanager
@@ -89,7 +91,7 @@ async def raw_update_handler(_: WhatsApp, update: dict):
     logger.warning(f"RAW UPDATE: {update}")
 
 
-@wa.on_message
+@wa.on_message(filters.text)
 async def message_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"MESSAGE USER: {msg}")
     await msg.mark_as_read()

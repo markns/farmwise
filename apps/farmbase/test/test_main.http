@@ -19,3 +19,11 @@ Accept: application/json
 
 GET http://127.0.0.1:8000/api/v1/gaez/growing_period?latitude=-1.1000000238419&longitude=36.46667098999
 Accept: application/json
+
+###
+GET http://127.0.0.1:8000/api/v1/gaez/suitability_index?latitude=-1.1000000238419&longitude=36.46667098999
+Accept: application/json
+
+###
+GET http://127.0.0.1:8000/api/v1/gaez/suitability?latitude=0.66566997766495&longitude=37.889739990234
+Accept: application/json

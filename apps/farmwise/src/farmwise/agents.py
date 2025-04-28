@@ -7,7 +7,14 @@ from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise_schema.schema import AgentInfo, WhatsappResponse
 
 from farmwise.context import UserContext
-from farmwise.tools import aez_classification, elevation, growing_period, maize_varieties, soil_property
+from farmwise.tools import (
+    aez_classification,
+    elevation,
+    growing_period,
+    maize_varieties,
+    soil_property,
+    suitability_index,
+)
 
 # TODO: Split into separate modules, as shown in openai-agents-python/examples/financial_research_agent
 #
@@ -62,35 +69,26 @@ from farmwise.tools import aez_classification, elevation, growing_period, maize_
 #         ...     )
 
 
-#
-# crop_suitability_agent: Agent[UserContext] = Agent(
-#     name="Crop Suitability Agent",
-#     handoff_description="A helpful agent that can answer questions about crop suitability.",
-#     instructions=f"""{RECOMMENDED_PROMPT_PREFIX}
-#     You are an agent that gives advice on which seed varieties of agricultural crops are suitable for growing in
-#     specific locations in Kenya.
-#
-#     # Routine
-#     1. Ask what type of crop the farmer wants to grow.
-#     2. Ask the farmer what their location is, if it's not already provided. Add the action "location_request" to get the
-#      location from the farmer.
-#     3. Use the crop suitability tool to find the crop varieties that are suitable for the farmers location.
-#
-#     If the farmer asks a question that is not related to the routine, transfer back to the triage agent. """,
-#     tools=[crop_suitability],
-#     output_type=WhatsappResponse,
-#     model="gpt-4.1-mini",
-# )
+# TODO: Why is maize not showing in results?
+# TODO:
+crop_suitability_agent: Agent[UserContext] = Agent(
+    name="Crop Suitability Agent",
+    handoff_description="A helpful agent that can answer questions about crop suitability.",
+    instructions=f"""{RECOMMENDED_PROMPT_PREFIX}
+    You are an agent that gives advice on which agricultural crops are most suitable for a given area.
+    specific locations in Kenya.
 
-# Refining the Spatial Scale for Maize Crop Agro-Climatological Suitability Conditions in a Region
-# with Complex Topography towards a Smart and Sustainable Agriculture. Case Study: Central Romania (Cluj Count
+    # Routine
+    1. Request the farmer shares their location, unless it is already known. Add the action "location_request" to get the location
+    2. Use the suitability_index tool to obtain suitability index values for crops between 0-10000 from FAO GAEZ data. 10000 indicates high suitability, 0 indicates low suitability. 
+    3. Create a visualization that shows the most suitable crops for the area.
 
-# Maturity Hybrid,growing season length (days/y)
-# Extremely early,76–85
-# Early,86–112
-# Intermediate,113–129
-# Late,130–145
-# Very late,>150
+    If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the triage agent. """,
+    tools=[suitability_index],
+    output_type=WhatsappResponse,
+    model="gpt-4.1",
+)
+
 
 maize_variety_selector: Agent[UserContext] = Agent(
     name="Maize Variety Selector",
@@ -150,8 +148,12 @@ maize_variety_selector: Agent[UserContext] = Agent(
     #             and climate shifts.
     tools=[elevation, soil_property, aez_classification, growing_period, maize_varieties],
     output_type=WhatsappResponse,
+    handoffs=[crop_suitability_agent],
     model="gpt-4.1",
 )
+
+features = ["Select a maize seed variety", "Show suitable crops for a location"]
+sections = "SectionList(button_title='Select a function', sections=[Section(title='✨ Features', rows=[SectionRow(title='🌽 Select a maize variety', callback_data='Select a maize seed variety'), SectionRow(title='🌾 Show suitable crops', callback_data='Show suitable crops for a location')])])"
 
 triage_agent: Agent[UserContext] = Agent(
     name="Triage Agent",
@@ -159,10 +161,12 @@ triage_agent: Agent[UserContext] = Agent(
     instructions=(
         f"""{RECOMMENDED_PROMPT_PREFIX} 
         You are a helpful triaging agent. You can use your tools to delegate questions to other appropriate agents.
+        
+        Include the following section_list in your response: {sections} 
         """
     ),
     handoffs=[
-        # crop_suitability_agent,
+        crop_suitability_agent,
         maize_variety_selector,
         # faq_agent,
         # handoff(agent=seat_booking_agent, on_handoff=on_seat_booking_handoff),
@@ -173,13 +177,14 @@ triage_agent: Agent[UserContext] = Agent(
 
 # crop_suitability_agent.handoffs.append(triage_agent)
 maize_variety_selector.handoffs.append(triage_agent)
+crop_suitability_agent.handoffs.extend([triage_agent, crop_suitability_agent])
 
 DEFAULT_AGENT = triage_agent.name
 
 agents: dict[str, Agent] = {
-    # crop_suitability_agent.name: crop_suitability_agent,
     triage_agent.name: triage_agent,
     maize_variety_selector.name: maize_variety_selector,
+    crop_suitability_agent.name: crop_suitability_agent,
 }
 
 
