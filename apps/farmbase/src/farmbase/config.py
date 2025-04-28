@@ -37,6 +37,9 @@ ENV = config("ENV", default="local")
 FARMBASE_UI_URL = config("FARMBASE_UI_URL", default="http://localhost:8080")
 FARMBASE_ENCRYPTION_KEY = config("FARMBASE_ENCRYPTION_KEY", cast=Secret)
 
+FARMBASE_JWT_SECRET = config("FARMBASE_JWT_SECRET", default=None)
+FARMBASE_JWT_ALG = config("FARMBASE_JWT_ALG", default="HS256")
+FARMBASE_JWT_EXP = config("FARMBASE_JWT_EXP", cast=int, default=86400)  # Seconds
 
 # static files
 DEFAULT_STATIC_DIR = os.path.join(
