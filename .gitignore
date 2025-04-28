@@ -2,6 +2,7 @@
 .streamlit/secrets.toml
 checkpoints.db
 checkpoints.db-*
+farmwise.db
 
 # VSCode
 .vscode
