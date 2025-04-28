@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from farmbase.api.deps import SessionDep
+from farmbase.api2.deps import SessionDep
 from farmbase.core.security import get_password_hash
 from farmbase.models import (
     User,

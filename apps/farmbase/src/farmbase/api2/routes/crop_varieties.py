@@ -4,7 +4,7 @@ import pandas as pd
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from farmbase.api.deps import SessionDep
+from farmbase.api2.deps import SessionDep
 
 router = APIRouter(prefix="/crop-varieties", tags=["crop-varieties"])
 

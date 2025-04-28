@@ -4,16 +4,14 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
 
-from farmbase.api.deps import CurrentUser, SessionDep
+from farmbase.api2.deps import CurrentUser, SessionDep
 from farmbase.models import Farm, FarmCreate, FarmPublic, FarmsPublic, FarmUpdate, Message
 
 router = APIRouter(prefix="/farms", tags=["farms"])
 
 
 @router.get("/", response_model=FarmsPublic)
-def read_farms(
-    session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
-) -> Any:
+def read_farms(session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100) -> Any:
     """
     Retrieve farms.
     """
@@ -24,18 +22,9 @@ def read_farms(
         statement = select(Farm).offset(skip).limit(limit)
         farms = session.exec(statement).all()
     else:
-        count_statement = (
-            select(func.count())
-            .select_from(Farm)
-            .where(Farm.owner_id == current_user.id)
-        )
+        count_statement = select(func.count()).select_from(Farm).where(Farm.owner_id == current_user.id)
         count = session.exec(count_statement).one()
-        statement = (
-            select(Farm)
-            .where(Farm.owner_id == current_user.id)
-            .offset(skip)
-            .limit(limit)
-        )
+        statement = select(Farm).where(Farm.owner_id == current_user.id).offset(skip).limit(limit)
         farms = session.exec(statement).all()
 
     return FarmsPublic(data=farms, count=count)
@@ -55,9 +44,7 @@ def read_farm(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> 
 
 
 @router.post("/", response_model=FarmPublic)
-def create_farm(
-    *, session: SessionDep, current_user: CurrentUser, farm_in: FarmCreate
-) -> Any:
+def create_farm(*, session: SessionDep, current_user: CurrentUser, farm_in: FarmCreate) -> Any:
     """
     Create new farm.
     """
@@ -93,9 +80,7 @@ def update_farm(
 
 
 @router.delete("/{id}")
-def delete_farm(
-    session: SessionDep, current_user: CurrentUser, id: uuid.UUID
-) -> Message:
+def delete_farm(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Message:
     """
     Delete a farm.
     """

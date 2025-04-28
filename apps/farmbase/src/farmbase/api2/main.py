@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from farmbase.api.routes import items, login, private, users, utils, farms, fields, crop_varieties, gaez
+from farmbase.api2.routes import crop_varieties, farms, fields, gaez, items, login, private, users, utils
 from farmbase.core.config import settings
 
 api_router = APIRouter()

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from pydantic.networks import EmailStr
 
-from farmbase.api.deps import get_current_active_superuser
+from farmbase.api2.deps import get_current_active_superuser
 from farmbase.models import Message
 from farmbase.utils import generate_test_email, send_email
 

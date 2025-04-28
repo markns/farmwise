@@ -10,7 +10,7 @@ from geojson_pydantic.geometries import Polygon, parse_geometry_obj
 from sqlalchemy import func
 from sqlmodel import select
 
-from farmbase.api.deps import CurrentUser, SessionDep
+from farmbase.api2.deps import CurrentUser, SessionDep
 from farmbase.models import Field, FieldCreate, FieldPublic, FieldsPublic, FieldUpdate, Message
 
 router = APIRouter(prefix="/farms/{farm_id}/fields", tags=["fields"])
