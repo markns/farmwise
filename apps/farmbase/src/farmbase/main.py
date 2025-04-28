@@ -18,7 +18,7 @@ from .api import api_router
 from .config import (
     STATIC_DIR,
 )
-from .logging import configure_logging
+from .logging_config import configure_logging
 from .rate_limiter import limiter
 
 log = logging.getLogger(__name__)

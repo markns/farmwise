@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from pydantic import ValidationError
+from pydantic.error_wrappers import ErrorWrapper
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import true
 
@@ -26,13 +27,12 @@ def get_default_or_raise(*, db_session: Session) -> Project:
     if not project:
         raise ValidationError(
             [
-                {
-                    "type": "not_found_error",
-                    "loc": ("project",),
-                    "msg": "No default project defined.",
-                }
+                ErrorWrapper(
+                    NotFoundError(msg="No default project defined."),
+                    loc="project",
+                )
             ],
-            ProjectRead,
+            model=ProjectRead,
         )
     return project
 
@@ -49,13 +49,12 @@ def get_by_name_or_raise(*, db_session: Session, project_in: ProjectRead) -> Pro
     if not project:
         raise ValidationError(
             [
-                {
-                    "type": "not_found_error",
-                    "loc": ("name",),
-                    "msg": f"Project not found: {project_in.name}",
-                }
+                ErrorWrapper(
+                    NotFoundError(msg="Project not found.", name=project_in.name),
+                    loc="name",
+                )
             ],
-            ProjectRead,
+            model=ProjectRead,
         )
 
     return project

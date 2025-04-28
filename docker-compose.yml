@@ -5,7 +5,7 @@ services:
     image: ghcr.io/baosystems/postgis:17
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_DB}"]
       interval: 10s
       retries: 5
       start_period: 30s
@@ -16,9 +16,9 @@ services:
       - .env
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
-      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD?Variable not set}
+      - POSTGRES_USER=${DATABASE_USER?Variable not set}
+      - POSTGRES_DB=${DATABASE_DB?Variable not set}
 
 
   adminer:
@@ -43,39 +43,39 @@ services:
       - traefik.http.routers.${STACK_NAME?Variable not set}-adminer-https.tls=true
       - traefik.http.routers.${STACK_NAME?Variable not set}-adminer-https.tls.certresolver=le
       - traefik.http.services.${STACK_NAME?Variable not set}-adminer.loadbalancer.server.port=8080
-
-  farmbase:
-    image: '${DOCKER_IMAGE_FARMBASE?Variable not set}:${TAG-latest}'
-    restart: always
-    networks:
-      - traefik-public
-      - default
-    depends_on:
-      db:
-        condition: service_healthy
-        restart: true
-#      prestart:
-#        condition: service_completed_successfully
-    env_file:
-      - .env
-    environment:
-      - DOMAIN=${DOMAIN}
-#      - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
-      - ENVIRONMENT=${ENVIRONMENT}
-      - FARMBASE_CORS_ORIGINS=${FARMBASE_CORS_ORIGINS}
-      - SECRET_KEY=${SECRET_KEY?Variable not set}
-      - FIRST_SUPERUSER=${FIRST_SUPERUSER?Variable not set}
-      - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD?Variable not set}
-#      - SMTP_HOST=${SMTP_HOST}
-#      - SMTP_USER=${SMTP_USER}
-#      - SMTP_PASSWORD=${SMTP_PASSWORD}
-#      - EMAILS_FROM_EMAIL=${EMAILS_FROM_EMAIL}
-      - POSTGRES_SERVER=db
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-#      - SENTRY_DSN=${SENTRY_DSN}
+#
+#  farmbase:
+#    image: '${DOCKER_IMAGE_FARMBASE?Variable not set}:${TAG-latest}'
+#    restart: always
+#    networks:
+#      - traefik-public
+#      - default
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#        restart: true
+##      prestart:
+##        condition: service_completed_successfully
+#    env_file:
+#      - .env
+#    environment:
+#      - DOMAIN=${DOMAIN}
+##      - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
+#      - ENVIRONMENT=${ENVIRONMENT}
+#      - FARMBASE_CORS_ORIGINS=${FARMBASE_CORS_ORIGINS}
+#      - SECRET_KEY=${SECRET_KEY?Variable not set}
+#      - FIRST_SUPERUSER=${FIRST_SUPERUSER?Variable not set}
+#      - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD?Variable not set}
+##      - SMTP_HOST=${SMTP_HOST}
+##      - SMTP_USER=${SMTP_USER}
+##      - SMTP_PASSWORD=${SMTP_PASSWORD}
+##      - EMAILS_FROM_EMAIL=${EMAILS_FROM_EMAIL}
+#      - POSTGRES_SERVER=db
+#      - POSTGRES_PORT=${POSTGRES_PORT}
+#      - POSTGRES_DB=${POSTGRES_DB}
+#      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+#      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+##      - SENTRY_DSN=${SENTRY_DSN}
 
 
 

@@ -104,10 +104,10 @@ class FeedbackMixin(object):
 # Pydantic models...
 class FarmbaseBase(BaseModel):
     class Config:
-        orm_mode = True
+        from_attributes = True
         validate_assignment = True
         arbitrary_types_allowed = True
-        anystr_strip_whitespace = True
+        str_strip_whitespace = True
 
         json_encoders = {
             # custom output conversion for datetime
@@ -117,7 +117,7 @@ class FarmbaseBase(BaseModel):
 
 
 class Pagination(FarmbaseBase):
-    itemsPerPage: int
+    items_per_page: int
     page: int
     total: int
 

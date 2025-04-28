@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import ValidationError
+from pydantic.error_wrappers import ValidationError
 
 from farmbase.auth.permissions import (
     OrganizationMemberPermission,
@@ -95,13 +95,12 @@ def create_user(
     if user:
         raise ValidationError(
             [
-                {
-                    "type": "invalid_configuration_error",
-                    "loc": ("email",),
-                    "msg": "A user with this email already exists.",
-                }
+                ErrorWrapper(
+                    InvalidConfigurationError(msg="A user with this email already exists."),
+                    loc="email",
+                )
             ],
-            UserCreate,
+            model=UserCreate,
         )
 
     current_user_organization_role = current_user.get_organization_role(organization)
@@ -299,18 +298,16 @@ def login_user(
 
     raise ValidationError(
         [
-            {
-                "type": "invalid_username_error",
-                "loc": ("username",),
-                "msg": "Invalid username.",
-            },
-            {
-                "type": "invalid_password_error",
-                "loc": ("password",),
-                "msg": "Invalid password.",
-            },
+            ErrorWrapper(
+                InvalidUsernameError(msg="Invalid username."),
+                loc="username",
+            ),
+            ErrorWrapper(
+                InvalidPasswordError(msg="Invalid password."),
+                loc="password",
+            ),
         ],
-        UserLogin,
+        model=UserLogin,
     )
 
 
@@ -323,13 +320,12 @@ def register_user(
     if user:
         raise ValidationError(
             [
-                {
-                    "type": "invalid_configuration_error",
-                    "loc": ("email",),
-                    "msg": "A user with this email already exists.",
-                }
+                ErrorWrapper(
+                    InvalidConfigurationError(msg="A user with this email already exists."),
+                    loc="email",
+                )
             ],
-            UserRegister,
+            model=UserRegister,
         )
 
     user = create(db_session=db_session, organization=organization, user_in=user_in)

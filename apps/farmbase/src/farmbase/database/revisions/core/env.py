@@ -1,9 +1,8 @@
 from alembic import context
-from sqlalchemy import engine_from_config, pool
-
-from farmbase.logging import logging
 from farmbase.config import SQLALCHEMY_DATABASE_URI
 from farmbase.database.core import Base
+from farmbase.logging_config import logging
+from sqlalchemy import engine_from_config, pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

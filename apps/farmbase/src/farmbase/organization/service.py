@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import ValidationError
+from pydantic.error_wrappers import ValidationError
 from sqlalchemy.sql.expression import true
 
 from farmbase.auth.models import FarmbaseUser, FarmbaseUserOrganization
@@ -26,15 +26,15 @@ def get_default_or_raise(*, db_session) -> Organization:
     organization = get_default(db_session=db_session)
 
     if not organization:
-        raise ValidationError(
+        raise ValidationError.from_exception_data(
+            "OrganizationRead",
             [
                 {
-                    "type": "value_error.not_found",
                     "loc": ("organization",),
                     "msg": "No default organization defined.",
+                    "type": "value_error.not_found",
                 }
             ],
-            OrganizationRead,
         )
     return organization
 
@@ -49,15 +49,15 @@ def get_by_name_or_raise(*, db_session, organization_in: OrganizationRead) -> Or
     organization = get_by_name(db_session=db_session, name=organization_in.name)
 
     if not organization:
-        raise ValidationError(
+        raise ValidationError.from_exception_data(
+            "OrganizationRead",
             [
                 {
-                    "type": "value_error.not_found",
                     "loc": ("organization",),
                     "msg": f"Organization '{organization_in.name}' not found.",
+                    "type": "value_error.not_found",
                 }
             ],
-            OrganizationRead,
         )
 
     return organization
@@ -73,15 +73,15 @@ def get_by_slug_or_raise(*, db_session, organization_in: OrganizationRead) -> Or
     organization = get_by_slug(db_session=db_session, slug=organization_in.slug)
 
     if not organization:
-        raise ValidationError(
+        raise ValidationError.from_exception_data(
+            "OrganizationRead",
             [
                 {
-                    "type": "value_error.not_found",
                     "loc": ("organization",),
                     "msg": f"Organization '{organization_in.slug}' not found.",
+                    "type": "value_error.not_found",
                 }
             ],
-            OrganizationRead,
         )
 
     return organization
