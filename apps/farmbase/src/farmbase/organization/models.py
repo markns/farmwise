@@ -3,8 +3,9 @@ from typing import Any, List, Optional
 from pydantic import Field, field_validator
 from pydantic.color import Color
 from slugify import slugify
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import Column
 from sqlalchemy.event import listen
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import TSVectorType
 
 from farmbase.database.core import Base
@@ -15,14 +16,16 @@ from farmbase.validators import must_not_be_blank
 class Organization(Base):
     __table_args__ = {"schema": "farmbase_core"}
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True)
-    slug = Column(String)
-    default = Column(Boolean)
-    description = Column(String)
-    banner_enabled = Column(Boolean)
-    banner_color = Column(String)
-    banner_text = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    slug: Mapped[str]
+    default: Mapped[bool]
+    description: Mapped[str]
+    banner_enabled: Mapped[bool] = mapped_column(nullable=True)
+    banner_color: Mapped[str] = mapped_column(nullable=True)
+    banner_text: Mapped[str] = mapped_column(nullable=True)
+
+    users: Mapped[List["FarmbaseUserOrganization"]] = relationship(back_populates="organization")
 
     search_vector = Column(TSVectorType("name", "description", weights={"name": "A", "description": "B"}))
 

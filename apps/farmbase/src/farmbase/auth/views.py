@@ -274,7 +274,7 @@ async def get_my_role(
     current_user: CurrentUser,
     organization: OrganizationSlug,
 ):
-    return current_user.get_organization_role(organization)
+    return await current_user.get_organization_role(organization)
 
 
 @auth_router.post("/login", response_model=UserLoginResponse)

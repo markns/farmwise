@@ -5,6 +5,7 @@ from fastapi import Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 from starlette.status import HTTP_401_UNAUTHORIZED
 
@@ -39,13 +40,20 @@ InvalidCredentialException = HTTPException(
 
 async def get(*, db_session: AsyncSession, user_id: int) -> Optional[FarmbaseUser]:
     """Returns a user based on the given user id."""
-    result = await db_session.execute(select(FarmbaseUser).where(FarmbaseUser.id == user_id))
+    result = await db_session.execute(
+        select(FarmbaseUser).where(FarmbaseUser.id == user_id)
+        # .options(selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization))
+    )
     return result.scalars().one_or_none()
 
 
 async def get_by_email(*, db_session: AsyncSession, email: str) -> Optional[FarmbaseUser]:
     """Returns a user object based on user email."""
-    result = await db_session.execute(select(FarmbaseUser).where(FarmbaseUser.email == email))
+    result = await db_session.execute(
+        select(FarmbaseUser)
+        .where(FarmbaseUser.email == email)
+        .options(selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization))
+    )
     return result.scalars().one_or_none()
 
 
@@ -187,7 +195,6 @@ async def get_or_create(*, db_session: AsyncSession, organization: str, user_in:
     """Gets an existing user or creates a new one."""
     user = await get_by_email(db_session=db_session, email=user_in.email)
 
-    await db_session.refresh(user, ["organizations"])
     if not user:
         try:
             user = await create(db_session=db_session, organization=organization, user_in=user_in)
@@ -257,6 +264,6 @@ async def get_current_user(request: Request) -> FarmbaseUser:
 CurrentUser = Annotated[FarmbaseUser, Depends(get_current_user)]
 
 
-def get_current_role(request: Request, current_user: FarmbaseUser = Depends(get_current_user)) -> UserRoles:
+async def get_current_role(request: Request, current_user: FarmbaseUser = Depends(get_current_user)) -> UserRoles:
     """Attempts to get the current user depending on the configured authentication provider."""
-    return current_user.get_organization_role(organization_slug=request.state.organization)
+    return await current_user.get_organization_role(organization_slug=request.state.organization)

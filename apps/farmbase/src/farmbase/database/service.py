@@ -445,7 +445,7 @@ def get_all(*, db_session, model):
     return db_session.query(get_class_by_tablename(model))
 
 
-def common_parameters(
+async def common_parameters(
     current_user: CurrentUser,
     db_session: DbSession,
     page: int = Query(1, gt=0, lt=2147483647),

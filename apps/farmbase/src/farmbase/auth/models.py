@@ -8,9 +8,9 @@ import bcrypt
 from jose import jwt
 from pydantic import Field, validator
 from pydantic.networks import EmailStr
-from sqlalchemy import Boolean, Column, DateTime, Integer, LargeBinary, String
+from sqlalchemy import Boolean, Column, Integer, LargeBinary, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy_utils import TSVectorType
 
@@ -50,14 +50,16 @@ def hash_password(password: str):
 class FarmbaseUser(Base, TimeStampMixin):
     __table_args__ = {"schema": "farmbase_core"}
 
-    id = Column(Integer, primary_key=True)
-    email = Column(String, unique=True)
-    password = Column(LargeBinary, nullable=False)
-    last_mfa_time = Column(DateTime, nullable=True)
-    experimental_features = Column(Boolean, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(unique=True, nullable=False)
+    password: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    last_mfa_time: Mapped[datetime] = mapped_column(nullable=True)
+    experimental_features: Mapped[bool] = mapped_column(default=False)
 
     # relationships
     # events = relationship("Event", backref="farmbase_user")
+    # TODO: look into https://docs.sqlalchemy.org/en/20/orm/extensions/associationproxy.html#simplifying-association-objects
+    organizations: Mapped[List["FarmbaseUserOrganization"]] = relationship(back_populates="farmbase_user")
 
     search_vector = Column(TSVectorType("email", regconfig="pg_catalog.simple", weights={"email": "A"}))
 
@@ -88,9 +90,9 @@ class FarmbaseUser(Base, TimeStampMixin):
         }
         return jwt.encode(data, FARMBASE_JWT_SECRET, algorithm=FARMBASE_JWT_ALG)
 
-    def get_organization_role(self, organization_slug: OrganizationSlug):
+    async def get_organization_role(self, organization_slug: OrganizationSlug):
         """Gets the user's role for a given organization slug."""
-        for o in self.organizations:
+        for o in await self.awaitable_attrs.organizations:
             if o.organization.slug == organization_slug:
                 return o.role
         return None
@@ -98,15 +100,16 @@ class FarmbaseUser(Base, TimeStampMixin):
 
 class FarmbaseUserOrganization(Base, TimeStampMixin):
     __table_args__ = {"schema": "farmbase_core"}
-    farmbase_user_id = Column(Integer, ForeignKey(FarmbaseUser.id), primary_key=True)
-    farmbase_user = relationship(FarmbaseUser, backref="organizations")
+    farmbase_user_id: Mapped[int] = mapped_column(ForeignKey(FarmbaseUser.id), primary_key=True)
+    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="organizations")
 
-    organization_id = Column(Integer, ForeignKey(Organization.id), primary_key=True)
-    organization = relationship(Organization, backref="users")
+    organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id), primary_key=True)
+    organization: Mapped[Organization] = relationship(back_populates="users")
 
     role = Column(String, default=UserRoles.member)
 
 
+# TODO use mapped_column as here: https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html#association-object
 class FarmbaseUserProject(Base, TimeStampMixin):
     farmbase_user_id = Column(Integer, ForeignKey(FarmbaseUser.id), primary_key=True)
     farmbase_user = relationship(FarmbaseUser, backref="projects")

@@ -7,7 +7,7 @@ from fastapi import Depends
 from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine.url import make_url
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine, AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
 from sqlalchemy_utils import get_mapper
@@ -165,7 +165,7 @@ class ReprMixin:
         return f"<{self.__class__.__name__} {id_str}{attrs}>"
 
 
-class Base(ReprMixin, DeclarativeBase):
+class Base(AsyncAttrs, ReprMixin, DeclarativeBase):
     """Project-wide declarative base (inherits mixin behaviour)."""
 
 
