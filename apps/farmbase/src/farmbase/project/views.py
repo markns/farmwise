@@ -1,5 +1,5 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
-from pydantic.error_wrappers import ErrorWrapper, ValidationError
+from pydantic import ValidationError
 
 from farmbase.auth.permissions import (
     PermissionsDependency,
@@ -8,7 +8,6 @@ from farmbase.auth.permissions import (
 )
 from farmbase.database.core import DbSession
 from farmbase.database.service import CommonParameters, search_filter_sort_paginate
-from farmbase.exceptions import ExistsError
 from farmbase.models import OrganizationSlug, PrimaryKey
 
 from .flows import project_init_flow
@@ -44,14 +43,27 @@ def create_project(
     """Create a new project."""
     project = get_by_name(db_session=db_session, name=project_in.name)
     if project:
-        raise ValidationError(
-            [ErrorWrapper(ExistsError(msg="A project with this name already exists."), loc="name")],
-            model=ProjectCreate,
+        raise ValidationError.from_exception_data(
+            "ProjectCreate",
+            [
+                {
+                    "loc": ("name",),
+                    "msg": "A project with this name already exists.",
+                    "type": "value_error.already_exists",
+                }
+            ],
         )
+
     if project_in.id and get(db_session=db_session, project_id=project_in.id):
-        raise ValidationError(
-            [ErrorWrapper(ExistsError(msg="A project with this id already exists."), loc="id")],
-            model=ProjectCreate,
+        raise ValidationError.from_exception_data(
+            "ProjectCreate",
+            [
+                {
+                    "loc": ("id",),
+                    "msg": "A project with this id already exists.",
+                    "type": "value_error.already_exists",
+                }
+            ],
         )
 
     project = create(db_session=db_session, project_in=project_in)

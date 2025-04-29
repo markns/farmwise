@@ -57,7 +57,7 @@ class FarmbaseUser(Base, TimeStampMixin):
     experimental_features = Column(Boolean, default=False)
 
     # relationships
-    events = relationship("Event", backref="farmbase_user")
+    # events = relationship("Event", backref="farmbase_user")
 
     search_vector = Column(TSVectorType("email", regconfig="pg_catalog.simple", weights={"email": "A"}))
 

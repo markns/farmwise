@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic.error_wrappers import ErrorWrapper, ValidationError
+from pydantic import ValidationError
 from slugify import slugify
 from sqlalchemy.exc import IntegrityError
 
@@ -11,7 +11,6 @@ from farmbase.auth.service import CurrentUser
 from farmbase.database.core import DbSession
 from farmbase.database.service import CommonParameters, search_filter_sort_paginate
 from farmbase.enums import UserRoles
-from farmbase.exceptions import ExistsError
 from farmbase.models import PrimaryKey
 from farmbase.project import flows as project_flows
 from farmbase.project import service as project_service
@@ -119,8 +118,14 @@ def update_organization(
     try:
         organization = update(db_session=db_session, organization=organization, organization_in=organization_in)
     except IntegrityError:
-        raise ValidationError(
-            [ErrorWrapper(ExistsError(msg="An organization with this name already exists."), loc="name")],
-            model=OrganizationUpdate,
+        raise ValidationError.from_exception_data(
+            "OrganizationUpdate",
+            [
+                {
+                    "loc": ("name",),
+                    "msg": "An organization with this name already exists.",
+                    "type": "value_error.already_exists",
+                }
+            ],
         ) from None
     return organization

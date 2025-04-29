@@ -1,8 +1,10 @@
+from configparser import RawConfigParser
+
 from alembic import context
-from farmbase.config import SQLALCHEMY_DATABASE_URI
+from farmbase.config import SQLALCHEMY_DATABASE_SYNC_URI
 from farmbase.database.core import Base
 from farmbase.logging_config import logging
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import engine_from_config, pool, text
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -12,8 +14,8 @@ config = context.config
 # This line sets up loggers basically.
 log = logging.getLogger(__name__)
 
-
-config.set_main_option("sqlalchemy.url", str(SQLALCHEMY_DATABASE_URI))
+config.file_config = RawConfigParser()
+config.set_main_option("sqlalchemy.url", str(SQLALCHEMY_DATABASE_SYNC_URI))
 
 target_metadata = Base.metadata  # noqa
 
@@ -50,7 +52,7 @@ def run_migrations_online():
     log.info("Migrating farmbase core schema...")
     # migrate common tables
     with connectable.connect() as connection:
-        connection.execute(f'set search_path to "{CORE_SCHEMA_NAME}"')
+        connection.execute(text(f'set search_path to "{CORE_SCHEMA_NAME}"'))
         connection.dialect.default_schema_name = CORE_SCHEMA_NAME
         context.configure(
             connection=connection,

@@ -8,6 +8,7 @@ dependencies = [
     "aiohttp>=3.11.18",
     "alembic>=1.15.1",
     "arcgis>=2.4.1",
+    "asyncpg>=0.30.0",
     "email-validator>=2.2.0",
     "emails>=0.6",
     "fastapi[standard]>=0.115.8",

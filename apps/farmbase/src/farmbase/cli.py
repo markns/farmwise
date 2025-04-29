@@ -271,7 +271,7 @@ def farmbase_database():
 def database_init():
     """Initializes a new database."""
     click.echo("Initializing new database...")
-    from .database.core import engine
+    from .database.core import engine_sync as engine
     from .database.manage import init_database
 
     init_database(engine)

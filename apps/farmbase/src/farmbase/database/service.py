@@ -7,8 +7,7 @@ from itertools import chain
 from typing import Annotated, List
 
 from fastapi import Depends, Query
-from pydantic import BaseModel
-from pydantic.error_wrappers import ErrorWrapper, ValidationError
+from pydantic import ValidationError
 from pydantic.types import Json, constr
 from six import string_types
 from sortedcontainers import SortedSet
@@ -23,14 +22,13 @@ from farmbase.auth.models import FarmbaseUser
 from farmbase.auth.service import CurrentUser, get_current_role
 from farmbase.database.core import DbSession
 from farmbase.enums import UserRoles
-from farmbase.exceptions import FieldNotFoundError, InvalidFilterError
 
 from .core import Base, get_class_by_tablename, get_model_name_by_tablename
 
 log = logging.getLogger(__file__)
 
 # allows only printable characters
-QueryStr = constr(regex=r"^[ -~]+$", min_length=1)
+QueryStr = constr(pattern=r"^[ -~]+$", min_length=1)
 
 BooleanFunction = namedtuple("BooleanFunction", ("key", "sqlalchemy_fn", "only_one_arg"))
 BOOLEAN_FUNCTIONS = [
@@ -565,14 +563,27 @@ def search_filter_sort_paginate(
             query = apply_sort(query, sort_spec)
 
     except FieldNotFound as e:
-        raise ValidationError(
+        raise ValidationError.from_exception_data(
+            "BaseModel",
             [
-                ErrorWrapper(FieldNotFoundError(msg=str(e)), loc="filter"),
+                {
+                    "loc": ("filter",),
+                    "msg": str(e),
+                    "type": "value_error.field_not_found",
+                }
             ],
-            model=BaseModel,
         ) from None
     except BadFilterFormat as e:
-        raise ValidationError([ErrorWrapper(InvalidFilterError(msg=str(e)), loc="filter")], model=BaseModel) from None
+        raise ValidationError.from_exception_data(
+            "BaseModel",
+            [
+                {
+                    "loc": ("filter",),
+                    "msg": str(e),
+                    "type": "value_error.invalid_filter",
+                }
+            ],
+        ) from None
 
     if items_per_page == -1:
         items_per_page = None

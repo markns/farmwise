@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 from sqlalchemy.sql.expression import true
 
 from farmbase.auth.models import FarmbaseUser, FarmbaseUserOrganization

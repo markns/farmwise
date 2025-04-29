@@ -18,10 +18,10 @@ def install_plugin_events(api):
 
 
 def install_plugins():
-    """Installs plugins associated with dispatch"""
-    dispatch_plugins = entry_points().select(group="dispatch.plugins")
+    """Installs plugins associated with farmbase"""
+    farmbase_plugins = entry_points().select(group="farmbase.plugins")
 
-    for ep in dispatch_plugins:
+    for ep in farmbase_plugins:
         logger.info(f"Attempting to load plugin: {ep.name}")
         try:
             plugin = ep.load()

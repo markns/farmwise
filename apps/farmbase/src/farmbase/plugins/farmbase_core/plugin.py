@@ -1,10 +1,3 @@
-"""
-.. module: farmbase.plugins.farmbase_core.plugin
-    :platform: Unix
-    :copyright: (c) 2019 by Netflix Inc., see AUTHORS for more
-    :license: Apache, see LICENSE for more details.
-"""
-
 import base64
 import json
 import logging

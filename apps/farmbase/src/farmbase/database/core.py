@@ -1,29 +1,20 @@
-"""
-.. module: farmbase.database.core
-    :platform: Unix
-    :copyright: (c) 2019 by Netflix Inc., see AUTHORS for more
-    :license: Apache, see LICENSE for more details.
-"""
-
 import functools
 import re
 from contextlib import contextmanager
-from typing import Annotated, Any
+from typing import Annotated, Any, ClassVar
 
 from fastapi import Depends
-from pydantic import BaseModel
-from pydantic.error_wrappers import ErrorWrapper, ValidationError
+from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine.url import make_url
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.orm import Session, object_session, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
 from sqlalchemy_utils import get_mapper
 from starlette.requests import Request
 
 from farmbase import config
 from farmbase.database.logging import SessionTracker
-from farmbase.exceptions import NotFoundError
 
 
 def create_db_engine(connection_string: str):
@@ -54,6 +45,9 @@ def create_db_engine(connection_string: str):
 engine = create_db_engine(
     config.SQLALCHEMY_DATABASE_URI,
 )
+engine_sync = create_db_engine(
+    config.SQLALCHEMY_DATABASE_SYNC_URI,
+)
 
 # Enable query timing logging
 #
@@ -77,6 +71,31 @@ engine = create_db_engine(
 
 SessionLocal = sessionmaker(bind=engine)
 
+# Async engine and session for SQLAlchemy 2 AsyncIO
+async_engine = create_async_engine(
+    make_url(str(config.SQLALCHEMY_DATABASE_URI)),
+    pool_timeout=config.DATABASE_ENGINE_POOL_TIMEOUT,
+    pool_recycle=config.DATABASE_ENGINE_POOL_RECYCLE,
+    pool_size=config.DATABASE_ENGINE_POOL_SIZE,
+    max_overflow=config.DATABASE_ENGINE_MAX_OVERFLOW,
+    pool_pre_ping=config.DATABASE_ENGINE_POOL_PING,
+)
+
+AsyncSessionLocal = async_sessionmaker(
+    bind=async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
+
+
+async def get_async_db() -> AsyncSession:
+    """Get async database session from dependency."""
+    async with AsyncSessionLocal() as session:
+        yield session
+
+
+AsyncDbSession = Annotated[AsyncSession, Depends(get_async_db)]
+
 
 def resolve_table_name(name):
     """Resolves table names to their mapped names."""
@@ -95,61 +114,55 @@ def resolve_attr(obj, attr, default=None):
         return default
 
 
-class CustomBase:
-    __repr_attrs__ = []
-    __repr_max_length__ = 15
+class ReprMixin:
+    """Mixin providing __repr__, dict(), tablename, …"""
 
-    @declared_attr
-    def __tablename__(self):
-        return resolve_table_name(self.__name__)
+    __repr_attrs__: ClassVar[list[str]] = []
+    __repr_max_length__: ClassVar[int] = 15
 
-    def dict(self):
-        """Returns a dict representation of a model."""
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    # --- automatic __tablename__ ----------------------------------
+    @declared_attr.directive
+    def __tablename__(cls) -> str:  # type: ignore[override]
+        return resolve_table_name(cls.__name__)
 
+    # --- utility helpers ------------------------------------------
+    def dict(self) -> dict[str, Any]:
+        """Return a plain-dict view of column values."""
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}  # type: ignore[attr-defined]
+
+    # internal helpers extracted from your original code
     @property
-    def _id_str(self):
+    def _id_str(self) -> str:  # pragma: no cover
         ids = inspect(self).identity
         if ids:
-            return "-".join([str(x) for x in ids]) if len(ids) > 1 else str(ids[0])
-        else:
-            return "None"
+            return "-".join(map(str, ids)) if len(ids) > 1 else str(ids[0])
+        return "None"
 
     @property
-    def _repr_attrs_str(self):
+    def _repr_attrs_str(self) -> str:  # pragma: no cover
         max_length = self.__repr_max_length__
-
-        values = []
         single = len(self.__repr_attrs__) == 1
+        values = []
         for key in self.__repr_attrs__:
             if not hasattr(self, key):
-                raise KeyError("{} has incorrect attribute '{}' in __repr__attrs__".format(self.__class__, key))
-            value = getattr(self, key)
-            wrap_in_quote = isinstance(value, str)
-
-            value = str(value)
-            if len(value) > max_length:
-                value = value[:max_length] + "..."
-
-            if wrap_in_quote:
-                value = "'{}'".format(value)
-            values.append(value if single else "{}:{}".format(key, value))
-
+                raise KeyError(f"{self.__class__} has incorrect attribute '{key}' in __repr_attrs__")
+            val = getattr(self, key)
+            quoted = isinstance(val, str)
+            val_str = str(val)[:max_length] + ("..." if len(str(val)) > max_length else "")
+            if quoted:
+                val_str = f"'{val_str}'"
+            values.append(val_str if single else f"{key}:{val_str}")
         return " ".join(values)
 
-    def __repr__(self):
-        # get id like '#123'
-        id_str = ("#" + self._id_str) if self._id_str else ""
-        # join class name, id and repr_attrs
-        return "<{} {}{}>".format(
-            self.__class__.__name__,
-            id_str,
-            " " + self._repr_attrs_str if self._repr_attrs_str else "",
-        )
+    # nice printable representation
+    def __repr__(self) -> str:  # pragma: no cover
+        id_str = f"#{self._id_str}" if self._id_str else ""
+        attrs = f" {self._repr_attrs_str}" if self._repr_attrs_str else ""
+        return f"<{self.__class__.__name__} {id_str}{attrs}>"
 
 
-Base = declarative_base(cls=CustomBase)
-# make_searchable(Base.metadata)
+class Base(ReprMixin, DeclarativeBase):
+    """Project-wide declarative base (inherits mixin behaviour)."""
 
 
 def get_db(request: Request) -> Session:
@@ -185,14 +198,15 @@ def get_class_by_tablename(table_fullname: str) -> Any:
         mapped_class = _find_class(f"farmbase_core.{mapped_name}")
 
     if not mapped_class:
-        raise ValidationError(
+        raise ValidationError.from_exception_data(
+            "BaseModel",
             [
-                ErrorWrapper(
-                    NotFoundError(msg="Model not found. Check the name of your model."),
-                    loc="filter",
-                )
+                {
+                    "loc": ("filterr",),
+                    "msg": "Model not found. Check the name of your model.",
+                    "type": "value_error.not_found",
+                }
             ],
-            model=BaseModel,
         )
 
     return mapped_class

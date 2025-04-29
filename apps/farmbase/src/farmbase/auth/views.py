@@ -1,15 +1,14 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 
 from farmbase.auth.permissions import (
     OrganizationMemberPermission,
     PermissionsDependency,
 )
 from farmbase.auth.service import CurrentUser
-from farmbase.config import FARMBASE_AUTH_REGISTRATION_ENABLED
-from farmbase.database.core import DbSession
+from farmbase.database.core import AsyncDbSession, DbSession
 from farmbase.database.service import CommonParameters, search_filter_sort_paginate
 from farmbase.enums import UserRoles
 from farmbase.exceptions import (
@@ -22,6 +21,7 @@ from farmbase.organization.models import OrganizationRead
 from farmbase.plugin import service as plugin_service
 from farmbase.plugins.farmbase_core.exceptions import MfaException
 
+from ..config import FARMBASE_AUTH_REGISTRATION_ENABLED
 from .models import (
     AdminPasswordReset,
     MfaPayload,
@@ -84,14 +84,14 @@ def get_users(organization: OrganizationSlug, common: CommonParameters):
     "",
     response_model=UserRead,
 )
-def create_user(
+async def create_user(
     user_in: UserCreate,
     organization: OrganizationSlug,
-    db_session: DbSession,
+    db_session: AsyncDbSession,
     current_user: CurrentUser,
 ):
     """Creates a new user."""
-    user = get_by_email(db_session=db_session, email=user_in.email)
+    user = await get_by_email(db_session=db_session, email=user_in.email)
     if user:
         raise ValidationError(
             [
@@ -114,14 +114,14 @@ def create_user(
             ],
         )
 
-    user = create(db_session=db_session, organization=organization, user_in=user_in)
+    user = await create(db_session=db_session, organization=organization, user_in=user_in)
     return user
 
 
 @user_router.get("/{user_id}", response_model=UserRead)
-def get_user(db_session: DbSession, user_id: PrimaryKey):
+async def get_user(db_session: AsyncDbSession, user_id: PrimaryKey):
     """Get a user."""
-    user = get(db_session=db_session, user_id=user_id)
+    user = await get(db_session=db_session, user_id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -135,8 +135,8 @@ def get_user(db_session: DbSession, user_id: PrimaryKey):
     "/{user_id}",
     response_model=UserRead,
 )
-def update_user(
-    db_session: DbSession,
+async def update_user(
+    db_session: AsyncDbSession,
     user_id: PrimaryKey,
     organization: OrganizationSlug,
     user_in: UserUpdate,
@@ -150,7 +150,7 @@ def update_user(
             detail=[{"msg": "A user that is not an Owner is trying to update another user."}],
         )
     """Update a user."""
-    user = get(db_session=db_session, user_id=user_id)
+    user = await get(db_session=db_session, user_id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -176,19 +176,19 @@ def update_user(
     # add organization information
     user_in.organizations = [UserOrganization(role=user_in.role, organization=OrganizationRead(name=organization))]
 
-    return update(db_session=db_session, user=user, user_in=user_in)
+    return await update(db_session=db_session, user=user, user_in=user_in)
 
 
 @user_router.post("/{user_id}/change-password", response_model=UserRead)
-def change_password(
-    db_session: DbSession,
+async def change_password(
+    db_session: AsyncDbSession,
     user_id: PrimaryKey,
     password_update: UserPasswordUpdate,
     current_user: CurrentUser,
     organization: OrganizationSlug,
 ):
     """Change user password with proper validation"""
-    user = get(db_session=db_session, user_id=user_id)
+    user = await get(db_session=db_session, user_id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -213,7 +213,7 @@ def change_password(
     # Set new password
     try:
         user.set_password(password_update.new_password)
-        db_session.commit()
+        await db_session.commit()
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -224,8 +224,8 @@ def change_password(
 
 
 @user_router.post("/{user_id}/reset-password", response_model=UserRead)
-def admin_reset_password(
-    db_session: DbSession,
+async def admin_reset_password(
+    db_session: AsyncDbSession,
     user_id: PrimaryKey,
     password_reset: AdminPasswordReset,
     current_user: CurrentUser,
@@ -239,7 +239,7 @@ def admin_reset_password(
             detail=[{"msg": "Only owners can reset passwords"}],
         )
 
-    user = get(db_session=db_session, user_id=user_id)
+    user = await get(db_session=db_session, user_id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -248,7 +248,7 @@ def admin_reset_password(
 
     try:
         user.set_password(password_reset.new_password)
-        db_session.commit()
+        await db_session.commit()
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -311,12 +311,12 @@ def login_user(
     )
 
 
-def register_user(
+async def register_user(
     user_in: UserRegister,
     organization: OrganizationSlug,
-    db_session: DbSession,
+    db_session: AsyncDbSession,
 ):
-    user = get_by_email(db_session=db_session, email=user_in.email)
+    user = await get_by_email(db_session=db_session, email=user_in.email)
     if user:
         raise ValidationError(
             [
@@ -328,7 +328,7 @@ def register_user(
             model=UserRegister,
         )
 
-    user = create(db_session=db_session, organization=organization, user_in=user_in)
+    user = await create(db_session=db_session, organization=organization, user_in=user_in)
     return user
 
 

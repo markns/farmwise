@@ -1,15 +1,10 @@
-"""
-.. module: farmbase.auth.service
-    :platform: Unix
-    :copyright: (c) 2019 by Netflix Inc., see AUTHORS for more
-    :license: Apache, see LICENSE for more details.
-"""
-
 import logging
 from typing import Annotated, Optional
 
 from fastapi import Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 from starlette.status import HTTP_401_UNAUTHORIZED
 
@@ -42,14 +37,16 @@ InvalidCredentialException = HTTPException(
 )
 
 
-def get(*, db_session, user_id: int) -> Optional[FarmbaseUser]:
+async def get(*, db_session: AsyncSession, user_id: int) -> Optional[FarmbaseUser]:
     """Returns a user based on the given user id."""
-    return db_session.query(FarmbaseUser).filter(FarmbaseUser.id == user_id).one_or_none()
+    result = await db_session.execute(select(FarmbaseUser).where(FarmbaseUser.id == user_id))
+    return result.scalars().one_or_none()
 
 
-def get_by_email(*, db_session, email: str) -> Optional[FarmbaseUser]:
+async def get_by_email(*, db_session: AsyncSession, email: str) -> Optional[FarmbaseUser]:
     """Returns a user object based on user email."""
-    return db_session.query(FarmbaseUser).filter(FarmbaseUser.email == email).one_or_none()
+    result = await db_session.execute(select(FarmbaseUser).where(FarmbaseUser.email == email))
+    return result.scalars().one_or_none()
 
 
 def create_or_update_project_role(*, db_session, user: FarmbaseUser, role_in: UserProject):
@@ -135,7 +132,7 @@ def create_or_update_organization_role(*, db_session, user: FarmbaseUser, role_i
     return organization_role
 
 
-def create(*, db_session, organization: str, user_in: (UserRegister | UserCreate)) -> FarmbaseUser:
+async def create(*, db_session: AsyncSession, organization: str, user_in: (UserRegister | UserCreate)) -> FarmbaseUser:
     """Creates a new farmbase user."""
     # pydantic forces a string password, but we really want bytes
     password = bytes(user_in.password, "utf-8")
@@ -178,25 +175,25 @@ def create(*, db_session, organization: str, user_in: (UserRegister | UserCreate
     user.projects = projects
 
     db_session.add(user)
-    db_session.commit()
+    await db_session.commit()
     return user
 
 
-def get_or_create(*, db_session, organization: str, user_in: UserRegister) -> FarmbaseUser:
+async def get_or_create(*, db_session: AsyncSession, organization: str, user_in: UserRegister) -> FarmbaseUser:
     """Gets an existing user or creates a new one."""
     user = get_by_email(db_session=db_session, email=user_in.email)
 
     if not user:
         try:
-            user = create(db_session=db_session, organization=organization, user_in=user_in)
+            user = await create(db_session=db_session, organization=organization, user_in=user_in)
         except IntegrityError:
-            db_session.rollback()
+            await db_session.rollback()
             log.exception(f"Unable to create user with email address {user_in.email}.")
 
     return user
 
 
-def update(*, db_session, user: FarmbaseUser, user_in: UserUpdate) -> FarmbaseUser:
+async def update(*, db_session: AsyncSession, user: FarmbaseUser, user_in: UserUpdate) -> FarmbaseUser:
     """Updates a user."""
     user_data = user.dict()
 
@@ -225,7 +222,7 @@ def update(*, db_session, user: FarmbaseUser, user_in: UserUpdate) -> FarmbaseUs
     if experimental_features := user_in.experimental_features:
         user.experimental_features = experimental_features
 
-    db_session.commit()
+    await db_session.commit()
     return user
 
 

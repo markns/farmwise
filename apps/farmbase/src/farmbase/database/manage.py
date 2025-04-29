@@ -2,13 +2,15 @@ import logging
 
 from alembic import command as alembic_command
 from alembic.config import Config as AlembicConfig
+from sqlalchemy import inspect
 from sqlalchemy.schema import CreateSchema
 from sqlalchemy_utils import create_database, database_exists
 
 from farmbase import config
 from farmbase.organization.models import Organization
-from farmbase.project.models import Project
 
+from ..plugin.models import Plugin
+from ..project.models import Project
 from .core import Base, sessionmaker
 from .enums import FARMBASE_ORGANIZATION_SCHEMA_PREFIX
 
@@ -26,6 +28,16 @@ def version_schema(script_location: str):
 
 def get_core_tables():
     """Fetches tables that belong to the 'farmbase_core' schema."""
+
+    # TODO: Remove once this is imported elsew
+    from farmbase.auth.models import FarmbaseUser, FarmbaseUserOrganization, FarmbaseUserProject
+    from farmbase.project.models import Project
+
+    print(FarmbaseUserProject.__table__)
+    print(FarmbaseUser.__table__)
+    print(FarmbaseUserOrganization.__table__)
+    print(Project.__table__)
+
     core_tables = []
     for _, table in Base.metadata.tables.items():
         if table.schema == "farmbase_core":
@@ -44,13 +56,17 @@ def get_tenant_tables():
 
 def init_database(engine):
     """Initializes the database."""
-    if not database_exists(str(config.SQLALCHEMY_DATABASE_URI)):
-        create_database(str(config.SQLALCHEMY_DATABASE_URI))
+    if not database_exists(str(config.SQLALCHEMY_DATABASE_SYNC_URI)):
+        print(f"Creating database {config.SQLALCHEMY_DATABASE_SYNC_URI}...")
+        create_database(str(config.SQLALCHEMY_DATABASE_SYNC_URI))
 
     schema_name = "farmbase_core"
-    if not engine.dialect.has_schema(engine, schema_name):
-        with engine.connect() as connection:
-            connection.execute(CreateSchema(schema_name))
+
+    with engine.begin() as conn:
+        inspector = inspect(conn)
+        if schema_name not in inspector.get_schema_names():
+            print(f"Creating schema {schema_name}...")
+            conn.execute(CreateSchema(schema_name))
 
     tables = get_core_tables()
 
@@ -65,6 +81,7 @@ def init_database(engine):
 
     # we create the default organization if it doesn't exist
     organization = db_session.query(Organization).filter(Organization.name == "default").one_or_none()
+
     if not organization:
         print("Creating default organization...")
         organization = Organization(
@@ -81,24 +98,24 @@ def init_database(engine):
     init_schema(engine=engine, organization=organization)
 
     # we install all plugins
-    # from farmbase.common.utils.cli import install_plugins
-    # from farmbase.plugins.base import plugins
+    from farmbase.common.utils.cli import install_plugins
+    from farmbase.plugins.base import plugins
 
-    # install_plugins()
+    install_plugins()
 
-    # for p in plugins.all():
-    #     plugin = Plugin(
-    #         title=p.title,
-    #         slug=p.slug,
-    #         type=p.type,
-    #         version=p.version,
-    #         author=p.author,
-    #         author_url=p.author_url,
-    #         multiple=p.multiple,
-    #         description=p.description,
-    #     )
-    #     db_session.add(plugin)
-    # db_session.commit()
+    for p in plugins.all():
+        plugin = Plugin(
+            title=p.title,
+            slug=p.slug,
+            type=p.type,
+            version=p.version,
+            author=p.author,
+            author_url=p.author_url,
+            multiple=p.multiple,
+            description=p.description,
+        )
+        db_session.add(plugin)
+    db_session.commit()
 
     # we create the default project if it doesn't exist
     project = db_session.query(Project).filter(Project.name == "default").one_or_none()
@@ -126,9 +143,10 @@ def init_schema(*, engine, organization: Organization):
     """Initializes a new schema."""
     schema_name = f"{FARMBASE_ORGANIZATION_SCHEMA_PREFIX}_{organization.slug}"
 
-    if not engine.dialect.has_schema(engine, schema_name):
-        with engine.connect() as connection:
-            connection.execute(CreateSchema(schema_name))
+    with engine.begin() as conn:
+        inspector = inspect(conn)
+        if schema_name not in inspector.get_schema_names():
+            conn.execute(CreateSchema(schema_name))
 
     # set the schema for table creation
     tables = get_tenant_tables()
@@ -144,13 +162,13 @@ def init_schema(*, engine, organization: Organization):
     # put schema under version control
     version_schema(script_location=config.ALEMBIC_TENANT_REVISION_PATH)
 
-    # with engine.connect() as connection:
-    #     # we need to map this for full text search as it uses sql literal strings
-    #     # and schema translate map does not apply
-    #     for t in tables:
-    #         t.schema = schema_name
-    #
-    #     setup_fulltext_search(connection, tables)
+    with engine.connect() as connection:
+        # we need to map this for full text search as it uses sql literal strings
+        # and schema translate map does not apply
+        for t in tables:
+            t.schema = schema_name
+        #
+        # setup_fulltext_search(connection, tables)
 
     session = sessionmaker(bind=schema_engine)
     db_session = session()
