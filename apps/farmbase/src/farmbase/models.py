@@ -1,14 +1,14 @@
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Optional
+from typing import Annotated, Optional
 
 import geoalchemy2 as ga
 from geojson_pydantic import LineString, Polygon
 from pydantic import BaseModel, ConfigDict, EmailStr
 from pydantic.fields import Field
 from pydantic.networks import AnyHttpUrl, EmailStr
-from pydantic.types import SecretStr, conint, constr
+from pydantic.types import SecretStr, constr
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, event, func
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -17,7 +17,7 @@ from sqlmodel import Field as SQLField
 from sqlmodel import Relationship, SQLModel
 
 # pydantic type that limits the range of primary keys
-PrimaryKey = conint(gt=0, lt=2147483647)
+PrimaryKey = Annotated[int | None, Field(default=None, gt=0.0, lt=2147483647.0)]
 OrganizationSlug = constr(pattern=r"^[\w]+(?:_[\w]+)*$", min_length=3)
 
 

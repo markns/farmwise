@@ -7,7 +7,7 @@ from fastapi import Depends
 from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine.url import make_url
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
 from sqlalchemy_utils import get_mapper
@@ -38,7 +38,11 @@ def create_db_engine(connection_string: str):
         # Connection pre-ping to verify connection is still alive
         "pool_pre_ping": config.DATABASE_ENGINE_POOL_PING,
     }
-    return create_engine(url, **timeout_kwargs)
+
+    if "async" in url.drivername:
+        return create_async_engine(url, **timeout_kwargs)
+    else:
+        return create_engine(url, **timeout_kwargs)
 
 
 # Create the default engine with standard timeout
@@ -249,6 +253,15 @@ def refetch_db_session(organization_slug: str) -> Session:
     session = sessionmaker(bind=schema_engine)()
     session._farmbase_session_id = SessionTracker.track_session(session, context=f"organization_{organization_slug}")
     return session
+
+
+async def get_schema_names(_engine: AsyncEngine) -> list[str]:
+    def _get_schema_names(sync_conn):
+        inspector = inspect(sync_conn)
+        return inspector.get_schema_names()
+
+    async with _engine.connect() as async_conn:
+        return await async_conn.run_sync(_get_schema_names)
 
 
 @contextmanager

@@ -27,7 +27,7 @@ dependencies = [
     "schemathesis>=3.39.16",
     "sentry-sdk>=2.23.1",
     "slowapi>=0.1.9",
-    "sqlalchemy>=2.0.39",
+    "sqlalchemy[asyncio]>=2.0.39",
     "sqlalchemy-filters>=0.13.0",
     "sqlalchemy-utils>=0.41.2",
     "sqlmodel>=0.0.24",
@@ -46,9 +46,11 @@ dev = [
     "ruff>0",
 ]
 
-[tool.uv.sources]
+[project.entry-points."farmbase.plugins"]
+farmbase_basic_auth = "farmbase.plugins.farmbase_core.plugin:BasicAuthProviderPlugin"
+farmbase_header_auth = "farmbase.plugins.farmbase_core.plugin:HeaderAuthProviderPlugin"
 
-# TODO: use https://github.com/fastapi/full-stack-fastapi-template
+[tool.uv.sources]
 
 
 [build-system]

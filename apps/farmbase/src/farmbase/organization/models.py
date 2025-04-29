@@ -37,7 +37,7 @@ listen(Organization.name, "set", generate_slug)
 
 
 class OrganizationBase(FarmbaseBase):
-    id: Optional[PrimaryKey]
+    id: Optional[PrimaryKey] = None
     name: str
     description: Optional[str] = Field(None, nullable=True)
     default: Optional[bool] = Field(False, nullable=True)
@@ -65,7 +65,7 @@ class OrganizationUpdate(FarmbaseBase):
 
 
 class OrganizationRead(OrganizationBase):
-    id: Optional[PrimaryKey]
+    # id: Optional[PrimaryKey]
     slug: Optional[OrganizationSlug]
 
 

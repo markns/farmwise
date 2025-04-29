@@ -2,22 +2,28 @@ import logging
 from contextvars import ContextVar
 from os import path
 from typing import Final, Optional
+from uuid import uuid1
 
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
-from fastapi.routing import APIRoute
-
-# from sentry_asgi import SentryMiddleware
+from pydantic import ValidationError
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from sqlalchemy.ext.asyncio import async_scoped_session, async_sessionmaker
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.middleware.gzip import GZipMiddleware
-from starlette.responses import FileResponse
+from starlette.requests import Request
+from starlette.responses import FileResponse, StreamingResponse
+from starlette.routing import compile_path
 from starlette.staticfiles import StaticFiles
 
 from .api import api_router
+from .common.utils.cli import install_plugin_events, install_plugins
 from .config import (
     STATIC_DIR,
 )
+from .database.core import engine, get_schema_names
+from .database.logging import SessionTracker
 from .logging_config import configure_logging
 from .rate_limiter import limiter
 
@@ -53,8 +59,8 @@ async def default_page(request, call_next):
     return response
 
 
-def custom_generate_unique_id(route: APIRoute) -> str:
-    return f"{route.tags[0]}-{route.name}"
+# def custom_generate_unique_id(route: APIRoute) -> str:
+#    return f"{route.tags[0]}-{route.name}"
 
 
 api = FastAPI(
@@ -65,10 +71,28 @@ api = FastAPI(
     docs_url=None,
     openapi_url="/docs/openapi.json",
     redoc_url="/docs",
-    generate_unique_id_function=custom_generate_unique_id,
+    # generate_unique_id_function=custom_generate_unique_id,
     separate_input_output_schemas=False,
 )
 api.add_middleware(GZipMiddleware, minimum_size=1000)
+
+
+def get_path_params_from_request(request: Request) -> dict:
+    path_params = {}
+    for r in api_router.routes:
+        path_regex, path_format, param_converters = compile_path(r.path)
+        path = request["path"].removeprefix("/api/v1")  # remove the /api/v1 for matching
+        match = path_regex.match(path)
+        if match:
+            path_params = match.groupdict()
+    return path_params
+
+
+def get_path_template(request: Request) -> str:
+    if hasattr(request, "path"):
+        return ",".join(request.path.split("/")[1:])
+    return ".".join(request.url.path.split("/")[1:])
+
 
 REQUEST_ID_CTX_KEY: Final[str] = "request_id"
 _request_id_ctx_var: ContextVar[Optional[str]] = ContextVar(REQUEST_ID_CTX_KEY, default=None)
@@ -78,8 +102,129 @@ def get_request_id() -> Optional[str]:
     return _request_id_ctx_var.get()
 
 
-# app.include_router(api_router, prefix=settings.API_V1_STR)
+@api.middleware("http")
+async def db_session_middleware(request: Request, call_next):
+    request_id = str(uuid1())
 
+    # we create a per-request id such that we can ensure that our session is scoped for a particular request.
+    # see: https://github.com/tiangolo/fastapi/issues/726
+    ctx_token = _request_id_ctx_var.set(request_id)
+    session = None
+
+    try:
+        path_params = get_path_params_from_request(request)
+
+        # if this call is organization specific set the correct search path
+        organization_slug = path_params.get("organization", "default")
+        request.state.organization = organization_slug
+        schema = f"farmbase_organization_{organization_slug}"
+
+        # validate slug exists
+        schema_names = await get_schema_names(engine)
+        if schema not in schema_names:
+            return JSONResponse(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content={"detail": [{"msg": f"Unknown database schema name: {schema}"}]},
+            )
+
+        # add correct schema mapping depending on the request
+        schema_engine = engine.execution_options(
+            schema_translate_map={
+                None: schema,
+            }
+        )
+        async_session_factory = async_sessionmaker(
+            bind=schema_engine,
+            expire_on_commit=False,
+        )
+
+        AsyncScopedSession = async_scoped_session(async_session_factory, scopefunc=get_request_id)  # noqa: N806
+        request.state.db = AsyncScopedSession()
+
+        # we track the session
+        request.state.db._dispatch_session_id = SessionTracker.track_session(
+            request.state.db, context=f"api_request_{organization_slug}"
+        )
+
+        response = await call_next(request)
+
+        # If we got here without exceptions, commit any pending changes
+        if hasattr(request.state, "db") and request.state.db.is_active:
+            await request.state.db.commit()
+
+        return response
+
+    except Exception as e:
+        # Explicitly rollback on exceptions
+        try:
+            if hasattr(request.state, "db") and request.state.db.is_active:
+                await request.state.db.rollback()
+        except Exception as rollback_error:
+            logging.error(f"Error during rollback: {rollback_error}")
+
+        # Re-raise the original exception
+        raise e from None
+    finally:
+        # Always clean up resources
+        if hasattr(request.state, "db"):
+            # Untrack the session
+            if hasattr(request.state.db, "_dispatch_session_id"):
+                try:
+                    SessionTracker.untrack_session(request.state.db._dispatch_session_id)
+                except Exception as untrack_error:
+                    logging.error(f"Failed to untrack session: {untrack_error}")
+
+            # Close the session
+            try:
+                await request.state.db.close()
+                if session is not None:
+                    session.remove()  # Remove the session from the registry
+            except Exception as close_error:
+                logging.error(f"Error closing database session: {close_error}")
+
+        # Always reset the context variable
+        _request_id_ctx_var.reset(ctx_token)
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Strict-Transport-Security"] = "max-age=31536000 ; includeSubDomains"
+    return response
+
+
+class ExceptionMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> StreamingResponse:
+        try:
+            response = await call_next(request)
+        except ValidationError as e:
+            log.exception(e)
+            response = JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content={"detail": e.errors()})
+        except ValueError as e:
+            log.exception(e)
+            response = JSONResponse(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                content={"detail": [{"msg": "Unknown", "loc": ["Unknown"], "type": "Unknown"}]},
+            )
+        except Exception as e:
+            log.exception(e)
+            response = JSONResponse(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content={"detail": [{"msg": "Unknown", "loc": ["Unknown"], "type": "Unknown"}]},
+            )
+
+        return response
+
+
+api.add_middleware(ExceptionMiddleware)
+
+# we install all the plugins
+install_plugins()
+
+# we add all the plugin event API routes to the API router
+install_plugin_events(api_router)
+
+# we add all API routes to the Web API framework
 api.include_router(api_router)
 
 # we mount the frontend and app

@@ -138,7 +138,9 @@ async def create(*, db_session: AsyncSession, organization: str, user_in: (UserR
     password = bytes(user_in.password, "utf-8")
 
     # create the user
-    user = FarmbaseUser(**user_in.dict(exclude={"password", "organizations", "projects", "role"}), password=password)
+    user = FarmbaseUser(
+        **user_in.model_dump(exclude={"password", "organizations", "projects", "role"}), password=password
+    )
 
     org = organization_service.get_by_slug_or_raise(
         db_session=db_session,
@@ -181,10 +183,11 @@ async def create(*, db_session: AsyncSession, organization: str, user_in: (UserR
 
 async def get_or_create(*, db_session: AsyncSession, organization: str, user_in: UserRegister) -> FarmbaseUser:
     """Gets an existing user or creates a new one."""
-    user = get_by_email(db_session=db_session, email=user_in.email)
+    user = await get_by_email(db_session=db_session, email=user_in.email)
 
     if not user:
         try:
+            print(organization)
             user = await create(db_session=db_session, organization=organization, user_in=user_in)
         except IntegrityError:
             await db_session.rollback()
@@ -226,7 +229,7 @@ async def update(*, db_session: AsyncSession, user: FarmbaseUser, user_in: UserU
     return user
 
 
-def get_current_user(request: Request) -> FarmbaseUser:
+async def get_current_user(request: Request) -> FarmbaseUser:
     """Attempts to get the current user depending on the configured authentication provider."""
     if FARMBASE_AUTHENTICATION_PROVIDER_SLUG:
         auth_plugin = plugins.get(FARMBASE_AUTHENTICATION_PROVIDER_SLUG)
@@ -241,7 +244,7 @@ def get_current_user(request: Request) -> FarmbaseUser:
         )
         raise InvalidCredentialException
 
-    return get_or_create(
+    return await get_or_create(
         db_session=request.state.db,
         organization=request.state.organization,
         user_in=UserRegister(email=user_email),
