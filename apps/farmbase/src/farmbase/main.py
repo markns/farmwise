@@ -178,7 +178,7 @@ async def db_session_middleware(request: Request, call_next):
             try:
                 await request.state.db.close()
                 if session is not None:
-                    session.remove()  # Remove the session from the registry
+                    await session.remove()  # Remove the session from the registry
             except Exception as close_error:
                 logging.error(f"Error closing database session: {close_error}")
 

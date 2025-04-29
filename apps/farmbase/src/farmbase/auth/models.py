@@ -93,6 +93,7 @@ class FarmbaseUser(Base, TimeStampMixin):
         for o in self.organizations:
             if o.organization.slug == organization_slug:
                 return o.role
+        return None
 
 
 class FarmbaseUserOrganization(Base, TimeStampMixin):
@@ -170,14 +171,14 @@ class UserLoginResponse(FarmbaseBase):
 class UserRead(UserBase):
     id: PrimaryKey
     role: Optional[str] = Field(None, nullable=True)
-    experimental_features: Optional[bool]
+    # experimental_features: Optional[bool]
 
 
 class UserUpdate(FarmbaseBase):
     id: PrimaryKey
     projects: Optional[List[UserProject]]
     organizations: Optional[List[UserOrganization]]
-    experimental_features: Optional[bool]
+    # experimental_features: Optional[bool]
     role: Optional[str] = Field(None, nullable=True)
 
 

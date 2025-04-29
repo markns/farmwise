@@ -8,7 +8,7 @@ from farmbase.auth.permissions import (
     PermissionsDependency,
 )
 from farmbase.auth.service import CurrentUser
-from farmbase.database.core import AsyncDbSession, DbSession
+from farmbase.database.core import AsyncDbSession
 from farmbase.database.service import CommonParameters, search_filter_sort_paginate
 from farmbase.enums import UserRoles
 from farmbase.exceptions import (
@@ -58,7 +58,7 @@ user_router = APIRouter()
     ],
     response_model=UserPagination,
 )
-def get_users(organization: OrganizationSlug, common: CommonParameters):
+async def get_users(organization: OrganizationSlug, common: CommonParameters):
     """Gets all organization users."""
     common["filter_spec"] = {"and": [{"model": "Organization", "op": "==", "field": "slug", "value": organization}]}
 
@@ -70,7 +70,7 @@ def get_users(organization: OrganizationSlug, common: CommonParameters):
                 "id": u.id,
                 "email": u.email,
                 "projects": u.projects,
-                "role": u.get_organization_role(organization),
+                "role": await u.get_organization_role(organization),
             }
             for u in items["items"]
         ],
@@ -196,7 +196,7 @@ async def change_password(
         )
 
     # Only allow users to change their own password or owners to reset
-    if user.id != current_user.id and not current_user.is_owner(organization):
+    if user.id != current_user.id and not await current_user.is_owner(organization):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=[{"msg": "Not authorized to change other user passwords"}],
@@ -233,7 +233,7 @@ async def admin_reset_password(
 ):
     """Admin endpoint to reset user password"""
     # Verify current user is an owner
-    if not current_user.is_owner(organization):
+    if not await current_user.is_owner(organization):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=[{"msg": "Only owners can reset passwords"}],
@@ -259,18 +259,18 @@ async def admin_reset_password(
 
 
 @auth_router.get("/me", response_model=UserRead)
-def get_me(
+async def get_me(
     *,
-    db_session: DbSession,
+    db_session: AsyncDbSession,
     current_user: CurrentUser,
 ):
     return current_user
 
 
 @auth_router.get("/myrole")
-def get_my_role(
+async def get_my_role(
     *,
-    db_session: DbSession,
+    db_session: AsyncDbSession,
     current_user: CurrentUser,
     organization: OrganizationSlug,
 ):
@@ -278,10 +278,10 @@ def get_my_role(
 
 
 @auth_router.post("/login", response_model=UserLoginResponse)
-def login_user(
+async def login_user(
     user_in: UserLogin,
     organization: OrganizationSlug,
-    db_session: DbSession,
+    db_session: AsyncDbSession,
 ):
     user = get_by_email(db_session=db_session, email=user_in.email)
     if user and user.verify_password(user_in.password):
@@ -333,10 +333,10 @@ async def register_user(
 
 
 @auth_router.post("/mfa", response_model=MfaPayloadResponse)
-def mfa_check(
+async def mfa_check(
     payload_in: MfaPayload,
     current_user: CurrentUser,
-    db_session: DbSession,
+    db_session: AsyncDbSession,
 ):
     log.info(f"MFA check initiated for user: {current_user.email}")
     log.debug(f"Payload received: {payload_in.dict()}")

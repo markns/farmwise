@@ -49,49 +49,52 @@ async def get_by_email(*, db_session: AsyncSession, email: str) -> Optional[Farm
     return result.scalars().one_or_none()
 
 
-def create_or_update_project_role(*, db_session, user: FarmbaseUser, role_in: UserProject):
+async def create_or_update_project_role(*, db_session: AsyncSession, user: FarmbaseUser, role_in: UserProject):
     """Creates a new project role or updates an existing role."""
+    # determine project id
     if not role_in.project.id:
-        project = project_service.get_by_name(db_session=db_session, name=role_in.project.name)
+        project = await project_service.get_by_name(db_session=db_session, name=role_in.project.name)
         project_id = project.id
     else:
         project_id = role_in.project.id
 
-    project_role = (
-        db_session.query(FarmbaseUserProject)
-        .filter(
+    # fetch existing role
+    result = await db_session.execute(
+        select(FarmbaseUserProject).where(
             FarmbaseUserProject.farmbase_user_id == user.id,
+            FarmbaseUserProject.project_id == project_id,
         )
-        .filter(FarmbaseUserProject.project_id == project_id)
-        .one_or_none()
     )
+    project_role = result.scalars().one_or_none()
 
+    # create or update
     if not project_role:
-        return FarmbaseUserProject(
-            project_id=project_id,
-            role=role_in.role,
-        )
+        return FarmbaseUserProject(project_id=project_id, role=role_in.role)
     project_role.role = role_in.role
     return project_role
 
 
-def create_or_update_project_default(*, db_session, user: FarmbaseUser, user_project_in: UserProject):
+async def create_or_update_project_default(
+    *, db_session: AsyncSession, user: FarmbaseUser, user_project_in: UserProject
+):
     """Creates a new user project or updates an existing one."""
+    # determine project id
     if user_project_in.project.id:
         project_id = user_project_in.project.id
     else:
-        project = project_service.get_by_name(db_session=db_session, name=user_project_in.project.name)
+        project = await project_service.get_by_name(db_session=db_session, name=user_project_in.project.name)
         project_id = project.id
 
-    user_project = (
-        db_session.query(FarmbaseUserProject)
-        .filter(
+    # fetch existing user project
+    result = await db_session.execute(
+        select(FarmbaseUserProject).where(
             FarmbaseUserProject.farmbase_user_id == user.id,
+            FarmbaseUserProject.project_id == project_id,
         )
-        .filter(FarmbaseUserProject.project_id == project_id)
-        .one_or_none()
     )
+    user_project = result.scalars().one_or_none()
 
+    # create new default or update existing
     if not user_project:
         user_project = FarmbaseUserProject(
             farmbase_user_id=user.id,
@@ -100,34 +103,33 @@ def create_or_update_project_default(*, db_session, user: FarmbaseUser, user_pro
         )
         db_session.add(user_project)
         return user_project
-
     user_project.default = user_project_in.default
     return user_project
 
 
-def create_or_update_organization_role(*, db_session, user: FarmbaseUser, role_in: UserOrganization):
+async def create_or_update_organization_role(
+    *, db_session: AsyncSession, user: FarmbaseUser, role_in: UserOrganization
+):
     """Creates a new organization role or updates an existing role."""
+    # determine organization id
     if not role_in.organization.id:
-        organization = organization_service.get_by_name(db_session=db_session, name=role_in.organization.name)
+        organization = await organization_service.get_by_name(db_session=db_session, name=role_in.organization.name)
         organization_id = organization.id
     else:
         organization_id = role_in.organization.id
 
-    organization_role = (
-        db_session.query(FarmbaseUserOrganization)
-        .filter(
+    # fetch existing organization role
+    result = await db_session.execute(
+        select(FarmbaseUserOrganization).where(
             FarmbaseUserOrganization.farmbase_user_id == user.id,
+            FarmbaseUserOrganization.organization_id == organization_id,
         )
-        .filter(FarmbaseUserOrganization.organization_id == organization_id)
-        .one_or_none()
     )
+    organization_role = result.scalars().one_or_none()
 
+    # create or update role
     if not organization_role:
-        return FarmbaseUserOrganization(
-            organization_id=organization.id,
-            role=role_in.role,
-        )
-
+        return FarmbaseUserOrganization(organization_id=organization_id, role=role_in.role)
     organization_role.role = role_in.role
     return organization_role
 
@@ -142,7 +144,7 @@ async def create(*, db_session: AsyncSession, organization: str, user_in: (UserR
         **user_in.model_dump(exclude={"password", "organizations", "projects", "role"}), password=password
     )
 
-    org = organization_service.get_by_slug_or_raise(
+    org = await organization_service.get_by_slug_or_raise(
         db_session=db_session,
         organization_in=OrganizationRead(name=organization, slug=organization),
     )
@@ -162,13 +164,13 @@ async def create(*, db_session: AsyncSession, organization: str, user_in: (UserR
 
         for user_project in user_in.projects:
             projects.append(
-                create_or_update_project_default(db_session=db_session, user=user, user_project_in=user_project)
+                await create_or_update_project_default(db_session=db_session, user=user, user_project_in=user_project)
             )
     else:
         # get the default project
-        default_project = project_service.get_default_or_raise(db_session=db_session)
+        default_project = await project_service.get_default_or_raise(db_session=db_session)
         projects.append(
-            create_or_update_project_default(
+            await create_or_update_project_default(
                 db_session=db_session,
                 user=user,
                 user_project_in=UserProject(project=ProjectBase(**default_project.dict())),
@@ -185,9 +187,9 @@ async def get_or_create(*, db_session: AsyncSession, organization: str, user_in:
     """Gets an existing user or creates a new one."""
     user = await get_by_email(db_session=db_session, email=user_in.email)
 
+    await db_session.refresh(user, ["organizations"])
     if not user:
         try:
-            print(organization)
             user = await create(db_session=db_session, organization=organization, user_in=user_in)
         except IntegrityError:
             await db_session.rollback()
@@ -207,9 +209,9 @@ async def update(*, db_session: AsyncSession, user: FarmbaseUser, user_in: UserU
 
     if user_in.organizations:
         roles = []
-
         for role in user_in.organizations:
-            roles.append(create_or_update_organization_role(db_session=db_session, user=user, role_in=role))
+            roles.append(await create_or_update_organization_role(db_session=db_session, user=user, role_in=role))
+        user.organizations = roles
 
     if user_in.projects:
         # we reset the default value for all user projects
@@ -219,8 +221,9 @@ async def update(*, db_session: AsyncSession, user: FarmbaseUser, user_in: UserU
         projects = []
         for user_project in user_in.projects:
             projects.append(
-                create_or_update_project_default(db_session=db_session, user=user, user_project_in=user_project)
+                await create_or_update_project_default(db_session=db_session, user=user, user_project_in=user_project)
             )
+        user.projects = projects
 
     if experimental_features := user_in.experimental_features:
         user.experimental_features = experimental_features

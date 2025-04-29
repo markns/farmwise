@@ -1,7 +1,6 @@
 from typing import List, Optional
 
 from pydantic import Field, field_validator
-from pydantic.networks import EmailStr
 from slugify import slugify
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -87,7 +86,7 @@ class Project(Base):
 
 
 class Service(FarmbaseBase):
-    id: PrimaryKey
+    id: PrimaryKey = None
     description: Optional[str] = Field(None, nullable=True)
     external_id: str
     is_active: Optional[bool] = None
@@ -101,30 +100,30 @@ class Service(FarmbaseBase):
 
 
 class ProjectBase(FarmbaseBase):
-    id: Optional[PrimaryKey]
+    id: PrimaryKey = None
     name: str
     display_name: Optional[str] = Field("", nullable=False)
-    owner_email: Optional[EmailStr] = Field(None, nullable=True)
-    owner_conversation: Optional[str] = Field(None, nullable=True)
-    annual_employee_cost: Optional[int]
-    business_year_hours: Optional[int]
+    # owner_email: Optional[EmailStr] = Field(None, nullable=True)
+    # owner_conversation: Optional[str] = Field(None, nullable=True)
+    # annual_employee_cost: Optional[int]
+    # business_year_hours: Optional[int]
     description: Optional[str] = Field(None, nullable=True)
     default: bool = False
-    color: Optional[str] = Field(None, nullable=True)
-    send_daily_reports: Optional[bool] = Field(True, nullable=True)
-    send_weekly_reports: Optional[bool] = Field(False, nullable=True)
-    weekly_report_notification_id: Optional[int] = Field(None, nullable=True)
+    # color: Optional[str] = Field(None, nullable=True)
+    # send_daily_reports: Optional[bool] = Field(True, nullable=True)
+    # send_weekly_reports: Optional[bool] = Field(False, nullable=True)
+    # weekly_report_notification_id: Optional[int] = Field(None, nullable=True)
     enabled: Optional[bool] = Field(True, nullable=True)
-    storage_folder_one: Optional[str] = Field(None, nullable=True)
-    storage_folder_two: Optional[str] = Field(None, nullable=True)
-    storage_use_folder_one_as_primary: Optional[bool] = Field(True, nullable=True)
-    storage_use_title: Optional[bool] = Field(False, nullable=True)
-    allow_self_join: Optional[bool] = Field(True, nullable=True)
-    select_commander_visibility: Optional[bool] = Field(True, nullable=True)
-    report_incident_instructions: Optional[str] = Field(None, nullable=True)
-    report_incident_title_hint: Optional[str] = Field(None, nullable=True)
-    report_incident_description_hint: Optional[str] = Field(None, nullable=True)
-    snooze_extension_oncall_service: Optional[Service]
+    # storage_folder_one: Optional[str] = Field(None, nullable=True)
+    # storage_folder_two: Optional[str] = Field(None, nullable=True)
+    # storage_use_folder_one_as_primary: Optional[bool] = Field(True, nullable=True)
+    # storage_use_title: Optional[bool] = Field(False, nullable=True)
+    # allow_self_join: Optional[bool] = Field(True, nullable=True)
+    # select_commander_visibility: Optional[bool] = Field(True, nullable=True)
+    # report_incident_instructions: Optional[str] = Field(None, nullable=True)
+    # report_incident_title_hint: Optional[str] = Field(None, nullable=True)
+    # report_incident_description_hint: Optional[str] = Field(None, nullable=True)
+    # snooze_extension_oncall_service: Optional[Service]
 
     @field_validator("name")
     @classmethod
@@ -137,15 +136,17 @@ class ProjectCreate(ProjectBase):
 
 
 class ProjectUpdate(ProjectBase):
-    send_daily_reports: Optional[bool] = Field(True, nullable=True)
-    send_weekly_reports: Optional[bool] = Field(False, nullable=True)
-    weekly_report_notification_id: Optional[int] = Field(None, nullable=True)
+    ...
+    # send_daily_reports: Optional[bool] = Field(True, nullable=True)
+    # send_weekly_reports: Optional[bool] = Field(False, nullable=True)
+    # weekly_report_notification_id: Optional[int] = Field(None, nullable=True)
     # stable_priority_id: Optional[int]
-    snooze_extension_oncall_service_id: Optional[int]
+    # snooze_extension_oncall_service_id: Optional[int]
 
 
 class ProjectRead(ProjectBase):
-    id: Optional[PrimaryKey]
+    ...
+    # id: Optional[PrimaryKey] = None
     # stable_priority: Optional[IncidentPriorityRead] = None
 
 
