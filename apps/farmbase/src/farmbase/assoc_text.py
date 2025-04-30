@@ -20,15 +20,15 @@ class FarmbaseUser(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(64))
 
-    project_assoc: Mapped[List[FarmbaseUserProject]] = relationship(
+    projects: Mapped[List[FarmbaseUserProject]] = relationship(
         back_populates="farmbase_user",
         cascade="all, delete-orphan",
     )
 
-    # association proxy of "project_assoc" collection
+    # association proxy of "projects" collection
     # to "keyword" attribute
     projects: AssociationProxy[List[Project]] = association_proxy(
-        "project_assoc",
+        "projects",
         "project",
         creator=lambda keyword_obj: FarmbaseUserProject(project=keyword_obj),
     )
@@ -59,7 +59,7 @@ class FarmbaseUserProject(Base):
     __tablename__ = "farmbase_user_project"
     # __table_args__ = {"schema": "tenant1"}
     farmbase_user_id: Mapped[int] = mapped_column(ForeignKey(FarmbaseUser.id), primary_key=True)
-    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="project_assoc")
+    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="projects")
 
     project_id: Mapped[int] = mapped_column(ForeignKey(Project.id), primary_key=True)
     project: Mapped[Project] = relationship(back_populates="user_assoc")
@@ -112,7 +112,7 @@ async def main():
 
     async with async_session() as session:
         stmt = select(FarmbaseUser).options(
-            selectinload(FarmbaseUser.project_assoc).selectinload(FarmbaseUserProject.project)
+            selectinload(FarmbaseUser.projects).selectinload(FarmbaseUserProject.project)
         )
         result = await session.execute(stmt)
         for user in result.scalars():

@@ -117,6 +117,26 @@ async def callback_handler(_: WhatsApp, sel: types.CallbackSelection):
     await _send_response(response, sel)
 
 
+@wa.on_message(filters.image)
+async def on_image(_: WhatsApp, msg: types.Message):
+    logger.info(f"IMAGE USER: {msg}")
+    url = await msg.image.get_media_url()
+    logger.info(f"IMAGE URL: {url}")
+    # try:
+    img_bytes = await msg.image.download(in_memory=True)
+
+    #     image = get_removed_bg_image(original_img)
+    # except requests.HTTPError as e:
+    #     msg.reply_text(f"A error occurred")
+    #     logging.exception(e)
+    #     return
+    # msg.reply_image(
+    #     image=image,
+    #     caption="Here you go",
+    #     mime_type='image/png',  # when sending bytes, you must specify the mime type
+    # )
+
+
 #
 #
 # MESSAGE_ID_TO_TEXT: dict[str, str] = {}  # msg_id -> text

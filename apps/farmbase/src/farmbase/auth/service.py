@@ -44,8 +44,8 @@ async def get(*, db_session: AsyncSession, user_id: int) -> Optional[FarmbaseUse
         select(FarmbaseUser)
         .where(FarmbaseUser.id == user_id)
         .options(
-            selectinload(FarmbaseUser.organizations_assoc).selectinload(FarmbaseUserOrganization.organization),
-            selectinload(FarmbaseUser.project_assoc).selectinload(FarmbaseUserProject.project),
+            selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization),
+            selectinload(FarmbaseUser.projects).selectinload(FarmbaseUserProject.project),
         )
     )
     return result.scalars().one_or_none()
@@ -57,8 +57,8 @@ async def get_by_email(*, db_session: AsyncSession, email: str) -> Optional[Farm
         select(FarmbaseUser)
         .where(FarmbaseUser.email == email)
         .options(
-            selectinload(FarmbaseUser.organizations_assoc).selectinload(FarmbaseUserOrganization.organization),
-            selectinload(FarmbaseUser.project_assoc),
+            selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization),
+            selectinload(FarmbaseUser.projects),
         )
     )
     return result.scalars().one_or_none()
@@ -169,7 +169,7 @@ async def create(*, db_session: AsyncSession, organization: str, user_in: (UserR
     if hasattr(user_in, "role"):
         role = user_in.role
 
-    user.organizations_assoc.append(FarmbaseUserOrganization(organization=org, role=role))
+    user.organizations.append(FarmbaseUserOrganization(organization=org, role=role))
 
     projects = []
     if user_in.projects:
@@ -191,7 +191,7 @@ async def create(*, db_session: AsyncSession, organization: str, user_in: (UserR
                 user_project_in=UserProject(project=ProjectBase(**default_project.dict())),
             )
         )
-    user.project_assoc = projects
+    user.projects = projects
 
     db_session.add(user)
     await db_session.commit()

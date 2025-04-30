@@ -12,7 +12,6 @@ from pydantic import Field, validator
 from pydantic.networks import EmailStr
 from sqlalchemy import Boolean, Column, Integer, LargeBinary, String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.associationproxy import AssociationProxy, association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy_utils import TSVectorType
@@ -61,19 +60,20 @@ class FarmbaseUser(Base, TimeStampMixin):
 
     # relationships
     # events = relationship("Event", backref="farmbase_user")
-    # TODO: look into https://docs.sqlalchemy.org/en/20/orm/extensions/associationproxy.html#simplifying-association-objects
-    project_assoc: Mapped[List[FarmbaseUserProject]] = relationship(
+    projects: Mapped[List[FarmbaseUserProject]] = relationship(
         back_populates="farmbase_user",
         cascade="all, delete-orphan",
     )
 
-    projects: AssociationProxy[List[Project]] = association_proxy(
-        "project_assoc",
-        "project",
-        creator=lambda project_obj: FarmbaseUserProject(project=project_obj),
-    )
+    # TODO: look into https://docs.sqlalchemy.org/en/20/orm/extensions/associationproxy.html#simplifying-association-objects
+    # This conflicts with the projects in FarmbaseBase
+    # projects: AssociationProxy[List[Project]] = association_proxy(
+    #     "projects",
+    #     "project",
+    #     creator=lambda project_obj: FarmbaseUserProject(project=project_obj),
+    # )
 
-    organizations_assoc: Mapped[List[FarmbaseUserOrganization]] = relationship(back_populates="farmbase_user")
+    organizations: Mapped[List[FarmbaseUserOrganization]] = relationship(back_populates="farmbase_user")
 
     search_vector = Column(TSVectorType("email", regconfig="pg_catalog.simple", weights={"email": "A"}))
 
@@ -115,7 +115,7 @@ class FarmbaseUser(Base, TimeStampMixin):
 # TODO use mapped_column as here: https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html#association-object
 class FarmbaseUserProject(Base, TimeStampMixin):
     farmbase_user_id: Mapped[int] = mapped_column(ForeignKey(FarmbaseUser.id), primary_key=True)
-    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="project_assoc")
+    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="projects")
 
     project_id: Mapped[int] = mapped_column(ForeignKey(Project.id), primary_key=True)
     project: Mapped[Project] = relationship(back_populates="user_assoc")
@@ -128,7 +128,7 @@ class FarmbaseUserProject(Base, TimeStampMixin):
 class FarmbaseUserOrganization(Base, TimeStampMixin):
     __table_args__ = {"schema": "farmbase_core"}
     farmbase_user_id: Mapped[int] = mapped_column(ForeignKey(FarmbaseUser.id), primary_key=True)
-    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="organizations_assoc")
+    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="organizations")
 
     organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id), primary_key=True)
     organization: Mapped[Organization] = relationship(back_populates="users")
