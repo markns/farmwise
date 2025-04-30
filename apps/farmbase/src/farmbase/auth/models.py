@@ -1,6 +1,6 @@
 import secrets
 import string
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import List, Optional
 from uuid import uuid4
 
@@ -83,7 +83,7 @@ class FarmbaseUser(Base, TimeStampMixin):
 
     @property
     def token(self):
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         exp = (now + timedelta(seconds=FARMBASE_JWT_EXP)).timestamp()
         data = {
             "exp": exp,
