@@ -7,7 +7,7 @@ from fastapi import Depends
 from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine.url import make_url
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
 from sqlalchemy_utils import get_mapper
@@ -73,31 +73,6 @@ engine_sync = create_db_engine(
 
 
 SessionLocal = sessionmaker(bind=engine)
-
-# Async engine and session for SQLAlchemy 2 AsyncIO
-async_engine = create_async_engine(
-    make_url(str(config.SQLALCHEMY_DATABASE_URI)),
-    pool_timeout=config.DATABASE_ENGINE_POOL_TIMEOUT,
-    pool_recycle=config.DATABASE_ENGINE_POOL_RECYCLE,
-    pool_size=config.DATABASE_ENGINE_POOL_SIZE,
-    max_overflow=config.DATABASE_ENGINE_MAX_OVERFLOW,
-    pool_pre_ping=config.DATABASE_ENGINE_POOL_PING,
-)
-
-AsyncSessionLocal = async_sessionmaker(
-    bind=async_engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
-
-
-async def get_async_db() -> AsyncSession:
-    """Get async database session from dependency."""
-    async with AsyncSessionLocal() as session:
-        yield session
-
-
-AsyncDbSession = Annotated[AsyncSession, Depends(get_async_db)]
 
 
 def resolve_table_name(name):

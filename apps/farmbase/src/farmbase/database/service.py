@@ -21,7 +21,7 @@ from sqlalchemy_filters.models import Field, get_model_from_spec
 
 from farmbase.auth.models import FarmbaseUser
 from farmbase.auth.service import CurrentUser, get_current_role
-from farmbase.database.core import DbSession, AsyncDbSession
+from farmbase.database.core import DbSession, DbSession
 from farmbase.enums import UserRoles
 
 from .core import Base, get_class_by_tablename, get_model_name_by_tablename
@@ -481,7 +481,7 @@ async def get_all(*, db_session: AsyncSession, model):
 
 async def common_parameters(
     current_user: CurrentUser,
-    db_session: AsyncDbSession,
+    db_session: DbSession,
     page: int = Query(1, gt=0, lt=2147483647),
     items_per_page: int = Query(5, alias="items_per_page", gt=-2, lt=2147483647),
     query_str: QueryStr = Query(None, alias="q"),

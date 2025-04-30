@@ -8,7 +8,7 @@ from farmbase.auth.permissions import (
     PermissionsDependency,
 )
 from farmbase.auth.service import CurrentUser
-from farmbase.database.core import AsyncDbSession
+from farmbase.database.core import DbSession
 from farmbase.database.service import CommonParameters, search_filter_sort_paginate
 from farmbase.enums import UserRoles
 from farmbase.exceptions import (
@@ -87,7 +87,7 @@ async def get_users(organization: OrganizationSlug, common: CommonParameters):
 async def create_user(
     user_in: UserCreate,
     organization: OrganizationSlug,
-    db_session: AsyncDbSession,
+    db_session: DbSession,
     current_user: CurrentUser,
 ):
     """Creates a new user."""
@@ -119,7 +119,7 @@ async def create_user(
 
 
 @user_router.get("/{user_id}", response_model=UserRead)
-async def get_user(db_session: AsyncDbSession, user_id: PrimaryKey):
+async def get_user(db_session: DbSession, user_id: PrimaryKey):
     """Get a user."""
     user = await get(db_session=db_session, user_id=user_id)
     if not user:
@@ -136,7 +136,7 @@ async def get_user(db_session: AsyncDbSession, user_id: PrimaryKey):
     response_model=UserRead,
 )
 async def update_user(
-    db_session: AsyncDbSession,
+    db_session: DbSession,
     user_id: PrimaryKey,
     organization: OrganizationSlug,
     user_in: UserUpdate,
@@ -181,7 +181,7 @@ async def update_user(
 
 @user_router.post("/{user_id}/change-password", response_model=UserRead)
 async def change_password(
-    db_session: AsyncDbSession,
+    db_session: DbSession,
     user_id: PrimaryKey,
     password_update: UserPasswordUpdate,
     current_user: CurrentUser,
@@ -225,7 +225,7 @@ async def change_password(
 
 @user_router.post("/{user_id}/reset-password", response_model=UserRead)
 async def admin_reset_password(
-    db_session: AsyncDbSession,
+    db_session: DbSession,
     user_id: PrimaryKey,
     password_reset: AdminPasswordReset,
     current_user: CurrentUser,
@@ -261,7 +261,7 @@ async def admin_reset_password(
 @auth_router.get("/me", response_model=UserRead)
 async def get_me(
     *,
-    db_session: AsyncDbSession,
+    db_session: DbSession,
     current_user: CurrentUser,
 ):
     return current_user
@@ -270,7 +270,7 @@ async def get_me(
 @auth_router.get("/myrole")
 async def get_my_role(
     *,
-    db_session: AsyncDbSession,
+    db_session: DbSession,
     current_user: CurrentUser,
     organization: OrganizationSlug,
 ):
@@ -281,7 +281,7 @@ async def get_my_role(
 async def login_user(
     user_in: UserLogin,
     organization: OrganizationSlug,
-    db_session: AsyncDbSession,
+    db_session: DbSession,
 ):
     user = get_by_email(db_session=db_session, email=user_in.email)
     if user and await user.verify_password(user_in.password):
@@ -314,7 +314,7 @@ async def login_user(
 async def register_user(
     user_in: UserRegister,
     organization: OrganizationSlug,
-    db_session: AsyncDbSession,
+    db_session: DbSession,
 ):
     user = await get_by_email(db_session=db_session, email=user_in.email)
     if user:
@@ -336,7 +336,7 @@ async def register_user(
 async def mfa_check(
     payload_in: MfaPayload,
     current_user: CurrentUser,
-    db_session: AsyncDbSession,
+    db_session: DbSession,
 ):
     log.info(f"MFA check initiated for user: {current_user.email}")
     log.debug(f"Payload received: {payload_in.dict()}")

@@ -45,8 +45,7 @@ async def get(*, db_session: AsyncSession, user_id: int) -> Optional[FarmbaseUse
         .where(FarmbaseUser.id == user_id)
         .options(
             selectinload(FarmbaseUser.organizations_assoc).selectinload(FarmbaseUserOrganization.organization),
-            selectinload(FarmbaseUser.project_assoc),
-            #     .selectinload(FarmbaseUserProject.project)
+            selectinload(FarmbaseUser.project_assoc).selectinload(FarmbaseUserProject.project),
         )
     )
     return result.scalars().one_or_none()
