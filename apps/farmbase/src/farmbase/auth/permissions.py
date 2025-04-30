@@ -61,10 +61,16 @@ class BasePermission(ABC):
     @abstractmethod
     def has_required_permissions(self, request: Request) -> bool: ...
 
-    def __init__(self, request: Request):
+    def __init__(self, request, role):
+        self.role = role
+        if not self.has_required_permissions(request):
+            raise HTTPException(status_code=self.user_role_error_code, detail=self.user_role_error_msg)
+
+    @classmethod
+    async def create(cls, request: Request):
         organization = None
         if request.path_params.get("organization"):
-            organization = organization_service.get_by_slug_or_raise(
+            organization = await organization_service.get_by_slug_or_raise(
                 db_session=request.state.db,
                 organization_in=OrganizationRead(
                     slug=request.path_params["organization"],
@@ -72,25 +78,25 @@ class BasePermission(ABC):
                 ),
             )
         elif request.path_params.get("organization_id"):
-            organization = organization_service.get(
+            organization = await organization_service.get(
                 db_session=request.state.db, organization_id=request.path_params["organization_id"]
             )
 
         if not organization:
-            raise HTTPException(status_code=self.org_error_code, detail=self.org_error_msg)
+            raise HTTPException(status_code=cls.org_error_code, detail=cls.org_error_msg)
 
-        org_check = organization_service.get_by_slug(db_session=request.state.db, slug=organization.slug)
+        org_check = await organization_service.get_by_slug(db_session=request.state.db, slug=organization.slug)
 
         if not org_check or org_check.id != organization.id:
-            raise HTTPException(status_code=self.org_error_code, detail=self.org_error_msg)
+            raise HTTPException(status_code=cls.org_error_code, detail=cls.org_error_msg)
 
-        user = get_current_user(request=request)
+        user = await get_current_user(request=request)
         if not user:
-            raise HTTPException(status_code=self.user_error_code, detail=self.user_error_msg)
+            raise HTTPException(status_code=cls.user_error_code, detail=cls.user_error_msg)
 
-        self.role = user.get_organization_role(organization.slug)
-        if not self.has_required_permissions(request):
-            raise HTTPException(status_code=self.user_role_error_code, detail=self.user_role_error_msg)
+        role = await user.get_organization_role(organization.slug)
+
+        return cls(request, role)
 
 
 class PermissionsDependency(object):
@@ -118,7 +124,7 @@ class PermissionsDependency(object):
 
     def __call__(self, request: Request):
         for permission_class in self.permissions_classes:
-            permission_class(request=request)
+            permission_class.create(request=request)
 
 
 class OrganizationOwnerPermission(BasePermission):

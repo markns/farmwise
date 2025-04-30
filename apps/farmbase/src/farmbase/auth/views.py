@@ -62,7 +62,7 @@ async def get_users(organization: OrganizationSlug, common: CommonParameters):
     """Gets all organization users."""
     common["filter_spec"] = {"and": [{"model": "Organization", "op": "==", "field": "slug", "value": organization}]}
 
-    items = search_filter_sort_paginate(model="FarmbaseUser", **common)
+    items = await search_filter_sort_paginate(model="FarmbaseUser", **common)
 
     return {
         "items": [
