@@ -59,6 +59,7 @@ class FarmbaseUser(Base, TimeStampMixin):
     # relationships
     # events = relationship("Event", backref="farmbase_user")
     # TODO: look into https://docs.sqlalchemy.org/en/20/orm/extensions/associationproxy.html#simplifying-association-objects
+    projects: Mapped[List["FarmbaseUserProject"]] = relationship(back_populates="farmbase_user")
     organizations: Mapped[List["FarmbaseUserOrganization"]] = relationship(back_populates="farmbase_user")
 
     search_vector = Column(TSVectorType("email", regconfig="pg_catalog.simple", weights={"email": "A"}))
@@ -111,15 +112,18 @@ class FarmbaseUserOrganization(Base, TimeStampMixin):
 
 # TODO use mapped_column as here: https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html#association-object
 class FarmbaseUserProject(Base, TimeStampMixin):
-    farmbase_user_id = Column(Integer, ForeignKey(FarmbaseUser.id), primary_key=True)
-    farmbase_user = relationship(FarmbaseUser, backref="projects")
+    farmbase_user_id: Mapped[int] = mapped_column(ForeignKey(FarmbaseUser.id), primary_key=True)
+    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="projects")
 
-    project_id = Column(Integer, ForeignKey(Project.id), primary_key=True)
-    project = relationship(Project, backref="users")
+    project_id: Mapped[int] = mapped_column(ForeignKey(Project.id), primary_key=True)
+    project: Mapped[Project] = relationship(back_populates="users")
 
     default = Column(Boolean, default=False)
 
     role = Column(String, nullable=False, default=UserRoles.member)
+
+
+# -- Pydantic
 
 
 class UserProject(FarmbaseBase):
@@ -262,7 +266,7 @@ class MfaChallenge(Base, TimeStampMixin):
     action = Column(String)
     status = Column(String, default=MfaChallengeStatus.PENDING)
     challenge_id = Column(UUID(as_uuid=True), default=uuid4, unique=True)
-    farmbase_user_id = Column(Integer, ForeignKey(FarmbaseUser.id), nullable=False)
+    farmbase_user_id: Mapped[int] = mapped_column(ForeignKey(FarmbaseUser.id), nullable=False)
     farmbase_user = relationship(FarmbaseUser, backref="mfa_challenges")
 
 

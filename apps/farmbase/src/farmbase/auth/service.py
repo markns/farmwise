@@ -52,7 +52,10 @@ async def get_by_email(*, db_session: AsyncSession, email: str) -> Optional[Farm
     result = await db_session.execute(
         select(FarmbaseUser)
         .where(FarmbaseUser.email == email)
-        .options(selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization))
+        .options(
+            selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization),
+            selectinload(FarmbaseUser.projects).selectinload(FarmbaseUserProject.project),
+        )
     )
     return result.scalars().one_or_none()
 

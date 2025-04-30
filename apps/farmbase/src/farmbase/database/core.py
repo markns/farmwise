@@ -7,7 +7,7 @@ from fastapi import Depends
 from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine.url import make_url
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine, AsyncAttrs
+from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
 from sqlalchemy_utils import get_mapper
@@ -189,10 +189,17 @@ def get_class_by_tablename(table_fullname: str) -> Any:
     """Return class reference mapped to table."""
 
     def _find_class(name):
-        for c in Base._decl_class_registry.values():
-            if hasattr(c, "__table__"):
-                if c.__table__.fullname.lower() == name.lower():
-                    return c
+        for mapper in Base.registry.mappers:
+            cls = mapper.class_
+            if hasattr(cls, "__tablename__") and cls.__tablename__ == name:
+                return cls
+        return None
+
+    # def _find_class(name):
+    #     for c in Base._decl_class_registry.values():
+    #         if hasattr(c, "__table__"):
+    #             if c.__table__.fullname.lower() == name.lower():
+    #                 return c
 
     mapped_name = resolve_table_name(table_fullname)
     mapped_class = _find_class(mapped_name)

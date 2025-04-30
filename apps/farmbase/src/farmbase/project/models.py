@@ -4,7 +4,7 @@ from pydantic import Field, field_validator
 from slugify import slugify
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy_utils import TSVectorType
 
 from farmbase.database.core import Base
@@ -38,6 +38,7 @@ class Project(Base):
     #     "FarmbaseUserProject",
     #     cascade="all, delete-orphan",
     # )
+    users: Mapped[List["FarmbaseUserProject"]] = relationship(back_populates="project")
 
     # display_name = Column(String, nullable=False, server_default="")
 

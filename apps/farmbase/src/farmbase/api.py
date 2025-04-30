@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
-from farmbase.auth.views import auth_router
+from farmbase.auth.service import get_current_user
+from farmbase.auth.views import auth_router, user_router
 from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
 from farmbase.project.views import router as project_router
@@ -47,3 +48,18 @@ authenticated_organization_api_router = APIRouter(
 )
 
 authenticated_organization_api_router.include_router(project_router, prefix="/projects", tags=["projects"])
+
+authenticated_organization_api_router.include_router(user_router, prefix="/users", tags=["users"])
+
+
+@api_router.get("/healthcheck", include_in_schema=False)
+def healthcheck():
+    return {"status": "ok"}
+
+
+api_router.include_router(authenticated_organization_api_router, dependencies=[Depends(get_current_user)])
+
+api_router.include_router(
+    authenticated_api_router,
+    dependencies=[Depends(get_current_user)],
+)
