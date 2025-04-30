@@ -128,11 +128,7 @@ async def db_session_middleware(request: Request, call_next):
             )
 
         # add correct schema mapping depending on the request
-        schema_engine = engine.execution_options(
-            schema_translate_map={
-                None: schema,
-            }
-        )
+        schema_engine = engine.execution_options(schema_translate_map={None: schema})
         async_session_factory = async_sessionmaker(
             bind=schema_engine,
             expire_on_commit=False,

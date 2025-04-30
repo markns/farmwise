@@ -6,7 +6,7 @@ from pydantic.json import pydantic_encoder
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import StringEncryptedType, TSVectorType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
@@ -81,10 +81,10 @@ class PluginEvent(Base):
 
 
 class PluginInstance(Base, ProjectMixin):
-    id = Column(Integer, primary_key=True)
-    enabled = Column(Boolean)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    enabled: Mapped[bool] = mapped_column(default=False)
     _configuration = Column(StringEncryptedType(key=str(FARMBASE_ENCRYPTION_KEY), engine=AesEngine, padding="pkcs5"))
-    plugin_id = Column(Integer, ForeignKey(Plugin.id))
+    plugin_id: Mapped[int] = mapped_column(ForeignKey(Plugin.id))
     plugin = relationship(Plugin, backref="instances")
 
     # this is some magic that allows us to use the plugin search vectors
@@ -100,7 +100,7 @@ class PluginInstance(Base, ProjectMixin):
             plugin.project_id = self.project_id
             return plugin
         except Exception as e:
-            logger.warning(f"Error trying to load plugin with slug {self.slug}: {e}")
+            logger.warning(f"Error trying to load plugin with slug {self.plugin.slug}: {e}")
             return self.plugin
 
     @property

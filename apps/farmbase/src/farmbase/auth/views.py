@@ -284,7 +284,7 @@ async def login_user(
     db_session: AsyncDbSession,
 ):
     user = get_by_email(db_session=db_session, email=user_in.email)
-    if user and user.verify_password(user_in.password):
+    if user and await user.verify_password(user_in.password):
         projects = []
         for user_project in user.projects:
             projects.append(

@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import secrets
 import string
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from typing import List, Optional
 from uuid import uuid4
 
@@ -10,6 +12,7 @@ from pydantic import Field, validator
 from pydantic.networks import EmailStr
 from sqlalchemy import Boolean, Column, Integer, LargeBinary, String
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.associationproxy import AssociationProxy, association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy_utils import TSVectorType
@@ -59,8 +62,18 @@ class FarmbaseUser(Base, TimeStampMixin):
     # relationships
     # events = relationship("Event", backref="farmbase_user")
     # TODO: look into https://docs.sqlalchemy.org/en/20/orm/extensions/associationproxy.html#simplifying-association-objects
-    projects: Mapped[List["FarmbaseUserProject"]] = relationship(back_populates="farmbase_user")
-    organizations: Mapped[List["FarmbaseUserOrganization"]] = relationship(back_populates="farmbase_user")
+    project_assoc: Mapped[List[FarmbaseUserProject]] = relationship(
+        back_populates="farmbase_user",
+        cascade="all, delete-orphan",
+    )
+
+    projects: AssociationProxy[List[Project]] = association_proxy(
+        "project_assoc",
+        "project",
+        creator=lambda project_obj: FarmbaseUserProject(project=project_obj),
+    )
+
+    organizations_assoc: Mapped[List[FarmbaseUserOrganization]] = relationship(back_populates="farmbase_user")
 
     search_vector = Column(TSVectorType("email", regconfig="pg_catalog.simple", weights={"email": "A"}))
 
@@ -99,28 +112,28 @@ class FarmbaseUser(Base, TimeStampMixin):
         return None
 
 
+# TODO use mapped_column as here: https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html#association-object
+class FarmbaseUserProject(Base, TimeStampMixin):
+    farmbase_user_id: Mapped[int] = mapped_column(ForeignKey(FarmbaseUser.id), primary_key=True)
+    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="project_assoc")
+
+    project_id: Mapped[int] = mapped_column(ForeignKey(Project.id), primary_key=True)
+    project: Mapped[Project] = relationship(back_populates="user_assoc")
+
+    default = Column(Boolean, default=False)
+
+    role = Column(String, nullable=False, default=UserRoles.member)
+
+
 class FarmbaseUserOrganization(Base, TimeStampMixin):
     __table_args__ = {"schema": "farmbase_core"}
     farmbase_user_id: Mapped[int] = mapped_column(ForeignKey(FarmbaseUser.id), primary_key=True)
-    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="organizations")
+    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="organizations_assoc")
 
     organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id), primary_key=True)
     organization: Mapped[Organization] = relationship(back_populates="users")
 
     role = Column(String, default=UserRoles.member)
-
-
-# TODO use mapped_column as here: https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html#association-object
-class FarmbaseUserProject(Base, TimeStampMixin):
-    farmbase_user_id: Mapped[int] = mapped_column(ForeignKey(FarmbaseUser.id), primary_key=True)
-    farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="projects")
-
-    project_id: Mapped[int] = mapped_column(ForeignKey(Project.id), primary_key=True)
-    project: Mapped[Project] = relationship(back_populates="users")
-
-    default = Column(Boolean, default=False)
-
-    role = Column(String, nullable=False, default=UserRoles.member)
 
 
 # -- Pydantic

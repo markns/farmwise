@@ -2,9 +2,9 @@ from typing import List, Optional
 
 from pydantic import Field, field_validator
 from slugify import slugify
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import TSVectorType
 
 from farmbase.database.core import Base
@@ -12,17 +12,12 @@ from farmbase.models import FarmbaseBase, Pagination, PrimaryKey
 from farmbase.organization.models import Organization, OrganizationRead
 from farmbase.validators import must_not_be_blank
 
-# from farmbase.incident.priority.models import (
-#     IncidentPriority,
-#     IncidentPriorityRead,
-# )
-
 
 class Project(Base):
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    description = Column(String)
-    default = Column(Boolean, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column()
+    description: Mapped[str] = mapped_column()
+    default: Mapped[bool] = mapped_column(default=False)
     # color = Column(String)
 
     # annual_employee_cost = Column(Integer, default=50000)
@@ -31,14 +26,19 @@ class Project(Base):
     # owner_email = Column(String)
     # owner_conversation = Column(String)
 
-    organization_id = Column(Integer, ForeignKey(Organization.id))
+    organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id))
     organization = relationship("Organization")
     #
     # farmbase_user_project = relationship(
     #     "FarmbaseUserProject",
     #     cascade="all, delete-orphan",
     # )
-    users: Mapped[List["FarmbaseUserProject"]] = relationship(back_populates="project")
+    # users: Mapped[List["FarmbaseUserProject"]] = relationship(back_populates="project")
+
+    user_assoc: Mapped[List["FarmbaseUserProject"]] = relationship(
+        back_populates="project",
+        cascade="all, delete-orphan",
+    )
 
     # display_name = Column(String, nullable=False, server_default="")
 
