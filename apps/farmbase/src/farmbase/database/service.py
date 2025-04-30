@@ -11,17 +11,16 @@ from pydantic import ValidationError
 from pydantic.types import Json, constr
 from six import string_types
 from sortedcontainers import SortedSet
-from sqlalchemy import and_, desc, func, not_, or_, select, orm
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import and_, desc, func, not_, or_, select
 from sqlalchemy.exc import InvalidRequestError, ProgrammingError
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.mapper import Mapper
-from sqlalchemy_filters import apply_pagination, apply_sort
 from sqlalchemy_filters.exceptions import BadFilterFormat, FieldNotFound
 from sqlalchemy_filters.models import Field, get_model_from_spec
 
 from farmbase.auth.models import FarmbaseUser
 from farmbase.auth.service import CurrentUser, get_current_role
-from farmbase.database.core import DbSession, DbSession
+from farmbase.database.core import DbSession
 from farmbase.enums import UserRoles
 
 from .core import Base, get_class_by_tablename, get_model_name_by_tablename

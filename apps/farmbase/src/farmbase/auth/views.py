@@ -7,9 +7,9 @@ from farmbase.auth.permissions import (
     OrganizationMemberPermission,
     PermissionsDependency,
 )
-from farmbase.auth.service import CurrentUser
+from farmbase.auth.service import CurrentUser, get_org_users
 from farmbase.database.core import DbSession
-from farmbase.database.service import CommonParameters, search_filter_sort_paginate
+from farmbase.database.service import CommonParameters
 from farmbase.enums import UserRoles
 from farmbase.exceptions import (
     InvalidConfigurationError,
@@ -37,7 +37,7 @@ from .models import (
     UserRegisterResponse,
     UserUpdate,
 )
-from .service import create, get, get_by_email, update
+from .service import create, get, get_by_email, get_org_users, update
 
 log = logging.getLogger(__name__)
 
@@ -60,9 +60,19 @@ user_router = APIRouter()
 )
 async def get_users(organization: OrganizationSlug, common: CommonParameters):
     """Gets all organization users."""
-    common["filter_spec"] = {"and": [{"model": "Organization", "op": "==", "field": "slug", "value": organization}]}
+    # common["filter_spec"] = {"and": [{"model": "Organization", "op": "==", "field": "slug", "value": organization}]}
 
-    items = await search_filter_sort_paginate(model="FarmbaseUser", **common)
+    # options = [selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization),
+    #         selectinload(FarmbaseUser.projects).selectinload(FarmbaseUserProject.project)]
+
+    # TODO: filters and pagination is broken. Maybe this will work for the time being.
+    users = await get_org_users(db_session=common["db_session"])
+    items = {
+        "items_per_page": len(users),
+        "page": common["page"],
+        "items": users,
+        "total": len(users),
+    }
 
     return {
         "items": [

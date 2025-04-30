@@ -1175,7 +1175,7 @@ requires-dist = [
     { name = "sentry-sdk", specifier = ">=2.23.1" },
     { name = "slowapi", specifier = ">=0.1.9" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.39" },
-    { name = "sqlalchemy-filters", specifier = ">=0.13.0" },
+    { name = "sqlalchemy-filters", git = "https://github.com/phillipuniverse/sqlalchemy-filters.git?rev=sqlalchemy-2.x" },
     { name = "sqlalchemy-utils", specifier = ">=0.41.2" },
     { name = "sqlmodel", specifier = ">=0.0.24" },
     { name = "tabulate", specifier = ">=0.9.0" },
@@ -4947,14 +4947,10 @@ asyncio = [
 [[package]]
 name = "sqlalchemy-filters"
 version = "0.13.0"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/phillipuniverse/sqlalchemy-filters.git?rev=sqlalchemy-2.x#402e27dc999e25eb7136786a4065706040cd2c55" }
 dependencies = [
     { name = "six" },
     { name = "sqlalchemy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/87/f0/d09af07271592dcd59ae5799595d56704153b8f199065a33814464466ca9/sqlalchemy-filters-0.13.0.tar.gz", hash = "sha256:40f2daead93c4db2409cf5e5abf67a420179f9e5c1df5c15fa1b474f6533b105", size = 17959 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/44/9e/5bd2e855cc171b4af69fa15c4ea9620ab97f4f754afc92bb21ab6a573b97/sqlalchemy_filters-0.13.0-py3-none-any.whl", hash = "sha256:aa4595b90d152eb76fa312a3e03d5d675f0c2e16762751f340f5449468689d9a", size = 15005 },
 ]
 
 [[package]]

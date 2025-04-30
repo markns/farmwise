@@ -106,7 +106,7 @@ class FarmbaseUser(Base, TimeStampMixin):
 
     async def get_organization_role(self, organization_slug: OrganizationSlug):
         """Gets the user's role for a given organization slug."""
-        for o in await self.awaitable_attrs.organizations:
+        for o in self.organizations:
             if o.organization.slug == organization_slug:
                 return o.role
         return None

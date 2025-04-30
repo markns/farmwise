@@ -1,5 +1,5 @@
 import logging
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List
 
 from fastapi import Depends, HTTPException
 from sqlalchemy import select
@@ -62,6 +62,18 @@ async def get_by_email(*, db_session: AsyncSession, email: str) -> Optional[Farm
         )
     )
     return result.scalars().one_or_none()
+
+
+async def get_org_users(*, db_session: AsyncSession) -> List[FarmbaseUser]:
+    """Returns a user based on the given user id."""
+    result = await db_session.execute(
+        select(FarmbaseUser).options(
+            selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization),
+            selectinload(FarmbaseUser.projects).selectinload(FarmbaseUserProject.project),
+        )
+    )
+    return result.scalars().all()
+    # search_filter_sort_paginate(model="FarmbaseUser", **common)
 
 
 async def create_or_update_project_role(*, db_session: AsyncSession, user: FarmbaseUser, role_in: UserProject):
