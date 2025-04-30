@@ -74,7 +74,7 @@ async def get_users(organization: OrganizationSlug, common: CommonParameters):
             }
             for u in items["items"]
         ],
-        "itemsPerPage": items["itemsPerPage"],
+        "items_per_page": items["items_per_page"],
         "page": items["page"],
         "total": items["total"],
     }
