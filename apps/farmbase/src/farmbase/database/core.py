@@ -7,7 +7,7 @@ from fastapi import Depends
 from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine.url import make_url
-from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
 from sqlalchemy_utils import get_mapper
@@ -17,11 +17,12 @@ from farmbase import config
 from farmbase.database.logging import SessionTracker
 
 
-def create_db_engine(connection_string: str):
+def create_db_engine(connection_string: str, echo=False):
     """Create a database engine with proper timeout settings.
 
     Args:
         connection_string: Database connection string
+        echo: Database connection string
     """
     url = make_url(connection_string)
 
@@ -40,15 +41,13 @@ def create_db_engine(connection_string: str):
     }
 
     if "async" in url.drivername:
-        return create_async_engine(url, **timeout_kwargs)
+        return create_async_engine(url, **timeout_kwargs, echo=echo)
     else:
-        return create_engine(url, **timeout_kwargs)
+        return create_engine(url, **timeout_kwargs, echo=echo)
 
 
 # Create the default engine with standard timeout
-engine = create_db_engine(
-    config.SQLALCHEMY_DATABASE_URI,
-)
+engine = create_db_engine(config.SQLALCHEMY_DATABASE_URI, echo=True)
 engine_sync = create_db_engine(
     config.SQLALCHEMY_DATABASE_SYNC_URI,
 )
@@ -165,7 +164,7 @@ class ReprMixin:
         return f"<{self.__class__.__name__} {id_str}{attrs}>"
 
 
-class Base(AsyncAttrs, ReprMixin, DeclarativeBase):
+class Base(ReprMixin, DeclarativeBase):
     """Project-wide declarative base (inherits mixin behaviour)."""
 
 
