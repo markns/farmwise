@@ -6,6 +6,8 @@ from starlette.responses import JSONResponse
 
 from farmbase.auth.service import get_current_user
 from farmbase.auth.views import auth_router, user_router
+from farmbase.data.crops.views import router as crops_router
+from farmbase.data.gaez.views import router as gaez_router
 from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
 from farmbase.project.views import router as project_router
@@ -32,6 +34,9 @@ api_router = APIRouter(
 
 # WARNING: Don't use this unless you want unauthenticated routes
 authenticated_api_router = APIRouter()
+
+authenticated_api_router.include_router(gaez_router, prefix="/gaez", tags=["gaez"])
+authenticated_api_router.include_router(crops_router, prefix="/crop-varieties", tags=["crop-varieties"])
 
 
 def get_organization_path(organization: OrganizationSlug):

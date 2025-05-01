@@ -5,7 +5,7 @@ Accept: application/json
 
 ###
 
-GET http://127.0.0.1:8000/api/v1/crop-varieties/suitability?crop_type=Maize&latitude=0.14743243681250168&longitude=35.08145448691857
+GET http://127.0.0.1:8000/api/v1/crop-varieties/maize?altitude=1700&growing_period=180
 Accept: application/json
 
 

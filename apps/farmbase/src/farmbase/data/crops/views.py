@@ -4,9 +4,7 @@ import pandas as pd
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from farmbase.api2.deps import SessionDep
-
-router = APIRouter(prefix="/crop-varieties", tags=["crop-varieties"])
+router = APIRouter()
 
 
 class CropVarietyResponse(BaseModel):
@@ -27,7 +25,7 @@ class CropVarietiesResponse(BaseModel):
 # crops_df = pd.read_csv("farmbase/data/kalro/crops.csv")
 # suitability_df = pd.read_pickle("farmbase/data/kalro/suitability.pkl")
 
-maize_df = pd.read_csv("farmbase/data/maize/maize_varieties.csv")
+maize_df = pd.read_csv("apps/farmbase/data/maize/maize_varieties.csv")
 
 
 def maize_maturity_category(growing_season_days: float | int | None) -> str | None:
@@ -73,7 +71,7 @@ def maize_maturity_category(growing_season_days: float | int | None) -> str | No
 
 
 @router.get("/maize", response_model=CropVarietiesResponse)
-def get_maize_varieties(session: SessionDep, altitude: float, growing_period: int) -> Any:
+def get_maize_varieties(altitude: float, growing_period: int) -> Any:
     maturity_category = maize_maturity_category(growing_period)
 
     suitable = maize_df[

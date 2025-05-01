@@ -4,7 +4,7 @@ import xarray as xr
 from fastapi import APIRouter
 from rioxarray import rioxarray
 
-router = APIRouter(prefix="/gaez", tags=["gaez"])
+router = APIRouter()
 
 
 def _read_clr(filepath):
@@ -20,12 +20,12 @@ def _read_clr(filepath):
     return colormap
 
 
-clr_path = "farmbase/data/gaez/GAEZ4_symbology_files/clr_files/AEZ_33classes.clr"
+clr_path = "apps/farmbase/data/gaez/GAEZ4_symbology_files/clr_files/AEZ_33classes.clr"
 class_map = _read_clr(clr_path)
 
-aez_raster = rioxarray.open_rasterio("farmbase/data/gaez/LR/aez/aez_v9v2red_ENSEMBLE_rcp4p5_2020s.tif")
+aez_raster = rioxarray.open_rasterio("apps/farmbase/data/gaez/LR/aez/aez_v9v2red_ENSEMBLE_rcp4p5_2020s.tif")
 growing_period_raster = rioxarray.open_rasterio(
-    "farmbase/data/gaez/res01/ENSEMBLE/rcp4p5/ld1_ENSEMBLE_rcp4p5_2020s.tif"
+    "apps/farmbase/data/gaez/res01/ENSEMBLE/rcp4p5/ld1_ENSEMBLE_rcp4p5_2020s.tif"
 )
 
 
