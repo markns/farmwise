@@ -1,13 +1,12 @@
 import functools
 import re
-from contextlib import contextmanager
 from typing import Annotated, Any, ClassVar
 
 from fastapi import Depends
 from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine.url import make_url
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
 from sqlalchemy_utils import get_mapper
@@ -47,7 +46,7 @@ def create_db_engine(connection_string: str, echo=False):
 
 
 # Create the default engine with standard timeout
-engine = create_db_engine(config.SQLALCHEMY_DATABASE_URI, echo=True)
+engine = create_db_engine(config.SQLALCHEMY_DATABASE_URI)
 engine_sync = create_db_engine(
     config.SQLALCHEMY_DATABASE_SYNC_URI,
 )
@@ -72,7 +71,7 @@ engine_sync = create_db_engine(
 #         logger.warning("Slow Query (%.2fs): %s", total, statement)
 
 
-SessionLocal = sessionmaker(bind=engine)
+SessionLocal = async_sessionmaker(bind=engine)
 
 
 def resolve_table_name(name):
@@ -245,33 +244,34 @@ async def get_schema_names(_engine: AsyncEngine) -> list[str]:
         return await async_conn.run_sync(_get_schema_names)
 
 
-@contextmanager
-def get_session() -> Session:
-    """Context manager to ensure the session is closed after use."""
-    session = SessionLocal()
-    session_id = SessionTracker.track_session(session, context="context_manager")
-    try:
-        yield session
-        session.commit()
-    except:
-        session.rollback()
-        raise
-    finally:
-        SessionTracker.untrack_session(session_id)
-        session.close()
-
-
-@contextmanager
-def get_organization_session(organization_slug: str) -> Session:
-    """Context manager to ensure the organization session is closed after use."""
-    session = refetch_db_session(organization_slug)
-    try:
-        yield session
-        session.commit()
-    except:
-        session.rollback()
-        raise
-    finally:
-        if hasattr(session, "_farmbase_session_id"):
-            SessionTracker.untrack_session(session._farmbase_session_id)
-        session.close()
+#
+# @contextmanager
+# def get_session() -> Session:
+#     """Context manager to ensure the session is closed after use."""
+#     session = SessionLocal()
+#     session_id = SessionTracker.track_session(session, context="context_manager")
+#     try:
+#         yield session
+#         session.commit()
+#     except:
+#         session.rollback()
+#         raise
+#     finally:
+#         SessionTracker.untrack_session(session_id)
+#         session.close()
+#
+#
+# @contextmanager
+# def get_organization_session(organization_slug: str) -> Session:
+#     """Context manager to ensure the organization session is closed after use."""
+#     session = refetch_db_session(organization_slug)
+#     try:
+#         yield session
+#         session.commit()
+#     except:
+#         session.rollback()
+#         raise
+#     finally:
+#         if hasattr(session, "_farmbase_session_id"):
+#             SessionTracker.untrack_session(session._farmbase_session_id)
+#         session.close()
