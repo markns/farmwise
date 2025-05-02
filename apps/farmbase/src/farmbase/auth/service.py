@@ -1,5 +1,5 @@
 import logging
-from typing import Annotated, Optional, List
+from typing import Annotated, List, Optional
 
 from fastapi import Depends, HTTPException
 from sqlalchemy import select
@@ -58,7 +58,7 @@ async def get_by_email(*, db_session: AsyncSession, email: str) -> Optional[Farm
         .where(FarmbaseUser.email == email)
         .options(
             selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization),
-            selectinload(FarmbaseUser.projects),
+            selectinload(FarmbaseUser.projects).selectinload(FarmbaseUserProject.project),
         )
     )
     return result.scalars().one_or_none()

@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 
@@ -242,23 +243,29 @@ def update_user(email: str, role: str, organization: str):
 @click.password_option()
 def reset_user_password(email: str, password: str):
     """Resets a user's password."""
-    from farmbase.auth import service as user_service
-    from farmbase.database.core import SessionLocal
 
-    db_session = SessionLocal()
-    user = user_service.get_by_email(email=email, db_session=db_session)
-    if not user:
-        click.secho(f"No user found. Email: {email}", fg="red")
-        return
+    async def _reset_user_password(email: str, password: str):
+        from farmbase.auth import service as user_service
+        from farmbase.database.core import SessionLocal
 
-    try:
-        # Use the new set_password method which includes validation
-        user.set_password(password)
-        db_session.commit()
-        click.secho("User password successfully updated.", fg="green")
-    except ValueError as e:
-        click.secho(f"Failed to update password: {str(e)}", fg="red")
-        return
+        db_session = SessionLocal()
+        # with db_session.begin() as session:
+        user = await user_service.get_by_email(email=email, db_session=db_session)
+        if not user:
+            click.secho(f"No user found. Email: {email}", fg="red")
+            return
+
+        try:
+            # Use the new set_password method which includes validation
+            user.set_password(password)
+            db_session.commit()
+            click.secho("User password successfully updated.", fg="green")
+        except ValueError as e:
+            click.secho(f"Failed to update password: {str(e)}", fg="red")
+            return
+
+
+    asyncio.run(_reset_user_password(email, password))
 
 
 @farmbase_cli.group("database")
@@ -773,143 +780,144 @@ def signals_group():
     pass
 
 
-@signals_group.command("consume")
-def consume_signals():
-    """
-    Runs a continuous process that consumes signals from the specified plugins.
-
-    This function sets up consumer threads for all active signal-consumer plugins
-    across all organizations and projects. It monitors these threads and restarts
-    them if they die. The process can be terminated using SIGINT or SIGTERM.
-
-    Returns:
-        None
-    """
-    from farmbase.common.utils.cli import install_plugins
-    from farmbase.database.core import get_organization_session, get_session
-    from farmbase.organization.service import get_all as get_all_organizations
-    from farmbase.plugin import service as plugin_service
-    from farmbase.project import service as project_service
-
-    install_plugins()
-
-    try:
-        with get_session() as session:
-            organizations = get_all_organizations(db_session=session)
-    except Exception as e:
-        log.exception(f"Error fetching organizations: {e}")
-        return
-
-    for organization in organizations:
-        try:
-            with get_organization_session(organization.slug) as session:
-                projects = project_service.get_all(db_session=session)
-
-                for project in projects:
-                    try:
-                        plugins = plugin_service.get_active_instances(
-                            db_session=session, plugin_type="signal-consumer", project_id=project.id
-                        )
-
-                        if not plugins:
-                            log.warning(
-                                f"No signals consumed. No signal-consumer plugins enabled. Project: {project.name}. Organization: {project.organization.name}"
-                            )
-                            continue
-
-                        for plugin in plugins:
-                            log.debug(f"Consuming signals for plugin: {plugin.plugin.slug}")
-                            try:
-                                plugin.instance.consume(db_session=session, project=project)
-                            except Exception as e:
-                                log.error(f"Error consuming signals for plugin: {plugin.plugin.slug}. Error: {e}")
-                    except Exception as e:
-                        log.exception(f"Error processing project {project.name}: {e}")
-        except Exception as e:
-            log.exception(f"Error processing organization {organization.slug}: {e}")
-
-
-@signals_group.command("process")
-def process_signals():
-    """
-    Runs a continuous process that does additional processing on newly created signals.
-
-    This function processes signal instances across all organizations by:
-    1. Creating a session for each organization using a context manager
-    2. Fetching unprocessed signal instances (with no filter_action or case_id)
-    3. Processing each instance with proper error handling
-    4. Ensuring proper session cleanup even if exceptions occur
-
-    Returns:
-        None
-    """
-    from contextlib import contextmanager
-
-    from sqlalchemy import asc
-    from sqlalchemy.orm import sessionmaker
-
-    from farmbase.common.utils.cli import install_plugins
-    from farmbase.database.core import SessionLocal, engine
-    from farmbase.organization.service import get_all as get_all_organizations
-    from farmbase.signal import flows as signal_flows
-    from farmbase.signal.models import SignalInstance
-
-    install_plugins()
-
-    @contextmanager
-    def session_scope(schema_engine):
-        """Provide a transactional scope around a series of operations."""
-        session = sessionmaker(bind=schema_engine)()
-        try:
-            yield session
-            session.commit()
-        except Exception:
-            session.rollback()
-            raise
-        finally:
-            session.close()
-
-    organizations = get_all_organizations(db_session=SessionLocal())
-
-    while True:
-        for organization in organizations:
-            schema_engine = engine.execution_options(
-                schema_translate_map={
-                    None: f"farmbase_organization_{organization.slug}",
-                }
-            )
-
-            try:
-                with session_scope(schema_engine) as db_session:
-                    # Get IDs first rather than full instances
-                    signal_instance_ids = (
-                        db_session.query(SignalInstance.id)
-                        .filter(SignalInstance.filter_action == None)  # noqa
-                        .filter(SignalInstance.case_id == None)  # noqa
-                        .order_by(asc(SignalInstance.created_at))
-                        .limit(500)
-                        .all()
-                    )
-
-                    # Process each instance with its own transaction
-                    for (instance_id,) in signal_instance_ids:
-                        try:
-                            # Process each signal instance in its own transaction
-                            # This ensures each instance is fresh and attached to the session
-                            signal_flows.signal_instance_create_flow(
-                                db_session=db_session,
-                                signal_instance_id=instance_id,
-                            )
-                            # Commit after each successful processing to avoid
-                            # accumulating too many objects in the session
-                            db_session.commit()
-                        except Exception as e:
-                            log.exception(f"Error processing signal instance {instance_id}: {e}")
-                            # Rollback this specific transaction but continue with others
-                            db_session.rollback()
-            except Exception as e:
-                log.exception(f"Error processing signals for organization {organization.slug}: {e}")
-                # No need to close the session here as it's handled by the context manager
+#
+# @signals_group.command("consume")
+# def consume_signals():
+#     """
+#     Runs a continuous process that consumes signals from the specified plugins.
+#
+#     This function sets up consumer threads for all active signal-consumer plugins
+#     across all organizations and projects. It monitors these threads and restarts
+#     them if they die. The process can be terminated using SIGINT or SIGTERM.
+#
+#     Returns:
+#         None
+#     """
+#     from farmbase.common.utils.cli import install_plugins
+#     from farmbase.database.core import get_organization_session, get_session
+#     from farmbase.organization.service import get_all as get_all_organizations
+#     from farmbase.plugin import service as plugin_service
+#     from farmbase.project import service as project_service
+#
+#     install_plugins()
+#
+#     try:
+#         with get_session() as session:
+#             organizations = get_all_organizations(db_session=session)
+#     except Exception as e:
+#         log.exception(f"Error fetching organizations: {e}")
+#         return
+#
+#     for organization in organizations:
+#         try:
+#             with get_organization_session(organization.slug) as session:
+#                 projects = project_service.get_all(db_session=session)
+#
+#                 for project in projects:
+#                     try:
+#                         plugins = plugin_service.get_active_instances(
+#                             db_session=session, plugin_type="signal-consumer", project_id=project.id
+#                         )
+#
+#                         if not plugins:
+#                             log.warning(
+#                                 f"No signals consumed. No signal-consumer plugins enabled. Project: {project.name}. Organization: {project.organization.name}"
+#                             )
+#                             continue
+#
+#                         for plugin in plugins:
+#                             log.debug(f"Consuming signals for plugin: {plugin.plugin.slug}")
+#                             try:
+#                                 plugin.instance.consume(db_session=session, project=project)
+#                             except Exception as e:
+#                                 log.error(f"Error consuming signals for plugin: {plugin.plugin.slug}. Error: {e}")
+#                     except Exception as e:
+#                         log.exception(f"Error processing project {project.name}: {e}")
+#         except Exception as e:
+#             log.exception(f"Error processing organization {organization.slug}: {e}")
+#
+#
+# @signals_group.command("process")
+# def process_signals():
+#     """
+#     Runs a continuous process that does additional processing on newly created signals.
+#
+#     This function processes signal instances across all organizations by:
+#     1. Creating a session for each organization using a context manager
+#     2. Fetching unprocessed signal instances (with no filter_action or case_id)
+#     3. Processing each instance with proper error handling
+#     4. Ensuring proper session cleanup even if exceptions occur
+#
+#     Returns:
+#         None
+#     """
+#     from contextlib import contextmanager
+#
+#     from sqlalchemy import asc
+#     from sqlalchemy.orm import sessionmaker
+#
+#     from farmbase.common.utils.cli import install_plugins
+#     from farmbase.database.core import SessionLocal, engine
+#     from farmbase.organization.service import get_all as get_all_organizations
+#     from farmbase.signal import flows as signal_flows
+#     from farmbase.signal.models import SignalInstance
+#
+#     install_plugins()
+#
+#     @contextmanager
+#     def session_scope(schema_engine):
+#         """Provide a transactional scope around a series of operations."""
+#         session = sessionmaker(bind=schema_engine)()
+#         try:
+#             yield session
+#             session.commit()
+#         except Exception:
+#             session.rollback()
+#             raise
+#         finally:
+#             session.close()
+#
+#     organizations = get_all_organizations(db_session=SessionLocal())
+#
+#     while True:
+#         for organization in organizations:
+#             schema_engine = engine.execution_options(
+#                 schema_translate_map={
+#                     None: f"farmbase_organization_{organization.slug}",
+#                 }
+#             )
+#
+#             try:
+#                 with session_scope(schema_engine) as db_session:
+#                     # Get IDs first rather than full instances
+#                     signal_instance_ids = (
+#                         db_session.query(SignalInstance.id)
+#                         .filter(SignalInstance.filter_action == None)  # noqa
+#                         .filter(SignalInstance.case_id == None)  # noqa
+#                         .order_by(asc(SignalInstance.created_at))
+#                         .limit(500)
+#                         .all()
+#                     )
+#
+#                     # Process each instance with its own transaction
+#                     for (instance_id,) in signal_instance_ids:
+#                         try:
+#                             # Process each signal instance in its own transaction
+#                             # This ensures each instance is fresh and attached to the session
+#                             signal_flows.signal_instance_create_flow(
+#                                 db_session=db_session,
+#                                 signal_instance_id=instance_id,
+#                             )
+#                             # Commit after each successful processing to avoid
+#                             # accumulating too many objects in the session
+#                             db_session.commit()
+#                         except Exception as e:
+#                             log.exception(f"Error processing signal instance {instance_id}: {e}")
+#                             # Rollback this specific transaction but continue with others
+#                             db_session.rollback()
+#             except Exception as e:
+#                 log.exception(f"Error processing signals for organization {organization.slug}: {e}")
+#                 # No need to close the session here as it's handled by the context manager
 
 
 @signals_group.command("perf-test")

@@ -13,8 +13,6 @@ from farmbase.database.service import CommonParameters
 from farmbase.enums import UserRoles
 from farmbase.exceptions import (
     InvalidConfigurationError,
-    InvalidPasswordError,
-    InvalidUsernameError,
 )
 from farmbase.models import OrganizationSlug, PrimaryKey
 from farmbase.organization.models import OrganizationRead
@@ -293,8 +291,8 @@ async def login_user(
     organization: OrganizationSlug,
     db_session: DbSession,
 ):
-    user = get_by_email(db_session=db_session, email=user_in.email)
-    if user and await user.verify_password(user_in.password):
+    user = await get_by_email(db_session=db_session, email=user_in.email)
+    if user and user.verify_password(user_in.password):
         projects = []
         for user_project in user.projects:
             projects.append(
@@ -306,19 +304,18 @@ async def login_user(
             )
         return {"projects": projects, "token": user.token}
 
-    raise ValidationError(
-        [
-            ErrorWrapper(
-                InvalidUsernameError(msg="Invalid username."),
-                loc="username",
-            ),
-            ErrorWrapper(
-                InvalidPasswordError(msg="Invalid password."),
-                loc="password",
-            ),
-        ],
-        model=UserLogin,
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid username or password.",
+        # headers={"WWW-Authenticate": "Bearer"},
     )
+    # raise ValidationError(
+    #     [
+    #         ErrorDetails(type="value_error", loc=("username",), msg="Invalid username.", input=None),
+    #         ErrorDetails(type="value_error", loc=("password",), msg="Invalid password.", input=None),
+    #     ],
+    # model=UserLogin,
+    # )
 
 
 async def register_user(
@@ -328,15 +325,16 @@ async def register_user(
 ):
     user = await get_by_email(db_session=db_session, email=user_in.email)
     if user:
-        raise ValidationError(
-            [
-                ErrorWrapper(
-                    InvalidConfigurationError(msg="A user with this email already exists."),
-                    loc="email",
-                )
-            ],
-            model=UserRegister,
-        )
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="A user with this email already exists.")
+        # raise ValidationError(
+        #     [
+        #         ErrorWrapper(
+        #             InvalidConfigurationError(msg="A user with this email already exists."),
+        #             loc="email",
+        #         )
+        #     ],
+        #     model=UserRegister,
+        # )
 
     user = await create(db_session=db_session, organization=organization, user_in=user_in)
     return user
