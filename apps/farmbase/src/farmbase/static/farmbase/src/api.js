@@ -5,7 +5,7 @@ import auth_store from "@/auth/store"
 import router from "./router"
 
 const instance = axios.create({
-  baseURL: "/api/v1",
+  baseURL: "http://localhost:8000/api/v1",
 })
 
 const authProviderSlug =

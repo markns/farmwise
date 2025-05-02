@@ -195,75 +195,75 @@ export const protectedRoute = [
         },
       ],
     },
-    {
-      path: "cases",
-      component: DefaultLayout,
-      name: "cases",
-      meta: {
-        title: "Cases",
-        icon: "mdi-briefcase",
-        group: "cases",
-        requiresAuth: true,
-        menu: true,
-        showEditSheet: false,
-      },
-      redirect: { name: "CaseTable" },
-      children: [
-        {
-          path: "/:organization/cases",
-          name: "CaseTable",
-          meta: { title: "List" },
-          component: () => import("@/case/Table.vue"),
-          children: [
-            {
-              path: "/:organization/cases/:name/edit",
-              name: "CaseTableEdit",
-              component: () => import("@/case/EditSheet.vue"),
-              props: true,
-              meta: {
-                showEditSheet: true,
-              },
-            },
-          ],
-        },
-        {
-          path: "/:organization/cases/:name",
-          name: "CasePage",
-          meta: { title: "Page" },
-          component: () => import("@/case/Page.vue"),
-          children: [
-            {
-              path: "signal/:signal_id",
-              name: "SignalDetails",
-              component: () => import("@/case/Page.vue"), // Use the same component to avoid re-render
-              props: true,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      path: "signals",
-      component: DefaultLayout,
-      name: "signals",
-      meta: {
-        title: "Signals",
-        icon: "mdi-broadcast",
-        group: "signals",
-        requiresAuth: true,
-        menu: true,
-        showEditSheet: false,
-      },
-      redirect: { name: "SignalInstanceTable" },
-      children: [
-        {
-          path: "/:organization/signals",
-          name: "SignalInstanceTable",
-          meta: { title: "List" },
-          component: () => import("@/signal/TableInstance.vue"),
-        },
-      ],
-    },
+    // {
+    //   path: "cases",
+    //   component: DefaultLayout,
+    //   name: "cases",
+    //   meta: {
+    //     title: "Cases",
+    //     icon: "mdi-briefcase",
+    //     group: "cases",
+    //     requiresAuth: true,
+    //     menu: true,
+    //     showEditSheet: false,
+    //   },
+    //   redirect: { name: "CaseTable" },
+    //   children: [
+    //     {
+    //       path: "/:organization/cases",
+    //       name: "CaseTable",
+    //       meta: { title: "List" },
+    //       component: () => import("@/case/Table.vue"),
+    //       children: [
+    //         {
+    //           path: "/:organization/cases/:name/edit",
+    //           name: "CaseTableEdit",
+    //           component: () => import("@/case/EditSheet.vue"),
+    //           props: true,
+    //           meta: {
+    //             showEditSheet: true,
+    //           },
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       path: "/:organization/cases/:name",
+    //       name: "CasePage",
+    //       meta: { title: "Page" },
+    //       component: () => import("@/case/Page.vue"),
+    //       children: [
+    //         {
+    //           path: "signal/:signal_id",
+    //           name: "SignalDetails",
+    //           component: () => import("@/case/Page.vue"), // Use the same component to avoid re-render
+    //           props: true,
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // },
+    // {
+    //   path: "signals",
+    //   component: DefaultLayout,
+    //   name: "signals",
+    //   meta: {
+    //     title: "Signals",
+    //     icon: "mdi-broadcast",
+    //     group: "signals",
+    //     requiresAuth: true,
+    //     menu: true,
+    //     showEditSheet: false,
+    //   },
+    //   redirect: { name: "SignalInstanceTable" },
+    //   children: [
+    //     {
+    //       path: "/:organization/signals",
+    //       name: "SignalInstanceTable",
+    //       meta: { title: "List" },
+    //       component: () => import("@/signal/TableInstance.vue"),
+    //     },
+    //   ],
+    // },
     {
       path: "data",
       component: DefaultLayout,
@@ -297,85 +297,85 @@ export const protectedRoute = [
         },
       ],
     },
-    {
-      path: "tasks",
-      component: DefaultLayout,
-      name: "tasks",
-      meta: {
-        title: "Tasks",
-        icon: "mdi-calendar-check",
-        group: "tasks",
-        menu: true,
-        requiresAuth: true,
-      },
-      redirect: { name: "TaskTable" },
-      children: [
-        {
-          path: "/:organization/tasks",
-          name: "TaskTable",
-          meta: { title: "List" },
-          component: () => import("@/task/Table.vue"),
-        },
-      ],
-    },
-    {
-      path: "forms",
-      component: DefaultLayout,
-      name: "forms",
-      meta: {
-        title: "Forms",
-        icon: "mdi-file-document-outline",
-        group: "forms",
-        menu: true,
-        requiresAuth: true,
-      },
-      redirect: { name: "FormsTable" },
-      children: [
-        {
-          path: "/:organization/forms",
-          name: "FormsTable",
-          meta: { title: "Forms" },
-          component: () => import("@/forms/table/Table.vue"),
-          children: [
-            {
-              path: "/:organization/forms/:id",
-              name: "FormsTableAttorneyEdit",
-              component: () => import("@/forms/table/Table.vue"),
-              meta: {
-                showAttorneyEdit: true,
-              },
-            },
-          ],
-        },
-      ],
-    },
-    {
-      path: "feedback",
-      component: DefaultLayout,
-      name: "feedback",
-      redirect: { name: "IncidentFeedbackTable" },
-      meta: {
-        title: "Feedback",
-        icon: "mdi-message-alert",
-        group: "feedback",
-        menu: true,
-        requiresAuth: true,
-      },
-      children: [
-        {
-          path: "/:organization/feedback/incident",
-          name: "IncidentFeedbackTable",
-          meta: { title: "Incident and Case feedback", group: "feedback" },
-          component: () => import("@/feedback/incident/Table.vue"),
-        },
-        {
-          path: "/:organization/feedback/service",
-          name: "ServiceFeedbackTable",
-          meta: { title: "Oncall feedback", group: "feedback" },
-          component: () => import("@/feedback/service/Table.vue"),
-        },
-      ],
-    },
+    // {
+    //   path: "tasks",
+    //   component: DefaultLayout,
+    //   name: "tasks",
+    //   meta: {
+    //     title: "Tasks",
+    //     icon: "mdi-calendar-check",
+    //     group: "tasks",
+    //     menu: true,
+    //     requiresAuth: true,
+    //   },
+    //   redirect: { name: "TaskTable" },
+    //   children: [
+    //     {
+    //       path: "/:organization/tasks",
+    //       name: "TaskTable",
+    //       meta: { title: "List" },
+    //       component: () => import("@/task/Table.vue"),
+    //     },
+    //   ],
+    // },
+    // {
+    //   path: "forms",
+    //   component: DefaultLayout,
+    //   name: "forms",
+    //   meta: {
+    //     title: "Forms",
+    //     icon: "mdi-file-document-outline",
+    //     group: "forms",
+    //     menu: true,
+    //     requiresAuth: true,
+    //   },
+    //   redirect: { name: "FormsTable" },
+    //   children: [
+    //     {
+    //       path: "/:organization/forms",
+    //       name: "FormsTable",
+    //       meta: { title: "Forms" },
+    //       component: () => import("@/forms/table/Table.vue"),
+    //       children: [
+    //         {
+    //           path: "/:organization/forms/:id",
+    //           name: "FormsTableAttorneyEdit",
+    //           component: () => import("@/forms/table/Table.vue"),
+    //           meta: {
+    //             showAttorneyEdit: true,
+    //           },
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // },
+    // {
+    //   path: "feedback",
+    //   component: DefaultLayout,
+    //   name: "feedback",
+    //   redirect: { name: "IncidentFeedbackTable" },
+    //   meta: {
+    //     title: "Feedback",
+    //     icon: "mdi-message-alert",
+    //     group: "feedback",
+    //     menu: true,
+    //     requiresAuth: true,
+    //   },
+    //   children: [
+    //     {
+    //       path: "/:organization/feedback/incident",
+    //       name: "IncidentFeedbackTable",
+    //       meta: { title: "Incident and Case feedback", group: "feedback" },
+    //       component: () => import("@/feedback/incident/Table.vue"),
+    //     },
+    //     {
+    //       path: "/:organization/feedback/service",
+    //       name: "ServiceFeedbackTable",
+    //       meta: { title: "Oncall feedback", group: "feedback" },
+    //       component: () => import("@/feedback/service/Table.vue"),
+    //     },
+    //   ],
+    // },
     {
       path: "settings",
       component: DefaultLayout,
