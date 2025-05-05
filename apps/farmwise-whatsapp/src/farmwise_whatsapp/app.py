@@ -25,8 +25,15 @@ class Commands(Enum):
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     print("Startup: Initializing resources...")
+
+    # TODO: Ice breakers is only showing the last command - why?
+    # ice_breakers = [c.value.name for c in Commands]
+    ice_breakers = []
+    print(ice_breakers)
     await wa.update_conversational_automation(
-        enable_chat_opened=True, ice_breakers=[], commands=[command.value for command in Commands]
+        enable_chat_opened=True,
+        ice_breakers=ice_breakers,
+        commands=[command.value for command in Commands],
     )
 
     yield  # Run the application
@@ -39,7 +46,7 @@ wa = WhatsApp(
     phone_id=settings.WHATSAPP_PHONE_ID,  # The phone id you got from the API Setup
     token=settings.WHATSAPP_TOKEN,  # The token you got from the API Setup
     server=app,
-    callback_url="https://421e-105-163-1-38.ngrok-free.app",
+    callback_url="https://84a7-105-163-2-144.ngrok-free.app",
     verify_token="xyz123fdsfds",
     app_id=1392339421934377,
     app_secret="b8a5543a9bf425a0e87676641569b2b4",
@@ -71,6 +78,25 @@ async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
         )
     else:
         await msg.reply_text(response.content)
+
+
+# TODO: Chat opened is not being triggered...
+@wa.on_chat_opened
+async def chat_opened_handler(client: WhatsApp, chat_opened: types.ChatOpened):
+    logger.info(f"CHAT OPENED USER: {chat_opened}")
+    # TODO: Do we already want to register a user here?
+    await chat_opened.reply_text(f"""Hi {chat_opened.from_user.name}! 👋 You’re now connected to FarmWise – your trusted partner for smart farming advice.
+
+Here’s what you can do:
+✅ Get tailored recommendations for your crops
+✅ Ask about pests, diseases, and weather risks
+✅ Record planting and input data
+✅ Get reminders for key farm activities
+
+Just type your question or send a photo, and we’ll help you grow better!
+
+Reply with “menu” to see all services.
+    """)
 
 
 @wa.on_message(filters.location)
