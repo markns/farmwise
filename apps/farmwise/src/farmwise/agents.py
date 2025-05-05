@@ -71,6 +71,7 @@ from farmwise.tools import (
 
 # TODO: Why is maize not showing in results?
 # TODO:
+#     3. Create a visualization that shows the most suitable crops for the area.
 crop_suitability_agent: Agent[UserContext] = Agent(
     name="Crop Suitability Agent",
     handoff_description="A helpful agent that can answer questions about crop suitability.",
@@ -80,11 +81,56 @@ crop_suitability_agent: Agent[UserContext] = Agent(
 
     # Routine
     1. Request the farmer shares their location, unless it is already known. Add the action "location_request" to get the location
-    2. Use the suitability_index tool to obtain suitability index values for crops between 0-10000 from FAO GAEZ data. 10000 indicates high suitability, 0 indicates low suitability. 
-    3. Create a visualization that shows the most suitable crops for the area.
+    2. Use the suitability_index tool to obtain suitability index values for crops between 0-10000 from FAO GAEZ data. 10000 indicates high suitability, 0 indicates low suitability.
+    3. Present the top 5 choices as a list, and offer to give advice on growing these crops. 
 
     If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the triage agent. """,
     tools=[suitability_index],
+    output_type=WhatsappResponse,
+    model="gpt-4.1",
+)
+
+
+crop_pathogen_diagnosis_agent: Agent[UserContext] = Agent(
+    name="Crop pathogen diagnosis agent",
+    handoff_description="An agent that can identify crop pests and diseases from an image",
+    instructions=f"""{RECOMMENDED_PROMPT_PREFIX}
+    Routine for Crop Pest and Disease Diagnosis Agent
+	1.	Accept Image Input
+        You will receive a photo of a crop. Accept only clear images that include leaves, stems, fruits, or other affected parts of the plant. If the image is blurry or incomplete, ask the user to send a clearer one.
+	2.	Confirm the Crop
+        Attempt to identify the crop from the image. If uncertain, ask the user to confirm the crop type (e.g., maize, tomato, bean).
+	3.	Scan for Visible Symptoms
+        Examine the image for visible symptoms such as:
+            •	Leaf spots, lesions, discolouration, yellowing
+            •	Wilting, stunting, or distortion
+            •	Holes, chewing damage, or tunnels
+            •	Fungal growth, mould, or rust
+            •	Insects or eggs on the plant
+	4.	Match to Known Conditions
+        Use your trained knowledge of plant pathology and entomology to match the observed symptoms to known:
+        •	Pests (e.g., Fall Armyworm, Aphids, Thrips)
+        •	Diseases (e.g., Maize Lethal Necrosis, Blight, Rust, Mildew)
+	5.	Evaluate Likelihood
+        Provide a diagnosis with a confidence level (e.g., “High confidence: Fall Armyworm” or “Low confidence: could be fungal leaf spot”).
+	6.	Ask for More Context (if needed)
+        If the diagnosis is unclear, ask the user for:
+            •	A closer or different-angle photo
+            •	Information on recent weather
+            •	When symptoms started
+            •	What inputs or chemicals have been applied
+	7.	Provide Actionable Advice
+        Offer clear next steps based on the likely diagnosis. This could include:
+            •	Pest or disease name
+            •	Recommended treatments (organic or chemical)
+            •	Whether immediate action is needed
+            •	Preventative tips for future
+	8.	Warn About Uncertainty When Appropriate
+        If the image does not provide enough information, explain that a field inspection or lab test may be necessary.
+	9.	Log the Diagnosis
+        Record the diagnosis and advice in a structured format for future reference (e.g., crop, issue, treatment recommended, date).
+
+""",
     output_type=WhatsappResponse,
     model="gpt-4.1",
 )
@@ -168,6 +214,7 @@ triage_agent: Agent[UserContext] = Agent(
     handoffs=[
         crop_suitability_agent,
         maize_variety_selector,
+        crop_pathogen_diagnosis_agent,
         # faq_agent,
         # handoff(agent=seat_booking_agent, on_handoff=on_seat_booking_handoff),
     ],
@@ -177,7 +224,8 @@ triage_agent: Agent[UserContext] = Agent(
 
 # crop_suitability_agent.handoffs.append(triage_agent)
 maize_variety_selector.handoffs.append(triage_agent)
-crop_suitability_agent.handoffs.extend([triage_agent, crop_suitability_agent])
+crop_suitability_agent.handoffs.extend([triage_agent, maize_variety_selector])
+crop_pathogen_diagnosis_agent.handoffs.append(triage_agent)
 
 DEFAULT_AGENT = triage_agent.name
 
@@ -185,6 +233,7 @@ agents: dict[str, Agent] = {
     triage_agent.name: triage_agent,
     maize_variety_selector.name: maize_variety_selector,
     crop_suitability_agent.name: crop_suitability_agent,
+    crop_pathogen_diagnosis_agent.name: crop_pathogen_diagnosis_agent,
 }
 
 

@@ -79,7 +79,7 @@ crop_codes = {
 
 @router.get("/suitability_index", response_model=dict[str, int])
 def suitability_index(latitude: float, longitude: float):
-    file_path = "farmbase/data/gaez/res05/HadGEM2-ES/rcp4p5/2020sH"
+    file_path = "apps/farmbase/data/gaez/res05/HadGEM2-ES/rcp4p5/2020sH"
     # variables = dict(zip(sdf.name, sdf.crop))
     # # variables
     rasters = [rioxarray.open_rasterio(os.path.join(file_path, f"suHr0_{v}.tif")) for v in crop_codes.keys()]

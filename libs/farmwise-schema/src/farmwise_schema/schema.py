@@ -45,6 +45,12 @@ class UserInput(BaseModel):
         description="User input to the agent.",
         examples=["What is the weather in Tokyo?"],
     )
+    # TODO: Use Image object from pywa
+    image: str | None = Field(
+        description="Image to send to the agent.",
+        default=None,
+        # examples=["https://example.com/image.jpg"],
+    )
     user_id: str | None = Field(
         description="User ID to persist and continue a multi-turn conversation.",
         # default=None,
@@ -115,10 +121,10 @@ class SectionList(BaseModel):
 class WhatsappResponse(BaseModel):
     content: str | None = Field(description="Content of the response.")
     actions: list[Action] = Field(
-        description="Actions that can be requested from the client. May be empty",
+        description="Actions that can be requested from the client. Should be left empty unless specified.",
     )
     buttons: list[Button] = Field(
-        description="Buttons that can be added to the response. May be empty.",
+        description="Buttons that can be added to the response. Should be left empty unless specified.",
     )
     section_list: SectionList | None = Field(
         description="Section list with multiple choice options. Should be left null unless specified."

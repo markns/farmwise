@@ -5,7 +5,7 @@ from typing import Annotated, Any, Optional
 from agents import Agent, ItemHelpers, MessageOutputItem, Runner, RunResult, gen_trace_id, set_default_openai_key, trace
 from farmwise_schema.schema import ServiceMetadata, UserInput, WhatsappResponse
 from fastapi import APIRouter, Depends, FastAPI
-from openai.types.responses import EasyInputMessageParam
+from openai.types.responses import EasyInputMessageParam, ResponseInputImageParam
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 from farmwise.agents import DEFAULT_AGENT, agents, get_all_agent_info
@@ -82,18 +82,29 @@ async def invoke(
     agent: Annotated[Agent[UserContext], Depends(current_agent)],
 ):
     logger.info(f"USER: {user_input.message}")
-    input_item = EasyInputMessageParam(content=user_input.message, role="user")
+    input_items = [EasyInputMessageParam(content=user_input.message, role="user")]
+    if user_input.image:
+        input_items.append(
+            EasyInputMessageParam(
+                content=[
+                    ResponseInputImageParam(
+                        detail="auto", image_url=f"data:image/jpeg;base64,{user_input.image}", type="input_image"
+                    )
+                ],
+                role="user",
+            ),
+        )
 
     trace_id = gen_trace_id()
     with trace("FarmWise", trace_id=trace_id, group_id=user_input.user_id):
-        result: RunResult = await Runner.run(agent, history + [input_item], context=context)
+        result: RunResult = await Runner.run(agent, input=history + input_items, context=context)
 
     with Session(engine) as session:
         session.add(
             Message(
                 user_id=user_input.user_id,
-                content=input_item["content"],
-                role=input_item["role"],
+                content=input_items[0]["content"],
+                role=input_items[0]["role"],
                 timestamp=user_input.timestamp,
                 trace_id=trace_id,
             )

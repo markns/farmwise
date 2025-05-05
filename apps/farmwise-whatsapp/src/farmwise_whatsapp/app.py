@@ -1,3 +1,4 @@
+import base64
 import logging
 from contextlib import asynccontextmanager
 from enum import Enum
@@ -143,24 +144,27 @@ async def callback_handler(_: WhatsApp, sel: types.CallbackSelection):
     await _send_response(response, sel)
 
 
+# Function to encode the image
+def encode_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
+
+
 @wa.on_message(filters.image)
 async def on_image(_: WhatsApp, msg: types.Message):
     logger.info(f"IMAGE USER: {msg}")
-    url = await msg.image.get_media_url()
-    logger.info(f"IMAGE URL: {url}")
-    # try:
     img_bytes = await msg.image.download(in_memory=True)
+    img_b64 = base64.b64encode(img_bytes).decode("utf-8")
 
-    #     image = get_removed_bg_image(original_img)
-    # except requests.HTTPError as e:
-    #     msg.reply_text(f"A error occurred")
-    #     logging.exception(e)
-    #     return
-    # msg.reply_image(
-    #     image=image,
-    #     caption="Here you go",
-    #     mime_type='image/png',  # when sending bytes, you must specify the mime type
-    # )
+    await msg.mark_as_read()
+    response = await agent_client.ainvoke(
+        message=msg.caption,
+        image=img_b64,
+        user_id=msg.from_user.wa_id,
+        user_name=msg.from_user.name,
+    )
+    logger.info(f"AGENT: {response}")
+    await _send_response(response, msg)
 
 
 #

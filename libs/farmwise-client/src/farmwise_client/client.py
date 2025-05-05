@@ -1,15 +1,9 @@
-import json
 import os
-from collections.abc import AsyncGenerator, Generator
 from typing import Any
 
 import httpx
 from farmwise_schema.schema import (
-    ChatHistory,
-    ChatHistoryInput,
-    Feedback,
     ServiceMetadata,
-    StreamInput,
     UserInput,
     WhatsappResponse,
 )
@@ -84,6 +78,7 @@ class AgentClient:
         self,
         message: str,
         user_id: str,
+        image: str = None,
         user_name: str | None = None,
         agent_config: dict[str, Any] | None = None,
     ) -> WhatsappResponse:
@@ -93,7 +88,7 @@ class AgentClient:
         Args:
             message (str): The message to send to the agent
             user_id (str): user ID for continuing a conversation
-            timestamp:
+            image:
             user_name:
             agent_config (dict[str, Any], optional): Additional configuration to pass through to the agent
 
@@ -106,6 +101,8 @@ class AgentClient:
 
         if agent_config:
             request.agent_config = agent_config
+        if image:
+            request.image = image
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
