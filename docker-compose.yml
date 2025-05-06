@@ -12,6 +12,13 @@ services:
       timeout: 10s
     volumes:
       - app-db-data:/var/lib/postgresql/data/pgdata
+    command:
+      [
+        "postgres",
+        "-c", "log_statement=all",
+        "-c", "log_min_error_statement=ERROR",
+        "-c", "log_min_messages=INFO",
+      ]
     env_file:
       - .env
     environment:
