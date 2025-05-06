@@ -1,8 +1,11 @@
 import os
+from typing import Annotated
 
 import xarray as xr
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from rioxarray import rioxarray
+
+from farmbase.data.gaez.models import SuitabilityIndexResponse
 
 router = APIRouter()
 
@@ -30,14 +33,23 @@ growing_period_raster = rioxarray.open_rasterio(
 
 
 @router.get("/aez_classification", response_model=str)
-def aez_classification(latitude: float, longitude: float):
-    # Ensure coordinates are named correctly and use the nearest match
+def aez_classification(
+    latitude: Annotated[float, Query(description="The latitude coordinate")],
+    longitude: Annotated[float, Query(description="The longitude coordinate")],
+):
+    """Get the AEZ (Agro-Ecological Zone) classification for a given geographical coordinate."""
+
     value = aez_raster.sel(x=longitude, y=latitude, method="nearest").item()
     return class_map[value]
 
 
 @router.get("/growing_period", response_model=int)
-def growing_period(latitude: float, longitude: float):
+def growing_period(
+    latitude: Annotated[float, Query(description="The latitude coordinate")],
+    longitude: Annotated[float, Query(description="The longitude coordinate")],
+):
+    """Get the growing period length in days for a given geographical coordinate."""
+
     # Ensure coordinates are named correctly and use the nearest match
     return growing_period_raster.sel(x=longitude, y=latitude, method="nearest").item()
 
@@ -77,8 +89,13 @@ crop_codes = {
 }
 
 
-@router.get("/suitability_index", response_model=dict[str, int])
-def suitability_index(latitude: float, longitude: float):
+@router.get("/suitability_index", response_model=SuitabilityIndexResponse)
+def suitability_index(
+    latitude: Annotated[float, Query(description="The latitude coordinate")],
+    longitude: Annotated[float, Query(description="The longitude coordinate")],
+):
+    """Get the crop suitability index values for a given geographical coordinate."""
+
     file_path = "apps/farmbase/data/gaez/res05/HadGEM2-ES/rcp4p5/2020sH"
     # variables = dict(zip(sdf.name, sdf.crop))
     # # variables
@@ -93,4 +110,4 @@ def suitability_index(latitude: float, longitude: float):
     suitability_point = raster.sel(x=longitude, y=latitude, method="nearest")
 
     crops = [crop_codes[c] for c in suitability_point.band.values]
-    return dict(zip(crops, suitability_point.values))
+    return SuitabilityIndexResponse(suitability_index=dict(zip(crops, suitability_point.values)))

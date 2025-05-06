@@ -5,65 +5,36 @@ from agents import (
     RunContextWrapper,
     function_tool,
 )
+from farmbase_client import AuthenticatedClient
+from farmbase_client.api.gaez import gaez_aez_classification, gaez_growing_period, gaez_suitability_index
+from farmbase_client.models import SuitabilityIndexResponse
 
 from farmwise.context import UserContext
+from farmwise.settings import settings
 
-#
-# @function_tool(name_override="faq_lookup_tool", description_override="Lookup frequently asked questions.")
-# async def faq_lookup_tool(question: str) -> str:
-#     if "bag" in question or "baggage" in question:
-#         return (
-#             "You are allowed to bring one bag on the plane. "
-#             "It must be under 50 pounds and 22 inches x 14 inches x 9 inches."
-#         )
-#     elif "seats" in question or "plane" in question:
-#         return (
-#             "There are 120 seats on the plane. "
-#             "There are 22 business class seats and 98 economy seats. "
-#             "Exit rows are rows 4 and 16. "
-#             "Rows 5-8 are Economy Plus, with extra legroom. "
-#         )
-#     elif "wifi" in question:
-#         return "We have free wifi on the plane, join Airline-Wifi"
-#     return "I'm sorry, I don't know the answer to that question."
-#
-#
-# @function_tool
-# async def update_seat(context: RunContextWrapper[UserContext], confirmation_number: str, new_seat: str) -> str:
-#     """
-#     Update the seat for a given confirmation number.
-#
-#     Args:
-#         confirmation_number: The confirmation number for the flight.
-#         new_seat: The new seat to update to.
-#     """
-#     # Update the context based on the customer's input
-#     context.context.confirmation_number = confirmation_number
-#     context.context.seat_number = new_seat
-#     # Ensure that the flight number has been set by the incoming handoff
-#     assert context.context.flight_number is not None, "Flight number is required"
-#     return f"Updated seat to {new_seat} for confirmation number {confirmation_number}"
+
+def copy_doc(from_func):
+    def decorator(to_func):
+        to_func.__doc__ = from_func.__doc__
+        return to_func
+
+    return decorator
 
 
 @function_tool
-async def suitability_index(context: RunContextWrapper[UserContext], latitude: float, longitude: float) -> str:
-    #  TODO: use farmbase-client / farmbase_agent_toolkit
-    async with httpx.AsyncClient() as client:
-        r = await client.get(
-            "http://127.0.0.1:8000/api/v1/gaez/suitability_index", params={"latitude": latitude, "longitude": longitude}
-        )
-        return r.json()
+@copy_doc(gaez_suitability_index.asyncio)
+async def suitability_index(
+    _: RunContextWrapper[UserContext], latitude: float, longitude: float
+) -> SuitabilityIndexResponse:
+    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+        return await gaez_suitability_index.asyncio(client=client, latitude=latitude, longitude=longitude)
 
 
 @function_tool
-async def aez_classification(context: RunContextWrapper[UserContext], latitude: float, longitude: float) -> str:
-    #  TODO: use farmbase-client / farmbase_agent_toolkit
-    async with httpx.AsyncClient() as client:
-        r = await client.get(
-            "http://127.0.0.1:8000/api/v1/gaez/aez_classification",
-            params={"latitude": latitude, "longitude": longitude},
-        )
-        return r.json()
+@copy_doc(gaez_aez_classification.asyncio)
+async def aez_classification(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> str:
+    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+        return await gaez_aez_classification.asyncio(client=client, latitude=latitude, longitude=longitude)
 
 
 # Refining the Spatial Scale for Maize Crop Agro-Climatological Suitability Conditions in a Region
@@ -78,18 +49,14 @@ async def aez_classification(context: RunContextWrapper[UserContext], latitude: 
 
 
 @function_tool
-async def growing_period(context: RunContextWrapper[UserContext], latitude: float, longitude: float) -> str:
-    #  TODO: use farmbase-client / farmbase_agent_toolkit
-    async with httpx.AsyncClient() as client:
-        r = await client.get(
-            "http://127.0.0.1:8000/api/v1/gaez/growing_period",
-            params={"latitude": latitude, "longitude": longitude},
-        )
-        return r.json()
+@copy_doc(gaez_growing_period.asyncio)
+async def growing_period(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> int:
+    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+        return await gaez_growing_period.asyncio(client=client, latitude=latitude, longitude=longitude)
 
 
 @function_tool
-async def maize_varieties(context: RunContextWrapper[UserContext], altitude: float, growing_period_days: int) -> str:
+async def maize_varieties(_: RunContextWrapper[UserContext], altitude: float, growing_period_days: int) -> str:
     #  TODO: use farmbase-client / farmbase_agent_toolkit
     async with httpx.AsyncClient() as client:
         r = await client.get(
@@ -100,7 +67,7 @@ async def maize_varieties(context: RunContextWrapper[UserContext], altitude: flo
 
 
 @function_tool
-async def elevation(ctx: RunContextWrapper[UserContext], latitude: float, longitude: float) -> float:
+async def elevation(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> float:
     """Fetch the elevation in metres for a given location.
 
     Args:
@@ -115,7 +82,7 @@ async def elevation(ctx: RunContextWrapper[UserContext], latitude: float, longit
 
 
 @function_tool
-async def soil_property(ctx: RunContextWrapper[UserContext], latitude: float, longitude: float) -> float:
+async def soil_property(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> float:
     """Fetch an estimate of a soil property for a given location.
 
     Args:

@@ -1,22 +1,11 @@
-from typing import Any, List
+from typing import Any
 
 import pandas as pd
 from fastapi import APIRouter
-from pydantic import BaseModel
+
+from farmbase.data.crops.models import CropVarietiesResponse, CropVarietyResponse
 
 router = APIRouter()
-
-
-class CropVarietyResponse(BaseModel):
-    variety: str
-    description: str
-    max_yield: str
-
-
-class CropVarietiesResponse(BaseModel):
-    crop: str
-    varieties: List[CropVarietyResponse]
-
 
 # Load the region lookup GeoDataFrame
 # region_gdf = pd.read_pickle("farmbase/data/kalro/regions.pkl")
