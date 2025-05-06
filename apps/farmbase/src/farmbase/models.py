@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 
 from pydantic import BaseModel, EmailStr
 from pydantic.fields import Field
-from pydantic.networks import AnyHttpUrl, EmailStr
+from pydantic.networks import AnyHttpUrl
 from pydantic.types import SecretStr, constr
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, event, func
 from sqlalchemy.ext.declarative import declared_attr
