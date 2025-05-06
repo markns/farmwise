@@ -27,3 +27,16 @@ Accept: application/json
 ###
 GET http://127.0.0.1:8000/api/v1/gaez/suitability?latitude=0.66566997766495&longitude=37.889739990234
 Accept: application/json
+
+###
+POST http://127.0.0.1:8000/api/v1/default/farmers
+Content-Type: application/json
+
+{
+  "name": "John",
+  "phone_number": "+31657775782",
+  "organization": {
+    "name": "default",
+    "slug":"default"
+  }
+}

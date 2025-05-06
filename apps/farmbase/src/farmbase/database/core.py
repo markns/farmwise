@@ -6,7 +6,7 @@ from fastapi import Depends
 from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine.url import make_url
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine, AsyncSession
 from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
 from sqlalchemy_utils import get_mapper
@@ -140,7 +140,7 @@ class Base(ReprMixin, DeclarativeBase):
     """Project-wide declarative base (inherits mixin behaviour)."""
 
 
-def get_db(request: Request) -> Session:
+def get_db(request: Request) -> AsyncSession:
     """Get database session from request state."""
     session = request.state.db
     if not hasattr(session, "_farmbase_session_id"):
@@ -148,7 +148,7 @@ def get_db(request: Request) -> Session:
     return session
 
 
-DbSession = Annotated[Session, Depends(get_db)]
+DbSession = Annotated[AsyncSession, Depends(get_db)]
 
 
 def get_model_name_by_tablename(table_fullname: str) -> str:

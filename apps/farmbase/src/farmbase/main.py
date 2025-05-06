@@ -6,15 +6,13 @@ from uuid import uuid1
 
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
-from pydantic import ValidationError
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy.ext.asyncio import async_scoped_session, async_sessionmaker
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.requests import Request
-from starlette.responses import FileResponse, StreamingResponse
+from starlette.responses import FileResponse
 from starlette.routing import compile_path
 from starlette.staticfiles import StaticFiles
 
@@ -25,6 +23,7 @@ from .config import (
 )
 from .database.core import engine, get_schema_names
 from .database.logging import SessionTracker
+from .exceptions.handlers import register_error_handlers
 from .logging_config import configure_logging
 from .rate_limiter import limiter
 
@@ -204,30 +203,31 @@ async def add_security_headers(request: Request, call_next):
     return response
 
 
-class ExceptionMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> StreamingResponse:
-        try:
-            response = await call_next(request)
-        except ValidationError as e:
-            log.exception(e)
-            response = JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content={"detail": e.errors()})
-        except ValueError as e:
-            log.exception(e)
-            response = JSONResponse(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                content={"detail": [{"msg": "Unknown", "loc": ["Unknown"], "type": "Unknown"}]},
-            )
-        except Exception as e:
-            log.exception(e)
-            response = JSONResponse(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content={"detail": [{"msg": "Unknown", "loc": ["Unknown"], "type": "Unknown"}]},
-            )
-
-        return response
-
-
-api.add_middleware(ExceptionMiddleware)
+# class ExceptionMiddleware(BaseHTTPMiddleware):
+#     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> StreamingResponse:
+#         try:
+#             response = await call_next(request)
+#         except ValidationError as e:
+#             log.exception(e)
+#             response = JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content={"detail": e.errors()})
+#         except ValueError as e:
+#             log.exception(e)
+#             response = JSONResponse(
+#                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+#                 content={"detail": [{"msg": "Unknown", "loc": ["Unknown"], "type": "Unknown"}]},
+#             )
+#         except Exception as e:
+#             log.exception(e)
+#             response = JSONResponse(
+#                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#                 content={"detail": [{"msg": "Unknown", "loc": ["Unknown"], "type": "Unknown"}]},
+#             )
+#
+#         return response
+#
+#
+# api.add_middleware(ExceptionMiddleware)
+register_error_handlers(app=api)
 
 # we install all the plugins
 install_plugins()

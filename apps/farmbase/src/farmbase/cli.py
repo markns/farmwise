@@ -11,7 +11,7 @@ from farmbase import __version__, config
 from farmbase.auth.models import FarmbaseUserOrganization
 from farmbase.config import FARMBASE_UI_URL
 from farmbase.enums import UserRoles
-from farmbase.exceptions import FarmbaseException
+from farmbase.exceptions import FarmbaseError
 from farmbase.extensions import configure_extensions
 from farmbase.farmer.models import Farmer
 from farmbase.plugin.models import PluginInstance
@@ -1112,7 +1112,7 @@ def entrypoint():
 
     try:
         farmbase_cli()
-    except FarmbaseException as e:
+    except FarmbaseError as e:
         click.secho(f"ERROR: {e}", bold=True, fg="red")
 
 

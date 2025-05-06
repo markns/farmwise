@@ -11,7 +11,7 @@ from farmbase.auth.service import CurrentUser, get_org_users
 from farmbase.database.core import DbSession
 from farmbase.database.service import CommonParameters
 from farmbase.enums import UserRoles
-from farmbase.exceptions import (
+from farmbase.exceptions.exceptions import (
     InvalidConfigurationError,
 )
 from farmbase.models import OrganizationSlug, PrimaryKey

@@ -1,6 +1,6 @@
 import logging
 
-from farmbase.exceptions import InvalidConfigurationError
+from farmbase.exceptions.exceptions import InvalidConfigurationError
 
 logger = logging.getLogger(__name__)
 

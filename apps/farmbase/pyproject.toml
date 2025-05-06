@@ -34,10 +34,14 @@ dependencies = [
     "tabulate>=0.9.0",
     "xarray>=2025.3.1",
     "xvec>=0.3.1",
+    "pydantic-extra-types>=2.10.4",
+    "phonenumbers>=9.0.4",
+    "loguru>=0.7.3",
 ]
 
 [dependency-groups]
 dev = [
+    "alembic-postgresql-enum>=1.7.0",
     "pdfplumber>=0.11.6",
     #    "basedpyright>0",
     "poethepoet>0",
