@@ -6,6 +6,7 @@ from uuid import uuid1
 
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
+from fastapi.routing import APIRoute
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy.ext.asyncio import async_scoped_session, async_sessionmaker
@@ -59,8 +60,10 @@ async def default_page(request, call_next):
     return response
 
 
-# def custom_generate_unique_id(route: APIRoute) -> str:
-#    return f"{route.tags[0]}-{route.name}"
+def custom_generate_unique_id(route: APIRoute) -> str:
+    if not route.include_in_schema:
+        return ""
+    return f"{route.tags[0]}-{route.name}"
 
 
 api = FastAPI(
@@ -71,7 +74,7 @@ api = FastAPI(
     docs_url=None,
     openapi_url="/docs/openapi.json",
     redoc_url="/docs",
-    # generate_unique_id_function=custom_generate_unique_id,
+    generate_unique_id_function=custom_generate_unique_id,
     separate_input_output_schemas=False,
 )
 api.add_middleware(GZipMiddleware, minimum_size=1000)

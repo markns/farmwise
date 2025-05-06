@@ -12,7 +12,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
 # pydantic type that limits the range of primary keys
-PrimaryKey = Annotated[int | None, Field(default=None, gt=0.0, lt=2147483647.0)]
+PrimaryKey = Annotated[int, Field(default=None, gt=0.0, lt=2147483647.0)]
 OrganizationSlug = constr(pattern=r"^[\w]+(?:_[\w]+)*$", min_length=3)
 
 

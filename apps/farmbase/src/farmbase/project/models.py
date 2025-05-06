@@ -101,7 +101,6 @@ class Service(FarmbaseBase):
 
 
 class ProjectBase(FarmbaseBase):
-    id: PrimaryKey = None
     name: str
     display_name: Optional[str] = Field("", nullable=False)
     # owner_email: Optional[EmailStr] = Field(None, nullable=True)
@@ -146,7 +145,7 @@ class ProjectUpdate(ProjectBase):
 
 
 class ProjectRead(ProjectBase):
-    ...
+    id: PrimaryKey
     # id: Optional[PrimaryKey] = None
     # stable_priority: Optional[IncidentPriorityRead] = None
 

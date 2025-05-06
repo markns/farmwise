@@ -8,21 +8,27 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
+from ...models import ErrorResponse
 from ...models import HTTPValidationError
-from ...models import PrivateUserCreate
-from ...models import UserPublic
+from ...models import UserRead
+from ...models import UserUpdate
 from typing import cast
 
 
 def _get_kwargs(
+    organization: str,
+    user_id: int,
     *,
-    body: PrivateUserCreate,
+    body: UserUpdate,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
 
     _kwargs: dict[str, Any] = {
-        "method": "post",
-        "url": "/api/v1/private/users/",
+        "method": "put",
+        "url": "/{organization}/users/{user_id}".format(
+            organization=organization,
+            user_id=user_id,
+        ),
     }
 
     _body = body.to_dict()
@@ -36,11 +42,31 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[HTTPValidationError, UserPublic]]:
+) -> Optional[Union[ErrorResponse, HTTPValidationError, UserRead]]:
     if response.status_code == 200:
-        response_200 = UserPublic.model_validate(response.json())
+        response_200 = UserRead.model_validate(response.json())
 
         return response_200
+    if response.status_code == 400:
+        response_400 = ErrorResponse.model_validate(response.json())
+
+        return response_400
+    if response.status_code == 401:
+        response_401 = ErrorResponse.model_validate(response.json())
+
+        return response_401
+    if response.status_code == 403:
+        response_403 = ErrorResponse.model_validate(response.json())
+
+        return response_403
+    if response.status_code == 404:
+        response_404 = ErrorResponse.model_validate(response.json())
+
+        return response_404
+    if response.status_code == 500:
+        response_500 = ErrorResponse.model_validate(response.json())
+
+        return response_500
     if response.status_code == 422:
         response_422 = HTTPValidationError.model_validate(response.json())
 
@@ -53,7 +79,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[HTTPValidationError, UserPublic]]:
+) -> Response[Union[ErrorResponse, HTTPValidationError, UserRead]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -63,26 +89,32 @@ def _build_response(
 
 
 def sync_detailed(
+    organization: str,
+    user_id: int,
     *,
     client: Union[AuthenticatedClient, Client],
-    body: PrivateUserCreate,
-) -> Response[Union[HTTPValidationError, UserPublic]]:
-    """Create User
+    body: UserUpdate,
+) -> Response[Union[ErrorResponse, HTTPValidationError, UserRead]]:
+    """Update User
 
-     Create a new user.
+     Check if Current_user is Owner and is trying to edit another user
 
     Args:
-        body (PrivateUserCreate):
+        organization (str):
+        user_id (int):
+        body (UserUpdate):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[HTTPValidationError, UserPublic]]
+        Response[Union[ErrorResponse, HTTPValidationError, UserRead]]
     """
 
     kwargs = _get_kwargs(
+        organization=organization,
+        user_id=user_id,
         body=body,
     )
 
@@ -94,52 +126,64 @@ def sync_detailed(
 
 
 def sync(
+    organization: str,
+    user_id: int,
     *,
     client: Union[AuthenticatedClient, Client],
-    body: PrivateUserCreate,
-) -> Optional[Union[HTTPValidationError, UserPublic]]:
-    """Create User
+    body: UserUpdate,
+) -> Optional[Union[ErrorResponse, HTTPValidationError, UserRead]]:
+    """Update User
 
-     Create a new user.
+     Check if Current_user is Owner and is trying to edit another user
 
     Args:
-        body (PrivateUserCreate):
+        organization (str):
+        user_id (int):
+        body (UserUpdate):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[HTTPValidationError, UserPublic]
+        Union[ErrorResponse, HTTPValidationError, UserRead]
     """
 
     return sync_detailed(
+        organization=organization,
+        user_id=user_id,
         client=client,
         body=body,
     ).parsed
 
 
 async def asyncio_detailed(
+    organization: str,
+    user_id: int,
     *,
     client: Union[AuthenticatedClient, Client],
-    body: PrivateUserCreate,
-) -> Response[Union[HTTPValidationError, UserPublic]]:
-    """Create User
+    body: UserUpdate,
+) -> Response[Union[ErrorResponse, HTTPValidationError, UserRead]]:
+    """Update User
 
-     Create a new user.
+     Check if Current_user is Owner and is trying to edit another user
 
     Args:
-        body (PrivateUserCreate):
+        organization (str):
+        user_id (int):
+        body (UserUpdate):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[HTTPValidationError, UserPublic]]
+        Response[Union[ErrorResponse, HTTPValidationError, UserRead]]
     """
 
     kwargs = _get_kwargs(
+        organization=organization,
+        user_id=user_id,
         body=body,
     )
 
@@ -149,27 +193,33 @@ async def asyncio_detailed(
 
 
 async def asyncio(
+    organization: str,
+    user_id: int,
     *,
     client: Union[AuthenticatedClient, Client],
-    body: PrivateUserCreate,
-) -> Optional[Union[HTTPValidationError, UserPublic]]:
-    """Create User
+    body: UserUpdate,
+) -> Optional[Union[ErrorResponse, HTTPValidationError, UserRead]]:
+    """Update User
 
-     Create a new user.
+     Check if Current_user is Owner and is trying to edit another user
 
     Args:
-        body (PrivateUserCreate):
+        organization (str):
+        user_id (int):
+        body (UserUpdate):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[HTTPValidationError, UserPublic]
+        Union[ErrorResponse, HTTPValidationError, UserRead]
     """
 
     return (
         await asyncio_detailed(
+            organization=organization,
+            user_id=user_id,
             client=client,
             body=body,
         )

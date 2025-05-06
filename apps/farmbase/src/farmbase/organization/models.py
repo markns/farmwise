@@ -40,7 +40,6 @@ listen(Organization.name, "set", generate_slug)
 
 
 class OrganizationBase(FarmbaseBase):
-    id: Optional[PrimaryKey] = None
     name: str
     description: Optional[str] = Field(None, nullable=True)
     default: Optional[bool] = Field(False, nullable=True)
@@ -59,7 +58,6 @@ class OrganizationCreate(OrganizationBase):
 
 
 class OrganizationUpdate(FarmbaseBase):
-    id: Optional[PrimaryKey]
     description: Optional[str] = Field(None, nullable=True)
     default: Optional[bool] = Field(False, nullable=True)
     banner_enabled: Optional[bool] = Field(False, nullable=True)
@@ -68,7 +66,7 @@ class OrganizationUpdate(FarmbaseBase):
 
 
 class OrganizationRead(OrganizationBase):
-    # id: Optional[PrimaryKey]
+    id: Optional[PrimaryKey]
     slug: Optional[OrganizationSlug]
 
 

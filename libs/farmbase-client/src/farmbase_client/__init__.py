@@ -1,4 +1,4 @@
-"""A client library for accessing FarmWise"""
+"""A client library for accessing FarmBase"""
 
 from .client import AuthenticatedClient, Client
 

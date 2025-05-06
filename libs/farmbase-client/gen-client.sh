@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 # Note run this from the project root directory!
 # ❯ libs/farmbase-client/gen-client.sh
@@ -10,7 +10,7 @@ set -e
 # https://github.com/openapi-generators/openapi-python-client/discussions/1049
 
 OUTPUT=libs/farmbase-client/src/farmbase_client
-OPENAPI_URL=http://0.0.0.0:8000/api/v1/openapi.json
+OPENAPI_URL=http://0.0.0.0:8000/api/v1/docs/openapi.json
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 uvx --from git+https://github.com/openapi-generators/openapi-python-client \
@@ -25,24 +25,24 @@ uvx --from git+https://github.com/koxudaxi/datamodel-code-generator[http] \
   datamodel-codegen --url $OPENAPI_URL \
   --output-model-type pydantic_v2.BaseModel \
   --strict-nullable --snake-case-field --capitalize-enum-members \
-  --use-union-operator --use-standard-collections \
-  --additional-imports "geojson_pydantic.LineString,geojson_pydantic.Polygon" \
+  --use-union-operator --use-standard-collections --input-file-type openapi \
   > $OUTPUT/models/__init__.py
+#  --additional-imports "geojson_pydantic.LineString,geojson_pydantic.Polygon" \
 
 # Remove the generated GeoJSON classes as we rely on geojson_pydantic
-
-MODELS=libs/farmbase-client/src/farmbase_client/models/__init__.py
-for geojson_class in Geometries Point MultiPoint LineString MultiLineString Polygon \
-                     MultiPolygon GeometryCollection Position2D Position3D Feature; do
-awk -v pat="class $geojson_class" '
-  $0 ~ pat { deleting=1 }
-  deleting && /^$/ { blank++ }
-  deleting && blank == 2 { deleting=0; blank=0; next }
-  !deleting
-  '  $MODELS > /tmp/models_123 && mv /tmp/models_123 $MODELS
-done
-
-sed -i '' '/model_rebuild/d' $MODELS
+#
+#MODELS=libs/farmbase-client/src/farmbase_client/models/__init__.py
+#for geojson_class in Geometries Point MultiPoint LineString MultiLineString Polygon \
+#                     MultiPolygon GeometryCollection Position2D Position3D Feature; do
+#awk -v pat="class $geojson_class" '
+#  $0 ~ pat { deleting=1 }
+#  deleting && /^$/ { blank++ }
+#  deleting && blank == 2 { deleting=0; blank=0; next }
+#  !deleting
+#  '  $MODELS > /tmp/models_123 && mv /tmp/models_123 $MODELS
+#done
+#
+#sed -i '' '/model_rebuild/d' $MODELS
 
 # Monkey patch the BaseModel to return model_dump() when calling to_dict()
 # as this is used by the generated client

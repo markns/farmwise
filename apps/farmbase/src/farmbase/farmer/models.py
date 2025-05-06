@@ -26,7 +26,6 @@ class Farmer(Base, TimeStampMixin):
 
 
 class FarmerBase(FarmbaseBase):
-    id: PrimaryKey = None
     name: str
     phone_number: str
 
@@ -44,6 +43,7 @@ class FarmerUpdate(FarmerBase): ...
 
 
 class FarmerRead(FarmerBase):
+    id: PrimaryKey
     created_at: datetime
     updated_at: datetime
 

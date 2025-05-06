@@ -198,7 +198,6 @@ class UserRead(UserBase):
 
 
 class UserUpdate(FarmbaseBase):
-    id: PrimaryKey
     projects: Optional[List[UserProject]]
     organizations: Optional[List[UserOrganization]]
     # experimental_features: Optional[bool]
