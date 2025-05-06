@@ -65,12 +65,14 @@ async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
             response.content,
             # todo: use pywa types directly in WhatsappResponse to prevent this reconstruction?
             buttons=SectionList(
+                # TODO: Should have a better way of meeting the char and list size limits
                 response.section_list.button_title[:20],
                 sections=[
                     Section(
                         title=section.title[:24],
                         rows=[
-                            SectionRow(title=row.title[:24], callback_data=row.callback_data) for row in section.rows
+                            SectionRow(title=row.title[:24], callback_data=row.callback_data)
+                            for row in section.rows[:10]
                         ],
                     )
                     for section in response.section_list.sections
