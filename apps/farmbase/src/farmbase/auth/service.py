@@ -2,6 +2,7 @@ import logging
 from typing import Annotated, List, Optional
 
 from fastapi import Depends, HTTPException
+from pydantic import EmailStr
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -51,7 +52,7 @@ async def get(*, db_session: AsyncSession, user_id: int) -> Optional[FarmbaseUse
     return result.scalars().one_or_none()
 
 
-async def get_by_email(*, db_session: AsyncSession, email: str) -> Optional[FarmbaseUser]:
+async def get_by_email(*, db_session: AsyncSession, email: EmailStr) -> Optional[FarmbaseUser]:
     """Returns a user object based on user email."""
     result = await db_session.execute(
         select(FarmbaseUser)

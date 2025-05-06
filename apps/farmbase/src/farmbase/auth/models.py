@@ -8,6 +8,7 @@ from uuid import uuid4
 
 import bcrypt
 from jose import jwt
+from loguru import logger
 from pydantic import Field, validator
 from pydantic.networks import EmailStr
 from sqlalchemy import Boolean, Column, Integer, LargeBinary, String
@@ -180,6 +181,8 @@ class UserRegister(UserLogin):
     def password_required(cls, v):
         # we generate a password for those that don't have one
         password = v or generate_password()
+        # TODO: Remove this obvs
+        logger.warning(f"Generated password {password}")
         return hash_password(password)
 
 

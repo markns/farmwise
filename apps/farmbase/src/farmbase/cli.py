@@ -11,12 +11,12 @@ from farmbase import __version__, config
 from farmbase.auth.models import FarmbaseUserOrganization
 from farmbase.config import FARMBASE_UI_URL
 from farmbase.enums import UserRoles
-from farmbase.exceptions import FarmbaseError
+from farmbase.exceptions.exceptions import FarmBaseApiError
 from farmbase.extensions import configure_extensions
 from farmbase.farmer.models import Farmer
 from farmbase.plugin.models import PluginInstance
 
-# TOOD: How to import models more cleanly?
+# TODO: How to import models more cleanly?
 Farmer.id
 FarmbaseUserOrganization.farmbase_user
 
@@ -1112,7 +1112,7 @@ def entrypoint():
 
     try:
         farmbase_cli()
-    except FarmbaseError as e:
+    except FarmBaseApiError as e:
         click.secho(f"ERROR: {e}", bold=True, fg="red")
 
 
