@@ -153,7 +153,7 @@ async def db_session_middleware(request: Request, call_next):
         request.state.db = AsyncScopedSession()
 
         # we track the session
-        request.state.db._dispatch_session_id = SessionTracker.track_session(
+        request.state.db._farmbase_session_id = SessionTracker.track_session(
             request.state.db, context=f"api_request_{organization_slug}"
         )
 
@@ -179,9 +179,9 @@ async def db_session_middleware(request: Request, call_next):
         # Always clean up resources
         if hasattr(request.state, "db"):
             # Untrack the session
-            if hasattr(request.state.db, "_dispatch_session_id"):
+            if hasattr(request.state.db, "_farmbase_session_id"):
                 try:
-                    SessionTracker.untrack_session(request.state.db._dispatch_session_id)
+                    SessionTracker.untrack_session(request.state.db._farmbase_session_id)
                 except Exception as untrack_error:
                     logging.error(f"Failed to untrack session: {untrack_error}")
 
