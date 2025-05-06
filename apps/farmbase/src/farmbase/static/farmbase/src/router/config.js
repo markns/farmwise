@@ -142,59 +142,59 @@ export const protectedRoute = [
         },
       ],
     },
-    {
-      path: "incidents",
-      component: DefaultLayout,
-      name: "incidents",
-      meta: {
-        title: "Incidents",
-        icon: "mdi-lock-open-alert-outline",
-        group: "incidents",
-        requiresAuth: true,
-        menu: true,
-        showEditSheet: false,
-      },
-      redirect: { name: "IncidentTable" },
-      children: [
-        {
-          path: "/:organization/incidents",
-          name: "IncidentTable",
-          meta: { title: "List" },
-          component: () => import("@/incident/Table.vue"),
-          children: [
-            {
-              path: "/:organization/incidents/:name",
-              name: "IncidentTableEdit",
-              component: () => import("@/incident/EditSheet.vue"),
-              props: true,
-              meta: {
-                showEditSheet: true,
-              },
-            },
-            {
-              path: "/:organization/incidents/:name/timeline",
-              name: "IncidentTableEditTimeline",
-              component: () => import("@/incident/EditSheet.vue"),
-              props: true,
-              meta: {
-                showEditSheet: true,
-                showTimeline: true,
-              },
-            },
-            {
-              path: "/:organization/incidents/:name/forms",
-              name: "IncidentTableEditForms",
-              component: () => import("@/incident/EditSheet.vue"),
-              props: true,
-              meta: {
-                showEditSheet: true,
-                showForms: true,
-              },
-            },
-          ],
-        },
-      ],
-    },
+    // {
+    //   path: "incidents",
+    //   component: DefaultLayout,
+    //   name: "incidents",
+    //   meta: {
+    //     title: "Incidents",
+    //     icon: "mdi-lock-open-alert-outline",
+    //     group: "incidents",
+    //     requiresAuth: true,
+    //     menu: true,
+    //     showEditSheet: false,
+    //   },
+    //   redirect: { name: "IncidentTable" },
+    //   children: [
+    //     {
+    //       path: "/:organization/incidents",
+    //       name: "IncidentTable",
+    //       meta: { title: "List" },
+    //       component: () => import("@/incident/Table.vue"),
+    //       children: [
+    //         {
+    //           path: "/:organization/incidents/:name",
+    //           name: "IncidentTableEdit",
+    //           component: () => import("@/incident/EditSheet.vue"),
+    //           props: true,
+    //           meta: {
+    //             showEditSheet: true,
+    //           },
+    //         },
+    //         {
+    //           path: "/:organization/incidents/:name/timeline",
+    //           name: "IncidentTableEditTimeline",
+    //           component: () => import("@/incident/EditSheet.vue"),
+    //           props: true,
+    //           meta: {
+    //             showEditSheet: true,
+    //             showTimeline: true,
+    //           },
+    //         },
+    //         {
+    //           path: "/:organization/incidents/:name/forms",
+    //           name: "IncidentTableEditForms",
+    //           component: () => import("@/incident/EditSheet.vue"),
+    //           props: true,
+    //           meta: {
+    //             showEditSheet: true,
+    //             showForms: true,
+    //           },
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // },
     // {
     //   path: "cases",
     //   component: DefaultLayout,
@@ -242,28 +242,28 @@ export const protectedRoute = [
     //     },
     //   ],
     // },
-    // {
-    //   path: "signals",
-    //   component: DefaultLayout,
-    //   name: "signals",
-    //   meta: {
-    //     title: "Signals",
-    //     icon: "mdi-broadcast",
-    //     group: "signals",
-    //     requiresAuth: true,
-    //     menu: true,
-    //     showEditSheet: false,
-    //   },
-    //   redirect: { name: "SignalInstanceTable" },
-    //   children: [
-    //     {
-    //       path: "/:organization/signals",
-    //       name: "SignalInstanceTable",
-    //       meta: { title: "List" },
-    //       component: () => import("@/signal/TableInstance.vue"),
-    //     },
-    //   ],
-    // },
+    {
+      path: "farmers",
+      component: DefaultLayout,
+      name: "farmers",
+      meta: {
+        title: "Farmers",
+        icon: "mdi-beekeeper",
+        group: "farmers",
+        requiresAuth: true,
+        menu: true,
+        showEditSheet: false,
+      },
+      redirect: { name: "FarmerInstanceTable" },
+      children: [
+        {
+          path: "/:organization/farmers",
+          name: "FarmerInstanceTable",
+          meta: { title: "List" },
+          component: () => import("@/farmer/TableInstance.vue"),
+        },
+      ],
+    },
     {
       path: "data",
       component: DefaultLayout,
@@ -280,21 +280,27 @@ export const protectedRoute = [
         {
           path: "/:organization/data/sources",
           name: "SourceTable",
-          meta: { title: "Sources", group: "data" },
+          meta: { title: "Maize", group: "data" },
           component: () => import("@/data/source/Table.vue"),
         },
-        {
-          path: "/:organization/data/sources/:name/:tab",
-          name: "SourceDetail",
-          meta: { title: "Source Detail" },
-          component: () => import("@/data/source/Detail.vue"),
-        },
-        {
-          path: "/:organization/data/queries",
-          name: "QueryTable",
-          meta: { title: "Queries", group: "data" },
-          component: () => import("@/data/query/Table.vue"),
-        },
+        // {
+        //   path: "/:organization/data/sources/:name/:tab",
+        //   name: "SourceDetail",
+        //   meta: { title: "Source Detail" },
+        //   component: () => import("@/data/source/Detail.vue"),
+        // },
+        // {
+        //   path: "/:organization/data/queries",
+        //   name: "QueryTable",
+        //   meta: { title: "Queries", group: "data" },
+        //   component: () => import("@/data/query/Table.vue"),
+        // },
+        // {
+        //   path: "/:organization/data/sources",
+        //   name: "QueryTable",
+        //   meta: { title: "Varieties", group: "data" },
+        //   component: () => import("@/data/source/Table.vue"),
+        // },
       ],
     },
     // {

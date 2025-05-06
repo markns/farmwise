@@ -33,8 +33,8 @@ POST http://127.0.0.1:8000/api/v1/default/farmers
 Content-Type: application/json
 
 {
-  "name": "John",
-  "phone_number": "+31657775782",
+  "name": "Mark",
+  "phone_number": "+31657775781",
   "organization": {
     "name": "default",
     "slug":"default"

@@ -1,27 +1,41 @@
-import ProjectApi from "@/project/api"
-
 import { getField, updateField } from "vuex-map-fields"
 import { debounce } from "lodash"
 
+import SearchUtils from "@/search/utils"
+import FarmerApi from "@/farmer/api"
+
 const getDefaultSelectedState = () => {
   return {
-    name: null,
-    id: null,
+    case_priority: null,
+    case_type: null,
+    conversation_target: null,
+    create_case: true,
+    created_at: null,
     description: null,
-    organization: null,
-    color: null,
+    enabled: false,
+    engagements: [],
+    entity_types: [],
+    external_id: null,
+    external_url: null,
+    filters: [],
+    genai_enabled: false,
+    genai_model: null,
+    genai_prompt: null,
+    genai_system_message: null,
+    id: null,
+    lifecycle: null,
     loading: false,
-    annual_employee_cost: 50000,
-    business_year_hours: 2080,
-    owner_email: null,
-    owner_conversation: null,
-    enabled: null,
-    storage_folder_one: null,
-    storage_folder_two: null,
-    storage_use_folder_one_as_primary: false,
-    storage_use_title: false,
-    allow_self_join: null,
-    select_commander_visibility: null,
+    name: null,
+    oncall_service: null,
+    owner: null,
+    project: null,
+    runbook: null,
+    farmer_definition: null,
+    source: null,
+    tags: [],
+    variant: null,
+    workflow_instances: null,
+    workflows: [],
   }
 }
 
@@ -31,7 +45,9 @@ const state = {
   },
   dialogs: {
     showCreateEdit: false,
+    showRawFarmerDialog: false,
     showRemove: false,
+    showHistory: false,
   },
   table: {
     rows: {
@@ -39,11 +55,41 @@ const state = {
       total: null,
     },
     options: {
+      filters: {
+        case_priority: [],
+        case_severity: [],
+        case_type: [],
+        project: [],
+        tag: [],
+        tag_type: [],
+      },
       q: "",
       page: 1,
       itemsPerPage: 25,
       sortBy: ["name"],
-      descending: [false],
+      descending: [true],
+    },
+    loading: false,
+    bulkEditLoading: false,
+  },
+  instanceTable: {
+    rows: {
+      items: [],
+      total: null,
+    },
+    options: {
+      filters: {
+        created_at: {
+          start: null,
+          end: null,
+        },
+        farmer: [],
+      },
+      q: "",
+      page: 1,
+      itemsPerPage: 25,
+      sortBy: ["created_at"],
+      descending: [true],
     },
     loading: false,
   },
@@ -51,12 +97,17 @@ const state = {
 
 const getters = {
   getField,
+  tableOptions({ state }) {
+    // format our filters
+    return state.table.options
+  },
 }
 
 const actions = {
   getAll: debounce(({ commit, state }) => {
     commit("SET_TABLE_LOADING", "primary")
-    return ProjectApi.getAll(state.table.options)
+    let params = SearchUtils.createParametersFromTableOptions({ ...state.table.options }, "farmer")
+    return FarmerApi.getAll(params)
       .then((response) => {
         commit("SET_TABLE_LOADING", false)
         commit("SET_TABLE_ROWS", response.data)
@@ -65,15 +116,41 @@ const actions = {
         commit("SET_TABLE_LOADING", false)
       })
   }, 500),
-  createEditShow({ commit }, project) {
-    commit("SET_DIALOG_CREATE_EDIT", true)
-    if (project) {
-      commit("SET_SELECTED", project)
-    }
+  getAllInstances: debounce(({ commit, state }) => {
+    commit("SET_INSTANCE_TABLE_LOADING", "primary")
+    let params = SearchUtils.createParametersFromTableOptions(
+      { ...state.instanceTable.options },
+      "farmer"
+    )
+    return FarmerApi.getAllInstances(params)
+      .then((response) => {
+        commit("SET_INSTANCE_TABLE_LOADING", false)
+        commit("SET_INSTANCE_TABLE_ROWS", response.data)
+      })
+      .catch(() => {
+        commit("SET_INSTANCE_TABLE_LOADING", false)
+      })
+  }, 500),
+  get({ commit, state }) {
+    return FarmerApi.get(state.selected.id).then((response) => {
+      commit("SET_SELECTED", response.data)
+    })
   },
-  removeShow({ commit }, project) {
+  createEditShow({ commit }, farmer) {
+    if (farmer) {
+      commit("SET_SELECTED", farmer)
+    }
+    commit("SET_DIALOG_CREATE_EDIT", true)
+  },
+  showHistory({ commit }, farmer) {
+    if (farmer) {
+      commit("SET_SELECTED", farmer)
+    }
+    commit("SET_DIALOG_HISTORY", true)
+  },
+  removeShow({ commit }, farmer) {
     commit("SET_DIALOG_DELETE", true)
-    commit("SET_SELECTED", project)
+    commit("SET_SELECTED", farmer)
   },
   closeCreateEdit({ commit }) {
     commit("SET_DIALOG_CREATE_EDIT", false)
@@ -83,23 +160,21 @@ const actions = {
     commit("SET_DIALOG_DELETE", false)
     commit("RESET_SELECTED")
   },
+  closeHistory({ commit }) {
+    commit("SET_DIALOG_HISTORY", false)
+    commit("RESET_SELECTED")
+  },
   save({ commit, dispatch }) {
     commit("SET_SELECTED_LOADING", true)
-    if (state.selected.snooze_extension_oncall_service) {
-      state.selected.snooze_extension_oncall_service_id =
-        state.selected.snooze_extension_oncall_service.id
-    } else {
-      state.selected.snooze_extension_oncall_service_id = null
-    }
     if (!state.selected.id) {
-      return ProjectApi.create(state.selected)
+      return FarmerApi.create(state.selected)
         .then(() => {
           commit("SET_SELECTED_LOADING", false)
           dispatch("closeCreateEdit")
           dispatch("getAll")
           commit(
             "notification_backend/addBeNotification",
-            { text: "Project created successfully.", type: "success" },
+            { text: "Farmer Definition created successfully.", type: "success" },
             { root: true }
           )
         })
@@ -107,14 +182,14 @@ const actions = {
           commit("SET_SELECTED_LOADING", false)
         })
     } else {
-      return ProjectApi.update(state.selected.id, state.selected)
+      return FarmerApi.update(state.selected.id, state.selected)
         .then(() => {
           commit("SET_SELECTED_LOADING", false)
           dispatch("closeCreateEdit")
           dispatch("getAll")
           commit(
             "notification_backend/addBeNotification",
-            { text: "Project updated successfully.", type: "success" },
+            { text: "Farmer Definition updated successfully.", type: "success" },
             { root: true }
           )
         })
@@ -124,12 +199,12 @@ const actions = {
     }
   },
   remove({ commit, dispatch }) {
-    return ProjectApi.delete(state.selected.id).then(function () {
+    return FarmerApi.delete(state.selected.id).then(function () {
       dispatch("closeRemove")
       dispatch("getAll")
       commit(
         "notification_backend/addBeNotification",
-        { text: "Project deleted successfully.", type: "success" },
+        { text: "Farmer Definition deleted successfully.", type: "success" },
         { root: true }
       )
     })
@@ -150,14 +225,26 @@ const mutations = {
   SET_TABLE_ROWS(state, value) {
     state.table.rows = value
   },
+  SET_INSTANCE_TABLE_LOADING(state, value) {
+    state.instanceTable.loading = value
+  },
+  SET_INSTANCE_TABLE_ROWS(state, value) {
+    state.instanceTable.rows = value
+  },
   SET_DIALOG_CREATE_EDIT(state, value) {
     state.dialogs.showCreateEdit = value
   },
   SET_DIALOG_DELETE(state, value) {
     state.dialogs.showRemove = value
   },
+  SET_DIALOG_HISTORY(state, value) {
+    state.dialogs.showHistory = value
+  },
   RESET_SELECTED(state) {
-    state.selected = Object.assign(state.selected, getDefaultSelectedState())
+    // do not reset project
+    let project = state.selected.project
+    state.selected = { ...getDefaultSelectedState() }
+    state.selected.project = project
   },
 }
 

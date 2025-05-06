@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from pydantic import field_validator
@@ -42,7 +43,9 @@ class FarmerCreate(FarmerBase):
 class FarmerUpdate(FarmerBase): ...
 
 
-class FarmerRead(FarmerBase): ...
+class FarmerRead(FarmerBase):
+    created_at: datetime
+    updated_at: datetime
 
 
 class FarmerPagination(Pagination):

@@ -35,6 +35,7 @@ import runbook from "@/document/runbook/store"
 import search from "@/search/store"
 import service from "@/service/store"
 import service_feedback from "@/feedback/service/store"
+import farmer from "@/farmer/store"
 import signal from "@/signal/store"
 import signalEngagement from "@/signal/engagement/store"
 import signalFilter from "@/signal/filter/store"
@@ -95,6 +96,7 @@ export default createStore({
     sourceStatus,
     sourceTransport,
     sourceType,
+    farmer,
     signal,
     signalEngagement,
     signalFilter,

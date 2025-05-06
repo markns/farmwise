@@ -1,27 +1,47 @@
 import API from "@/api"
 
-const resource = "projects"
+const resource = "/farmers"
 
 export default {
   getAll(options) {
-    return API.get(`/${resource}`, {
+    return API.get(`${resource}`, {
       params: { ...options },
     })
   },
 
-  get(projectId) {
-    return API.get(`/${resource}/${projectId}`)
+  get(farmerId) {
+    return API.get(`${resource}/${farmerId}`)
   },
 
   create(payload) {
-    return API.post(`/${resource}`, payload)
+    return API.post(`${resource}`, payload)
   },
 
-  update(projectId, payload) {
-    return API.put(`/${resource}/${projectId}`, payload)
+  update(farmerId, payload) {
+    return API.put(`${resource}/${farmerId}`, payload)
   },
 
-  delete(projectId) {
-    return API.delete(`/${resource}/${projectId}`)
+  delete(farmerId) {
+    return API.delete(`${resource}/${farmerId}`)
+  },
+
+  getAllFilters(options) {
+    return API.get(`${resource}/filters`, {
+      params: { ...options },
+    })
+  },
+
+  getAllInstances(options) {
+    return API.get(`${resource}`, {
+      params: { ...options },
+    })
+  },
+
+  // getInstances(farmerId) {
+  //   return API.get(`${resource}/${farmerId}`)
+  // },
+
+  getInstance(farmerId, instanceId) {
+    return API.get(`${resource}/${farmerId}/${instanceId}`)
   },
 }
