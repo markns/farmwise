@@ -654,7 +654,7 @@ async def search_filter_sort_paginate(
         items = result.scalars().all()
 
     except ProgrammingError as e:
-        log.debug(e)
+        log.error(e)
         return {
             "items": [],
             "items_per_page": items_per_page,

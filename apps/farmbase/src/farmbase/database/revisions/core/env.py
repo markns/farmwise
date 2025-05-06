@@ -21,6 +21,31 @@ target_metadata = Base.metadata  # noqa
 
 CORE_SCHEMA_NAME = "farmbase_core"
 
+IGNORE_TABLES: list[str] = ["spatial_ref_sys"]
+
+# ❯ uv run --package farmbase python -m alembic -c apps/farmbase/src/farmbase/alembic.ini -n core revision -m "Initial migration" --autogenerate
+# /Users/markns/workspace/farmwise/apps/farmbase/src/farmbase/database/revisions/core/env.py:68: SAWarning: Did not recognize type 'public.geometry' of column 'the_geom'
+#   context.run_migrations()
+
+# https://github.com/sqlalchemy/alembic/discussions/1282
+# def include_object(
+#     object: SchemaItem,
+#     name: Optional[str],
+#     type_: Literal[
+#         "schema",
+#         "table",
+#         "column",
+#         "index",
+#         "unique_constraint",
+#         "foreign_key_constraint",
+#     ],
+#     reflected: bool,
+#     compare_to: Optional[SchemaItem]
+# ) -> bool:
+#     if type_ == 'table' and (name in IGNORE_TABLES or object.info.get("skip_autogenerate", False)):
+#         return False
+#     return True
+
 
 def include_object(object, name, type_, reflected, compare_to):
     if type_ == "table":
@@ -60,10 +85,14 @@ def run_migrations_online():
             include_schemas=True,
             include_object=include_object,
             process_revision_directives=process_revision_directives,
+            # literal_binds=True,
+            # dialect_opts={"paramstyle": "named"},
         )
 
         with context.begin_transaction():
             context.run_migrations()
+
+        connection.commit()
 
 
 if context.is_offline_mode():

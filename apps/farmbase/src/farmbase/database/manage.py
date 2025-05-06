@@ -28,16 +28,6 @@ def version_schema(script_location: str):
 
 def get_core_tables():
     """Fetches tables that belong to the 'farmbase_core' schema."""
-
-    # TODO: Remove once this is imported elsew
-    from farmbase.auth.models import FarmbaseUser, FarmbaseUserOrganization, FarmbaseUserProject
-    from farmbase.project.models import Project
-
-    print(FarmbaseUserProject.__table__)
-    print(FarmbaseUser.__table__)
-    print(FarmbaseUserOrganization.__table__)
-    print(Project.__table__)
-
     core_tables = []
     for _, table in Base.metadata.tables.items():
         if table.schema == "farmbase_core":
@@ -162,13 +152,16 @@ def init_schema(*, engine, organization: Organization):
     # put schema under version control
     version_schema(script_location=config.ALEMBIC_TENANT_REVISION_PATH)
 
-    with engine.connect() as connection:
-        # we need to map this for full text search as it uses sql literal strings
-        # and schema translate map does not apply
-        for t in tables:
-            t.schema = schema_name
-        #
-        # setup_fulltext_search(connection, tables)
+    # with engine.connect() as connection:
+    #     # we need to map this for full text search as it uses sql literal strings
+    #     # and schema translate map does not apply
+    #     for t in tables:
+    #         t.schema = schema_name
+    #
+    #     setup_fulltext_search(connection, tables)
+
+    for t in tables:
+        t.schema = schema_name
 
     session = sessionmaker(bind=schema_engine)
     db_session = session()

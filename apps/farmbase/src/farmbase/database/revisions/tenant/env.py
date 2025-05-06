@@ -76,6 +76,8 @@ def run_migrations_online():
                 if context.config.cmd_opts.cmd == "revision":
                     break
 
+            connection.commit()
+
 
 if context.is_offline_mode():
     log.info("Can't run migrations offline")

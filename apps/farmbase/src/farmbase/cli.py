@@ -1,18 +1,24 @@
 import asyncio
+import importlib
 import logging
 import os
+import pkgutil
 
 import click
 import uvicorn
 
 from farmbase import __version__, config
+from farmbase.auth.models import FarmbaseUserOrganization
 from farmbase.config import FARMBASE_UI_URL
 from farmbase.enums import UserRoles
 from farmbase.exceptions import FarmbaseException
 from farmbase.extensions import configure_extensions
+from farmbase.farmer.models import Farmer
 from farmbase.plugin.models import PluginInstance
 
-# from .scheduler import scheduler
+# TOOD: How to import models more cleanly?
+Farmer.id
+FarmbaseUserOrganization.farmbase_user
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
@@ -264,7 +270,6 @@ def reset_user_password(email: str, password: str):
             click.secho(f"Failed to update password: {str(e)}", fg="red")
             return
 
-
     asyncio.run(_reset_user_password(email, password))
 
 
@@ -376,16 +381,14 @@ def drop_database():
     """Drops all data in database."""
     from sqlalchemy_utils import database_exists, drop_database
 
-    database_hostname = click.prompt(f"Please enter the database hostname (env = {config.DATABASE_HOSTNAME})")
-    database_name = click.prompt(f"Please enter the database name (env = {config.DATABASE_NAME})")
-    sqlalchemy_database_uri = f"postgresql+psycopg2://{config._DATABASE_CREDENTIAL_USER}:{config._QUOTED_DATABASE_PASSWORD}@{database_hostname}:{config.DATABASE_PORT}/{database_name}"
+    sqlalchemy_database_uri = str(config.SQLALCHEMY_DATABASE_SYNC_URI)
 
     if database_exists(str(sqlalchemy_database_uri)):
-        if click.confirm(f"Are you sure you want to drop database: '{database_hostname}:{database_name}'?"):
+        if click.confirm(f"Are you sure you want to drop database? {str(sqlalchemy_database_uri)}"):
             drop_database(str(sqlalchemy_database_uri))
             click.secho("Success.", fg="green")
     else:
-        click.secho(f"Database '{database_hostname}:{database_name}' does not exist!!!", fg="red")
+        click.secho(f"Database '{sqlalchemy_database_uri}' does not exist!!!", fg="red")
 
 
 @farmbase_database.command("upgrade")
@@ -399,30 +402,26 @@ def drop_database():
 @click.option("--revision", nargs=1, default="head", help="Revision identifier.")
 @click.option("--revision-type", type=click.Choice(["core", "tenant"]))
 def upgrade_database(tag, sql, revision, revision_type):
-    """Upgrades database schema to newest version."""
-    import sqlalchemy
+    """Upgrades database schema to the newest version."""
     from alembic import command as alembic_command
     from alembic.config import Config as AlembicConfig
-    from sqlalchemy import inspect
     from sqlalchemy_utils import database_exists
 
-    from .database.core import engine
+    from .database.core import engine_sync as engine
     from .database.manage import init_database
 
     alembic_cfg = AlembicConfig(config.ALEMBIC_INI_PATH)
+    import farmbase.farmer
 
-    if not database_exists(str(config.SQLALCHEMY_DATABASE_URI)):
+    # f: Farmer = Farmer()
+    for _, modname, _ in pkgutil.walk_packages(farmbase.farmer.__path__):
+        print(modname)
+        importlib.import_module(f"farmbase.farmer.{modname}")
+    # importlib.import_module(".farmer.models.Farmer")
+    if not database_exists(str(config.SQLALCHEMY_DATABASE_SYNC_URI)):
         click.secho("Found no database to upgrade, initializing new database...")
         init_database(engine)
     else:
-        conn = engine.connect()
-
-        # detect if we need to convert to a multi-tenant schema structure
-        schema_names = inspect(engine).get_schema_names()
-        if "farmbase_core" not in schema_names:
-            click.secho("Detected single tenant database, converting to multi-tenant...")
-            conn.execute(sqlalchemy.text(open(config.ALEMBIC_MULTI_TENANT_MIGRATION_PATH).read()))
-
         if revision_type:
             if revision_type == "core":
                 path = config.ALEMBIC_CORE_REVISION_PATH
