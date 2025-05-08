@@ -11,14 +11,7 @@ from farmbase_client.models import SuitabilityIndexResponse
 
 from farmwise.context import UserContext
 from farmwise.settings import settings
-
-
-def copy_doc(from_func):
-    def decorator(to_func):
-        to_func.__doc__ = from_func.__doc__
-        return to_func
-
-    return decorator
+from farmwise.tools.utils import copy_doc
 
 
 @function_tool
