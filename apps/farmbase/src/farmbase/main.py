@@ -6,6 +6,7 @@ from uuid import uuid1
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
+from loguru import logger
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy.ext.asyncio import async_scoped_session, async_sessionmaker
@@ -166,7 +167,7 @@ async def db_session_middleware(request: Request, call_next):
             if hasattr(request.state, "db") and request.state.db.is_active:
                 await request.state.db.rollback()
         except Exception as rollback_error:
-            logging.error(f"Error during rollback: {rollback_error}")
+            logger.error(f"Error during rollback: {rollback_error}")
 
         # Re-raise the original exception
         raise e from None
@@ -178,7 +179,7 @@ async def db_session_middleware(request: Request, call_next):
                 try:
                     SessionTracker.untrack_session(request.state.db._farmbase_session_id)
                 except Exception as untrack_error:
-                    logging.error(f"Failed to untrack session: {untrack_error}")
+                    logger.error(f"Failed to untrack session: {untrack_error}")
 
             # Close the session
             try:
@@ -186,7 +187,7 @@ async def db_session_middleware(request: Request, call_next):
                 if session is not None:
                     await session.remove()  # Remove the session from the registry
             except Exception as close_error:
-                logging.error(f"Error closing database session: {close_error}")
+                logger.error(f"Error closing database session: {close_error}")
 
         # Always reset the context variable
         _request_id_ctx_var.reset(ctx_token)
