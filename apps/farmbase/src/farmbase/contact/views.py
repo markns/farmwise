@@ -75,7 +75,7 @@ async def get_contact(db_session: DbSession, contact_id: PrimaryKey):
     response_model=ContactRead,
     # dependencies=[Depends(PermissionsDependency([ContactUpdatePermission]))],
 )
-async def update_contact(
+async def patch_contact(
     db_session: DbSession,
     contact_id: PrimaryKey,
     contact_in: ContactPatch,

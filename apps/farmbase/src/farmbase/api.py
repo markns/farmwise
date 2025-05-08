@@ -54,7 +54,7 @@ authenticated_organization_api_router = APIRouter(
 )
 
 authenticated_organization_api_router.include_router(project_router, prefix="/projects", tags=["projects"])
-authenticated_organization_api_router.include_router(contact_router, prefix="/farmers", tags=["farmers"])
+authenticated_organization_api_router.include_router(contact_router, prefix="/contacts", tags=["contacts"])
 
 authenticated_organization_api_router.include_router(user_router, prefix="/users", tags=["users"])
 

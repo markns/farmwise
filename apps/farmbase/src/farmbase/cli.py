@@ -9,14 +9,14 @@ import uvicorn
 from farmbase import __version__, config
 from farmbase.auth.models import FarmbaseUserOrganization
 from farmbase.config import FARMBASE_UI_URL
-from farmbase.contact.models import Farmer
+from farmbase.contact.models import Contact
 from farmbase.enums import UserRoles
 from farmbase.exceptions.exceptions import FarmBaseApiError
 from farmbase.extensions import configure_extensions
 from farmbase.plugin.models import PluginInstance
 
 # TODO: How to import models more cleanly?
-Farmer.id
+Contact.id
 FarmbaseUserOrganization.farmbase_user
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -407,11 +407,11 @@ def upgrade_database(tag, sql, revision, revision_type):
     alembic_cfg = AlembicConfig(config.ALEMBIC_INI_PATH)
     import farmbase.contact
 
-    # f: Farmer = Farmer()
-    for _, modname, _ in pkgutil.walk_packages(farmbase.farmer.__path__):
+    # f: Contact = Contact()
+    for _, modname, _ in pkgutil.walk_packages(farmbase.contact.__path__):
         print(modname)
-        importlib.import_module(f"farmbase.farmer.{modname}")
-    # importlib.import_module(".farmer.models.Farmer")
+        importlib.import_module(f"farmbase.contact.{modname}")
+    # importlib.import_module(".contact.models.Contact")
     if not database_exists(str(config.SQLALCHEMY_DATABASE_SYNC_URI)):
         click.secho("Found no database to upgrade, initializing new database...")
         init_database(engine)
