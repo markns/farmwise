@@ -9,10 +9,10 @@ import uvicorn
 from farmbase import __version__, config
 from farmbase.auth.models import FarmbaseUserOrganization
 from farmbase.config import FARMBASE_UI_URL
+from farmbase.contact.models import Farmer
 from farmbase.enums import UserRoles
 from farmbase.exceptions.exceptions import FarmBaseApiError
 from farmbase.extensions import configure_extensions
-from farmbase.farmer.models import Farmer
 from farmbase.plugin.models import PluginInstance
 
 # TODO: How to import models more cleanly?
@@ -405,7 +405,7 @@ def upgrade_database(tag, sql, revision, revision_type):
     from .database.manage import init_database
 
     alembic_cfg = AlembicConfig(config.ALEMBIC_INI_PATH)
-    import farmbase.farmer
+    import farmbase.contact
 
     # f: Farmer = Farmer()
     for _, modname, _ in pkgutil.walk_packages(farmbase.farmer.__path__):

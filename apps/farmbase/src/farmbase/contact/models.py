@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
+from geoalchemy2 import Geometry, WKBElement
 from pydantic import field_validator
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -11,7 +12,7 @@ from farmbase.organization.models import Organization
 from farmbase.validators import must_not_be_blank
 
 
-class Farmer(Base, TimeStampMixin):
+class Contact(Base, TimeStampMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column()
 
@@ -24,8 +25,10 @@ class Farmer(Base, TimeStampMixin):
     organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id))
     organization = relationship("Organization")
 
+    geo_location: Mapped[WKBElement] = mapped_column(Geometry(geometry_type="POINT", srid=4326, spatial_index=True))
 
-class FarmerBase(FarmbaseBase):
+
+class ContactBase(FarmbaseBase):
     name: str
     phone_number: str
 
@@ -35,10 +38,10 @@ class FarmerBase(FarmbaseBase):
         return must_not_be_blank(v)
 
 
-class FarmerCreate(FarmerBase): ...
+class ContactCreate(ContactBase): ...
 
 
-class FarmerPatch(FarmerBase):
+class ContactPatch(ContactBase):
     name: Optional[str] = None
     phone_number: Optional[str] = None
 
@@ -50,11 +53,11 @@ class FarmerPatch(FarmerBase):
         return v
 
 
-class FarmerRead(FarmerBase):
+class ContactRead(ContactBase):
     id: PrimaryKey
     created_at: datetime
     updated_at: datetime
 
 
-class FarmerPagination(Pagination):
-    items: List[FarmerRead] = []
+class ContactPagination(Pagination):
+    items: List[ContactRead] = []
