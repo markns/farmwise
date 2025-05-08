@@ -1,15 +1,16 @@
 import logging
-from datetime import datetime, timezone
-from typing import Annotated, Any, Optional
+from typing import Annotated, Any
 
 from agents import Agent, ItemHelpers, MessageOutputItem, Runner, RunResult, gen_trace_id, set_default_openai_key, trace
 from farmwise_schema.schema import ServiceMetadata, UserInput, WhatsappResponse
 from fastapi import APIRouter, Depends, FastAPI
 from openai.types.responses import EasyInputMessageParam, ResponseInputImageParam
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Session
 
-from farmwise.agents import DEFAULT_AGENT, agents, get_all_agent_info
-from farmwise.context import UserContext, UserContextDep
+from farmwise.agents import DEFAULT_AGENT, get_all_agent_info
+from farmwise.context import UserContext
+from farmwise.database import Message, engine
+from farmwise.dependencies import chat_history, current_agent, user_context
 from farmwise.settings import settings
 
 logging.basicConfig(level=logging.INFO)
@@ -33,55 +34,14 @@ async def info() -> ServiceMetadata:
     return ServiceMetadata(agents=get_all_agent_info(), default_agent=DEFAULT_AGENT)
 
 
-class Message(SQLModel, table=True):
-    __tablename__ = "messages"
-
-    id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: str
-    role: str
-    content: str
-    agent: str | None
-    # user_name: str | None  # Todo: normalize to users table
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    trace_id: str | None
-
-
-engine = create_engine("sqlite:///farmwise.db")
-SQLModel.metadata.create_all(engine)
-
-
-def get_session():
-    with Session(engine) as session:
-        yield session
-
-
-def chat_history(user_input: UserInput, session: Session = Depends(get_session)):
-    statement = (
-        select(Message.role, Message.content).where(Message.user_id == user_input.user_id).order_by(Message.id.desc())
-    )
-    results = [
-        EasyInputMessageParam(role=row.role, content=row.content) for row in reversed(session.exec(statement).all())
-    ]
-    return results
-
-
-def current_agent(user_input: UserInput, session: Session = Depends(get_session)):
-    statement = select(Message.agent).where(Message.user_id == user_input.user_id).order_by(Message.id.desc()).limit(1)
-
-    try:
-        return agents[session.exec(statement).one_or_none()]
-    except KeyError:
-        return agents[DEFAULT_AGENT]
-
-
 @router.post("/invoke", response_model=WhatsappResponse)
 async def invoke(
     user_input: UserInput,
-    context: UserContextDep,
+    context: Annotated[UserContext, Depends(user_context)],
     history: Annotated[Any, Depends(chat_history)],
     agent: Annotated[Agent[UserContext], Depends(current_agent)],
 ):
-    logger.info(f"USER: {user_input.message}")
+    logger.info(f"USER: {user_input.message} CONTEXT: {context}")
     input_items = [EasyInputMessageParam(content=user_input.message, role="user")]
     if user_input.image:
         input_items.append(
@@ -97,6 +57,14 @@ async def invoke(
 
     trace_id = gen_trace_id()
     with trace("FarmWise", trace_id=trace_id, group_id=user_input.user_id):
+        # async with MCPServerSse(
+        #     name="FarmBase API",
+        #     params={
+        #         "url": "http://localhost:8080/api/v1/mcp",
+        #     },
+        # ) as server:
+        #     # TODO: may be better to construct the agents on demand for concurrency
+        #     agent.mcp_servers = [server]
         result: RunResult = await Runner.run(agent, input=history + input_items, context=context)
 
     with Session(engine) as session:

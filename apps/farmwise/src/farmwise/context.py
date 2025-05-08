@@ -1,12 +1,9 @@
-from typing import Annotated
-
-from fastapi import Depends
-
 # You can use the context for things like:
 #
 # - Contextual data for your run (e.g. things like a username/uid or other information about the user)
 # - Dependencies (e.g. logger objects, data fetchers, etc)
 # - Helper functions
+from pydantic import BaseModel
 
 #
 # class UserContext(BaseModel):
@@ -18,11 +15,7 @@ from fastapi import Depends
 #     flight_number: str | None = None
 
 
-class UserContext:
-    def __init__(self, q: str | None = None, skip: int = 0, limit: int = 100):
-        self.q = q
-        self.skip = skip
-        self.limit = limit
-
-
-UserContextDep = Annotated[UserContext, Depends()]
+class UserContext(BaseModel):
+    user_id: int
+    phone_number: str = ""
+    organization: str = "default"
