@@ -160,6 +160,7 @@ async def on_image(_: WhatsApp, msg: types.Message):
 
     await msg.mark_as_read()
     response = await agent_client.ainvoke(
+        # FIXME: This borks when no caption is provided.
         message=msg.caption,
         image=img_b64,
         user_id=msg.from_user.wa_id,
