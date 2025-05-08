@@ -9,10 +9,10 @@ from .flows import farmer_init_flow
 from .models import (
     FarmerCreate,
     FarmerPagination,
+    FarmerPatch,
     FarmerRead,
-    FarmerUpdate,
 )
-from .service import create, delete, get, get_by_phone_number, update
+from .service import create, delete, get, get_by_phone_number, patch
 
 router = APIRouter()
 
@@ -70,7 +70,7 @@ async def get_farmer(db_session: DbSession, farmer_id: PrimaryKey):
     return farmer
 
 
-@router.put(
+@router.patch(
     "/{farmer_id}",
     response_model=FarmerRead,
     # dependencies=[Depends(PermissionsDependency([FarmerUpdatePermission]))],
@@ -78,13 +78,13 @@ async def get_farmer(db_session: DbSession, farmer_id: PrimaryKey):
 async def update_farmer(
     db_session: DbSession,
     farmer_id: PrimaryKey,
-    farmer_in: FarmerUpdate,
+    farmer_in: FarmerPatch,
 ):
-    """Update a farmer."""
+    """Patch a farmer."""
     farmer = await get(db_session=db_session, farmer_id=farmer_id)
     if not farmer:
         raise EntityDoesNotExistError(message="A farmer with this id does not exist.")
-    farmer = await update(db_session=db_session, farmer=farmer, farmer_in=farmer_in)
+    farmer = await patch(db_session=db_session, farmer=farmer, farmer_in=farmer_in)
     return farmer
 
 

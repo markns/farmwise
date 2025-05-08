@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import true
 
-from .models import Farmer, FarmerCreate, FarmerRead, FarmerUpdate
+from .models import Farmer, FarmerCreate, FarmerPatch, FarmerRead
 
 
 async def get(*, db_session: AsyncSession, farmer_id: int) -> Farmer | None:
@@ -113,15 +113,15 @@ async def get_or_create(*, db_session: AsyncSession, farmer_in: FarmerCreate) ->
     return await create(db_session=db_session, farmer_in=farmer_in)
 
 
-async def update(*, db_session: AsyncSession, farmer: Farmer, farmer_in: FarmerUpdate) -> Farmer:
-    """Updates a farmer."""
+async def patch(*, db_session: AsyncSession, farmer: Farmer, farmer_in: FarmerPatch) -> Farmer:
+    """Patches a farmer."""
     farmer_data = farmer.dict()
 
-    update_data = farmer_in.model_dump(skip_defaults=True, exclude={})
+    patch_data = farmer_in.model_dump(exclude_defaults=True, exclude_unset=True)
 
     for field in farmer_data:
-        if field in update_data:
-            setattr(farmer, field, update_data[field])
+        if field in patch_data:
+            setattr(farmer, field, patch_data[field])
 
     await db_session.commit()
     return farmer

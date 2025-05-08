@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import field_validator
 from sqlalchemy import ForeignKey
@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
 from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
-from farmbase.organization.models import Organization, OrganizationRead
+from farmbase.organization.models import Organization
 from farmbase.validators import must_not_be_blank
 
 
@@ -35,11 +35,19 @@ class FarmerBase(FarmbaseBase):
         return must_not_be_blank(v)
 
 
-class FarmerCreate(FarmerBase):
-    organization: OrganizationRead
+class FarmerCreate(FarmerBase): ...
 
 
-class FarmerUpdate(FarmerBase): ...
+class FarmerPatch(FarmerBase):
+    name: Optional[str] = None
+    phone_number: Optional[str] = None
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v):
+        if v is not None:
+            return must_not_be_blank(v)
+        return v
 
 
 class FarmerRead(FarmerBase):
