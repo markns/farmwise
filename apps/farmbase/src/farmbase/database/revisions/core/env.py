@@ -3,6 +3,7 @@ from configparser import RawConfigParser
 from alembic import context
 from farmbase.config import SQLALCHEMY_DATABASE_SYNC_URI
 from farmbase.database.core import Base
+from loguru import logger
 from sqlalchemy import engine_from_config, pool, text
 
 # this is the Alembic Config object, which provides

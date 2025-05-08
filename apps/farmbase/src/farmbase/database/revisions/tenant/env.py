@@ -3,6 +3,8 @@ from configparser import RawConfigParser
 from alembic import context
 from farmbase.config import SQLALCHEMY_DATABASE_SYNC_URI
 from farmbase.database.core import Base
+from geoalchemy2 import alembic_helpers
+from loguru import logger
 from sqlalchemy import engine_from_config, inspect, pool, text
 
 # this is the Alembic Config object, which provides
@@ -42,12 +44,12 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-
-    def process_revision_directives(context, revision, directives):
-        script = directives[0]
-        if script.upgrade_ops.is_empty():
-            directives[:] = []
-            logger.info("No changes found skipping revision creation.")
+    #
+    # def process_revision_directives(context, revision, directives):
+    #     script = directives[0]
+    #     if script.upgrade_ops.is_empty():
+    #         directives[:] = []
+    #         logger.info("No changes found skipping revision creation.")
 
     connectable = engine_from_config(
         config.get_section(config.config_ini_section), prefix="sqlalchemy.", poolclass=pool.NullPool
@@ -64,8 +66,12 @@ def run_migrations_online():
                 connection=connection,
                 target_metadata=target_metadata,
                 include_schemas=True,
+                # process_revision_directives=process_revision_directives,
+                # https://geoalchemy-2.readthedocs.io/en/latest/alembic.html
+                # include_object=alembic_helpers.include_object,
                 include_object=include_object,
-                process_revision_directives=process_revision_directives,
+                process_revision_directives=alembic_helpers.writer,
+                render_item=alembic_helpers.render_item,
             )
 
             with context.begin_transaction():
