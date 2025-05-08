@@ -9,8 +9,8 @@ from ...types import Response, UNSET
 from ... import errors
 
 from ...models import ErrorResponse
+from ...models import FarmerPatch
 from ...models import FarmerRead
-from ...models import FarmerUpdate
 from ...models import HTTPValidationError
 from typing import cast
 
@@ -19,12 +19,12 @@ def _get_kwargs(
     organization: str,
     farmer_id: int,
     *,
-    body: FarmerUpdate,
+    body: FarmerPatch,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
 
     _kwargs: dict[str, Any] = {
-        "method": "put",
+        "method": "patch",
         "url": "/{organization}/farmers/{farmer_id}".format(
             organization=organization,
             farmer_id=farmer_id,
@@ -93,16 +93,16 @@ def sync_detailed(
     farmer_id: int,
     *,
     client: Union[AuthenticatedClient, Client],
-    body: FarmerUpdate,
+    body: FarmerPatch,
 ) -> Response[Union[ErrorResponse, FarmerRead, HTTPValidationError]]:
     """Update Farmer
 
-     Update a farmer.
+     Patch a farmer.
 
     Args:
         organization (str):
         farmer_id (int):
-        body (FarmerUpdate):
+        body (FarmerPatch):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -130,16 +130,16 @@ def sync(
     farmer_id: int,
     *,
     client: Union[AuthenticatedClient, Client],
-    body: FarmerUpdate,
+    body: FarmerPatch,
 ) -> Optional[Union[ErrorResponse, FarmerRead, HTTPValidationError]]:
     """Update Farmer
 
-     Update a farmer.
+     Patch a farmer.
 
     Args:
         organization (str):
         farmer_id (int):
-        body (FarmerUpdate):
+        body (FarmerPatch):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -162,16 +162,16 @@ async def asyncio_detailed(
     farmer_id: int,
     *,
     client: Union[AuthenticatedClient, Client],
-    body: FarmerUpdate,
+    body: FarmerPatch,
 ) -> Response[Union[ErrorResponse, FarmerRead, HTTPValidationError]]:
     """Update Farmer
 
-     Update a farmer.
+     Patch a farmer.
 
     Args:
         organization (str):
         farmer_id (int):
-        body (FarmerUpdate):
+        body (FarmerPatch):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -197,16 +197,16 @@ async def asyncio(
     farmer_id: int,
     *,
     client: Union[AuthenticatedClient, Client],
-    body: FarmerUpdate,
+    body: FarmerPatch,
 ) -> Optional[Union[ErrorResponse, FarmerRead, HTTPValidationError]]:
     """Update Farmer
 
-     Update a farmer.
+     Patch a farmer.
 
     Args:
         organization (str):
         farmer_id (int):
-        body (FarmerUpdate):
+        body (FarmerPatch):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
