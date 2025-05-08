@@ -52,7 +52,7 @@ engine_sync = create_db_engine(config.SQLALCHEMY_DATABASE_SYNC_URI, echo=True)
 # Enable query timing logging
 #
 # Set up logging for query debugging
-# logger = logging.getLogger(__name__)
+#
 #
 # @event.listens_for(Engine, "before_cursor_execute")
 # def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):

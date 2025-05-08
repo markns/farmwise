@@ -1,11 +1,9 @@
-import logging
+from loguru import logger
 import uuid
 from datetime import datetime
 from typing import Any
 
 from sqlalchemy.orm import Session
-
-logger = logging.getLogger(__name__)
 
 
 class SessionTracker:

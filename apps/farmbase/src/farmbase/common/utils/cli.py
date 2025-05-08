@@ -1,12 +1,10 @@
-import logging
+from loguru import logger
 import traceback
 from importlib.metadata import entry_points
 
 from sqlalchemy.exc import SQLAlchemyError
 
 from farmbase.plugins.base import plugins, register
-
-logger = logging.getLogger(__name__)
 
 
 # Plugin endpoints should determine authentication # TODO allow them to specify (kglisson)

@@ -157,10 +157,10 @@ SIGN_UP_FLOW_JSON = FlowJSON(
                                     },
                                 ),
                             ),
-                        ]
-                    )
+                        ],
+                    ),
                 ]
-            )
+            ),
         ),
         Screen(
             id="LOGIN",
@@ -172,9 +172,7 @@ SIGN_UP_FLOW_JSON = FlowJSON(
             ],
             layout=Layout(
                 children=[
-                    TextHeading(
-                        text="Please enter your details"
-                    ),
+                    TextHeading(text="Please enter your details"),
                     EmbeddedLink(
                         text="Don't have an account?",
                         on_click_action=Action(
@@ -219,8 +217,8 @@ SIGN_UP_FLOW_JSON = FlowJSON(
                                     },
                                 ),
                             ),
-                        ]
-                    )
+                        ],
+                    ),
                 ]
             ),
         ),
@@ -252,12 +250,12 @@ SIGN_UP_FLOW_JSON = FlowJSON(
                                     },
                                 ),
                             ),
-                        ]
-                    )
+                        ],
+                    ),
                 ]
             ),
-        )
-    ]
+        ),
+    ],
 )
 
 
@@ -265,12 +263,11 @@ from pywa import WhatsApp
 from pywa.types.flows import FlowCategory
 
 wa = WhatsApp(
-    phone_id=os.environ.get('WHATSAPP_PHONE_ID'),  # The phone id you got from the API Setup
-    token=os.environ.get('WHATSAPP_TOKEN'),  # The token you got from the API Setup
+    phone_id=os.environ.get("WHATSAPP_PHONE_ID"),  # The phone id you got from the API Setup
+    token=os.environ.get("WHATSAPP_TOKEN"),  # The token you got from the API Setup
     verify_token="xyz123",
     app_id=1392339421934377,
     app_secret="b8a5543a9bf425a0e87676641569b2b4",
-
     business_account_id="1220686245817945",  # the ID of the WhatsApp Business Account
 )
 

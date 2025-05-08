@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 
 from alembic import command as alembic_command
 from alembic.config import Config as AlembicConfig
@@ -13,8 +13,6 @@ from ..plugin.models import Plugin
 from ..project.models import Project
 from .core import Base, sessionmaker
 from .enums import FARMBASE_ORGANIZATION_SCHEMA_PREFIX
-
-log = logging.getLogger(__file__)
 
 
 def version_schema(script_location: str):
@@ -194,7 +192,7 @@ def init_schema(*, engine, organization: Organization):
 #                         }
 #                     )
 #                 else:
-#                     log.warning(
+#                     logger.warning(
 #                         f"Column search_vector defined but no index columns found. Table: {table.name}"
 #                     )
 #

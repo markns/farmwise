@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 from typing import Any, List, Optional
 
 from pydantic import Field, SecretStr, field_validator
@@ -16,8 +16,6 @@ from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, ProjectMixin
 from farmbase.plugins.base import plugins
 from farmbase.project.models import ProjectRead
 from farmbase.validators import must_not_be_blank
-
-logger = logging.getLogger(__name__)
 
 
 def show_secrets_encoder(obj):

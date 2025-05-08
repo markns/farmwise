@@ -4,9 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class TaskData(BaseModel):
-    name: str | None = Field(
-        description="Name of the task.", default=None, examples=["Check input safety"]
-    )
+    name: str | None = Field(description="Name of the task.", default=None, examples=["Check input safety"])
     run_id: str = Field(
         description="ID of the task run to pair state updates to.",
         default="",

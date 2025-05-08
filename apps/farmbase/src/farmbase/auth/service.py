@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 from typing import Annotated, List, Optional
 
 from fastapi import Depends, HTTPException
@@ -32,7 +32,6 @@ from .models import (
     UserUpdate,
 )
 
-log = logging.getLogger(__name__)
 
 InvalidCredentialException = HTTPException(
     status_code=HTTP_401_UNAUTHORIZED, detail=[{"msg": "Could not validate credentials"}]
@@ -220,7 +219,7 @@ async def get_or_create(*, db_session: AsyncSession, organization: str, user_in:
             user = await create(db_session=db_session, organization=organization, user_in=user_in)
         except IntegrityError:
             await db_session.rollback()
-            log.exception(f"Unable to create user with email address {user_in.email}.")
+            logger.exception(f"Unable to create user with email address {user_in.email}.")
 
     return user
 
@@ -265,11 +264,11 @@ async def get_current_user(request: Request) -> FarmbaseUser:
         auth_plugin = plugins.get(FARMBASE_AUTHENTICATION_PROVIDER_SLUG)
         user_email = auth_plugin.get_current_user(request)
     else:
-        log.debug("No authentication provider. Default user will be used")
+        logger.debug("No authentication provider. Default user will be used")
         user_email = FARMBASE_AUTHENTICATION_DEFAULT_USER
 
     if not user_email:
-        log.exception(
+        logger.exception(
             f"Unable to determine user email based on configured auth provider or no default auth user email defined. Provider: {FARMBASE_AUTHENTICATION_PROVIDER_SLUG}"
         )
         raise InvalidCredentialException

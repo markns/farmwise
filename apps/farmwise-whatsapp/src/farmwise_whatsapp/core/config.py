@@ -16,4 +16,5 @@ class Settings(BaseSettings):
     # class Config:
     #     env_file = ".env"  # Load environment variables from .env
 
+
 settings = Settings()  # type: ignore

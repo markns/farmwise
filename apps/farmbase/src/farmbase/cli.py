@@ -1,6 +1,5 @@
 import asyncio
 import importlib
-import logging
 import os
 import pkgutil
 
@@ -22,16 +21,11 @@ FarmbaseUserOrganization.farmbase_user
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-log = logging.getLogger(__name__)
-
 
 @click.group()
 @click.version_option(version=__version__)
 def farmbase_cli():
     """Command-line interface to Farmbase."""
-    from .logging_config import configure_logging
-
-    configure_logging()
 
     configure_extensions()
 
@@ -804,7 +798,7 @@ def signals_group():
 #         with get_session() as session:
 #             organizations = get_all_organizations(db_session=session)
 #     except Exception as e:
-#         log.exception(f"Error fetching organizations: {e}")
+#         logger.exception(f"Error fetching organizations: {e}")
 #         return
 #
 #     for organization in organizations:
@@ -819,21 +813,21 @@ def signals_group():
 #                         )
 #
 #                         if not plugins:
-#                             log.warning(
+#                             logger.warning(
 #                                 f"No signals consumed. No signal-consumer plugins enabled. Project: {project.name}. Organization: {project.organization.name}"
 #                             )
 #                             continue
 #
 #                         for plugin in plugins:
-#                             log.debug(f"Consuming signals for plugin: {plugin.plugin.slug}")
+#                             logger.debug(f"Consuming signals for plugin: {plugin.plugin.slug}")
 #                             try:
 #                                 plugin.instance.consume(db_session=session, project=project)
 #                             except Exception as e:
-#                                 log.error(f"Error consuming signals for plugin: {plugin.plugin.slug}. Error: {e}")
+#                                 logger.error(f"Error consuming signals for plugin: {plugin.plugin.slug}. Error: {e}")
 #                     except Exception as e:
-#                         log.exception(f"Error processing project {project.name}: {e}")
+#                         logger.exception(f"Error processing project {project.name}: {e}")
 #         except Exception as e:
-#             log.exception(f"Error processing organization {organization.slug}: {e}")
+#             logger.exception(f"Error processing organization {organization.slug}: {e}")
 #
 #
 # @signals_group.command("process")
@@ -911,11 +905,11 @@ def signals_group():
 #                             # accumulating too many objects in the session
 #                             db_session.commit()
 #                         except Exception as e:
-#                             log.exception(f"Error processing signal instance {instance_id}: {e}")
+#                             logger.exception(f"Error processing signal instance {instance_id}: {e}")
 #                             # Rollback this specific transaction but continue with others
 #                             db_session.rollback()
 #             except Exception as e:
-#                 log.exception(f"Error processing signals for organization {organization.slug}: {e}")
+#                 logger.exception(f"Error processing signals for organization {organization.slug}: {e}")
 #                 # No need to close the session here as it's handled by the context manager
 
 
@@ -976,7 +970,7 @@ def perf_test(num_instances: int, num_workers: int, api_endpoint: str, api_token
                     "Authorization": f"Bearer {api_token}",
                 },
             )
-            log.info(f"Response: {r.json()}")
+            logger.info(f"Response: {r.json()}")
             if r.status_code == status.HTTP_401_UNAUTHORIZED:
                 raise PermissionError(
                     "Unauthorized. Please check your bearer token. You can find it in the Dev Tools under Request Headers -> Authorization."
@@ -985,9 +979,9 @@ def perf_test(num_instances: int, num_workers: int, api_endpoint: str, api_token
             r.raise_for_status()
 
         except requests.exceptions.RequestException as e:
-            log.error(f"Unable to send finding. Reason: {e} Response: {r.json() if r else 'N/A'}")
+            logger.error(f"Unable to send finding. Reason: {e} Response: {r.json() if r else 'N/A'}")
         else:
-            log.info(f"{signal_instance.get('raw', {}).get('id')} created successfully")
+            logger.info(f"{signal_instance.get('raw', {}).get('id')} created successfully")
 
     def send_signal_instances(api_endpoint: str, api_token: str, signal_instances: list[dict[str, str]]):
         with concurrent.futures.ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
@@ -1003,7 +997,7 @@ def perf_test(num_instances: int, num_workers: int, api_endpoint: str, api_token
             ]
             results = [future.result() for future in concurrent.futures.as_completed(futures)]
 
-        log.info(f"\nSent {len(results)} of {NUM_SIGNAL_INSTANCES} signal instances")
+        logger.info(f"\nSent {len(results)} of {NUM_SIGNAL_INSTANCES} signal instances")
 
     signal_instances = [
         {

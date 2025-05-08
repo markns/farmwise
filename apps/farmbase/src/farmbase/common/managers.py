@@ -1,8 +1,6 @@
-import logging
+from loguru import logger
 
 from farmbase.exceptions.exceptions import InvalidConfigurationError
-
-logger = logging.getLogger(__name__)
 
 
 # inspired by https://github.com/getsentry/sentry

@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
@@ -14,8 +14,6 @@ from .models import (
     PluginInstanceCreate,
     PluginInstanceUpdate,
 )
-
-log = logging.getLogger(__name__)
 
 
 def get(*, db_session: Session, plugin_id: int) -> Optional[Plugin]:

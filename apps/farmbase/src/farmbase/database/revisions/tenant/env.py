@@ -3,7 +3,6 @@ from configparser import RawConfigParser
 from alembic import context
 from farmbase.config import SQLALCHEMY_DATABASE_SYNC_URI
 from farmbase.database.core import Base
-from farmbase.logging_config import logging
 from sqlalchemy import engine_from_config, inspect, pool, text
 
 # this is the Alembic Config object, which provides
@@ -12,7 +11,7 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-log = logging.getLogger(__name__)
+
 
 config.file_config = RawConfigParser()
 config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_SYNC_URI)
@@ -48,7 +47,7 @@ def run_migrations_online():
         script = directives[0]
         if script.upgrade_ops.is_empty():
             directives[:] = []
-            log.info("No changes found skipping revision creation.")
+            logger.info("No changes found skipping revision creation.")
 
     connectable = engine_from_config(
         config.get_section(config.config_ini_section), prefix="sqlalchemy.", poolclass=pool.NullPool
@@ -57,7 +56,7 @@ def run_migrations_online():
     with connectable.connect() as connection:
         # get the schema names
         for schema in get_tenant_schemas(connection):
-            log.info(f"Migrating {schema}...")
+            logger.info(f"Migrating {schema}...")
             connection.execute(text(f'set search_path to "{schema}"'))
             connection.dialect.default_schema_name = schema
 
@@ -80,6 +79,6 @@ def run_migrations_online():
 
 
 if context.is_offline_mode():
-    log.info("Can't run migrations offline")
+    logger.info("Can't run migrations offline")
 else:
     run_migrations_online()

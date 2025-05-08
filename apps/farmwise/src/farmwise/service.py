@@ -1,9 +1,9 @@
-import logging
 from typing import Annotated, Any
 
 from agents import Agent, ItemHelpers, MessageOutputItem, Runner, RunResult, gen_trace_id, set_default_openai_key, trace
 from farmwise_schema.schema import ServiceMetadata, UserInput, WhatsappResponse
 from fastapi import APIRouter, Depends, FastAPI
+from loguru import logger
 from openai.types.responses import EasyInputMessageParam, ResponseInputImageParam
 from sqlmodel import Session
 
@@ -12,9 +12,6 @@ from farmwise.context import UserContext
 from farmwise.database import Message, engine
 from farmwise.dependencies import chat_history, current_agent, user_context
 from farmwise.settings import settings
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 set_default_openai_key(settings.OPENAI_API_KEY.get_secret_value())
 

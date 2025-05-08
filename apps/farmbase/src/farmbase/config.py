@@ -1,4 +1,3 @@
-import logging
 import os
 from typing import List
 from urllib import parse
@@ -6,8 +5,6 @@ from urllib import parse
 from pydantic import BaseModel
 from starlette.config import Config
 from starlette.datastructures import CommaSeparatedStrings, Secret
-
-log = logging.getLogger(__name__)
 
 
 class BaseConfigurationModel(BaseModel):
@@ -31,7 +28,7 @@ def get_env_tags(tag_list: List[str]) -> dict:
 config = Config(".env")
 
 
-LOG_LEVEL = config("LOG_LEVEL", default=logging.WARNING)
+# LOG_LEVEL = config("LOG_LEVEL", default=logging.WARNING)
 ENV = config("ENV", default="local")
 
 ENV_TAG_LIST = config("ENV_TAGS", cast=CommaSeparatedStrings, default="")

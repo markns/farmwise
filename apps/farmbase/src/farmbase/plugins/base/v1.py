@@ -1,10 +1,8 @@
-import logging
+from loguru import logger
 from threading import local
 from typing import Any, List, Optional
 
 from pydantic import BaseModel
-
-logger = logging.getLogger(__name__)
 
 
 class PluginConfiguration(BaseModel):

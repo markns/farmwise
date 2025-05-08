@@ -33,7 +33,6 @@ class Actions(TypedDict, total=False):
     fields: Optional[Permission]
 
 
-
 # Define Context type
 class Context(TypedDict, total=False):
     account: Optional[str]
@@ -51,10 +50,6 @@ def is_tool_allowed(tool, configuration):
             return False
 
         for permission in permissions:
-            if (
-                not configuration["actions"]
-                .get(resource, {})
-                .get(permission, False)
-            ):
+            if not configuration["actions"].get(resource, {}).get(permission, False):
                 return False
     return True

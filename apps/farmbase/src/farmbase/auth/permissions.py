@@ -1,4 +1,3 @@
-import logging
 from abc import ABC, abstractmethod
 
 from fastapi import HTTPException
@@ -9,8 +8,6 @@ from farmbase.auth.service import get_current_user
 from farmbase.enums import UserRoles
 from farmbase.organization import service as organization_service
 from farmbase.organization.models import OrganizationRead
-
-log = logging.getLogger(__name__)
 
 
 def any_permission(permissions: list, request: Request) -> bool:

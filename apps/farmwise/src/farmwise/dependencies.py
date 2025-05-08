@@ -37,6 +37,4 @@ async def user_context(user_input: UserInput, session: Session = Depends(get_ses
 
     #   todo: get or create user
 
-
-
     return UserContext(user_id=1, phone_number=user_input.user_id, organization="default")

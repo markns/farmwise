@@ -10,207 +10,206 @@ from pydantic import BaseModel, EmailStr, Field, conint, constr
 
 
 class AdminPasswordReset(BaseModel):
-    new_password: str = Field(..., title='New Password')
+    new_password: str = Field(..., title="New Password")
 
 
 class CropVarietyResponse(BaseModel):
-    variety: str = Field(..., title='Variety')
-    description: str = Field(..., title='Description')
-    max_yield: str = Field(..., title='Max Yield')
+    variety: str = Field(..., title="Variety")
+    description: str = Field(..., title="Description")
+    max_yield: str = Field(..., title="Max Yield")
 
 
 class ErrorMessage(BaseModel):
-    msg: str = Field(..., title='Msg')
+    msg: str = Field(..., title="Msg")
 
 
 class ErrorResponse(BaseModel):
-    detail: list[ErrorMessage] | None = Field(..., title='Detail')
+    detail: list[ErrorMessage] | None = Field(..., title="Detail")
 
 
 class FarmerCreate(BaseModel):
-    name: str = Field(..., title='Name')
-    phone_number: str = Field(..., title='Phone Number')
+    name: str = Field(..., title="Name")
+    phone_number: str = Field(..., title="Phone Number")
 
 
 class FarmerPatch(BaseModel):
-    name: str | None = Field(None, title='Name')
-    phone_number: str | None = Field(None, title='Phone Number')
+    name: str | None = Field(None, title="Name")
+    phone_number: str | None = Field(None, title="Phone Number")
 
 
 class FarmerRead(BaseModel):
-    name: str = Field(..., title='Name')
-    phone_number: str = Field(..., title='Phone Number')
-    id: conint(lt=2147483647, gt=0) | None = Field(None, title='Id')
-    created_at: datetime = Field(..., title='Created At')
-    updated_at: datetime = Field(..., title='Updated At')
+    name: str = Field(..., title="Name")
+    phone_number: str = Field(..., title="Phone Number")
+    id: conint(lt=2147483647, gt=0) | None = Field(None, title="Id")
+    created_at: datetime = Field(..., title="Created At")
+    updated_at: datetime = Field(..., title="Updated At")
 
 
 class OrganizationCreate(BaseModel):
-    name: str = Field(..., title='Name')
-    description: str | None = Field(None, title='Description')
-    default: bool | None = Field(False, title='Default')
-    banner_enabled: bool | None = Field(False, title='Banner Enabled')
-    banner_color: str | None = Field(None, title='Banner Color')
-    banner_text: str | None = Field(None, title='Banner Text')
+    name: str = Field(..., title="Name")
+    description: str | None = Field(None, title="Description")
+    default: bool | None = Field(False, title="Default")
+    banner_enabled: bool | None = Field(False, title="Banner Enabled")
+    banner_color: str | None = Field(None, title="Banner Color")
+    banner_text: str | None = Field(None, title="Banner Text")
 
 
 class OrganizationRead(BaseModel):
-    name: str = Field(..., title='Name')
-    description: str | None = Field(None, title='Description')
-    default: bool | None = Field(False, title='Default')
-    banner_enabled: bool | None = Field(False, title='Banner Enabled')
-    banner_color: str | None = Field(None, title='Banner Color')
-    banner_text: str | None = Field(None, title='Banner Text')
-    id: conint(lt=2147483647, gt=0) | None = Field(..., title='Id')
-    slug: constr(pattern=r'^[\w]+(?:_[\w]+)*$', min_length=3) | None = Field(
-        ..., title='Slug'
-    )
+    name: str = Field(..., title="Name")
+    description: str | None = Field(None, title="Description")
+    default: bool | None = Field(False, title="Default")
+    banner_enabled: bool | None = Field(False, title="Banner Enabled")
+    banner_color: str | None = Field(None, title="Banner Color")
+    banner_text: str | None = Field(None, title="Banner Text")
+    id: conint(lt=2147483647, gt=0) | None = Field(..., title="Id")
+    slug: constr(pattern=r"^[\w]+(?:_[\w]+)*$", min_length=3) | None = Field(..., title="Slug")
 
 
 class OrganizationUpdate(BaseModel):
-    description: str | None = Field(None, title='Description')
-    default: bool | None = Field(False, title='Default')
-    banner_enabled: bool | None = Field(False, title='Banner Enabled')
-    banner_color: str | None = Field(None, title='Banner Color')
-    banner_text: str | None = Field(None, title='Banner Text')
+    description: str | None = Field(None, title="Description")
+    default: bool | None = Field(False, title="Default")
+    banner_enabled: bool | None = Field(False, title="Banner Enabled")
+    banner_color: str | None = Field(None, title="Banner Color")
+    banner_text: str | None = Field(None, title="Banner Text")
 
 
 class ProjectCreate(BaseModel):
-    name: str = Field(..., title='Name')
-    display_name: str | None = Field('', title='Display Name')
-    description: str | None = Field(None, title='Description')
-    default: bool = Field(False, title='Default')
-    enabled: bool | None = Field(True, title='Enabled')
+    name: str = Field(..., title="Name")
+    display_name: str | None = Field("", title="Display Name")
+    description: str | None = Field(None, title="Description")
+    default: bool = Field(False, title="Default")
+    enabled: bool | None = Field(True, title="Enabled")
     organization: OrganizationRead
 
 
 class ProjectRead(BaseModel):
-    name: str = Field(..., title='Name')
-    display_name: str | None = Field('', title='Display Name')
-    description: str | None = Field(None, title='Description')
-    default: bool = Field(False, title='Default')
-    enabled: bool | None = Field(True, title='Enabled')
-    id: conint(lt=2147483647, gt=0) | None = Field(None, title='Id')
+    name: str = Field(..., title="Name")
+    display_name: str | None = Field("", title="Display Name")
+    description: str | None = Field(None, title="Description")
+    default: bool = Field(False, title="Default")
+    enabled: bool | None = Field(True, title="Enabled")
+    id: conint(lt=2147483647, gt=0) | None = Field(None, title="Id")
 
 
 class ProjectUpdate(BaseModel):
-    name: str = Field(..., title='Name')
-    display_name: str | None = Field('', title='Display Name')
-    description: str | None = Field(None, title='Description')
-    default: bool = Field(False, title='Default')
-    enabled: bool | None = Field(True, title='Enabled')
+    name: str = Field(..., title="Name")
+    display_name: str | None = Field("", title="Display Name")
+    description: str | None = Field(None, title="Description")
+    default: bool = Field(False, title="Default")
+    enabled: bool | None = Field(True, title="Enabled")
 
 
 class SuitabilityIndexResponse(BaseModel):
-    suitability_index: dict[str, int] = Field(..., title='Suitability Index')
+    suitability_index: dict[str, int] = Field(..., title="Suitability Index")
 
 
 class UserOrganization(BaseModel):
     organization: OrganizationRead
-    default: bool | None = Field(False, title='Default')
-    role: str | None = Field(None, title='Role')
+    default: bool | None = Field(False, title="Default")
+    role: str | None = Field(None, title="Role")
 
 
 class UserPasswordUpdate(BaseModel):
-    current_password: str = Field(..., title='Current Password')
-    new_password: str = Field(..., title='New Password')
+    current_password: str = Field(..., title="Current Password")
+    new_password: str = Field(..., title="New Password")
 
 
 class UserProject(BaseModel):
     project: ProjectRead
-    default: bool | None = Field(False, title='Default')
-    role: str | None = Field(None, title='Role')
+    default: bool | None = Field(False, title="Default")
+    role: str | None = Field(None, title="Role")
 
 
 class UserRead(BaseModel):
-    email: EmailStr = Field(..., title='Email')
-    projects: list[UserProject] | None = Field([], title='Projects')
-    organizations: list[UserOrganization] | None = Field([], title='Organizations')
-    id: conint(lt=2147483647, gt=0) | None = Field(None, title='Id')
-    role: str | None = Field(None, title='Role')
+    email: EmailStr = Field(..., title="Email")
+    projects: list[UserProject] | None = Field([], title="Projects")
+    organizations: list[UserOrganization] | None = Field([], title="Organizations")
+    id: conint(lt=2147483647, gt=0) | None = Field(None, title="Id")
+    role: str | None = Field(None, title="Role")
 
 
 class UserRegister(BaseModel):
-    email: EmailStr = Field(..., title='Email')
-    projects: list[UserProject] | None = Field([], title='Projects')
-    organizations: list[UserOrganization] | None = Field([], title='Organizations')
-    password: str | None = Field(None, title='Password')
+    email: EmailStr = Field(..., title="Email")
+    projects: list[UserProject] | None = Field([], title="Projects")
+    organizations: list[UserOrganization] | None = Field([], title="Organizations")
+    password: str | None = Field(None, title="Password")
 
 
 class UserRegisterResponse(BaseModel):
-    token: str | None = Field(None, title='Token')
+    token: str | None = Field(None, title="Token")
 
 
 class UserUpdate(BaseModel):
-    projects: list[UserProject] | None = Field(..., title='Projects')
-    organizations: list[UserOrganization] | None = Field(..., title='Organizations')
-    role: str | None = Field(None, title='Role')
+    projects: list[UserProject] | None = Field(..., title="Projects")
+    organizations: list[UserOrganization] | None = Field(..., title="Organizations")
+    role: str | None = Field(None, title="Role")
 
 
 class ValidationError(BaseModel):
-    loc: list[str | int] = Field(..., title='Location')
-    msg: str = Field(..., title='Message')
-    type: str = Field(..., title='Error Type')
+    loc: list[str | int] = Field(..., title="Location")
+    msg: str = Field(..., title="Message")
+    type: str = Field(..., title="Error Type")
 
 
 class CropVarietiesResponse(BaseModel):
-    crop: str = Field(..., title='Crop')
-    varieties: list[CropVarietyResponse] = Field(..., title='Varieties')
+    crop: str = Field(..., title="Crop")
+    varieties: list[CropVarietyResponse] = Field(..., title="Varieties")
 
 
 class FarmerPagination(BaseModel):
-    items_per_page: int = Field(..., title='Items Per Page')
-    page: int = Field(..., title='Page')
-    total: int = Field(..., title='Total')
-    items: list[FarmerRead] = Field([], title='Items')
+    items_per_page: int = Field(..., title="Items Per Page")
+    page: int = Field(..., title="Page")
+    total: int = Field(..., title="Total")
+    items: list[FarmerRead] = Field([], title="Items")
 
 
 class HTTPValidationError(BaseModel):
-    detail: list[ValidationError] | None = Field(None, title='Detail')
+    detail: list[ValidationError] | None = Field(None, title="Detail")
 
 
 class OrganizationPagination(BaseModel):
-    items_per_page: int = Field(..., title='Items Per Page')
-    page: int = Field(..., title='Page')
-    total: int = Field(..., title='Total')
-    items: list[OrganizationRead] = Field([], title='Items')
+    items_per_page: int = Field(..., title="Items Per Page")
+    page: int = Field(..., title="Page")
+    total: int = Field(..., title="Total")
+    items: list[OrganizationRead] = Field([], title="Items")
 
 
 class ProjectPagination(BaseModel):
-    items_per_page: int = Field(..., title='Items Per Page')
-    page: int = Field(..., title='Page')
-    total: int = Field(..., title='Total')
-    items: list[ProjectRead] = Field([], title='Items')
+    items_per_page: int = Field(..., title="Items Per Page")
+    page: int = Field(..., title="Page")
+    total: int = Field(..., title="Total")
+    items: list[ProjectRead] = Field([], title="Items")
 
 
 class UserCreate(BaseModel):
-    email: EmailStr = Field(..., title='Email')
-    password: str | None = Field(None, title='Password')
-    projects: list[UserProject] | None = Field(..., title='Projects')
-    organizations: list[UserOrganization] | None = Field(..., title='Organizations')
-    role: str | None = Field(None, title='Role')
+    email: EmailStr = Field(..., title="Email")
+    password: str | None = Field(None, title="Password")
+    projects: list[UserProject] | None = Field(..., title="Projects")
+    organizations: list[UserOrganization] | None = Field(..., title="Organizations")
+    role: str | None = Field(None, title="Role")
 
 
 class UserLogin(BaseModel):
-    email: EmailStr = Field(..., title='Email')
-    projects: list[UserProject] | None = Field([], title='Projects')
-    organizations: list[UserOrganization] | None = Field([], title='Organizations')
-    password: str = Field(..., title='Password')
+    email: EmailStr = Field(..., title="Email")
+    projects: list[UserProject] | None = Field([], title="Projects")
+    organizations: list[UserOrganization] | None = Field([], title="Organizations")
+    password: str = Field(..., title="Password")
 
 
 class UserLoginResponse(BaseModel):
-    projects: list[UserProject] | None = Field(..., title='Projects')
-    token: str | None = Field(None, title='Token')
+    projects: list[UserProject] | None = Field(..., title="Projects")
+    token: str | None = Field(None, title="Token")
 
 
 class UserPagination(BaseModel):
-    items_per_page: int = Field(..., title='Items Per Page')
-    page: int = Field(..., title='Page')
-    total: int = Field(..., title='Total')
-    items: list[UserRead] = Field([], title='Items')
+    items_per_page: int = Field(..., title="Items Per Page")
+    page: int = Field(..., title="Page")
+    total: int = Field(..., title="Total")
+    items: list[UserRead] = Field([], title="Items")
+
 
 def to_dict(self):
     return self.model_dump()
 
-BaseModel.to_dict = to_dict
 
+BaseModel.to_dict = to_dict

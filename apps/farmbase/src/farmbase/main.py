@@ -1,4 +1,3 @@
-import logging
 from contextvars import ContextVar
 from os import path
 from typing import Final, Optional
@@ -25,13 +24,7 @@ from .config import (
 from .database.core import engine, get_schema_names
 from .database.logging import SessionTracker
 from .exceptions.handlers import register_error_handlers
-from .logging_config import configure_logging
 from .rate_limiter import limiter
-
-log = logging.getLogger(__name__)
-
-# we configure the logging level and format
-configure_logging()
 
 
 async def not_found(request, exc):
@@ -211,16 +204,16 @@ async def add_security_headers(request: Request, call_next):
 #         try:
 #             response = await call_next(request)
 #         except ValidationError as e:
-#             log.exception(e)
+#             logger.exception(e)
 #             response = JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content={"detail": e.errors()})
 #         except ValueError as e:
-#             log.exception(e)
+#             logger.exception(e)
 #             response = JSONResponse(
 #                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
 #                 content={"detail": [{"msg": "Unknown", "loc": ["Unknown"], "type": "Unknown"}]},
 #             )
 #         except Exception as e:
-#             log.exception(e)
+#             logger.exception(e)
 #             response = JSONResponse(
 #                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
 #                 content={"detail": [{"msg": "Unknown", "loc": ["Unknown"], "type": "Unknown"}]},

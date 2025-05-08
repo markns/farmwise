@@ -4,11 +4,11 @@ from pywa import WhatsApp
 from pywa.types import Template
 
 wa = WhatsApp(
-    phone_id=os.environ.get('WHATSAPP_PHONE_ID'),  # The phone id you got from the API Setup
-    token=os.environ.get('WHATSAPP_TOKEN')  # The token you got from the API Setup
+    phone_id=os.environ.get("WHATSAPP_PHONE_ID"),  # The phone id you got from the API Setup
+    token=os.environ.get("WHATSAPP_TOKEN"),  # The token you got from the API Setup
 )
 
-TO_NUMBER = '+254748256530'
+TO_NUMBER = "+254748256530"
 
 # wa.send_template(to=TO_NUMBER,
 #                  template=Template(name='hello_world', language=Template.Language.ENGLISH_US))
@@ -26,13 +26,13 @@ TO_NUMBER = '+254748256530'
 
 wa.request_location(
     to=TO_NUMBER,
-    text='Please share your location with us.',
+    text="Please share your location with us.",
 )
 
 wa.send_location(
     to=TO_NUMBER,
     latitude=37.4847483695049,
     longitude=-122.1473373086664,
-    name='WhatsApp HQ',
-    address='Menlo Park, 1601 Willow Rd, United States',
+    name="WhatsApp HQ",
+    address="Menlo Park, 1601 Willow Rd, United States",
 )

@@ -304,9 +304,7 @@ async def draw_messages(
 
                 if last_message_type != "task":
                     last_message_type = "task"
-                    st.session_state.last_message = st.chat_message(
-                        name="task", avatar=":material/manufacturing:"
-                    )
+                    st.session_state.last_message = st.chat_message(name="task", avatar=":material/manufacturing:")
                     with st.session_state.last_message:
                         status = TaskDataStatus()
 

@@ -1,5 +1,5 @@
 import json
-import logging
+from loguru import logger
 from collections import namedtuple
 from collections.abc import Iterable
 from inspect import signature
@@ -25,7 +25,6 @@ from farmbase.enums import UserRoles
 
 from .core import Base, get_class_by_tablename, get_model_name_by_tablename
 
-log = logging.getLogger(__file__)
 
 # allows only printable characters
 QueryStr = constr(pattern=r"^[ -~]+$", min_length=1)
@@ -393,7 +392,7 @@ async def apply_filter_specific_joins(model: Base, filter_spec: dict, stmt):
                         stmt = stmt.join(joined_model)
                     joined_models.append(joined_model)
             except Exception as e:
-                log.exception(e)
+                logger.exception(e)
 
     return stmt
 
@@ -469,7 +468,7 @@ def create_sort_spec(model, sort_by, descending):
                 )
             else:
                 sort_spec.append({"model": model, "field": field, "direction": direction})
-    log.debug(f"Sort Spec: {json.dumps(sort_spec, indent=2)}")
+    logger.debug(f"Sort Spec: {json.dumps(sort_spec, indent=2)}")
     return sort_spec
 
 
@@ -654,7 +653,7 @@ async def search_filter_sort_paginate(
         items = result.scalars().all()
 
     except ProgrammingError as e:
-        log.error(e)
+        logger.error(e)
         return {
             "items": [],
             "items_per_page": items_per_page,

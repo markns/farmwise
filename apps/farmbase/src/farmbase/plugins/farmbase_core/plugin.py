@@ -1,6 +1,6 @@
 import base64
 import json
-import logging
+from loguru import logger
 
 import requests
 from fastapi import HTTPException
@@ -21,8 +21,6 @@ from farmbase.config import (
 from farmbase.plugins import farmbase_core as farmbase_plugin
 from farmbase.plugins.bases import AuthenticationProviderPlugin
 
-log = logging.getLogger(__name__)
-
 
 class BasicAuthProviderPlugin(AuthenticationProviderPlugin):
     title = "Farmbase Plugin - Basic Authentication Provider"
@@ -37,7 +35,7 @@ class BasicAuthProviderPlugin(AuthenticationProviderPlugin):
         authorization: str = request.headers.get("Authorization")
         scheme, param = get_authorization_scheme_param(authorization)
         if not authorization or scheme.lower() != "bearer":
-            log.exception(
+            logger.exception(
                 f"Malformed authorization header. Scheme: {scheme} Param: {param} Authorization: {authorization}"
             )
             return
@@ -94,7 +92,7 @@ class PKCEAuthProviderPlugin(AuthenticationProviderPlugin):
             else:
                 data = jwt.decode(token, key, options=jwt_opts)
         except JWTError as err:
-            log.debug("JWT Decode error: {}".format(err))
+            logger.debug("JWT Decode error: {}".format(err))
             raise credentials_exception from err
 
         # Support overriding where email is returned in the id token
@@ -116,6 +114,6 @@ class HeaderAuthProviderPlugin(AuthenticationProviderPlugin):
     def get_current_user(self, request: Request, **kwargs):
         value: str = request.headers.get(FARMBASE_AUTHENTICATION_PROVIDER_HEADER_NAME)
         if not value:
-            log.error(f"Unable to authenticate. Header {FARMBASE_AUTHENTICATION_PROVIDER_HEADER_NAME} not found.")
+            logger.error(f"Unable to authenticate. Header {FARMBASE_AUTHENTICATION_PROVIDER_HEADER_NAME} not found.")
             raise HTTPException(status_code=HTTP_401_UNAUTHORIZED)
         return value

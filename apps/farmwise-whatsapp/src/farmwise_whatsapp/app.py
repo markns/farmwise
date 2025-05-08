@@ -1,19 +1,16 @@
 import base64
-import logging
 from contextlib import asynccontextmanager
 from enum import Enum
 
 from farmwise_client import AgentClient
 from farmwise_schema.schema import Action, WhatsappResponse
 from fastapi import FastAPI
+from loguru import logger
 from pywa.types import Command, Section, SectionList, SectionRow
 from pywa_async import WhatsApp, filters, types
 from pywa_async.types.base_update import BaseUserUpdateAsync
 
 from farmwise_whatsapp.core.config import settings  # Import settings
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 # TODO: load these commands from the FarmWise service
