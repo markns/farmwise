@@ -1,8 +1,6 @@
-from loguru import logger
-
 from alembic import command as alembic_command
 from alembic.config import Config as AlembicConfig
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 from sqlalchemy.schema import CreateSchema
 from sqlalchemy_utils import create_database, database_exists
 
@@ -51,6 +49,8 @@ def init_database(engine):
     schema_name = "farmbase_core"
 
     with engine.begin() as conn:
+        conn.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))
+
         inspector = inspect(conn)
         if schema_name not in inspector.get_schema_names():
             print(f"Creating schema {schema_name}...")
