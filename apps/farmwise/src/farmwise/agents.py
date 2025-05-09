@@ -4,6 +4,7 @@ from pprint import pprint
 
 from agents import (
     Agent,
+    RunContextWrapper,
 )
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise_schema.schema import AgentInfo, WhatsappResponse
@@ -202,17 +203,19 @@ maize_variety_selector: Agent[UserContext] = Agent(
     model="gpt-4.1",
 )
 
-features = ["Select a maize seed variety", "Show suitable crops for a location"]
-sections = "SectionList(button_title='Select a function', sections=[Section(title='✨ Features', rows=[SectionRow(title='🌽 Select a maize variety', callback_data='Select a maize seed variety'), SectionRow(title='🌾 Show suitable crops', callback_data='Show suitable crops for a location')])])"
+
+def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
+    return f"""{RECOMMENDED_PROMPT_PREFIX} 
+        You are a helpful triaging agent. You can use your tools to delegate questions to other appropriate agents.
+        
+        these are the details of the current user: {ctx.context}
+        """
+
 
 triage_agent: Agent[UserContext] = Agent(
     name="Triage Agent",
     handoff_description="A triage agent that can delegate a customer's request to the appropriate agent.",
-    instructions=(
-        f"""{RECOMMENDED_PROMPT_PREFIX} 
-        You are a helpful triaging agent. You can use your tools to delegate questions to other appropriate agents.
-        """
-    ),
+    instructions=triage_agent_instructions,
     handoffs=[
         # crop_suitability_agent,
         # maize_variety_selector,
