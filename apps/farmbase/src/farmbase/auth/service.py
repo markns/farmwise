@@ -171,7 +171,7 @@ async def create(*, db_session: AsyncSession, organization: str, user_in: (UserR
 
     org = await organization_service.get_by_slug_or_raise(
         db_session=db_session,
-        slug=organization,
+        organization=organization,
     )
 
     # add user to the current organization

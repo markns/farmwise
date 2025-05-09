@@ -54,14 +54,6 @@ async def invoke(
 
     trace_id = gen_trace_id()
     with trace("FarmWise", trace_id=trace_id, group_id=user_input.user_id):
-        # async with MCPServerSse(
-        #     name="FarmBase API",
-        #     params={
-        #         "url": "http://localhost:8080/api/v1/mcp",
-        #     },
-        # ) as server:
-        #     # TODO: may be better to construct the agents on demand for concurrency
-        #     agent.mcp_servers = [server]
         result: RunResult = await Runner.run(agent, input=history + input_items, context=context)
 
     with Session(engine) as session:

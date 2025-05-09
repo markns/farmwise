@@ -116,7 +116,7 @@ export default {
       headers: [
         { title: "Name", value: "name", sortable: true },
         { title: "Phone Number", value: "phone_number", sortable: true },
-        // { title: "Case", value: "case", sortable: false },
+        { title: "Location", value: "location", sortable: false },
         // { title: "Farmer Definition", value: "farmer", sortable: false },
         // { title: "Filter Action", value: "filter_action", sortable: true },
         // { title: "Project", value: "farmer.project.display_name", sortable: true },

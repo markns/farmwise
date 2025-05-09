@@ -68,7 +68,7 @@ class BasePermission(ABC):
         if request.path_params.get("organization"):
             organization = await organization_service.get_by_slug_or_raise(
                 db_session=request.state.db,
-                slug=request.path_params["organization"],
+                organization=request.path_params["organization"],
             )
         elif request.path_params.get("organization_id"):
             organization = await organization_service.get(

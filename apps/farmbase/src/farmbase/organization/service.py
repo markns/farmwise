@@ -1,12 +1,13 @@
-from typing import List, Optional
+from typing import Annotated, List, Optional
 
+from fastapi import Depends
 from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import true
 
 from farmbase.auth.models import FarmbaseUser, FarmbaseUserOrganization
-from farmbase.database.core import engine
+from farmbase.database.core import engine, DbSession
 from farmbase.database.manage import init_schema
 from farmbase.enums import UserRoles
 
@@ -74,9 +75,9 @@ async def get_by_slug(*, db_session: AsyncSession, slug: str) -> Optional[Organi
     return result.scalars().one_or_none()
 
 
-async def get_by_slug_or_raise(*, db_session: AsyncSession, slug: str) -> Organization:
+async def get_by_slug_or_raise(*, db_session: DbSession, organization: str) -> Organization:
     """Returns the organization specified or raises ValidationError."""
-    organization = await get_by_slug(db_session=db_session, slug=slug)
+    organization = await get_by_slug(db_session=db_session, slug=organization)
 
     if not organization:
         raise ValidationError.from_exception_data(
@@ -84,13 +85,16 @@ async def get_by_slug_or_raise(*, db_session: AsyncSession, slug: str) -> Organi
             [
                 {
                     "loc": ("organization",),
-                    "msg": f"Organization '{slug}' not found.",
+                    "msg": f"Organization '{organization}' not found.",
                     "type": "value_error.not_found",
                 }
             ],
         )
 
     return organization
+
+
+CurrentOrganization = Annotated[Organization, Depends(get_by_slug_or_raise)]
 
 
 async def get_by_name_or_default(*, db_session: AsyncSession, organization_in: OrganizationRead) -> Organization:

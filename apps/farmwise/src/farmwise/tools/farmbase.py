@@ -5,7 +5,7 @@ from farmbase_client.models import ContactCreate, ContactPatch, ContactRead
 
 from farmwise.context import UserContext
 from farmwise.settings import settings
-from farmwise.tools.utils import copy_doc
+from farmwise.tools.utils import copy_doc, join_with_or
 
 
 @function_tool
@@ -18,8 +18,11 @@ async def create_contact(ctx: RunContextWrapper[UserContext], contact_in: Contac
         return result
 
 
-@function_tool
-@copy_doc(contacts_patch_contact.asyncio)
+@function_tool(
+    description_override=f"""Update a contact's details. 
+    Use this tool to update a users {join_with_or([k for k in ContactPatch.model_fields.keys()])} 
+    if the user mentions them in a message."""
+)
 async def update_contact(ctx: RunContextWrapper[UserContext], contact_in: ContactPatch) -> ContactRead:
     with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
         result = await contacts_patch_contact.asyncio(

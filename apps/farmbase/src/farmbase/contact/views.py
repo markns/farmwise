@@ -2,9 +2,10 @@ from fastapi import APIRouter
 
 from farmbase.database.core import DbSession
 from farmbase.database.service import CommonParameters, search_filter_sort_paginate
-from farmbase.models import OrganizationSlug, PrimaryKey
+from farmbase.models import PrimaryKey
 
 from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
+from ..organization.service import CurrentOrganization
 from .flows import contact_init_flow
 from .models import (
     ContactCreate,
@@ -12,7 +13,7 @@ from .models import (
     ContactPatch,
     ContactRead,
 )
-from .service import create, delete, get, get_by_phone_number, patch
+from .service import create, delete, get, get_by_phone_number, get_or_create, patch
 
 router = APIRouter()
 
@@ -31,7 +32,7 @@ async def get_contacts(common: CommonParameters):
 )
 async def create_contact(
     db_session: DbSession,
-    organization: OrganizationSlug,
+    organization: CurrentOrganization,
     contact_in: ContactCreate,
 ):
     """Create a new contact."""
@@ -53,9 +54,23 @@ async def create_contact(
     #         }
     #     ],
     # )
-    contact = await create(db_session=db_session, contact_in=contact_in, organization_slug=organization)
-    await contact_init_flow(db_session=db_session, contact_id=contact.id, organization_slug=organization)
+    contact = await create(db_session=db_session, contact_in=contact_in, organization=organization)
+    await contact_init_flow(db_session=db_session, contact_id=contact.id, organization=organization)
     return contact
+
+
+@router.put(
+    "",
+    response_model=ContactRead,
+    summary="Get or create a new contact.",
+    # dependencies=[Depends(PermissionsDependency([ContactCreatePermission]))],
+)
+async def get_or_create_contact(
+    db_session: DbSession,
+    organization: CurrentOrganization,
+    contact_in: ContactCreate,
+):
+    return await get_or_create(db_session=db_session, organization=organization, contact_in=contact_in)
 
 
 @router.get(

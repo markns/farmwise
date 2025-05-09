@@ -17,11 +17,13 @@ from farmbase.validators import must_not_be_blank
 
 
 class Contact(Base, TimeStampMixin):
+    __repr_attrs__ = ["name", "phone_number"]
+
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column()
 
     # TODO: use PhoneNumber libraries for sqlalchemy and pydantic
-    phone_number: Mapped[str] = mapped_column()
+    phone_number: Mapped[str] = mapped_column(unique=True)
     # _phone_number = Column(Unicode(20))
     # country_code: Mapped[str] = mapped_column()
     # phone_number = orm.composite(SQLPhoneNumber, _phone_number, country_code)
@@ -38,7 +40,6 @@ class ContactBase(FarmbaseBase):
     """Base model for Contact data."""
 
     name: str = Field(description="The full name of the contact")
-    phone_number: str = Field(description="Contact's phone number")
     location: Optional[Location] = Field(default=None, description="Contact's geographical location")
 
     @field_validator("location", mode="before")
@@ -54,17 +55,19 @@ class ContactBase(FarmbaseBase):
 class ContactBaseWrite(ContactBase):
     @field_serializer("location")
     def serialize_location(self, location: Location):
+        if location is None:
+            return None
         return location.to_ewkt()
 
 
-class ContactCreate(ContactBaseWrite): ...
+class ContactCreate(ContactBaseWrite):
+    phone_number: str = Field(description="Contact's phone number")
 
 
 class ContactPatch(ContactBaseWrite):
     """Model for updating existing Contact."""
 
     name: Optional[str] = Field(default=None, description="Updated name of the contact")
-    phone_number: Optional[str] = Field(default=None, description="Updated phone number")
 
     @field_validator("name")
     @classmethod
@@ -78,6 +81,7 @@ class ContactRead(ContactBase):
     """Model for reading Contact data."""
 
     id: PrimaryKey = Field(description="Unique identifier of the contact")
+    phone_number: str = Field(description="Contact's phone number")
     created_at: datetime = Field(description="Timestamp when the contact was created")
     updated_at: datetime = Field(description="Timestamp when the contact was last updated")
 

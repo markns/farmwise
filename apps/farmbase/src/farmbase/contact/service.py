@@ -1,10 +1,12 @@
 from typing import List, Optional
 
+from loguru import logger
 from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import true
 
+from ..organization.models import Organization
 from .models import Contact, ContactCreate, ContactPatch, ContactRead
 
 
@@ -83,11 +85,9 @@ async def get_all(*, db_session: AsyncSession) -> List[Optional[Contact]]:
     return result.scalars().all()
 
 
-async def create(*, db_session: AsyncSession, contact_in: ContactCreate, organization_slug: str) -> Contact:
+async def create(*, db_session: AsyncSession, contact_in: ContactCreate, organization: Organization) -> Contact:
     """Creates a contact."""
-    from farmbase.organization import service as organization_service
 
-    organization = await organization_service.get_by_slug(db_session=db_session, slug=organization_slug)
     contact = Contact(
         **contact_in.model_dump(exclude={"organization"}),
         organization_id=organization.id,
@@ -98,19 +98,22 @@ async def create(*, db_session: AsyncSession, contact_in: ContactCreate, organiz
     return contact
 
 
-async def get_or_create(*, db_session: AsyncSession, contact_in: ContactCreate) -> Contact:
-    if contact_in.id:
-        stmt = select(Contact).where(Contact.id == contact_in.id)
+async def get_or_create(*, db_session: AsyncSession, organization: Organization, contact_in: ContactCreate) -> Contact:
+    contact = await get_by_phone_number(db_session=db_session, phone_number=contact_in.phone_number)
+    if contact:
+        logger.debug(contact)
+        return contact
+        # stmt = select(Contact).where(Contact.id == contact_in.id)
     else:
-        filters = contact_in.model_dump(exclude={"id", "organization"})
-        stmt = select(Contact).filter_by(**filters)
+        #     filters = contact_in.model_dump(exclude={"id", "organization"})
+        #     stmt = select(Contact).filter_by(**filters)
+        #
+        # result = await db_session.execute(stmt)
+        # instance = result.scalars().first()
+        # if instance:
+        #     return instance
 
-    result = await db_session.execute(stmt)
-    instance = result.scalars().first()
-    if instance:
-        return instance
-
-    return await create(db_session=db_session, contact_in=contact_in)
+        return await create(db_session=db_session, contact_in=contact_in, organization=organization)
 
 
 async def patch(*, db_session: AsyncSession, contact: Contact, contact_in: ContactPatch) -> Contact:

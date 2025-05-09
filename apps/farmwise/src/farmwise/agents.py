@@ -1,5 +1,7 @@
 from __future__ import annotations as _annotations
 
+from pprint import pprint
+
 from agents import (
     Agent,
 )
@@ -7,7 +9,7 @@ from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise_schema.schema import AgentInfo, WhatsappResponse
 
 from farmwise.context import UserContext
-from farmwise.tools.farmbase import update_farmer
+from farmwise.tools.farmbase import update_contact
 from farmwise.tools.tools import (
     aez_classification,
     elevation,
@@ -212,13 +214,13 @@ triage_agent: Agent[UserContext] = Agent(
         """
     ),
     handoffs=[
-        crop_suitability_agent,
-        maize_variety_selector,
-        crop_pathogen_diagnosis_agent,
+        # crop_suitability_agent,
+        # maize_variety_selector,
+        # crop_pathogen_diagnosis_agent,
         # faq_agent,
         # handoff(agent=seat_booking_agent, on_handoff=on_seat_booking_handoff),
     ],
-    tools=[update_farmer],
+    tools=[update_contact],
     output_type=WhatsappResponse,
     model="gpt-4.1",
 )
@@ -232,10 +234,12 @@ DEFAULT_AGENT = triage_agent.name
 
 agents: dict[str, Agent] = {
     triage_agent.name: triage_agent,
-    maize_variety_selector.name: maize_variety_selector,
-    crop_suitability_agent.name: crop_suitability_agent,
-    crop_pathogen_diagnosis_agent.name: crop_pathogen_diagnosis_agent,
+    # maize_variety_selector.name: maize_variety_selector,
+    # crop_suitability_agent.name: crop_suitability_agent,
+    # crop_pathogen_diagnosis_agent.name: crop_pathogen_diagnosis_agent,
 }
+
+pprint(triage_agent.tools)
 
 
 def get_all_agent_info() -> list[AgentInfo]:
