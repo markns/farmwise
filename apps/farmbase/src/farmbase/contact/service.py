@@ -123,7 +123,7 @@ async def patch(*, db_session: AsyncSession, contact: Contact, contact_in: Conta
     patch_data = contact_in.model_dump(exclude_defaults=True, exclude_unset=True)
 
     for field in contact_data:
-        if field in patch_data:
+        if field in patch_data and patch_data[field] is not None:
             setattr(contact, field, patch_data[field])
 
     await db_session.commit()
