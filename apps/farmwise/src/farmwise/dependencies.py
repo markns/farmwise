@@ -32,13 +32,16 @@ def current_agent(user_input: UserInput, session: Session = Depends(get_session)
         return agents[DEFAULT_AGENT]
 
 
-async def user_context(user_input: UserInput):
-    logger.info(f"loading user context for {user_input}...")
+# TODO: how does organization get set?
+async def user_context(user_input: UserInput, organization="default"):
     with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
         result = await contacts_get_or_create_contact.asyncio(
             client=client,
-            organization="default",
+            organization=organization,
             body=ContactCreate(name=user_input.user_name, phone_number=user_input.user_id),
         )
-        logger.info(f"loaded contact {result}...")
-        return UserContext(user_id=result.id, phone_number=result.phone_number, organization="default")
+        context = UserContext(
+            user_id=result.id, name=result.name, phone_number=result.phone_number, organization=organization
+        )
+        logger.debug(f"loaded context {context}")
+        return context

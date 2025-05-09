@@ -17,5 +17,6 @@ from pydantic import BaseModel
 
 class UserContext(BaseModel):
     user_id: int
+    name: str = ""
     phone_number: str = ""
     organization: str = "default"
