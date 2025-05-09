@@ -1,15 +1,19 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from geoalchemy2 import Geometry, WKBElement
-from pydantic import field_validator
+from geoalchemy2.shape import to_shape
+from pydantic import Field, field_serializer, field_validator
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
-from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
+from farmbase.models import FarmbaseBase, Location, Pagination, PrimaryKey, TimeStampMixin
 from farmbase.organization.models import Organization
 from farmbase.validators import must_not_be_blank
+
+# TODO: use this pattern to add other contact types. eg. farmers
+# https://docs.sqlalchemy.org/en/20/orm/queryguide/_inheritance_setup.html
 
 
 class Contact(Base, TimeStampMixin):
@@ -25,25 +29,42 @@ class Contact(Base, TimeStampMixin):
     organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id))
     organization = relationship("Organization")
 
-    geo_location: Mapped[WKBElement] = mapped_column(Geometry(geometry_type="POINT", srid=4326, spatial_index=True))
+    location: Mapped[Optional[WKBElement]] = mapped_column(
+        Geometry(geometry_type="POINT", srid=4326, spatial_index=True), nullable=True
+    )
 
 
 class ContactBase(FarmbaseBase):
-    name: str
-    phone_number: str
+    """Base model for Contact data."""
 
-    @field_validator("name")
+    name: str = Field(description="The full name of the contact")
+    phone_number: str = Field(description="Contact's phone number")
+    location: Optional[Location] = Field(default=None, description="Contact's geographical location")
+
+    @field_validator("location", mode="before")
     @classmethod
-    def validate_name(cls, v):
-        return must_not_be_blank(v)
+    def validate_location(cls, data: Any) -> Any:
+        if isinstance(data, WKBElement):
+            point = to_shape(data)
+            return {"latitude": point.x, "longitude": point.y}
+        # If data is already a dictionary or another compatible type, pass it through.
+        return data
 
 
-class ContactCreate(ContactBase): ...
+class ContactBaseWrite(ContactBase):
+    @field_serializer("location")
+    def serialize_location(self, location: Location):
+        return location.to_ewkt()
 
 
-class ContactPatch(ContactBase):
-    name: Optional[str] = None
-    phone_number: Optional[str] = None
+class ContactCreate(ContactBaseWrite): ...
+
+
+class ContactPatch(ContactBaseWrite):
+    """Model for updating existing Contact."""
+
+    name: Optional[str] = Field(default=None, description="Updated name of the contact")
+    phone_number: Optional[str] = Field(default=None, description="Updated phone number")
 
     @field_validator("name")
     @classmethod
@@ -54,10 +75,14 @@ class ContactPatch(ContactBase):
 
 
 class ContactRead(ContactBase):
-    id: PrimaryKey
-    created_at: datetime
-    updated_at: datetime
+    """Model for reading Contact data."""
+
+    id: PrimaryKey = Field(description="Unique identifier of the contact")
+    created_at: datetime = Field(description="Timestamp when the contact was created")
+    updated_at: datetime = Field(description="Timestamp when the contact was last updated")
 
 
 class ContactPagination(Pagination):
-    items: List[ContactRead] = []
+    """Model for paginated list of contacts."""
+
+    items: List[ContactRead] = Field(default_factory=list, description="List of contacts in the current page")
