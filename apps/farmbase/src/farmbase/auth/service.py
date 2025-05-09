@@ -1,7 +1,7 @@
-from loguru import logger
 from typing import Annotated, List, Optional
 
 from fastapi import Depends, HTTPException
+from loguru import logger
 from pydantic import EmailStr
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -16,7 +16,6 @@ from farmbase.config import (
 )
 from farmbase.enums import UserRoles
 from farmbase.organization import service as organization_service
-from farmbase.organization.models import OrganizationRead
 from farmbase.plugins.base import plugins
 from farmbase.project import service as project_service
 from farmbase.project.models import ProjectBase
@@ -31,7 +30,6 @@ from .models import (
     UserRegister,
     UserUpdate,
 )
-
 
 InvalidCredentialException = HTTPException(
     status_code=HTTP_401_UNAUTHORIZED, detail=[{"msg": "Could not validate credentials"}]
@@ -173,7 +171,7 @@ async def create(*, db_session: AsyncSession, organization: str, user_in: (UserR
 
     org = await organization_service.get_by_slug_or_raise(
         db_session=db_session,
-        organization_in=OrganizationRead(name=organization, slug=organization),
+        slug=organization,
     )
 
     # add user to the current organization

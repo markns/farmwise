@@ -1290,8 +1290,8 @@ dev = [
 requires-dist = [
     { name = "farmbase-agent-toolkit", editable = "libs/farmbase-agent-toolkit" },
     { name = "farmwise-schema", editable = "libs/farmwise-schema" },
-    { name = "openai", specifier = ">=1.66.3" },
-    { name = "openai-agents", specifier = ">=0.0.10" },
+    { name = "openai", specifier = ">=1.77.0" },
+    { name = "openai-agents", specifier = ">=0.0.14" },
     { name = "sqlmodel", specifier = ">=0.0.24" },
 ]
 
@@ -1336,7 +1336,6 @@ dependencies = [
     { name = "fastapi" },
     { name = "google-genai" },
     { name = "httpx" },
-    { name = "openai" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
@@ -1362,7 +1361,6 @@ requires-dist = [
     { name = "fastapi", specifier = "~=0.115.8" },
     { name = "google-genai", specifier = ">=1.11.0" },
     { name = "httpx", specifier = ">=0.28.1" },
-    { name = "openai", specifier = "~=1.68.0" },
     { name = "pydantic", specifier = "~=2.10.6" },
     { name = "pydantic-settings", specifier = "~=2.6.1" },
     { name = "python-dotenv", specifier = "~=1.0.1" },
@@ -3173,7 +3171,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "1.68.2"
+version = "1.77.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -3185,14 +3183,14 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3f/6b/6b002d5d38794645437ae3ddb42083059d556558493408d39a0fcea608bc/openai-1.68.2.tar.gz", hash = "sha256:b720f0a95a1dbe1429c0d9bb62096a0d98057bcda82516f6e8af10284bdd5b19", size = 413429 }
+sdist = { url = "https://files.pythonhosted.org/packages/cc/c0/ea2e9a78bf88404b97e7b708f0823b4699ab2ee3f5564425b8531a890a43/openai-1.77.0.tar.gz", hash = "sha256:897969f927f0068b8091b4b041d1f8175bcf124f7ea31bab418bf720971223bc", size = 435778 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fd/34/cebce15f64eb4a3d609a83ac3568d43005cc9a1cba9d7fde5590fd415423/openai-1.68.2-py3-none-any.whl", hash = "sha256:24484cb5c9a33b58576fdc5acf0e5f92603024a4e39d0b99793dfa1eb14c2b36", size = 606073 },
+    { url = "https://files.pythonhosted.org/packages/90/58/37ae3ca75936b824a0a5ca30491c968192007857319d6836764b548b9d9b/openai-1.77.0-py3-none-any.whl", hash = "sha256:07706e91eb71631234996989a8ea991d5ee56f0744ef694c961e0824d4f39218", size = 662031 },
 ]
 
 [[package]]
 name = "openai-agents"
-version = "0.0.10"
+version = "0.0.14"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "griffe" },
@@ -3203,9 +3201,9 @@ dependencies = [
     { name = "types-requests" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/79/44/cde8d17f549f06fecdeb2eb796942bbbe3330cc69a32a9e9eff22a083865/openai_agents-0.0.10.tar.gz", hash = "sha256:584269dc70b2d718241ce4434fc0629c797af43d1728356c55a87a2a3c6a0688", size = 1022585 }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/b1/586b7413132e9ead6a671f468a1f3465cf3d12e1e73172aa51fcc936142c/openai_agents-0.0.14.tar.gz", hash = "sha256:884d6a1d4be7e77c2442b3ed058abe2c56231a6a05942fe87c6d8ecee72ca491", size = 1339042 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/1f/1fda25946dddefec225f03be06fb5ad17ffffc40620c36a67af359b51423/openai_agents-0.0.10-py3-none-any.whl", hash = "sha256:b4db46e246ae92a4da41313a73dcb527fa4b85f243007d5daca1890724251a19", size = 108235 },
+    { url = "https://files.pythonhosted.org/packages/28/50/83bf8515219ffa319a011aa74fc61f4d9036c6a4f49ed9c87d6a4f4484a1/openai_agents-0.0.14-py3-none-any.whl", hash = "sha256:43f88ae01787aaf699a5354997970cfeef12495286da55807ce0e4c1b2ebbb2c", size = 116871 },
 ]
 
 [[package]]

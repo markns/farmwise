@@ -83,11 +83,11 @@ async def get_all(*, db_session: AsyncSession) -> List[Optional[Contact]]:
     return result.scalars().all()
 
 
-async def create(*, db_session: AsyncSession, contact_in: ContactCreate) -> Contact:
+async def create(*, db_session: AsyncSession, contact_in: ContactCreate, organization_slug: str) -> Contact:
     """Creates a contact."""
     from farmbase.organization import service as organization_service
 
-    organization = await organization_service.get_by_slug(db_session=db_session, slug=contact_in.organization.slug)
+    organization = await organization_service.get_by_slug(db_session=db_session, slug=organization_slug)
     contact = Contact(
         **contact_in.model_dump(exclude={"organization"}),
         organization_id=organization.id,
@@ -124,6 +124,8 @@ async def patch(*, db_session: AsyncSession, contact: Contact, contact_in: Conta
             setattr(contact, field, patch_data[field])
 
     await db_session.commit()
+    # refresh to ensure location is reloaded from db
+    await db_session.refresh(contact)
     return contact
 
 

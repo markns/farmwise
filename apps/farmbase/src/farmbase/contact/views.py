@@ -39,6 +39,8 @@ async def create_contact(
     if contact:
         raise EntityAlreadyExistsError(message="A contact with this phone number already exists.")
 
+    # TODO: how to handle sqlalchemy.exc.IntegrityError: (sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) <class 'asyncpg.exceptions.UniqueViolationError'>: duplicate key value violates unique constraint "contact_pkey"
+    #  DETAIL:  Key (id)=(1) already exists.
     # if contact_in.id and await get(db_session=db_session, contact_id=contact_in.id):
     #     raise ValueError("A contact with this id already exists.")
     # raise ValidationError.from_exception_data(
@@ -51,8 +53,7 @@ async def create_contact(
     #         }
     #     ],
     # )
-
-    contact = await create(db_session=db_session, contact_in=contact_in)
+    contact = await create(db_session=db_session, contact_in=contact_in, organization_slug=organization)
     await contact_init_flow(db_session=db_session, contact_id=contact.id, organization_slug=organization)
     return contact
 
@@ -80,7 +81,7 @@ async def patch_contact(
     contact_id: PrimaryKey,
     contact_in: ContactPatch,
 ):
-    """Patch a contact."""
+    """Update an existing contact with partial data."""
     contact = await get(db_session=db_session, contact_id=contact_id)
     if not contact:
         raise EntityDoesNotExistError(message="A contact with this id does not exist.")

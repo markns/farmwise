@@ -1,0 +1,35 @@
+###
+POST http://127.0.0.1:8000/api/v1/default/contacts
+Content-Type: application/json
+
+{
+  "name": "Mark",
+  "phone_number": "+31657775784",
+  "location": {
+    "longitude": 0.1,
+    "latitude": 0.1
+  }
+}
+
+###
+PATCH http://127.0.0.1:8000/api/v1/default/contacts/2
+Content-Type: application/json
+
+{
+  "location": {
+    "latitude": -0.1278,
+    "longitude": 52.5074
+  }
+}
+###
+GET http://127.0.0.1:8000/api/v1/default/contacts/1
+Content-Type: application/json
+
+###
+GET http://127.0.0.1:8000/api/v1/default/contacts
+Content-Type: application/json
+
+###
+DELETE http://127.0.0.1:8000/api/v1/default/contacts/1
+Content-Type: application/json
+

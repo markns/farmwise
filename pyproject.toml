@@ -14,7 +14,6 @@ dependencies = [
     "python-dotenv~=1.0.1",
     "uvicorn>=0.34.0",
     "httpx>=0.28.1",
-    "openai~=1.68.0",
     "google-genai>=1.11.0",
 ]
 

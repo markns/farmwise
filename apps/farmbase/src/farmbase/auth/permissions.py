@@ -7,7 +7,6 @@ from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 from farmbase.auth.service import get_current_user
 from farmbase.enums import UserRoles
 from farmbase.organization import service as organization_service
-from farmbase.organization.models import OrganizationRead
 
 
 def any_permission(permissions: list, request: Request) -> bool:
@@ -69,10 +68,7 @@ class BasePermission(ABC):
         if request.path_params.get("organization"):
             organization = await organization_service.get_by_slug_or_raise(
                 db_session=request.state.db,
-                organization_in=OrganizationRead(
-                    slug=request.path_params["organization"],
-                    name=request.path_params["organization"],
-                ),
+                slug=request.path_params["organization"],
             )
         elif request.path_params.get("organization_id"):
             organization = await organization_service.get(

@@ -66,7 +66,7 @@ class OrganizationUpdate(FarmbaseBase):
 
 
 class OrganizationRead(OrganizationBase):
-    id: Optional[PrimaryKey]
+    id: PrimaryKey
     slug: Optional[OrganizationSlug]
 
 

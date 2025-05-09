@@ -74,9 +74,9 @@ async def get_by_slug(*, db_session: AsyncSession, slug: str) -> Optional[Organi
     return result.scalars().one_or_none()
 
 
-async def get_by_slug_or_raise(*, db_session: AsyncSession, organization_in: OrganizationRead) -> Organization:
+async def get_by_slug_or_raise(*, db_session: AsyncSession, slug: str) -> Organization:
     """Returns the organization specified or raises ValidationError."""
-    organization = await get_by_slug(db_session=db_session, slug=organization_in.slug)
+    organization = await get_by_slug(db_session=db_session, slug=slug)
 
     if not organization:
         raise ValidationError.from_exception_data(
@@ -84,7 +84,7 @@ async def get_by_slug_or_raise(*, db_session: AsyncSession, organization_in: Org
             [
                 {
                     "loc": ("organization",),
-                    "msg": f"Organization '{organization_in.slug}' not found.",
+                    "msg": f"Organization '{slug}' not found.",
                     "type": "value_error.not_found",
                 }
             ],

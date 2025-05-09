@@ -1,6 +1,6 @@
 import API from "@/api"
 
-const resource = "/farmers"
+const resource = "/contacts"
 
 export default {
   getAll(options) {

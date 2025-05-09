@@ -1,10 +1,9 @@
 from datetime import datetime, timedelta
-from typing import Annotated, Optional
+from typing import Annotated
 from zoneinfo import ZoneInfo
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, field_validator
 from pydantic.fields import Field
-from pydantic.networks import AnyHttpUrl
 from pydantic.types import SecretStr, constr
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, event, func
 from sqlalchemy.ext.declarative import declared_attr
@@ -118,6 +117,29 @@ class FarmbaseBase(BaseModel):
         }
 
 
+class Location(BaseModel):
+    latitude: float = Field(..., description="Latitude in decimal degrees (-90 to 90)")
+    longitude: float = Field(..., description="Longitude in decimal degrees (-180 to 180)")
+
+    @field_validator("latitude")
+    @classmethod
+    def validate_latitude(cls, value: float) -> float:
+        if not -90 <= value <= 90:
+            raise ValueError("Latitude must be between -90 and 90 degrees.")
+        return value
+
+    @field_validator("longitude")
+    @classmethod
+    def validate_longitude(cls, value: float) -> float:
+        if not -180 <= value <= 180:
+            raise ValueError("Longitude must be between -180 and 180 degrees.")
+        return value
+
+    def to_ewkt(self) -> str:
+        """Convert to EWKT format."""
+        return f"SRID=4326;POINT({self.longitude} {self.latitude})"
+
+
 class Pagination(FarmbaseBase):
     items_per_page: int
     page: int
@@ -128,25 +150,14 @@ class PrimaryKeyModel(BaseModel):
     id: PrimaryKey
 
 
-class EvergreenBase(FarmbaseBase):
-    evergreen: Optional[bool] = False
-    evergreen_owner: Optional[EmailStr]
-    evergreen_reminder_interval: Optional[int] = 90
-    evergreen_last_reminder_at: Optional[datetime] = Field(None, nullable=True)
-
-
-class ResourceBase(FarmbaseBase):
-    resource_type: Optional[str] = Field(None, nullable=True)
-    resource_id: Optional[str] = Field(None, nullable=True)
-    weblink: Optional[AnyHttpUrl] = Field(None, nullable=True)
-
-
-class ContactBase(FarmbaseBase):
-    email: EmailStr
-    name: Optional[str] = Field(None, nullable=True)
-    is_active: Optional[bool] = True
-    is_external: Optional[bool] = False
-    company: Optional[str] = Field(None, nullable=True)
-    contact_type: Optional[str] = Field(None, nullable=True)
-    notes: Optional[str] = Field(None, nullable=True)
-    owner: Optional[str] = Field(None, nullable=True)
+# class EvergreenBase(FarmbaseBase):
+#     evergreen: Optional[bool] = False
+#     evergreen_owner: Optional[EmailStr]
+#     evergreen_reminder_interval: Optional[int] = 90
+#     evergreen_last_reminder_at: Optional[datetime] = Field(None, nullable=True)
+#
+#
+# class ResourceBase(FarmbaseBase):
+#     resource_type: Optional[str] = Field(None, nullable=True)
+#     resource_id: Optional[str] = Field(None, nullable=True)
+#     weblink: Optional[AnyHttpUrl] = Field(None, nullable=True)
