@@ -47,7 +47,7 @@ class ContactBase(FarmbaseBase):
     def validate_location(cls, data: Any) -> Any:
         if isinstance(data, WKBElement):
             point = to_shape(data)
-            return {"latitude": point.x, "longitude": point.y}
+            return {"longitude": point.x, "latitude": point.y}
         # If data is already a dictionary or another compatible type, pass it through.
         return data
 
