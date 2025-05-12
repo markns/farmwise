@@ -3,6 +3,7 @@
 # - Contextual data for your run (e.g. things like a username/uid or other information about the user)
 # - Dependencies (e.g. logger objects, data fetchers, etc)
 # - Helper functions
+from farmbase_client.models import Location
 from pydantic import BaseModel
 
 #
@@ -20,3 +21,4 @@ class UserContext(BaseModel):
     name: str = ""
     phone_number: str = ""
     organization: str = "default"
+    location: Location

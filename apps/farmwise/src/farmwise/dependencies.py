@@ -41,7 +41,11 @@ async def user_context(user_input: UserInput, organization="default"):
             body=ContactCreate(name=user_input.user_name, phone_number=user_input.user_id),
         )
         context = UserContext(
-            user_id=result.id, name=result.name, phone_number=result.phone_number, organization=organization
+            user_id=result.id,
+            name=result.name,
+            location=result.location,
+            phone_number=result.phone_number,
+            organization=organization,
         )
         logger.debug(f"loaded context {context}")
         return context

@@ -1,7 +1,5 @@
 from __future__ import annotations as _annotations
 
-from pprint import pprint
-
 from agents import (
     Agent,
     RunContextWrapper,
@@ -76,10 +74,10 @@ from farmwise.tools.tools import (
 # TODO: Why is maize not showing in results?
 # TODO:
 #     3. Create a visualization that shows the most suitable crops for the area.
-crop_suitability_agent: Agent[UserContext] = Agent(
-    name="Crop Suitability Agent",
-    handoff_description="A helpful agent that can answer questions about crop suitability.",
-    instructions=f"""{RECOMMENDED_PROMPT_PREFIX}
+
+
+def crop_suitability_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
+    return f"""{RECOMMENDED_PROMPT_PREFIX} 
     You are an agent that gives advice on which agricultural crops are most suitable for a given area.
     specific locations in Kenya.
 
@@ -88,8 +86,17 @@ crop_suitability_agent: Agent[UserContext] = Agent(
     2. Use the suitability_index tool to obtain suitability index values for crops between 0-10000 from FAO GAEZ data. 10000 indicates high suitability, 0 indicates low suitability.
     3. Present the top 5 choices as a list, and offer to give advice on growing these crops. 
 
-    If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the triage agent. """,
-    tools=[suitability_index],
+    If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the triage agent.
+
+    These are the details of the current user: {ctx.context}
+    """
+
+
+crop_suitability_agent: Agent[UserContext] = Agent(
+    name="Crop Suitability Agent",
+    handoff_description="A helpful agent that can answer questions about crop suitability.",
+    instructions=crop_suitability_agent_instructions,
+    tools=[suitability_index, update_contact],
     output_type=WhatsappResponse,
     model="gpt-4.1",
 )
@@ -137,16 +144,13 @@ crop_pathogen_diagnosis_agent: Agent[UserContext] = Agent(
     If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the triage agent. 
 """,
     output_type=WhatsappResponse,
+    tools=[update_contact],
     model="gpt-4.1",
 )
 
 
-maize_variety_selector: Agent[UserContext] = Agent(
-    name="Maize Variety Selector",
-    handoff_description="An agent that can recommend suitable varieties of Maize",
-    # 2.4 Request and log average seasonal rainfall (mm) and drought-risk pattern.
-    instructions=(
-        f"""{RECOMMENDED_PROMPT_PREFIX}
+def maize_variety_selector_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
+    return f"""{RECOMMENDED_PROMPT_PREFIX} 
         You are an expert in Maize agronomy. Your task is to recommend suitable varieties of Maize to farmers in Kenya.
         Use concise and simple language as much as possible.
         
@@ -166,10 +170,11 @@ maize_variety_selector: Agent[UserContext] = Agent(
         3.	
         3.1 Use the maize_varieties tool to find suitable varieties using the altitude and growing season length
         3.2 Present a list of the varieties highlighting those that are resistant to diseases and crop pests the farmer has mentioned, and yield potential.
-        3.3 Offer to find availability of these varieties by including a section_list in the response with the variety names.     
+        3.3 Offer to find availability of these varieties by including a section_list in the response with the variety names.
+
+        These are the details of the current user: {ctx.context}
         """
-    ),
-    #
+    # 2.4 Request and log average seasonal rainfall (mm) and drought-risk pattern.
     #         5.	Check Yield Potential and Stability
     #         5.1 Retrieve multi-location or regional on-farm trial data for shortlisted varieties.
     #         5.2 Prioritise varieties with higher mean yield and lower coefficient of variation.
@@ -197,9 +202,15 @@ maize_variety_selector: Agent[UserContext] = Agent(
     #             a contingency.
     #         10.2 Set an annual reminder for the user to repeat Steps 2-9 to account for new hybrids, evolving pests,
     #             and climate shifts.
+
+
+maize_variety_selector: Agent[UserContext] = Agent(
+    name="Maize Variety Selector",
+    handoff_description="An agent that can recommend suitable varieties of Maize",
+    instructions=maize_variety_selector_instructions,
     tools=[elevation, soil_property, aez_classification, growing_period, maize_varieties],
     output_type=WhatsappResponse,
-    handoffs=[crop_suitability_agent],
+    handoffs=[crop_suitability_agent, update_contact],
     model="gpt-4.1",
 )
 
@@ -208,7 +219,7 @@ def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[
     return f"""{RECOMMENDED_PROMPT_PREFIX} 
         You are a helpful triaging agent. You can use your tools to delegate questions to other appropriate agents.
         
-        these are the details of the current user: {ctx.context}
+        These are the details of the current user: {ctx.context}
         """
 
 
@@ -217,10 +228,9 @@ triage_agent: Agent[UserContext] = Agent(
     handoff_description="A triage agent that can delegate a customer's request to the appropriate agent.",
     instructions=triage_agent_instructions,
     handoffs=[
-        # crop_suitability_agent,
-        # maize_variety_selector,
-        # crop_pathogen_diagnosis_agent,
-        # faq_agent,
+        crop_suitability_agent,
+        maize_variety_selector,
+        crop_pathogen_diagnosis_agent,
         # handoff(agent=seat_booking_agent, on_handoff=on_seat_booking_handoff),
     ],
     tools=[update_contact],
@@ -228,7 +238,6 @@ triage_agent: Agent[UserContext] = Agent(
     model="gpt-4.1",
 )
 
-# crop_suitability_agent.handoffs.append(triage_agent)
 maize_variety_selector.handoffs.append(triage_agent)
 crop_suitability_agent.handoffs.extend([triage_agent, maize_variety_selector])
 crop_pathogen_diagnosis_agent.handoffs.append(triage_agent)
@@ -237,12 +246,10 @@ DEFAULT_AGENT = triage_agent.name
 
 agents: dict[str, Agent] = {
     triage_agent.name: triage_agent,
-    # maize_variety_selector.name: maize_variety_selector,
-    # crop_suitability_agent.name: crop_suitability_agent,
-    # crop_pathogen_diagnosis_agent.name: crop_pathogen_diagnosis_agent,
+    maize_variety_selector.name: maize_variety_selector,
+    crop_suitability_agent.name: crop_suitability_agent,
+    crop_pathogen_diagnosis_agent.name: crop_pathogen_diagnosis_agent,
 }
-
-pprint(triage_agent.tools)
 
 
 def get_all_agent_info() -> list[AgentInfo]:
