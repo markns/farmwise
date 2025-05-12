@@ -1,11 +1,14 @@
 from __future__ import annotations as _annotations
 
+from collections import UserDict
+
 from agents import (
     Agent,
     RunContextWrapper,
 )
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise_schema.schema import AgentInfo, WhatsappResponse
+from loguru import logger
 
 from farmwise.context import UserContext
 from farmwise.tools.farmbase import update_contact
@@ -157,7 +160,7 @@ def maize_variety_selector_instructions(ctx: RunContextWrapper[UserContext], age
         Follow this protocol:
         
         1.	Profile the Growing Environment
-        1.1 Request the farmer shares their location. Add the action "location_request" to get the location.
+        1.1 Request the farmer shares their location, unless it is already provided. Add the action "location_request" to get the location.
         1.2 Determine altitude (metres above sea level) using the elevation tool.
         1.3 Determine soil ph using the soil_property tool.
         1.4 Determine aez classification using the aez_classification tool.
@@ -244,12 +247,31 @@ crop_pathogen_diagnosis_agent.handoffs.append(triage_agent)
 
 DEFAULT_AGENT = triage_agent.name
 
-agents: dict[str, Agent] = {
-    triage_agent.name: triage_agent,
-    maize_variety_selector.name: maize_variety_selector,
-    crop_suitability_agent.name: crop_suitability_agent,
-    crop_pathogen_diagnosis_agent.name: crop_pathogen_diagnosis_agent,
-}
+
+class AgentDict(UserDict):
+    def __init__(self, default_agent, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.default_agent = default_agent
+
+    def __getitem__(self, key):
+        if key is None:
+            logger.debug("Using default agent")
+            return self.default_agent
+        elif key in self.data:
+            return self.data[key]
+        else:
+            raise KeyError(f"Agent '{key}' not found.")
+
+
+agents = AgentDict(
+    triage_agent,
+    {
+        triage_agent.name: triage_agent,
+        maize_variety_selector.name: maize_variety_selector,
+        crop_suitability_agent.name: crop_suitability_agent,
+        crop_pathogen_diagnosis_agent.name: crop_pathogen_diagnosis_agent,
+    },
+)
 
 
 def get_all_agent_info() -> list[AgentInfo]:

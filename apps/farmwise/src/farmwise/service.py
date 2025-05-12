@@ -1,16 +1,16 @@
-from typing import Annotated, Any
+from typing import Annotated
 
-from agents import Agent, ItemHelpers, MessageOutputItem, Runner, RunResult, gen_trace_id, set_default_openai_key, trace
+from agents import ItemHelpers, MessageOutputItem, Runner, RunResult, gen_trace_id, set_default_openai_key, trace
 from farmwise_schema.schema import ServiceMetadata, UserInput, WhatsappResponse
 from fastapi import APIRouter, Depends, FastAPI
 from loguru import logger
 from openai.types.responses import EasyInputMessageParam, ResponseInputImageParam
 from sqlmodel import Session
 
-from farmwise.agents import DEFAULT_AGENT, get_all_agent_info
+from farmwise.agents import DEFAULT_AGENT, agents, get_all_agent_info
 from farmwise.context import UserContext
 from farmwise.database import Message, engine
-from farmwise.dependencies import chat_history, current_agent, user_context
+from farmwise.dependencies import ChatStateDep, user_context
 from farmwise.settings import settings
 
 set_default_openai_key(settings.OPENAI_API_KEY.get_secret_value())
@@ -35,10 +35,11 @@ async def info() -> ServiceMetadata:
 async def invoke(
     user_input: UserInput,
     context: Annotated[UserContext, Depends(user_context)],
-    history: Annotated[Any, Depends(chat_history)],
-    agent: Annotated[Agent[UserContext], Depends(current_agent)],
+    chat_state: ChatStateDep,
 ):
-    logger.info(f"USER: {user_input.message} CONTEXT: {context}")
+    agent = agents[chat_state.current_agent]
+
+    logger.info(f"USER: {user_input.message} CONTEXT: {context} STATE: {chat_state}")
     input_items = [EasyInputMessageParam(content=user_input.message, role="user")]
     if user_input.image:
         input_items.append(
@@ -54,7 +55,12 @@ async def invoke(
 
     trace_id = gen_trace_id()
     with trace("FarmWise", trace_id=trace_id, group_id=user_input.user_id):
-        result: RunResult = await Runner.run(agent, input=history + input_items, context=context)
+        result: RunResult = await Runner.run(
+            agent,
+            input=input_items,
+            context=context,
+            previous_response_id=chat_state.previous_response_id,
+        )
 
     with Session(engine) as session:
         session.add(
@@ -76,21 +82,13 @@ async def invoke(
                         role=item.raw_item.role,
                         agent=item.agent.name,
                         trace_id=trace_id,
+                        previous_response_id=result.last_response_id,
                     )
                 )
         session.commit()
 
     logger.info(f"ASSISTANT: {result.final_output}")
     return result.final_output
-    # if isinstance(result.final_output, WhatsappResponse):
-    #     return ChatMessage(
-    #         type="assistant",
-    #         content=result.final_output.response,
-    #         actions=result.final_output.actions,
-    #         buttons=result.final_output.buttons,
-    #     )
-    # else:
-    #     return ChatMessage(type="assistant", content=result.final_output)
 
 
 # @router.post("/history")

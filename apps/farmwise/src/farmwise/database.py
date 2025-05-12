@@ -11,6 +11,7 @@ class Message(SQLModel, table=True):
     user_id: str
     role: str
     content: str
+    previous_response_id: str | None
     agent: str | None
     # user_name: str | None  # Todo: normalize to users table
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
