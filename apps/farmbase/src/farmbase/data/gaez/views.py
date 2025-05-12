@@ -23,13 +23,11 @@ def _read_clr(filepath):
     return colormap
 
 
-clr_path = "apps/farmbase/data/gaez/GAEZ4_symbology_files/clr_files/AEZ_33classes.clr"
+clr_path = "data/gaez/GAEZ4_symbology_files/clr_files/AEZ_33classes.clr"
 class_map = _read_clr(clr_path)
 
-aez_raster = rioxarray.open_rasterio("apps/farmbase/data/gaez/LR/aez/aez_v9v2red_ENSEMBLE_rcp4p5_2020s.tif")
-growing_period_raster = rioxarray.open_rasterio(
-    "apps/farmbase/data/gaez/res01/ENSEMBLE/rcp4p5/ld1_ENSEMBLE_rcp4p5_2020s.tif"
-)
+aez_raster = rioxarray.open_rasterio("data/gaez/LR/aez/aez_v9v2red_ENSEMBLE_rcp4p5_2020s.tif")
+growing_period_raster = rioxarray.open_rasterio("data/gaez/res01/ENSEMBLE/rcp4p5/ld1_ENSEMBLE_rcp4p5_2020s.tif")
 
 
 @router.get("/aez_classification", response_model=str)
@@ -96,7 +94,7 @@ def suitability_index(
 ):
     """Get the crop suitability index values for a given geographical coordinate."""
 
-    file_path = "apps/farmbase/data/gaez/res05/HadGEM2-ES/rcp4p5/2020sH"
+    file_path = "data/gaez/res05/HadGEM2-ES/rcp4p5/2020sH"
     # variables = dict(zip(sdf.name, sdf.crop))
     # # variables
     rasters = [rioxarray.open_rasterio(os.path.join(file_path, f"suHr0_{v}.tif")) for v in crop_codes.keys()]

@@ -2,6 +2,7 @@ import os
 from typing import List
 from urllib import parse
 
+from dotenv import find_dotenv
 from pydantic import BaseModel
 from starlette.config import Config
 from starlette.datastructures import CommaSeparatedStrings, Secret
@@ -25,7 +26,9 @@ def get_env_tags(tag_list: List[str]) -> dict:
     return tags
 
 
-config = Config(".env")
+# TODO: Convert this to pydantic config
+
+config = Config(find_dotenv())
 
 
 # LOG_LEVEL = config("LOG_LEVEL", default=logging.WARNING)

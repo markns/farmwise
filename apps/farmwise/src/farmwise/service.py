@@ -15,7 +15,6 @@ from farmwise.settings import settings
 
 set_default_openai_key(settings.OPENAI_API_KEY.get_secret_value())
 
-
 app = FastAPI(debug=settings.is_dev())
 router = APIRouter()
 

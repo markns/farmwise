@@ -9,7 +9,7 @@ client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 google_search_tool = Tool(google_search=GoogleSearch())
 
-crops = pd.read_csv("apps/farmbase/data/kalro/crops.csv")
+crops = pd.read_csv("data/kalro/crops.csv")
 # filter_ = ((crops.crop == 'Maize') & (crops.variety == 'DH01'))
 # filter_ = ((crops.crop == 'Macadamia') & (crops.variety == 'EMB-1'))
 filter_ = crops.crop != "Maize"
@@ -22,7 +22,7 @@ for category, crop, variety in crops[filter_].itertuples(index=False):
 
     crop_sanitized = crop.replace("/", "_")
     variety_sanitized = variety.replace("/", " ")
-    filename = f"apps/farmbase/data/varieties/{crop_sanitized}/{variety_sanitized}.json"
+    filename = f"data/varieties/{crop_sanitized}/{variety_sanitized}.json"
     if os.path.exists(filename):
         continue
 
