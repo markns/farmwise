@@ -14,6 +14,7 @@ from farmbase.validators import must_not_be_blank
 
 
 class Project(Base):
+    __tablename__ = "project"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column()
     description: Mapped[str] = mapped_column()

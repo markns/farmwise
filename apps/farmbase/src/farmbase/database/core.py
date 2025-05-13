@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase, Session, declared_attr, object_session, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Session, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
 from sqlalchemy_utils import get_mapper
 from starlette.requests import Request
@@ -96,9 +96,9 @@ class ReprMixin:
     __repr_max_length__: ClassVar[int] = 15
 
     # --- automatic __tablename__ ----------------------------------
-    @declared_attr.directive
-    def __tablename__(cls) -> str:  # type: ignore[override]
-        return resolve_table_name(cls.__name__)
+    # @declared_attr.directive
+    # def __tablename__(cls) -> str:  # type: ignore[override]
+    #     return resolve_table_name(cls.__name__)
 
     # --- utility helpers ------------------------------------------
     def dict(self) -> dict[str, Any]:

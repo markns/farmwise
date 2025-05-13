@@ -17,6 +17,7 @@ from farmbase.validators import must_not_be_blank
 
 
 class Contact(Base, TimeStampMixin):
+    __tablename__ = "contact"
     __repr_attrs__ = ["name", "phone_number"]
 
     id: Mapped[int] = mapped_column(primary_key=True)

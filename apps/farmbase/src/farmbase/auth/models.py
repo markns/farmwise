@@ -52,7 +52,7 @@ def hash_password(password: str):
 
 class FarmbaseUser(Base, TimeStampMixin):
     __table_args__ = {"schema": "farmbase_core"}
-
+    __tablename__ = "farmbase_user"
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
     password: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
@@ -115,6 +115,7 @@ class FarmbaseUser(Base, TimeStampMixin):
 
 # TODO use mapped_column as here: https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html#association-object
 class FarmbaseUserProject(Base, TimeStampMixin):
+    __tablename__ = "farmbase_user_project"
     farmbase_user_id: Mapped[int] = mapped_column(ForeignKey(FarmbaseUser.id), primary_key=True)
     farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="projects")
 
@@ -127,6 +128,7 @@ class FarmbaseUserProject(Base, TimeStampMixin):
 
 
 class FarmbaseUserOrganization(Base, TimeStampMixin):
+    __tablename__ = "farmbase_user_organization"
     __table_args__ = {"schema": "farmbase_core"}
     farmbase_user_id: Mapped[int] = mapped_column(ForeignKey(FarmbaseUser.id), primary_key=True)
     farmbase_user: Mapped[FarmbaseUser] = relationship(back_populates="organizations")
@@ -275,6 +277,7 @@ class MfaChallengeStatus(FarmbaseEnum):
 
 
 class MfaChallenge(Base, TimeStampMixin):
+    __tablename__ = "mfa_challenge"
     id = Column(Integer, primary_key=True, autoincrement=True)
     valid = Column(Boolean, default=False)
     reason = Column(String, nullable=True)

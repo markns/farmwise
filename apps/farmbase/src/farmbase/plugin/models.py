@@ -1,6 +1,6 @@
-from loguru import logger
 from typing import Any, List, Optional
 
+from loguru import logger
 from pydantic import Field, SecretStr, field_validator
 from pydantic.json import pydantic_encoder
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
@@ -27,6 +27,7 @@ def show_secrets_encoder(obj):
 
 class Plugin(Base):
     __table_args__ = {"schema": "farmbase_core"}
+    __tablename__ = "plugin"
     id = Column(Integer, primary_key=True)
     title = Column(String)
     slug = Column(String, unique=True)
@@ -61,6 +62,7 @@ class Plugin(Base):
 # SQLAlchemy Model
 class PluginEvent(Base):
     __table_args__ = {"schema": "farmbase_core"}
+    __tablename__ = "plugin_event"
     id = Column(Integer, primary_key=True)
     name = Column(String)
     slug = Column(String, unique=True)
