@@ -50,7 +50,7 @@ uvx --from git+https://github.com/koxudaxi/datamodel-code-generator[http] \
 cat << EOF >> $OUTPUT/models/__init__.py
 
 def to_dict(self):
-    return self.model_dump()
+    return self.model_dump(mode='json')
 
 BaseModel.to_dict = to_dict
 

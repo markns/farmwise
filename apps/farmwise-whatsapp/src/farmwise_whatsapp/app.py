@@ -126,6 +126,7 @@ async def message_handler(_: WhatsApp, msg: types.Message):
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
     )
+    # TODO: Add error handling here.
     logger.info(f"AGENT: {response}")
     await _send_response(response, msg)
 

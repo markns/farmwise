@@ -81,6 +81,8 @@ class PluginEvent(Base):
 
 
 class PluginInstance(Base, ProjectMixin):
+    __tablename__ = "plugin_instance"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     enabled: Mapped[bool] = mapped_column(default=False)
     _configuration = Column(StringEncryptedType(key=str(FARMBASE_ENCRYPTION_KEY), engine=AesEngine, padding="pkcs5"))

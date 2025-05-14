@@ -1,59 +1,15 @@
-from datetime import datetime
 from typing import Annotated
 
 from farmbase_client import AuthenticatedClient
 from farmbase_client.api.contacts import contacts_get_or_create_contact
-from farmbase_client.models import ContactCreate
+from farmbase_client.api.messages import messages_get_chat_state
+from farmbase_client.models import ChatState, ContactCreate
 from farmwise_schema.schema import UserInput
 from fastapi import Depends
 from loguru import logger
-from openai.types.responses import EasyInputMessageParam
-from pydantic import BaseModel
-from sqlmodel import Session, select
 
 from farmwise.context import UserContext
-from farmwise.database import Message, get_session
 from farmwise.settings import settings
-
-
-def chat_history(user_input: UserInput, session: Session = Depends(get_session)):
-    statement = (
-        select(Message.role, Message.content).where(Message.user_id == user_input.user_id).order_by(Message.id.desc())
-    )
-    results = [
-        EasyInputMessageParam(role=row.role, content=row.content) for row in reversed(session.exec(statement).all())
-    ]
-    return results
-
-
-class ChatState(BaseModel):
-    current_agent: str | None = None
-    previous_response_id: str | None = None
-    timestamp: datetime | None = None
-    trace_id: str | None = None
-
-
-def chat_state(user_input: UserInput, session: Session = Depends(get_session)):
-    statement = (
-        select(Message.agent, Message.previous_response_id)
-        .where(Message.user_id == user_input.user_id)
-        .order_by(Message.id.desc())
-        .limit(1)
-    )
-
-    results = session.exec(statement).one_or_none()
-    if results:
-        return ChatState(
-            current_agent=results.agent,
-            previous_response_id=results.previous_response_id,
-            timestamp=None,
-            trace_id=None,
-        )
-
-    return ChatState()
-
-
-ChatStateDep = Annotated[ChatState, Depends(chat_state)]
 
 
 # TODO: how does organization get set?
@@ -73,3 +29,17 @@ async def user_context(user_input: UserInput, organization="default"):
         )
         logger.debug(f"loaded context {context}")
         return context
+
+
+UserContextDep = Annotated[UserContext, Depends(user_context)]
+
+
+# TODO: Dependency caching can be used to get all state
+async def chat_state(context: UserContextDep) -> ChatState:
+    with AuthenticatedClient(base_url="http://127.0.0.1:8000/api/v1", token="fdsfds") as client:
+        return await messages_get_chat_state.asyncio(
+            organization=context.organization, client=client, contact_id=context.user_id
+        )
+
+
+ChatStateDep = Annotated[ChatState, Depends(chat_state)]

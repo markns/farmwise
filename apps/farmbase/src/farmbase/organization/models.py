@@ -15,6 +15,7 @@ from farmbase.validators import must_not_be_blank
 
 class Organization(Base):
     __table_args__ = {"schema": "farmbase_core"}
+    __tablename__ = "organization"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)

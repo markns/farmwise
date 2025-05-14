@@ -45,7 +45,7 @@ class UserInput(BaseModel):
         description="User input to the agent.",
         examples=["What is the weather in Tokyo?"],
     )
-    # TODO: Use Image object from pywa
+    # TODO: Use eg. Image object from pywa, rather than `str`
     image: str | None = Field(
         description="Image to send to the agent.",
         default=None,

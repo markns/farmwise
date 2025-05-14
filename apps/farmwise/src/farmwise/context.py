@@ -17,8 +17,8 @@ from pydantic import BaseModel
 
 
 class UserContext(BaseModel):
-    user_id: int
+    user_id: int  # TODO: Rename to contact_id
     name: str = ""
     phone_number: str = ""
     organization: str = "default"
-    location: Location
+    location: Location | None

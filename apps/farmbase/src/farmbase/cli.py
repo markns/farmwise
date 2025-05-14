@@ -13,11 +13,13 @@ from farmbase.contact.models import Contact
 from farmbase.enums import UserRoles
 from farmbase.exceptions.exceptions import FarmBaseApiError
 from farmbase.extensions import configure_extensions
+from farmbase.messages.models import Agent
 from farmbase.plugin.models import PluginInstance
 
 # TODO: How to import models more cleanly?
 Contact.id
 FarmbaseUserOrganization.farmbase_user
+Agent.id
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 

@@ -9,6 +9,7 @@ from farmbase.auth.views import auth_router, user_router
 from farmbase.contact.views import router as contact_router
 from farmbase.data.crops.views import router as crops_router
 from farmbase.data.gaez.views import router as gaez_router
+from farmbase.messages.views import router as messages_router
 from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
 from farmbase.project.views import router as project_router
@@ -57,6 +58,7 @@ authenticated_organization_api_router.include_router(project_router, prefix="/pr
 authenticated_organization_api_router.include_router(contact_router, prefix="/contacts", tags=["contacts"])
 
 authenticated_organization_api_router.include_router(user_router, prefix="/users", tags=["users"])
+authenticated_organization_api_router.include_router(messages_router, prefix="/messages", tags=["messages"])
 
 
 @api_router.get("/healthcheck", include_in_schema=False)

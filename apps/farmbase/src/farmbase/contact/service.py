@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-from loguru import logger
 from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,13 +42,14 @@ async def get_default_or_raise(*, db_session: AsyncSession) -> Contact:
 async def get_by_name(*, db_session: AsyncSession, name: str) -> Optional[Contact]:
     """Returns a contact based on the given contact name."""
     result = await db_session.execute(select(Contact).where(Contact.name == name))
+    # TODO: refactor to scalar_one_or_none()
     return result.scalars().one_or_none()
 
 
 async def get_by_phone_number(*, db_session: AsyncSession, phone_number: str) -> Optional[Contact]:
     """Returns a contact based on the given contact name."""
     result = await db_session.execute(select(Contact).where(Contact.phone_number == phone_number))
-    return result.scalars().one_or_none()
+    return result.scalar_one_or_none()
 
 
 async def get_by_name_or_raise(*, db_session: AsyncSession, contact_in: ContactRead) -> Contact:
@@ -101,7 +101,6 @@ async def create(*, db_session: AsyncSession, contact_in: ContactCreate, organiz
 async def get_or_create(*, db_session: AsyncSession, organization: Organization, contact_in: ContactCreate) -> Contact:
     contact = await get_by_phone_number(db_session=db_session, phone_number=contact_in.phone_number)
     if contact:
-        logger.debug(contact)
         return contact
         # stmt = select(Contact).where(Contact.id == contact_in.id)
     else:
