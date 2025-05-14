@@ -228,7 +228,10 @@ These are the details of the current user: {ctx.context}
 
 triage_agent: Agent[UserContext] = Agent(
     name="Triage Agent",
-    handoff_description="A triage agent that can delegate a customer's request to the appropriate agent.",
+    # TODO: how to get agents to transfer back to Triage agent?
+    handoff_description="""
+        A triage agent that can delegate a customer's request to the appropriate agent. Transfer back to this agent
+        when the message from the user isn't relevant to your instructions. """,
     instructions=triage_agent_instructions,
     handoffs=[
         crop_suitability_agent,
