@@ -6,7 +6,7 @@ from agents import (
     ToolCallItem,
     ToolCallOutputItem,
 )
-from farmbase.messages.models import RunItem
+from farmbase.message.models import RunItem
 from farmbase_client import models
 
 

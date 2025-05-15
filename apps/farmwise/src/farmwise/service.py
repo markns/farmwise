@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 
 from agents import Runner, RunResult, gen_trace_id, set_default_openai_key, trace
 from farmbase_client import AuthenticatedClient
-from farmbase_client.api.messages import messages_create_run_result
+from farmbase_client.api.runresult import runresult_create_run_result as create_run_result
 from farmbase_client.models import AgentBase, RunResultCreate
 from farmwise_schema.schema import ServiceMetadata, UserInput, WhatsappResponse
 from fastapi import APIRouter, FastAPI
@@ -36,7 +36,10 @@ async def invoke(
     context: UserContextDep,
     chat_state: ChatStateDep,
 ):
-    agent = agents[chat_state.last_agent.name]
+    if chat_state.last_agent:
+        agent = agents[chat_state.last_agent.name]
+    else:
+        agent = agents[DEFAULT_AGENT]
 
     logger.info(f"USER: {user_input.message} CONTEXT: {context} STATE: {chat_state}")
 
@@ -68,7 +71,7 @@ async def invoke(
         )
 
     with AuthenticatedClient(base_url="http://127.0.0.1:8000/api/v1", token="fdsfds") as client:
-        await messages_create_run_result.asyncio(
+        await create_run_result.asyncio(
             client=client,
             organization=context.organization,
             body=RunResultCreate(

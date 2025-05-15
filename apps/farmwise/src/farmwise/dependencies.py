@@ -1,8 +1,8 @@
 from typing import Annotated
 
 from farmbase_client import AuthenticatedClient
+from farmbase_client.api.chatstate import chatstate_get_chat_state as get_chat_state
 from farmbase_client.api.contacts import contacts_get_or_create_contact
-from farmbase_client.api.messages import messages_get_chat_state
 from farmbase_client.models import ChatState, ContactCreate
 from farmwise_schema.schema import UserInput
 from fastapi import Depends
@@ -37,7 +37,7 @@ UserContextDep = Annotated[UserContext, Depends(user_context)]
 # TODO: Dependency caching can be used to get all state
 async def chat_state(context: UserContextDep) -> ChatState:
     with AuthenticatedClient(base_url="http://127.0.0.1:8000/api/v1", token="fdsfds") as client:
-        return await messages_get_chat_state.asyncio(
+        return await get_chat_state.asyncio(
             organization=context.organization, client=client, contact_id=context.user_id
         )
 

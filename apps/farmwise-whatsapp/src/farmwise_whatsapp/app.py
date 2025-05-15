@@ -54,12 +54,17 @@ wa = WhatsApp(
 agent_client = AgentClient(base_url=settings.AGENT_URL)
 
 
+def _convert_md_to_whatsapp(response: str) -> str:
+    """Convert a markdown string to WhatsApp markdown."""
+    return response.replace("**", "*").replace("__", "_")
+
+
 async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
     if Action.request_location in response.actions:
         await msg.reply_location_request(response.content)
     elif response.section_list:
         await msg.reply_text(
-            response.content,
+            text=_convert_md_to_whatsapp(response.content),
             # todo: use pywa types directly in WhatsappResponse to prevent this reconstruction?
             buttons=SectionList(
                 # TODO: Should have a better way of meeting the char and list size limits
@@ -77,7 +82,7 @@ async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
             ),
         )
     else:
-        await msg.reply_text(response.content)
+        await msg.reply_text(_convert_md_to_whatsapp(response.content))
 
 
 # TODO: Chat opened is not being triggered...

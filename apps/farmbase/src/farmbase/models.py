@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 from zoneinfo import ZoneInfo
 
@@ -8,7 +8,7 @@ from pydantic.types import SecretStr, constr
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, event, func
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # pydantic type that limits the range of primary keys
 PrimaryKey = Annotated[int, Field(default=None, gt=0.0, lt=2147483647.0)]
@@ -31,14 +31,18 @@ class ProjectMixin(object):
 class TimeStampMixin(object):
     """Timestamping mixin"""
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
     created_at._creation_order = 9998
-    updated_at = Column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    )
     updated_at._creation_order = 9998
 
     @staticmethod
     def _updated_at(mapper, connection, target):
-        target.updated_at = datetime.utcnow()
+        target.updated_at = datetime.now(UTC)
 
     @classmethod
     def __declare_last__(cls):
@@ -71,11 +75,11 @@ class EvergreenMixin(object):
     evergreen = Column(Boolean)
     evergreen_owner = Column(String)
     evergreen_reminder_interval = Column(Integer, default=90)  # number of days
-    evergreen_last_reminder_at = Column(DateTime, default=datetime.utcnow())
+    evergreen_last_reminder_at = Column(DateTime, default=datetime.now(UTC))
 
     @hybrid_property
     def overdue(self):
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         next_reminder = self.evergreen_last_reminder_at + timedelta(days=self.evergreen_reminder_interval)
 
         if now >= next_reminder:

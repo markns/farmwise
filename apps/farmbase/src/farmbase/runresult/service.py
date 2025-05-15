@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from farmbase.contact import service as contact_service
-from farmbase.messages.models import Agent, RunResult, RunResultCreate
+
+from .models import Agent, RunResult, RunResultCreate
 
 
 async def get_or_create_agent_by_name(*, db_session: AsyncSession, name: str) -> Agent:
@@ -38,7 +39,7 @@ async def create(*, db_session: AsyncSession, run_result_in: RunResultCreate) ->
     return run_result
 
 
-async def get(*, db_session: AsyncSession, contact_id: int) -> RunResult:
+async def get_latest(*, db_session: AsyncSession, contact_id: int) -> RunResult:
     """Returns a Run Result based on the given run result id."""
     result = await db_session.execute(
         select(RunResult)
