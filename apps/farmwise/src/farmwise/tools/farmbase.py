@@ -19,9 +19,13 @@ async def create_contact(ctx: RunContextWrapper[UserContext], contact_in: Contac
 
 
 @function_tool(
-    description_override=f"""Update a contact's details. 
-    Use this tool to update a users {join_with([k for k in ContactPatch.model_fields.keys()])} 
-    if the user mentions them in a message."""
+    description_override=f"""
+Update a contact's details. 
+Use this tool to update a users {join_with([k for k in ContactPatch.model_fields.keys()])} 
+if the user mentions them in a message.
+For example if a user mentions their location as a place name or as latitude,longitude coordinates, update them
+using this tool.
+"""
 )
 async def update_contact(ctx: RunContextWrapper[UserContext], contact_in: ContactPatch) -> ContactRead:
     with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
