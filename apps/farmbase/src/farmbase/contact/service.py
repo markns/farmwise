@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional, Sequence
 
 from pydantic import ValidationError
 from sqlalchemy import select
@@ -79,9 +79,15 @@ async def get_by_name_or_default(*, db_session: AsyncSession, contact_in: Contac
     return await get_default_or_raise(db_session=db_session)
 
 
-async def get_all(*, db_session: AsyncSession) -> List[Optional[Contact]]:
+async def get_all(*, db_session: AsyncSession) -> Sequence[Contact]:
     """Returns all contacts."""
     result = await db_session.execute(select(Contact))
+    return result.scalars().all()
+
+
+async def get_all_with_location(*, db_session: AsyncSession) -> Sequence[Contact]:
+    """Returns all contacts."""
+    result = await db_session.execute(select(Contact).where(Contact.location.is_not(None)))
     return result.scalars().all()
 
 
