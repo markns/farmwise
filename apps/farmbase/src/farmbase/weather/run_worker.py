@@ -17,6 +17,7 @@ async def main():
         task_queue=DEFAULT_TASK_QUEUE,
         workflows=[SendWeatherWorkflow],
         activities=[
+            activities.get_contacts_with_location,
             activities.get_weather_forecast,
             activities.summarize_forecast,
             activities.send_whatsapp_message,

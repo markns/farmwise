@@ -4,7 +4,6 @@ from temporalio import workflow
 from temporalio.common import RetryPolicy
 
 from farmbase.weather.activities import WeatherActivities
-from farmbase.weather.shared import LocationQuery
 
 # with workflow.unsafe.imports_passed_through():
 # from activities import BankingActivities
@@ -69,34 +68,37 @@ class SendWeatherWorkflow:
         )
 
         # load all contacts with a location
-
-        forecast = await workflow.execute_activity_method(
-            WeatherActivities.get_weather_forecast,
-            LocationQuery(location="0.5635, 34.5606"),
-            # YourParams("Hello", name),
+        contacts = await workflow.execute_activity_method(
+            WeatherActivities.get_contacts_with_location,
             start_to_close_timeout=timedelta(seconds=10),
             retry_policy=retry_policy,
         )
-        forecast_summary = await workflow.execute_activity_method(
-            WeatherActivities.summarize_forecast,
-            args=(forecast,),
-            # YourParams("Hello", name),
-            start_to_close_timeout=timedelta(seconds=10),
-        )
+        for contact in contacts:
+            forecast = await workflow.execute_activity_method(
+                WeatherActivities.get_weather_forecast,
+                contact,
+                start_to_close_timeout=timedelta(seconds=10),
+                retry_policy=retry_policy,
+            )
+            forecast_summary = await workflow.execute_activity_method(
+                WeatherActivities.summarize_forecast,
+                args=(forecast,),
+                start_to_close_timeout=timedelta(seconds=10),
+            )
 
-        await workflow.execute_activity_method(
-            WeatherActivities.send_whatsapp_message,
-            args=["31657775781", forecast_summary],
-            # YourParams("Hello", name),
-            start_to_close_timeout=timedelta(seconds=10),
-        )
+            await workflow.execute_activity_method(
+                # TODO: Move to WhatsAppActivities
+                WeatherActivities.send_whatsapp_message,
+                args=[contact, forecast_summary],
+                start_to_close_timeout=timedelta(seconds=10),
+            )
 
-        # Save new messages to db
-        await workflow.execute_activity_method(
-            WeatherActivities.save_message,
-            args=[1, forecast_summary],
-            # YourParams("Hello", name),
-            start_to_close_timeout=timedelta(seconds=10),
-        )
+            # Save new messages to db
+            await workflow.execute_activity_method(
+                # TODO: Move to WhatsAppActivities
+                WeatherActivities.save_message,
+                args=[contact, forecast_summary],
+                start_to_close_timeout=timedelta(seconds=10),
+            )
 
-        return f"sent {forecast_summary} to 3165"
+        return "TODO"
