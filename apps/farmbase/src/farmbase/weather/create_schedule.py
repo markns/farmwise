@@ -25,7 +25,7 @@ async def main():
                 task_queue=DEFAULT_TASK_QUEUE,
             ),
             spec=ScheduleSpec(
-                cron_expressions=["0 4 * * *"],  # UTC time: 7 AM EAT = 4 AM UTC
+                cron_expressions=["0 7 * * *"],  # UTC time: 7 AM EAT = 4 AM UTC
                 time_zone_name="Africa/Nairobi",  # EAT corresponds to this IANA zone
             ),
             state=ScheduleState(note="Here's a note on my Schedule."),
