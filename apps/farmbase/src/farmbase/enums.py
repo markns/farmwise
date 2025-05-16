@@ -91,3 +91,9 @@ class SubjectNames(FarmbaseEnum):
     CASE = "Case"
     INCIDENT = "Incident"
     SIGNAL = "Signal"
+
+class ProductCategory(FarmbaseEnum):
+    """Categories of agricultural products."""
+    fungicide = "Fungicide"
+    insecticide = "Insecticide"
+    herbicide = "Herbicide"

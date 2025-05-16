@@ -10,6 +10,7 @@ from farmbase import __version__, config
 from farmbase.auth.models import FarmbaseUserOrganization
 from farmbase.config import FARMBASE_UI_URL
 from farmbase.contact.models import Contact
+from farmbase.data.products.models import Product
 from farmbase.enums import UserRoles
 from farmbase.exceptions.exceptions import FarmBaseApiError
 from farmbase.extensions import configure_extensions
@@ -22,6 +23,7 @@ Contact.id
 FarmbaseUserOrganization.farmbase_user
 Agent.id
 Message.id
+Product.id
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
