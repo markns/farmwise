@@ -1,15 +1,17 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise_schema.schema import WhatsappResponse
+
 from farmwise.context import UserContext
 from farmwise.tools.farmbase import update_contact
 
+from .crop_pathogen_diagnosis_agent import crop_pathogen_diagnosis_agent
 from .crop_suitability_agent import crop_suitability_agent
 from .maize_variety_selector import maize_variety_selector
-from .crop_pathogen_diagnosis_agent import crop_pathogen_diagnosis_agent
+
 
 def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    return f'''{RECOMMENDED_PROMPT_PREFIX}
+    return f"""{RECOMMENDED_PROMPT_PREFIX}
 Role and Purpose:
 
 You are FarmWise, an intelligent, reliable, and proactive agronomy advisor and farm management assistant. Your
@@ -58,8 +60,11 @@ FarmWise: “Planting maize in the upcoming month is feasible, considering the e
 soil is well-prepared and consider using drought-resistant maize varieties suitable for your region. Would you like
 assistance in selecting the appropriate variety or calculating the required fertilizer application?”
 
+If the user shares their location in a message, use the update_contact tool to update their details.
+
 These are the details of the current user: {ctx.context}
-'''
+"""
+
 
 triage_agent: Agent[UserContext] = Agent(
     name="Triage Agent",
