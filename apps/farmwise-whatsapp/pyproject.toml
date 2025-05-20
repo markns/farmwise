@@ -9,7 +9,7 @@ authors = [
 requires-python = "<=3.13"
 dependencies = [
     "farmwise-client",
-    "pywa[cryptography,fastapi]>=2.7.0",
+    "pywa[cryptography,fastapi]>=2.10.0",
 ]
 
 [project.scripts]

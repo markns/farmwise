@@ -1686,7 +1686,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "farmwise-client", editable = "libs/farmwise-client" },
-    { name = "pywa", extras = ["cryptography", "fastapi"], specifier = ">=2.7.0" },
+    { name = "pywa", extras = ["cryptography", "fastapi"], specifier = ">=2.10.0" },
 ]
 
 [[package]]
@@ -4903,14 +4903,14 @@ wheels = [
 
 [[package]]
 name = "pywa"
-version = "2.7.0"
+version = "2.10.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/48/a4/8a02043af8442804e8a4b43f08182e8530621a513659d5b4329597845190/pywa-2.7.0.tar.gz", hash = "sha256:890bfebda10ef12ab38f5e64a9e420db7fad5d8ccc07dda16f20121e8966e2f6", size = 184781 }
+sdist = { url = "https://files.pythonhosted.org/packages/44/f7/00a1785fe7e89d6ce3d8036e6e5124243b3bf6e971831535ac78f327d255/pywa-2.10.0.tar.gz", hash = "sha256:e325dbe85f24956c85f9a01859b86415ae7829f064683e01166413374e957c77", size = 200440 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/d6/b0cfdc16186b735cd1b72f094722a9ca01618bab61d5c07e76b4e93fc5a2/pywa-2.7.0-py3-none-any.whl", hash = "sha256:cb58512d862909380da4b9f9ffa60622c94046aca9f4d734aabd6e03acbda57e", size = 180038 },
+    { url = "https://files.pythonhosted.org/packages/a9/0a/92d4f251f48ea4dab2dba5e2db1313f91c21808f9b4b459130fa6e42a6f4/pywa-2.10.0-py3-none-any.whl", hash = "sha256:7657247acb9ef09295f3c44a2f6d5beada44b25eda7a1af86594a654587b5d7c", size = 194187 },
 ]
 
 [package.optional-dependencies]

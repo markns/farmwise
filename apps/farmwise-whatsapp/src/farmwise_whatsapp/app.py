@@ -1,4 +1,5 @@
 import base64
+import logging
 from contextlib import asynccontextmanager
 from enum import Enum
 
@@ -6,11 +7,15 @@ from farmwise_client import AgentClient
 from farmwise_schema.schema import Action, WhatsappResponse
 from fastapi import FastAPI
 from loguru import logger
+from loguru_logging_intercept import InterceptHandler
 from pywa.types import Command, Section, SectionList, SectionRow
 from pywa_async import WhatsApp, filters, types
 from pywa_async.types.base_update import BaseUserUpdateAsync
 
-from farmwise_whatsapp.core.config import settings  # Import settings
+from .core.config import settings
+
+# Intercept standard logging and route to loguru
+logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
 
 
 # TODO: load these commands from the FarmWise service
@@ -24,15 +29,18 @@ class Commands(Enum):
 async def lifespan(_: FastAPI):
     print("Startup: Initializing resources...")
 
-    # TODO: Ice breakers is only showing the last command - why?
-    # ice_breakers = [c.value.name for c in Commands]
-    ice_breakers = []
-    print(ice_breakers)
-    await wa.update_conversational_automation(
-        enable_chat_opened=True,
-        ice_breakers=ice_breakers,
-        commands=[command.value for command in Commands],
-    )
+    # Ice breakers don't allow emojis when set via API, so set these in the WhatsApp Manager
+    ice_breakers = [
+        "🌻 What crops are suitable for my area",
+        "🌤️ Give me a weather forecast",
+        "🌱 Calculate fertilizer for my field",
+    ]
+    # TODO: It's all or nothing with conversational automation, so we can't set commands and not ice breakers
+    # await wa.update_conversational_automation(
+    #     enable_chat_opened=True,
+    #     # ice_breakers=ice_breakers,
+    #     commands=[command.value for command in Commands],
+    # )
 
     yield  # Run the application
     print("Shutdown: Cleaning up resources...")
@@ -107,7 +115,8 @@ Reply with “menu” to see all services.
 @wa.on_message(filters.location)
 async def location_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"LOCATION USER: {msg}")
-    await msg.mark_as_read()
+    # await msg.mark_as_read()
+    await msg.indicate_typing()
     response = await agent_client.ainvoke(
         message=f"My location is {msg.location}",
         user_id=msg.from_user.wa_id,
@@ -125,7 +134,7 @@ async def raw_update_handler(_: WhatsApp, update: dict):
 @wa.on_message(filters.text)
 async def message_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"MESSAGE USER: {msg}")
-    await msg.mark_as_read()
+    await msg.indicate_typing()
     response = await agent_client.ainvoke(
         message=msg.text,
         user_id=msg.from_user.wa_id,
@@ -139,7 +148,7 @@ async def message_handler(_: WhatsApp, msg: types.Message):
 @wa.on_callback_selection
 async def callback_handler(_: WhatsApp, sel: types.CallbackSelection):
     logger.info(f"CALLBACK SELECTION USER: {sel}")
-    await sel.mark_as_read()
+    await msg.indicate_typing()
     response = await agent_client.ainvoke(
         message=sel.data,
         user_id=sel.from_user.wa_id,
@@ -157,7 +166,7 @@ def encode_image(image_path):
 
 @wa.on_message(filters.image)
 async def on_image(_: WhatsApp, msg: types.Message):
-    logger.info(f"IMAGE USER: {msg}")
+    await msg.indicate_typing()
     img_bytes = await msg.image.download(in_memory=True)
     img_b64 = base64.b64encode(img_bytes).decode("utf-8")
 
