@@ -85,6 +85,7 @@ class WeatherActivities:
 
     @activity.defn
     async def send_whatsapp_message(self, contact: Contact, message: str):
+        from loguru import logger
         from pywa_async import WhatsApp
 
         wa = WhatsApp(
@@ -92,7 +93,9 @@ class WeatherActivities:
             token=os.environ["WHATSAPP_TOKEN"],
         )
         # TODO: This should be a template message: https://pywa.readthedocs.io/en/latest/content/examples/template.html
-        await wa.send_message(to=contact.phone_number, text=message)
+        resp = await wa.send_message(to=contact.phone_number, text=message)
+        # TODO: Log/alert when message sending failed.
+        logger.info(f"Response for message to {contact.phone_number}: {resp}")
 
     @activity.defn
     async def save_message(self, contact: Contact, text: str):
