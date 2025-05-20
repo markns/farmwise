@@ -94,6 +94,9 @@ async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
 
 
 # TODO: Chat opened is not being triggered...
+#  https://developers.facebook.com/docs/whatsapp/cloud-api/phone-numbers/conversational-components#welcome-messages
+#  Welcome messages are currently not functioning as intended.
+#  https://developers.facebook.com/community/threads/1842836979827258/?post_id=1842836983160591
 @wa.on_chat_opened
 async def chat_opened_handler(client: WhatsApp, chat_opened: types.ChatOpened):
     logger.info(f"CHAT OPENED USER: {chat_opened}")
