@@ -6,6 +6,7 @@ from sqlalchemy_utils import create_database, database_exists
 
 from farmbase import config
 from farmbase.organization.models import Organization
+from ..farm.models import Platform, ActivityType, Commodity
 
 from ..plugin.models import Plugin
 from ..project.models import Project
@@ -38,6 +39,77 @@ def get_tenant_tables():
         if not table.schema:
             tenant_tables.append(table)
     return tenant_tables
+
+
+def populate_static_data(session):
+    # Check and add Platforms
+    if not session.query(Platform).first():
+        print("Populating static Platform data...")
+        platforms_to_add = [
+            Platform(platform_name="Web"),
+            Platform(platform_name="Mobile App (iOS)"),
+            Platform(platform_name="Mobile App (Android)"),
+            Platform(platform_name="Machine Data Import"),
+            Platform(platform_name="API Integration"),
+        ]
+        session.add_all(platforms_to_add)
+        session.commit()
+        print(f"{len(platforms_to_add)} Platforms added.")
+    else:
+        print("Platform data already exists.")
+
+    # Check and add ActivityTypes
+    if not session.query(ActivityType).first():
+        print("Populating static ActivityType data...")
+        activity_types_to_add = [
+            ActivityType(activity_type_name="Planting", description="Recording crop planting activities."),
+            ActivityType(activity_type_name="Fertilizing", description="Application of fertilizers."),
+            ActivityType(
+                activity_type_name="Spraying", description="Application of pesticides, herbicides, or fungicides."
+            ),
+            ActivityType(activity_type_name="Tillage", description="Soil cultivation activities."),
+            ActivityType(activity_type_name="Irrigation", description="Water application activities."),
+            ActivityType(activity_type_name="Harvesting", description="Crop harvesting activities."),
+            ActivityType(activity_type_name="Scouting", description="Field scouting and observation."),
+            ActivityType(activity_type_name="Soil Sampling", description="Collecting soil samples for analysis."),
+            ActivityType(activity_type_name="Maintenance", description="Equipment or infrastructure maintenance."),
+        ]
+        session.add_all(activity_types_to_add)
+        session.commit()
+        print(f"{len(activity_types_to_add)} ActivityTypes added.")
+    else:
+        print("ActivityType data already exists.")
+
+    # Optionally, add some default commodities if desired
+    if not session.query(Commodity).first():
+        print("Populating static Commodity data...")
+        commodities_to_add = [
+            Commodity(commodity_name="Corn"),
+            Commodity(commodity_name="Soybeans"),
+            Commodity(commodity_name="Wheat"),
+            Commodity(commodity_name="Cotton"),
+            Commodity(commodity_name="Barley"),
+            Commodity(commodity_name="Sorghum"),
+            Commodity(commodity_name="Canola"),
+            Commodity(commodity_name="Alfalfa"),
+        ]
+        session.add_all(commodities_to_add)
+        session.commit()
+        print(f"{len(commodities_to_add)} Commodities added.")
+    else:
+        print("Commodity data already exists.")
+
+    # Verify data
+    print("\n--- Verification ---")
+    print(f"Total Platforms: {session.query(Platform).count()}")
+    for p in session.query(Platform).all():
+        print(f"  {p}")
+    print(f"Total ActivityTypes: {session.query(ActivityType).count()}")
+    for at in session.query(ActivityType).all():
+        print(f"  {at}")
+    print(f"Total Commodities: {session.query(Commodity).count()}")
+    for c in session.query(Commodity).all():
+        print(f"  {c}")
 
 
 def init_database(engine):
@@ -125,6 +197,8 @@ def init_database(engine):
         project_flows.project_init_flow(
             project_id=project.id, organization_slug=organization.slug, db_session=db_session
         )
+
+    populate_static_data(db_session)
 
 
 def init_schema(*, engine, organization: Organization):

@@ -4,7 +4,12 @@ from typing import Any, List, Optional
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
 from pydantic import Field, field_serializer, field_validator
-from sqlalchemy import ForeignKey
+from sqlalchemy import (
+    ForeignKey,
+    Integer,
+    String,
+)
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
@@ -15,26 +20,52 @@ from farmbase.validators import must_not_be_blank
 # TODO: use this pattern to add other contact types. eg. farmers
 # https://docs.sqlalchemy.org/en/20/orm/queryguide/_inheritance_setup.html
 
+#
+# class Contact(Base):
+#     __tablename__ = "contact"
+#     __repr_attrs__ = ["name", "phone_number"]
+#
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     name: Mapped[str] = mapped_column()
+#
+#     # TODO: use PhoneNumber libraries for sqlalchemy and pydantic
+#     phone_number: Mapped[str] = mapped_column(unique=True)
+#     # _phone_number = Column(Unicode(20))
+#     # country_code: Mapped[str] = mapped_column()
+#     # phone_number = orm.composite(SQLPhoneNumber, _phone_number, country_code)
+#
+#     organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id))
+#     organization = relationship("Organization")
+#
+#     location: Mapped[Optional[WKBElement]] = mapped_column(
+#         Geometry(geometry_type="POINT", srid=4326, spatial_index=True), nullable=True
+#     )
+
 
 class Contact(Base, TimeStampMixin):
     __tablename__ = "contact"
-    __repr_attrs__ = ["name", "phone_number"]
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    contact_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    phone_number: Mapped[str | None] = mapped_column(String(50), unique=True, nullable=True)
+    email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
+    location: Mapped[Optional[WKBElement]] = mapped_column(
+        Geometry(geometry_type="POINT", srid=4326, from_text="ST_GeomFromEWKT", name="geometry"), nullable=True
+    )
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column()
-
-    # TODO: use PhoneNumber libraries for sqlalchemy and pydantic
-    phone_number: Mapped[str] = mapped_column(unique=True)
-    # _phone_number = Column(Unicode(20))
-    # country_code: Mapped[str] = mapped_column()
-    # phone_number = orm.composite(SQLPhoneNumber, _phone_number, country_code)
-
+    # Relationships
     organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id))
     organization = relationship("Organization")
 
-    location: Mapped[Optional[WKBElement]] = mapped_column(
-        Geometry(geometry_type="POINT", srid=4326, spatial_index=True), nullable=True
+    farm_associations: Mapped[list["FarmContact"]] = relationship(
+        back_populates="contact", cascade="all, delete-orphan"
     )
+    notes_created: Mapped[list["Note"]] = relationship(back_populates="created_by_contact")
+    harvest_loads_involved: Mapped[list["HarvestLoad"]] = relationship(back_populates="person_involved_contact")
+
+    farms = association_proxy("farm_associations", "farm")
+
+    def __repr__(self):
+        return f"<Contact(id={self.id}, contact_name='{self.contact_name}')>"
 
 
 class ContactBase(FarmbaseBase):

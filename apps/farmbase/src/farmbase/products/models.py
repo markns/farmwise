@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from sqlalchemy import Float, ForeignKey, String, Text
+from sqlalchemy import Float, ForeignKey, String, Text, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
@@ -21,13 +21,29 @@ class Product(Base, TimeStampMixin):
     """An agricultural product, e.g., fungicide, insecticide, herbicide."""
 
     __tablename__ = "product"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     category: Mapped[ProductCategory] = mapped_column(String, nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
     manufacturer_id: Mapped[int] = mapped_column(ForeignKey("manufacturer.id"), nullable=False)
     manufacturer: Mapped[Manufacturer] = relationship("Manufacturer")
-    price: Mapped[float] = mapped_column(Float, nullable=False)
+    price: Mapped[float] = mapped_column(Float, nullable=False)  # TODO: this should be a time series
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    default_unit: Mapped[str | None] = mapped_column(String(50), nullable=True)
+
+    # Relationships
+    activity_associations: Mapped[list["ActivityProduct"]] = relationship(
+        back_populates="product", cascade="all, delete-orphan"
+    )
+
+    # class Product(Base):
+    #     __tablename__ = "product"
+    #     product_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    #     product_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    #     product_type: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    #
+
+    def __repr__(self):
+        return f"<Product(id={self.id}, product_name='{self.product_name}')>"
 
 
 # Pydantic schemas

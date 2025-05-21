@@ -7,9 +7,9 @@ from sqlalchemy_filterset import (
     SearchFilter,
 )
 
-from ...database.core import BaseFilterSet
-from ...enums import ProductCategory
-from ...models import PaginationParams
+from ..database.core import BaseFilterSet
+from ..enums import ProductCategory
+from ..models import PaginationParams
 from .models import Manufacturer, Product
 
 

@@ -1,12 +1,13 @@
 """
 Service layer for products and manufacturers.
 """
-from typing import Optional, List
+
+from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from farmbase.data.products.models import Product, ProductCreate, ProductUpdate
+from farmbase.products.models import Product, ProductCreate, ProductUpdate
 
 
 async def get(*, db_session: AsyncSession, product_id: int) -> Optional[Product]:
