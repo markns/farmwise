@@ -1,33 +1,44 @@
 from collections import UserDict
 
+from agents import RunContextWrapper, handoff
 from farmwise_schema.schema import AgentInfo
 from loguru import logger
+from pydantic import BaseModel, Field
 
 from .crop_pathogen_diagnosis_agent import crop_pathogen_diagnosis_agent
 from .crop_suitability_agent import crop_suitability_agent
 from .maize_variety_selector import maize_variety_selector
 from .triage_agent import triage_agent
 
-# Setup handoff relationships
-triage_agent.handoffs = [
-    crop_suitability_agent,
-    maize_variety_selector,
-    crop_pathogen_diagnosis_agent,
+
+class HandoffInfo(BaseModel):
+    subagent_name: str = Field(description="The name of the subagent being called.")
+    reason: str = Field(description="The reason for the handoff.")
+
+
+# we redefine the on_handoff to include the HandoffInfo
+async def on_handoff(ctx: RunContextWrapper[None], input_data: HandoffInfo):
+    logger.debug(f"Handoff to '{input_data.subagent_name}' because '{input_data.reason}'")
+
+
+triage_agent_handoff = handoff(agent=triage_agent, on_handoff=on_handoff, input_type=HandoffInfo)
+crop_pathogen_diagnosis_agent_handoff = handoff(
+    agent=crop_pathogen_diagnosis_agent, on_handoff=on_handoff, input_type=HandoffInfo
+)
+crop_suitability_agent_handoff = handoff(agent=crop_suitability_agent, on_handoff=on_handoff, input_type=HandoffInfo)
+maize_variety_selector_handoff = handoff(agent=maize_variety_selector, on_handoff=on_handoff, input_type=HandoffInfo)
+
+handoffs = [
+    triage_agent_handoff,
+    crop_pathogen_diagnosis_agent_handoff,
+    crop_suitability_agent_handoff,
+    maize_variety_selector_handoff,
 ]
 
-maize_variety_selector.handoffs = [
-    crop_suitability_agent,
-    triage_agent,
-]
-
-crop_suitability_agent.handoffs = [
-    triage_agent,
-    maize_variety_selector,
-]
-
-crop_pathogen_diagnosis_agent.handoffs = [
-    triage_agent,
-]
+triage_agent.handoffs = handoffs
+maize_variety_selector.handoffs = handoffs
+crop_suitability_agent.handoffs = handoffs
+crop_pathogen_diagnosis_agent.handoffs = handoffs
 
 DEFAULT_AGENT = triage_agent.name
 

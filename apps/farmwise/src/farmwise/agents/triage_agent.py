@@ -5,10 +5,6 @@ from farmwise_schema.schema import WhatsappResponse
 from farmwise.context import UserContext
 from farmwise.tools.farmbase import update_contact
 
-from .crop_pathogen_diagnosis_agent import crop_pathogen_diagnosis_agent
-from .crop_suitability_agent import crop_suitability_agent
-from .maize_variety_selector import maize_variety_selector
-
 
 def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
     return f"""{RECOMMENDED_PROMPT_PREFIX}
@@ -68,9 +64,10 @@ These are the details of the current user: {ctx.context}
 
 triage_agent: Agent[UserContext] = Agent(
     name="Triage Agent",
-    handoff_description="Provides personalized agronomic advice and manages farm records. Ideal for queries on crop planning, pest management, input optimization, and farm data updates. Transfer back to this agent when the message from the user isn't relevant to your instructions.",
+    handoff_description="""Provides personalized agronomic advice and manages farm records. Ideal for queries on 
+    crop planning, pest management, input optimization, and farm data updates. Transfer back to this agent when the 
+    message from the user isn't relevant to your instructions.""",
     instructions=triage_agent_instructions,
-    handoffs=[crop_suitability_agent, maize_variety_selector, crop_pathogen_diagnosis_agent],
     tools=[update_contact],
     output_type=WhatsappResponse,
     model="gpt-4.1",

@@ -41,7 +41,7 @@ async def invoke(
     else:
         agent = agents[DEFAULT_AGENT]
 
-    logger.info(f"USER: {user_input.message} CONTEXT: {context} STATE: {chat_state}")
+    logger.info(f"USER: {user_input.message} CONTEXT: {context} LAST_AGENT: {chat_state.last_agent}")
 
     input_items = chat_state.input_list
 
