@@ -43,6 +43,7 @@ class SendWeatherWorkflow:
 
             await workflow.execute_activity_method(
                 WhatsAppActivities.send_whatsapp_template,
+                # TODO: could used named params once https://github.com/david-lev/pywa/issues/115 is fixed
                 args=[contact, "weather_forecast", [forecast_summary.location] + forecast_summary.forecast],
                 start_to_close_timeout=timedelta(seconds=10),
             )
