@@ -1,5 +1,3 @@
-import os
-
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from temporalio import activity
@@ -8,18 +6,35 @@ from .shared import Contact
 
 
 class WhatsAppActivities:
-
     def __init__(self, whatsapp_client):
         self.whatsapp = whatsapp_client
 
     @activity.defn
-    async def send_whatsapp_message(self, contact: Contact, message: str):
+    async def send_whatsapp_template(self, contact: Contact, template_name: str, values: list[str]):
         from loguru import logger
+        from pywa_async.types import Template
+        from pywa_async.types.sent_message import SentTemplate
 
-        # TODO: This should be a template message: https://pywa.readthedocs.io/en/latest/content/examples/template.html
-        resp = await self.whatsapp.send_message(to=contact.phone_number, text=message)
+        resp: SentTemplate = await self.whatsapp.send_template(
+            to=contact.phone_number,
+            template=Template(
+                name=template_name,
+                language=Template.Language.ENGLISH,
+                # header=Template.TextValue(value="15"),
+                body=[Template.TextValue(s) for s in values],
+                # buttons=[
+                #   Template.UrlButtonValue(value="iphone15"),
+                #   Template.QuickReplyButtonData(data="unsubscribe_from_marketing_messages"),
+                #   Template.QuickReplyButtonData(data="unsubscribe_from_all_messages"),
+                # ],
+            ),
+        )
+
         # TODO: Log/alert when message sending failed.
         logger.info(f"Response for message to {contact.phone_number}: {resp}")
+
+        # TODO: Get message body somehow
+        # return resp
 
     @activity.defn
     async def save_message(self, contact: Contact, text: str):

@@ -1,8 +1,13 @@
-from dataclasses import dataclass
+from temporalio import workflow
+
+# Always pass through external modules to the sandbox that you know are safe for
+# workflow use
+with workflow.unsafe.imports_passed_through():
+    from pydantic import BaseModel
 
 
-@dataclass
-class Contact:
+# TODO: Maybe can use ContactRead here?
+class Contact(BaseModel):
     id: int
     phone_number: str
     name: str

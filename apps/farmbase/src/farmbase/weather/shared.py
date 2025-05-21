@@ -1,16 +1,24 @@
-from dataclasses import dataclass
+from temporalio import workflow
 
 # MONEY_TRANSFER_TASK_QUEUE_NAME = "TRANSFER_MONEY_TASK_QUEUE"
 DEFAULT_TASK_QUEUE = "DEFAULT_TASK_QUEUE"
 
+# Always pass through external modules to the sandbox that you know are safe for
+# workflow use
+with workflow.unsafe.imports_passed_through():
+    from pydantic import BaseModel
 
-@dataclass
-class LocationQuery:
+
+class LocationQuery(BaseModel):
     location: str
 
 
-@dataclass
-class ForecastDetails:
+class ForecastDetails(BaseModel):
     location: str
     country: str
     hourly_descriptions: list[str]
+
+
+class ForecastSummary(BaseModel):
+    location: str
+    forecast: list[str]

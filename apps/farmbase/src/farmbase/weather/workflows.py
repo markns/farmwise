@@ -6,6 +6,11 @@ from temporalio.common import RetryPolicy
 from farmbase.weather.activities import WeatherActivities
 from farmbase.whatsapp.activities import WhatsAppActivities
 
+# Always pass through external modules to the sandbox that you know are safe for
+# workflow use
+with workflow.unsafe.imports_passed_through():
+    pass
+
 
 @workflow.defn
 class SendWeatherWorkflow:
@@ -37,16 +42,16 @@ class SendWeatherWorkflow:
             )
 
             await workflow.execute_activity_method(
-                WhatsAppActivities.send_whatsapp_message,
-                args=[contact, forecast_summary],
+                WhatsAppActivities.send_whatsapp_template,
+                args=[contact, "weather_forecast", [forecast_summary.location] + forecast_summary.forecast],
                 start_to_close_timeout=timedelta(seconds=10),
             )
 
             # Save new messages to db
             await workflow.execute_activity_method(
                 WhatsAppActivities.save_message,
-                args=[contact, forecast_summary],
+                args=[contact, "\n".join(forecast_summary.forecast)],
                 start_to_close_timeout=timedelta(seconds=10),
             )
 
-        return "TODO"
+        # TODO: What is the right thing to return here?

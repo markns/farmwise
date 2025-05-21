@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from temporalio import activity
 
 from ..whatsapp.shared import Contact
-from .shared import ForecastDetails
+from .shared import ForecastDetails, ForecastSummary
 
 
 class WeatherActivities:
@@ -37,23 +37,21 @@ class WeatherActivities:
         return [_get_contact(c) for c in contacts]
 
     @activity.defn
-    async def summarize_forecast(self, forecast: ForecastDetails):
+    async def summarize_forecast(self, forecast: ForecastDetails) -> ForecastSummary:
         from openai import OpenAI
 
         client = OpenAI()
 
-        response = client.responses.create(
-            model="gpt-4.1-nano",
-            input=f"""
+        input_ = f"""
     Summarise the weather forecast for the next 3 days using the details below.
     The forecast is to be sent to farmers in {forecast.location}, {forecast.country}.
-    Use one summary emoji at the start of each line.
+    Use an emoji that best summarizes the daily forecast at the start of each line.
     
     {forecast.hourly_descriptions}
-          """,
-        )
-
-        return response.output[0].content[0].text
+"""
+        response = client.responses.parse(model="gpt-4.1-nano", input=input_, text_format=ForecastSummary)
+        print(response.output_parsed)
+        return response.output_parsed
 
     @activity.defn
     async def get_weather_forecast(self, contact: Contact) -> ForecastDetails:
