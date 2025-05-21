@@ -1,7 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import ValidationError
 from slugify import slugify
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import selectinload
 
 from farmbase.auth.permissions import (
     OrganizationOwnerPermission,
@@ -9,14 +13,15 @@ from farmbase.auth.permissions import (
 )
 from farmbase.auth.service import CurrentUser
 from farmbase.database.core import DbSession
-from farmbase.database.service import CommonParameters, search_filter_sort_paginate
 from farmbase.enums import UserRoles
 from farmbase.models import PrimaryKey
 from farmbase.project import flows as project_flows
 from farmbase.project import service as project_service
 from farmbase.project.models import ProjectCreate
 
+from .filterset import OrganizationQueryParams, OrganizationFilterSet
 from .models import (
+    Organization,
     OrganizationCreate,
     OrganizationPagination,
     OrganizationRead,
@@ -28,10 +33,19 @@ router = APIRouter()
 
 
 @router.get("", response_model=OrganizationPagination)
-async def get_organizations(common: CommonParameters):
+async def get_organizations(db_session: DbSession, query_params: Annotated[OrganizationQueryParams, Query()]):
     """Get all organizations."""
-    result = await search_filter_sort_paginate(model="Organization", **common)
-    return result
+    stmt = select(Organization)
+    filter_set = OrganizationFilterSet(db_session, stmt)
+    params_d = query_params.model_dump(exclude_none=True)
+    total = await filter_set.count(params_d)
+    organizations = await filter_set.filter(params_d)
+    return OrganizationPagination(
+        items=organizations,
+        items_per_page=query_params.items_per_page,
+        page=query_params.page,
+        total=total,
+    )
 
 
 @router.post(

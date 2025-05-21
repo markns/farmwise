@@ -9,6 +9,8 @@ from sqlalchemy.engine.url import make_url
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Session, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
+from sqlalchemy_filterset import AsyncFilterSet, LimitOffsetFilter
+from sqlalchemy_filterset.filtersets import Model
 from sqlalchemy_utils import get_mapper
 from starlette.requests import Request
 
@@ -46,7 +48,7 @@ def create_db_engine(connection_string: str, echo=False):
 
 
 # Create the default engine with standard timeout
-engine = create_db_engine(config.SQLALCHEMY_DATABASE_URI)
+engine = create_db_engine(config.SQLALCHEMY_DATABASE_URI, echo=True)
 engine_sync = create_db_engine(config.SQLALCHEMY_DATABASE_SYNC_URI, echo=True)
 
 # Enable query timing logging
@@ -240,6 +242,10 @@ async def get_schema_names(_engine: AsyncEngine) -> list[str]:
 
     async with _engine.connect() as async_conn:
         return await async_conn.run_sync(_get_schema_names)
+
+
+class BaseFilterSet(AsyncFilterSet[Model]):
+    limit_offset = LimitOffsetFilter()
 
 
 #

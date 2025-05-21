@@ -1,8 +1,12 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Query
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from farmbase.database.core import DbSession
-from farmbase.database.service import CommonParameters, search_filter_sort_paginate
 from farmbase.models import PrimaryKey
+from .filterset import ContactQueryParams, ContactFilterSet
 
 from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
 from ..organization.service import CurrentOrganization
@@ -12,6 +16,7 @@ from .models import (
     ContactPagination,
     ContactPatch,
     ContactRead,
+    Contact,
 )
 from .service import create, delete, get, get_by_phone_number, get_or_create, patch
 
@@ -19,9 +24,22 @@ router = APIRouter()
 
 
 @router.get("", response_model=ContactPagination)
-async def get_contacts(common: CommonParameters):
+async def get_contacts(    db_session: DbSession,
+    query_params: Annotated[ContactQueryParams, Query()],
+                           ):
     """Get all contacts."""
-    return await search_filter_sort_paginate(model="Contact", **common)
+    stmt = select(Contact).options(selectinload(Contact.organization))
+    filter_set = ContactFilterSet(db_session, stmt)
+    params_d = query_params.model_dump(exclude_none=True)
+    total = await filter_set.count(params_d)
+    contacts = await filter_set.filter(params_d)
+    return ContactPagination(
+        items=contacts,
+        items_per_page=query_params.items_per_page,
+        page=query_params.page,
+        total=total,
+    )
+
 
 
 @router.post(

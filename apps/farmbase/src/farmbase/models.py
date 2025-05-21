@@ -1,11 +1,11 @@
 from datetime import UTC, datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Optional
 from zoneinfo import ZoneInfo
 
 from pydantic import BaseModel, field_validator
-from pydantic.fields import Field
+from pydantic.fields import Field, computed_field
 from pydantic.types import SecretStr, constr
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, event, func
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -29,24 +29,26 @@ class ProjectMixin(object):
 
 
 class TimeStampMixin(object):
-    """Timestamping mixin"""
+    """
+    A mixin class for SQLAlchemy models to add UTC timestamp columns.
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
-    )
-    created_at._creation_order = 9998
+    Attributes:
+        created_at (Mapped[datetime.datetime]): Timestamp of when the record was created,
+                                                defaults to the current UTC time.
+        updated_at (Mapped[datetime.datetime]): Timestamp of when the record was last updated,
+                                                defaults to the current UTC time and updates
+                                                on every modification.
+    """
+
+    __abstract__ = True  # Important for mixin classes not to be mapped to a table
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),  # Updates on every modification using database's NOW()
+        nullable=False,
     )
-    updated_at._creation_order = 9998
-
-    @staticmethod
-    def _updated_at(mapper, connection, target):
-        target.updated_at = datetime.now(UTC)
-
-    @classmethod
-    def __declare_last__(cls):
-        event.listen(cls, "before_update", cls._updated_at)
 
 
 class ContactMixin(TimeStampMixin):
@@ -142,6 +144,20 @@ class Location(BaseModel):
     def to_ewkt(self) -> str:
         """Convert to EWKT format."""
         return f"SRID=4326;POINT({self.longitude} {self.latitude})"
+
+
+class PaginationParams(BaseModel):
+    items_per_page: int = Field(100, gt=0, le=100, exclude=True)
+    page: int = Field(1, ge=1, exclude=True)
+    ordering: list[str] = Field(default_factory=list)
+
+    @computed_field
+    @property
+    def limit_offset(self) -> Optional[tuple[int, int]]:
+        if self.items_per_page and self.page:
+            offset = (self.page - 1) * self.items_per_page
+            return self.items_per_page, offset
+        return None
 
 
 class Pagination(FarmbaseBase):

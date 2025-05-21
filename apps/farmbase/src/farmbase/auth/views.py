@@ -1,5 +1,3 @@
-from loguru import logger
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import ValidationError
 
@@ -9,21 +7,16 @@ from farmbase.auth.permissions import (
 )
 from farmbase.auth.service import CurrentUser, get_org_users
 from farmbase.database.core import DbSession
-from farmbase.database.service import CommonParameters
 from farmbase.enums import UserRoles
 from farmbase.exceptions.exceptions import (
     InvalidConfigurationError,
 )
 from farmbase.models import OrganizationSlug, PrimaryKey
 from farmbase.organization.models import OrganizationRead
-from farmbase.plugin import service as plugin_service
-from farmbase.plugins.farmbase_core.exceptions import MfaException
 
 from ..config import FARMBASE_AUTH_REGISTRATION_ENABLED
 from .models import (
     AdminPasswordReset,
-    MfaPayload,
-    MfaPayloadResponse,
     UserCreate,
     UserLogin,
     UserLoginResponse,
@@ -36,7 +29,6 @@ from .models import (
     UserUpdate,
 )
 from .service import create, get, get_by_email, get_org_users, update
-
 
 auth_router = APIRouter()
 user_router = APIRouter()
@@ -55,7 +47,7 @@ user_router = APIRouter()
     ],
     response_model=UserPagination,
 )
-async def get_users(organization: OrganizationSlug, common: CommonParameters):
+async def get_users(db_session: DbSession, organization: OrganizationSlug):
     """Gets all organization users."""
     # common["filter_spec"] = {"and": [{"model": "Organization", "op": "==", "field": "slug", "value": organization}]}
 
@@ -63,10 +55,10 @@ async def get_users(organization: OrganizationSlug, common: CommonParameters):
     #         selectinload(FarmbaseUser.projects).selectinload(FarmbaseUserProject.project)]
 
     # TODO: filters and pagination is broken. Maybe this will work for the time being.
-    users = await get_org_users(db_session=common["db_session"])
+    users = await get_org_users(db_session=db_session)
     items = {
         "items_per_page": len(users),
-        "page": common["page"],
+        # "page": common["page"],
         "items": users,
         "total": len(users),
     }

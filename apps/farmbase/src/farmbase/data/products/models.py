@@ -1,22 +1,25 @@
 from typing import List, Optional
 
-from sqlalchemy import String, Float, Text, ForeignKey
+from sqlalchemy import Float, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
-from farmbase.models import FarmbaseBase, Pagination, PrimaryKey
 from farmbase.enums import ProductCategory
+from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
 
 
-class Manufacturer(Base):
+# TODO: add
+class Manufacturer(Base, TimeStampMixin):
     """Manufacturer of agricultural products."""
+
     __tablename__ = "manufacturer"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
 
 
-class Product(Base):
+class Product(Base, TimeStampMixin):
     """An agricultural product, e.g., fungicide, insecticide, herbicide."""
+
     __tablename__ = "product"
     id: Mapped[int] = mapped_column(primary_key=True)
     category: Mapped[ProductCategory] = mapped_column(String, nullable=False)
@@ -40,7 +43,7 @@ class ManufacturerCreate(FarmbaseBase):
 class ProductBase(FarmbaseBase):
     category: ProductCategory
     name: str
-    manufacturer_id: PrimaryKey
+    # manufacturer_id: PrimaryKey
     price: float
     description: Optional[str] = None
 
@@ -52,11 +55,13 @@ class ProductRead(ProductBase):
 
 class ProductCreate(ProductBase):
     """Schema for creating a new product."""
+
     pass
 
 
 class ProductUpdate(FarmbaseBase):
     """Schema for updating an existing product."""
+
     category: Optional[ProductCategory] = None
     name: Optional[str] = None
     manufacturer_id: Optional[PrimaryKey] = None

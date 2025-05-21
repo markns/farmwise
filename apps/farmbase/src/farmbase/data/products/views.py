@@ -1,43 +1,42 @@
-import json
-from typing import Optional
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from farmbase.database.core import DbSession
-from farmbase.database.service import CommonParameters, search_filter_sort_paginate
 from farmbase.models import PrimaryKey
-from farmbase.enums import ProductCategory
 
+from .filterset import ProductFilterSet, ProductQueryParams
 from .models import (
-    ProductRead,
+    Product,
     ProductCreate,
-    ProductUpdate,
     ProductPagination,
+    ProductRead,
+    ProductUpdate,
 )
-from .service import get, create, update, delete
+from .service import create, delete, get, update
 
 router = APIRouter()
 
 
 @router.get("", response_model=ProductPagination)
 async def list_products(
-    common: CommonParameters,
-    category: Optional[ProductCategory] = None,
+    db_session: DbSession,
+    query_params: Annotated[ProductQueryParams, Query()],
 ):
-    """List products, optionally filtered by category."""
-    # Merge category filter into existing filters
-    if category:
-        spec = common.get("filter_spec")
-        # parse existing filter spec if present
-        filters = []
-        if spec:
-            filters = json.loads(spec) if isinstance(spec, str) else spec
-            if not isinstance(filters, list):
-                filters = [filters]
-        # add category filter
-        filters.append({"field": "category", "op": "==", "value": category})
-        common["filter_spec"] = filters
-    return await search_filter_sort_paginate(model="Product", **common)
+    """List products."""
+    stmt = select(Product).options(selectinload(Product.manufacturer))
+    filter_set = ProductFilterSet(db_session, stmt)
+    params_d = query_params.model_dump(exclude_none=True)
+    total = await filter_set.count(params_d)
+    products = await filter_set.filter(params_d)
+    return ProductPagination(
+        items=products,
+        items_per_page=query_params.items_per_page,
+        page=query_params.page,
+        total=total,
+    )
 
 
 @router.post("", response_model=ProductRead)

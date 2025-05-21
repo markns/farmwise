@@ -1,5 +1,9 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from typing import Annotated
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from pydantic import ValidationError
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from farmbase.auth.permissions import (
     PermissionsDependency,
@@ -7,11 +11,12 @@ from farmbase.auth.permissions import (
     ProjectUpdatePermission,
 )
 from farmbase.database.core import DbSession
-from farmbase.database.service import CommonParameters, search_filter_sort_paginate
 from farmbase.models import OrganizationSlug, PrimaryKey
 
+from .filterset import ProjectFilterSet, ProjectQueryParams
 from .flows import project_init_flow
 from .models import (
+    Project,
     ProjectCreate,
     ProjectPagination,
     ProjectRead,
@@ -23,9 +28,19 @@ router = APIRouter()
 
 
 @router.get("", response_model=ProjectPagination)
-async def get_projects(common: CommonParameters):
+async def get_projects(db_session: DbSession, query_params: Annotated[ProjectQueryParams, Query()]):
     """Get all projects."""
-    return await search_filter_sort_paginate(model="Project", **common)
+    stmt = select(Project).options(selectinload(Project.organization))
+    filter_set = ProjectFilterSet(db_session, stmt)
+    params_d = query_params.model_dump(exclude_none=True)
+    total = await filter_set.count(params_d)
+    projects = await filter_set.filter(params_d)
+    return ProjectPagination(
+        items=projects,
+        items_per_page=query_params.items_per_page,
+        page=query_params.page,
+        total=total,
+    )
 
 
 @router.post(
