@@ -3,13 +3,14 @@
     <v-layout class="h-100">
       <v-navigation-drawer width="220" permanent :rail="mini">
         <v-list density="compact" nav>
-          <v-list-item
-            v-for="(route, index) in routes"
-            :key="index"
-            :to="{ name: route.name }"
-            :prepend-icon="route.meta.icon"
-            :title="route.meta.title"
-          />
+          <template v-for="(route, index) in routes" :key="route.name">
+            <v-list-item
+              :to="{ name: route.name }"
+              :prepend-icon="route.meta.icon"
+              :title="route.meta.title"
+            />
+            <v-divider v-if="route.name === 'farmers'" />
+          </template>
           <v-list-item
             @click.stop="toggleMiniNav()"
             :prepend-icon="mini ? 'mdi-chevron-right' : 'mdi-chevron-left'"
@@ -48,15 +49,16 @@
   </v-navigation-drawer>
   <v-navigation-drawer permanent width="220" :rail="mini" v-else>
     <v-list density="compact" nav>
-      <v-list-item
-        v-for="(route, index) in routes"
-        :key="index"
-        :to="{ name: route.name }"
-        :prepend-icon="route.meta.icon"
-        :title="route.meta.title"
-      >
-        <v-tooltip v-if="mini" activator="parent" location="right" :text="route.meta.title" />
-      </v-list-item>
+      <template v-for="(route, index) in routes" :key="route.name">
+        <v-list-item
+          :to="{ name: route.name }"
+          :prepend-icon="route.meta.icon"
+          :title="route.meta.title"
+        >
+          <v-tooltip v-if="mini" activator="parent" location="right" :text="route.meta.title" />
+        </v-list-item>
+        <v-divider v-if="route.name === 'farmers'" />
+      </template>
       <v-list-item
         @click.stop="toggleMiniNav()"
         :prepend-icon="mini ? 'mdi-chevron-right' : 'mdi-chevron-left'"
