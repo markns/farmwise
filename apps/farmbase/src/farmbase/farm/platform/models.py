@@ -10,7 +10,7 @@ from farmbase.database.core import Base
 
 class Platform(Base):
     __tablename__ = "platform"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)  # Changed platform_id to id
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     platform_name: Mapped[str] = mapped_column(String(50), nullable=False)
 
     # Relationships (collection names remain plural)
@@ -18,4 +18,4 @@ class Platform(Base):
     boundary_activities: Mapped[list["BoundaryDefinitionActivity"]] = relationship(back_populates="platform")
 
     def __repr__(self):
-        return f"<Platform(id={self.id}, platform_name='{self.platform_name}')>"  # Changed platform_id to id
+        return f"<Platform(id={self.id}, platform_name='{self.platform_name}')>"

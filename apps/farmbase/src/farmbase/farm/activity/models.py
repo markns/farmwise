@@ -17,7 +17,7 @@ from farmbase.products.models import Product
 
 class ActivityType(Base):
     __tablename__ = "activity_type"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)  # Changed activity_type_id to id
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     activity_type_name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     description: Mapped[str | None] = mapped_column(TEXT, nullable=True)
 
@@ -25,7 +25,7 @@ class ActivityType(Base):
     farm_activities: Mapped[list["FarmActivity"]] = relationship(back_populates="activity_type")
 
     def __repr__(self):
-        return f"<ActivityType(id={self.id}, activity_type_name='{self.activity_type_name}')>"  # Changed activity_type_id to id
+        return f"<ActivityType(id={self.id}, activity_type_name='{self.activity_type_name}')>"
 
 
 class FarmActivity(Base):
@@ -40,10 +40,10 @@ class FarmActivity(Base):
     date_logged: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
 
     # Relationships
-    field: Mapped[Optional["Field"]] = relationship(back_populates="farm_activities")  # Changed to Optional["Field"]
+    field: Mapped[Optional["Field"]] = relationship(back_populates="farm_activities")
     planting: Mapped[Optional["Planting"]] = relationship(
         back_populates="farm_activities"
-    )  # Changed to Optional["Planting"]
+    )
     activity_type: Mapped["ActivityType"] = relationship(back_populates="farm_activities")
     product_associations: Mapped[list["ActivityProduct"]] = relationship(
         back_populates="farm_activity", cascade="all, delete-orphan"
@@ -73,4 +73,4 @@ class ActivityProduct(Base):
     product: Mapped["Product"] = relationship(back_populates="activity_associations")
 
     def __repr__(self):
-        return f"<ActivityProduct(id={self.id}, farm_activity_id={self.farm_activity_id}, product_id={self.product_id})>"  # Changed activity_product_id to id
+        return f"<ActivityProduct(id={self.id}, farm_activity_id={self.farm_activity_id}, product_id={self.product_id})>"

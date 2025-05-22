@@ -23,7 +23,7 @@ from farmbase.models import FarmbaseBase, Pagination, PrimaryKey
 
 class Farm(Base):
     __tablename__ = "farm"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)  # Changed farm_id to id
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     farm_name: Mapped[str] = mapped_column(String(255), nullable=False)
     address: Mapped[str | None] = mapped_column(TEXT, nullable=True)
     date_registered: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=True)
@@ -40,16 +40,16 @@ class Farm(Base):
     contacts = association_proxy("contact_associations", "contact")
 
     def __repr__(self):
-        return f"<Farm(id={self.id}, farm_name='{self.farm_name}')>"  # Changed farm_id to id
+        return f"<Farm(id={self.id}, farm_name='{self.farm_name}')>"
 
 
 class FarmContact(Base):
     __tablename__ = "farm_contact"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)  # Changed farm_contact_id to id
-    farm_id: Mapped[int] = mapped_column(ForeignKey(Farm.id), nullable=False)  # Changed Farm.farm_id to Farm.id
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    farm_id: Mapped[int] = mapped_column(ForeignKey(Farm.id), nullable=False)
     contact_id: Mapped[int] = mapped_column(
         ForeignKey(Contact.id), nullable=False
-    )  # Changed Contact.contact_id to Contact.id
+    )
     role: Mapped[str] = mapped_column(String(100), nullable=False)
 
     __table_args__ = (UniqueConstraint("farm_id", "contact_id", "role", name="uq_farm_contact_role"),)
@@ -59,7 +59,7 @@ class FarmContact(Base):
     contact: Mapped["Contact"] = relationship(back_populates="farm_associations")
 
     def __repr__(self):
-        return f"<FarmContact(id={self.id}, farm_id={self.farm_id}, contact_id={self.contact_id}, role='{self.role}')>"  # Changed farm_contact_id to id
+        return f"<FarmContact(id={self.id}, farm_id={self.farm_id}, contact_id={self.contact_id}, role='{self.role}')>"
 
 
 # Pydantic models

@@ -39,4 +39,4 @@ class Planting(Base):
     notes: Mapped[list["Note"]] = relationship(back_populates="planting", cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f"<Planting(id={self.id}, field_id={self.field_id}, commodity_id={self.commodity_id})>"  # Changed planting_id to id
+        return f"<Planting(id={self.id}, field_id={self.field_id}, commodity_id={self.commodity_id})>"

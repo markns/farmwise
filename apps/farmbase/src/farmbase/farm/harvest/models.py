@@ -27,7 +27,7 @@ class StorageLocation(Base):
     harvest_loads_destination: Mapped[list["HarvestLoad"]] = relationship(back_populates="destination_storage_location")
 
     def __repr__(self):
-        return f"<StorageLocation(id={self.id}, name='{self.name}')>"  # Changed storage_location_id to id
+        return f"<StorageLocation(id={self.id}, name='{self.name}')>"
 
 
 class HarvestLoad(Base):
@@ -59,10 +59,10 @@ class HarvestLoad(Base):
     farm_activity: Mapped["FarmActivity"] = relationship(back_populates="harvest_loads")
     destination_storage_location: Mapped[Optional["StorageLocation"]] = relationship(
         back_populates="harvest_loads_destination"
-    )  # Changed to Optional["StorageLocation"]
+    )
     person_involved_contact: Mapped[Optional["Contact"]] = relationship(
         back_populates="harvest_loads_involved"
-    )  # Changed to Optional["Contact"]
+    )
 
     def __repr__(self):
-        return f"<HarvestLoad(id={self.id}, farm_activity_id={self.farm_activity_id})>"  # Changed harvest_load_id to id
+        return f"<HarvestLoad(id={self.id}, farm_activity_id={self.farm_activity_id})>"
