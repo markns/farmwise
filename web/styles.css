@@ -107,7 +107,10 @@ nav ul li a:hover {
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://via.placeholder.com/1920x1080') no-repeat center center/cover;
+    /*background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://via.placeholder.com/1920x1080') no-repeat center center/cover;*/
+
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url('images/hero.png') no-repeat center center/cover;
     color: white;
     text-align: center;
     padding: 150px 0;
