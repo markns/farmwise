@@ -43,8 +43,8 @@ class Field(Base):
     field_name: Mapped[str] = mapped_column(String(255), nullable=False)
     boundary_geometry: Mapped[Optional[str]] = mapped_column(
         Geometry(geometry_type="POLYGON", srid=4326, from_text="ST_GeomFromEWKT", name="geometry"), nullable=True
-    )  
-    total_physical_acres: Mapped[Optional[float]] = mapped_column(DECIMAL(10, 2), nullable=True)  
+    )
+    total_physical_acres: Mapped[Optional[float]] = mapped_column(DECIMAL(10, 2), nullable=True)
     added_on_platform_id: Mapped[int] = mapped_column(ForeignKey(Platform.id), nullable=False)
     date_created: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     last_modified: Mapped[datetime.datetime] = mapped_column(

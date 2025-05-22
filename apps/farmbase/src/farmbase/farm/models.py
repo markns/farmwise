@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import datetime
+from typing import List, Optional
 
+from pydantic import Field as PydanticField
 from sqlalchemy import (
     TEXT,
     DateTime,
@@ -13,9 +15,10 @@ from sqlalchemy import (
 from sqlalchemy.ext.associationproxy import association_proxy  # For simpler many-to-many access if needed
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from farmbase.contact.models import Contact
+from farmbase.contact.models import Contact, ContactRead
 from farmbase.database.core import Base
 from farmbase.farm.field.models import Field
+from farmbase.models import FarmbaseBase, Pagination, PrimaryKey
 
 
 class Farm(Base):
@@ -57,3 +60,78 @@ class FarmContact(Base):
 
     def __repr__(self):
         return f"<FarmContact(id={self.id}, farm_id={self.farm_id}, contact_id={self.contact_id}, role='{self.role}')>"  # Changed farm_contact_id to id
+
+
+# Pydantic models
+class FarmBase(FarmbaseBase):
+    """Base model for Farm data."""
+
+    farm_name: str = PydanticField(description="The name of the farm")
+    address: Optional[str] = PydanticField(default=None, description="The address of the farm")
+    date_registered: Optional[datetime.datetime] = PydanticField(
+        default=None, description="The date the farm was registered"
+    )
+
+
+class FarmCreate(FarmBase):
+    """Model for creating a new Farm."""
+
+    pass
+
+
+class FarmUpdate(FarmbaseBase):
+    """Model for updating an existing Farm."""
+
+    farm_name: Optional[str] = PydanticField(default=None, description="Updated name of the farm")
+    address: Optional[str] = PydanticField(default=None, description="Updated address of the farm")
+    date_registered: Optional[datetime.datetime] = PydanticField(default=None, description="Updated registration date")
+
+
+class FarmContactBase(FarmbaseBase):
+    """Base model for FarmContact data."""
+
+    farm_id: PrimaryKey = PydanticField(description="ID of the farm")
+    contact_id: PrimaryKey = PydanticField(description="ID of the contact")
+    role: str = PydanticField(description="Role of the contact in the farm")
+
+
+class FarmContactCreate(FarmContactBase):
+    """Model for creating a new FarmContact."""
+
+    pass
+
+
+class FarmContactUpdate(FarmbaseBase):
+    """Model for updating an existing FarmContact."""
+
+    role: Optional[str] = PydanticField(default=None, description="Updated role of the contact in the farm")
+
+
+class FarmContactRead(FarmContactBase):
+    """Model for reading FarmContact data."""
+
+    id: PrimaryKey = PydanticField(description="Unique identifier of the farm contact association")
+    contact: ContactRead = PydanticField(description="Contact details")
+
+
+class FarmRead(FarmBase):
+    """Model for reading Farm data."""
+
+    id: PrimaryKey = PydanticField(description="Unique identifier of the farm")
+    contacts: Optional[List[ContactRead]] = PydanticField(
+        default_factory=list, description="List of contacts associated with the farm"
+    )
+
+
+class FarmPagination(Pagination):
+    """Model for paginated list of farms."""
+
+    items: List[FarmRead] = PydanticField(default_factory=list, description="List of farms in the current page")
+
+
+class FarmContactPagination(Pagination):
+    """Model for paginated list of farm contacts."""
+
+    items: List[FarmContactRead] = PydanticField(
+        default_factory=list, description="List of farm contacts in the current page"
+    )
