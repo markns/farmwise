@@ -45,7 +45,7 @@ from farmbase.validators import must_not_be_blank
 class Contact(Base, TimeStampMixin):
     __tablename__ = "contact"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    contact_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
     phone_number: Mapped[str | None] = mapped_column(String(50), unique=True, nullable=True)
     email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
     location: Mapped[Optional[WKBElement]] = mapped_column(
@@ -65,7 +65,7 @@ class Contact(Base, TimeStampMixin):
     farms = association_proxy("farm_associations", "farm")
 
     def __repr__(self):
-        return f"<Contact(id={self.id}, contact_name='{self.contact_name}')>"
+        return f"<Contact(id={self.id}, name='{self.name}')>"
 
 
 class ContactBase(FarmbaseBase):

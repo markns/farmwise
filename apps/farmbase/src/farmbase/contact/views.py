@@ -6,17 +6,17 @@ from sqlalchemy.orm import selectinload
 
 from farmbase.database.core import DbSession
 from farmbase.models import PrimaryKey
-from .filterset import ContactQueryParams, ContactFilterSet
 
 from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
 from ..organization.service import CurrentOrganization
+from .filterset import ContactFilterSet, ContactQueryParams
 from .flows import contact_init_flow
 from .models import (
+    Contact,
     ContactCreate,
     ContactPagination,
     ContactPatch,
     ContactRead,
-    Contact,
 )
 from .service import create, delete, get, get_by_phone_number, get_or_create, patch
 
@@ -24,9 +24,10 @@ router = APIRouter()
 
 
 @router.get("", response_model=ContactPagination)
-async def get_contacts(    db_session: DbSession,
+async def get_contacts(
+    db_session: DbSession,
     query_params: Annotated[ContactQueryParams, Query()],
-                           ):
+):
     """Get all contacts."""
     stmt = select(Contact).options(selectinload(Contact.organization))
     filter_set = ContactFilterSet(db_session, stmt)
@@ -39,7 +40,6 @@ async def get_contacts(    db_session: DbSession,
         page=query_params.page,
         total=total,
     )
-
 
 
 @router.post(

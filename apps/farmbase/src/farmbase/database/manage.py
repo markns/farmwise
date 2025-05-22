@@ -6,12 +6,19 @@ from sqlalchemy_utils import create_database, database_exists
 
 from farmbase import config
 from farmbase.organization.models import Organization
-from ..farm.models import Platform, ActivityType, Commodity
 
+from ..farm.activity.models import ActivityType
+from ..farm.commodity.models import Commodity
+from ..farm.harvest.models import HarvestLoad
+from ..farm.note.models import Note
+from ..farm.platform.models import Platform
 from ..plugin.models import Plugin
 from ..project.models import Project
 from .core import Base, sessionmaker
 from .enums import FARMBASE_ORGANIZATION_SCHEMA_PREFIX
+
+Note.id
+HarvestLoad.id
 
 
 def version_schema(script_location: str):
