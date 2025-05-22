@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from sqlalchemy import Float, ForeignKey, String, Text, Integer
+from sqlalchemy import Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
@@ -43,7 +43,7 @@ class Product(Base, TimeStampMixin):
     #
 
     def __repr__(self):
-        return f"<Product(id={self.id}, product_name='{self.product_name}')>"
+        return f"<Product(id={self.id}, product_name='{self.name}')>"
 
 
 # Pydantic schemas
