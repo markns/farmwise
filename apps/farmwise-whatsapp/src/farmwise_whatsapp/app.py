@@ -8,7 +8,7 @@ from farmwise_schema.schema import Action, WhatsappResponse
 from fastapi import FastAPI
 from loguru import logger
 from loguru_logging_intercept import InterceptHandler
-from pywa.types import Command, Section, SectionList, SectionRow
+from pywa.types import Button, Command, Section, SectionList, SectionRow
 from pywa_async import WhatsApp, filters, types
 from pywa_async.types.base_update import BaseUserUpdateAsync
 
@@ -86,7 +86,10 @@ async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
             ),
         )
     else:
-        await msg.reply_text(_convert_md_to_whatsapp(response.content))
+        await msg.reply_text(
+            _convert_md_to_whatsapp(response.content),
+            buttons=[Button(b.title, b.callback_data) for b in response.buttons],
+        )
 
 
 # TODO: Chat opened is not being triggered...
@@ -140,7 +143,7 @@ async def message_handler(_: WhatsApp, msg: types.Message):
 
 
 @wa.on_callback_selection
-async def callback_handler(_: WhatsApp, sel: types.CallbackSelection):
+async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
     logger.info(f"CALLBACK SELECTION USER: {sel}")
     await sel.indicate_typing()
     response = await agent_client.ainvoke(
@@ -150,6 +153,19 @@ async def callback_handler(_: WhatsApp, sel: types.CallbackSelection):
     )
     logger.info(f"AGENT: {response}")
     await _send_response(response, sel)
+
+
+@wa.on_callback_button
+async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
+    logger.info(f"CALLBACK BUTTON USER: {btn}")
+    await btn.indicate_typing()
+    response = await agent_client.ainvoke(
+        message=btn.data,
+        user_id=btn.from_user.wa_id,
+        user_name=btn.from_user.name,
+    )
+    logger.info(f"AGENT: {response}")
+    await _send_response(response, btn)
 
 
 @wa.on_message(filters.image)

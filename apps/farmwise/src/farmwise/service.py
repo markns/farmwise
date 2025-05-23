@@ -11,6 +11,7 @@ from openai.types.responses import EasyInputMessageParam, ResponseInputImagePara
 
 from farmwise.agents import DEFAULT_AGENT, ONBOARDING_AGENT, agents, get_all_agent_info
 from farmwise.dependencies import ChatStateDep, UserContext, UserContextDep
+from farmwise.hooks import LoggingHooks
 from farmwise.settings import settings
 
 set_default_openai_key(settings.OPENAI_API_KEY.get_secret_value())
@@ -56,12 +57,9 @@ async def run_agent(
         )
 
     trace_id = gen_trace_id()
+    hooks = LoggingHooks()
     with trace("FarmWise", trace_id=trace_id, group_id=user_input.user_id):
-        result: RunResult = await Runner.run(
-            agent,
-            input=input_items,
-            context=context,
-        )
+        result: RunResult = await Runner.run(agent, input=input_items, context=context, hooks=hooks)
 
     with AuthenticatedClient(base_url="http://127.0.0.1:8000/api/v1", token="fdsfds") as client:
         await create_run_result.asyncio(
