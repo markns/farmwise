@@ -7,7 +7,8 @@ from farmbase_client.api.contacts import contacts_get_contact_by_phone as get_co
 from farmbase_client.models import ChatState, ContactCreate, ContactRead
 from farmwise_schema.schema import UserInput
 from fastapi import Depends
-from pydantic import BaseModel
+from loguru import logger
+from pydantic import BaseModel, ValidationError
 
 from farmwise.settings import settings
 
@@ -20,16 +21,20 @@ class UserContext(BaseModel):
 # TODO: how does organization get set?
 async def user_context(user_input: UserInput, organization="default"):
     with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
-        contact = await get_contact_by_phone.asyncio(
-            client=client,
-            organization=organization,
-            phone=user_input.user_id,
-        )
-        if contact:
+        # TODO: Handle errors better, more consistently in farmbase.
+        try:
+            contact = await get_contact_by_phone.asyncio(
+                client=client,
+                organization=organization,
+                phone=user_input.user_id,
+            )
+
             context = UserContext(
                 contact=contact,
             )
-        else:
+        except ValidationError as e:
+            logger.warning(f"User not found: {e}")
+
             contact = await create_contact.asyncio(
                 client=client,
                 organization=organization,

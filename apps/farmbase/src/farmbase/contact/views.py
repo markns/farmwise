@@ -105,7 +105,7 @@ async def get_contact_by_phone(
     result = await filter_set.filter({"phone": phone})
 
     if not result:
-        raise HTTPException(status_code=404, detail="Contact not found")
+        raise EntityDoesNotExistError(message="Contact not found")
     if len(result) > 1:
         raise HTTPException(status_code=409, detail="Multiple contacts found with this phone number")
 

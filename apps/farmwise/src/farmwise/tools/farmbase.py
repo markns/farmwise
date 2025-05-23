@@ -27,9 +27,13 @@ For example if a user mentions their location as a place name or as latitude,lon
 using this tool.
 """
 )
-async def update_contact(ctx: RunContextWrapper[UserContext], contact_in: ContactPatch) -> ContactRead:
+async def update_contact(wrapper: RunContextWrapper[UserContext], contact_in: ContactPatch) -> ContactRead:
+    context = wrapper.context
     with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
         result = await contacts_patch_contact.asyncio(
-            client=client, organization=ctx.context.organization, contact_id=ctx.context.user_id, body=contact_in
+            client=client,
+            organization=context.contact.organization.slug,
+            contact_id=context.contact.id,
+            body=contact_in,
         )
         return result

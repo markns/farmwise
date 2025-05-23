@@ -1,16 +1,16 @@
 from datetime import UTC, datetime
 
-from agents import Runner, RunResult, gen_trace_id, set_default_openai_key, trace
+from agents import Agent, Runner, RunResult, gen_trace_id, set_default_openai_key, trace
 from farmbase_client import AuthenticatedClient
 from farmbase_client.api.runresult import runresult_create_run_result as create_run_result
-from farmbase_client.models import AgentBase, RunResultCreate
+from farmbase_client.models import AgentBase, ChatState, RunResultCreate
 from farmwise_schema.schema import ServiceMetadata, UserInput, WhatsappResponse
 from fastapi import APIRouter, FastAPI
 from loguru import logger
 from openai.types.responses import EasyInputMessageParam, ResponseInputImageParam, ResponseInputTextParam
 
-from farmwise.agents import DEFAULT_AGENT, agents, get_all_agent_info
-from farmwise.dependencies import ChatStateDep, UserContextDep
+from farmwise.agents import DEFAULT_AGENT, ONBOARDING_AGENT, agents, get_all_agent_info
+from farmwise.dependencies import ChatStateDep, UserContext, UserContextDep
 from farmwise.settings import settings
 
 set_default_openai_key(settings.OPENAI_API_KEY.get_secret_value())
@@ -30,22 +30,12 @@ async def info() -> ServiceMetadata:
     return ServiceMetadata(agents=get_all_agent_info(), default_agent=DEFAULT_AGENT)
 
 
-@router.post("/invoke", response_model=WhatsappResponse)
-async def invoke(
+async def run_agent(
+    agent: Agent[UserContext],
+    context: UserContext,
     user_input: UserInput,
-    context: UserContextDep,
-    chat_state: ChatStateDep,
+    chat_state: ChatState,
 ):
-    if context.new_user:
-        logger.info(f"NEW USER: {user_input.user_id}")
-
-    if chat_state.last_agent:
-        agent = agents[chat_state.last_agent.name]
-    else:
-        agent = agents[DEFAULT_AGENT]
-
-    logger.info(f"USER: {user_input.message} CONTEXT: {context} LAST_AGENT: {chat_state.last_agent}")
-
     input_items = chat_state.input_list
 
     if user_input.image:
@@ -96,6 +86,24 @@ async def invoke(
 
     logger.info(f"ASSISTANT: {result.final_output}")
     return result.final_output
+
+
+@router.post("/invoke", response_model=WhatsappResponse)
+async def invoke(
+    user_input: UserInput,
+    context: UserContextDep,
+    chat_state: ChatStateDep,
+):
+    if context.new_user:
+        logger.info(f"NEW USER: {user_input.user_id}")
+        agent = agents[ONBOARDING_AGENT]
+    elif chat_state.last_agent:
+        agent = agents[chat_state.last_agent.name]
+    else:
+        agent = agents[DEFAULT_AGENT]
+
+    logger.info(f"USER: {user_input.message} AGENT: {agent.name} CONTEXT: {context}")
+    return await run_agent(agent, context, user_input, chat_state)
 
 
 app.include_router(router)

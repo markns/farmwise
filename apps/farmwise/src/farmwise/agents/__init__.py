@@ -8,17 +8,19 @@ from pydantic import BaseModel, Field
 from .crop_pathogen_diagnosis_agent import crop_pathogen_diagnosis_agent
 from .crop_suitability_agent import crop_suitability_agent
 from .maize_variety_selector import maize_variety_selector
+from .onboarding_agent import onboarding_agent
 from .triage_agent import triage_agent
 
 
 class HandoffInfo(BaseModel):
-    subagent_name: str = Field(description="The name of the subagent being called.")
+    agent_name: str = Field(description="The name of the agent being handed off to.")
     reason: str = Field(description="The reason for the handoff.")
 
 
-# we redefine the on_handoff to include the HandoffInfo
 async def on_handoff(ctx: RunContextWrapper[None], input_data: HandoffInfo):
-    logger.debug(f"Handoff to '{input_data.subagent_name}' because '{input_data.reason}'")
+    # nb. the agent_name and reason are non-deterministic,
+    # they might not correspond to the actual handoff that happened
+    logger.debug(f"Handoff to '{input_data.agent_name}' because '{input_data.reason}'")
 
 
 triage_agent_handoff = handoff(agent=triage_agent, on_handoff=on_handoff, input_type=HandoffInfo)
@@ -39,7 +41,9 @@ triage_agent.handoffs = handoffs
 maize_variety_selector.handoffs = handoffs
 crop_suitability_agent.handoffs = handoffs
 crop_pathogen_diagnosis_agent.handoffs = handoffs
+onboarding_agent.handoffs = [triage_agent_handoff]
 
+ONBOARDING_AGENT = onboarding_agent.name
 DEFAULT_AGENT = triage_agent.name
 
 
@@ -65,6 +69,7 @@ agents = AgentDict(
         maize_variety_selector.name: maize_variety_selector,
         crop_suitability_agent.name: crop_suitability_agent,
         crop_pathogen_diagnosis_agent.name: crop_pathogen_diagnosis_agent,
+        onboarding_agent.name: onboarding_agent,
     },
 )
 

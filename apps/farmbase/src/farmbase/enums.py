@@ -92,8 +92,16 @@ class SubjectNames(FarmbaseEnum):
     INCIDENT = "Incident"
     SIGNAL = "Signal"
 
+
 class ProductCategory(FarmbaseEnum):
     """Categories of agricultural products."""
+
     fungicide = "Fungicide"
     insecticide = "Insecticide"
     herbicide = "Herbicide"
+
+
+class ContactRole(FarmbaseEnum):
+    FARMER = "farmer"
+    EXTENSION_OFFICER = "extension_officer"
+    OTHER = "other"

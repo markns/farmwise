@@ -1,18 +1,21 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, List, Optional
 
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
 from pydantic import Field, field_serializer, field_validator
 from sqlalchemy import (
+    Date,
     ForeignKey,
     Integer,
     String,
 )
+from sqlalchemy import Enum as SqlEnum
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
+from farmbase.enums import ContactRole
 from farmbase.models import FarmbaseBase, Location, Pagination, PrimaryKey, TimeStampMixin
 from farmbase.organization.models import Organization, OrganizationRead
 from farmbase.validators import must_not_be_blank
@@ -47,6 +50,11 @@ class Contact(Base, TimeStampMixin):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     phone_number: Mapped[str | None] = mapped_column(String(50), unique=True, nullable=True)
+    preferred_form_of_address: Mapped[str] = mapped_column(String(255), nullable=False)
+    date_of_birth: Mapped[date] = mapped_column(Date)
+    estimated_age: Mapped[int] = mapped_column(Integer)
+    # TODO: we might want to change Contact to a hierarchy in future.
+    role: Mapped[ContactRole] = mapped_column(SqlEnum(ContactRole, name="contact_role_enum"), nullable=False)
     email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
     location: Mapped[Optional[WKBElement]] = mapped_column(
         Geometry(geometry_type="POINT", srid=4326, from_text="ST_GeomFromEWKT", name="geometry"), nullable=True
@@ -73,7 +81,6 @@ class ContactBase(FarmbaseBase):
 
     name: str = Field(description="The full name of the contact")
     location: Optional[Location] = Field(default=None, description="Contact's geographical location")
-
 
     @field_validator("location", mode="before")
     @classmethod
