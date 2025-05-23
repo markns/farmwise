@@ -2,7 +2,7 @@ from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise_schema.schema import WhatsappResponse
 
-from farmwise.context import UserContext
+from farmwise.dependencies import UserContext
 from farmwise.tools.farmbase import update_contact
 
 

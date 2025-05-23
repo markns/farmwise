@@ -1,13 +1,14 @@
 from agents import Agent
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise_schema.schema import WhatsappResponse
-from farmwise.context import UserContext
+
+from farmwise.dependencies import UserContext
 from farmwise.tools.farmbase import update_contact
 
 crop_pathogen_diagnosis_agent: Agent[UserContext] = Agent(
     name="Crop pathogen diagnosis agent",
     handoff_description="An agent that can identify crop pests and diseases from an image",
-    instructions=f'''{RECOMMENDED_PROMPT_PREFIX}
+    instructions=f"""{RECOMMENDED_PROMPT_PREFIX}
 Routine for Crop Pest and Disease Diagnosis Agent
 1.	Accept Image Input
     You will receive a photo of a crop. Accept only clear images that include leaves, stems, fruits, or other affected parts of the plant. If the image is blurry or incomplete, ask the user to send a clearer one.
@@ -44,7 +45,7 @@ Routine for Crop Pest and Disease Diagnosis Agent
     Record the diagnosis and advice in a structured format for future reference (e.g., crop, issue, treatment recommended, date).
 
 If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the triage agent.
-''',
+""",
     output_type=WhatsappResponse,
     tools=[update_contact],
     model="gpt-4.1",

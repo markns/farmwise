@@ -13,40 +13,36 @@ from ...models import HTTPValidationError
 from ...models import ProjectPagination
 from ...types import UNSET, Unset
 from typing import cast
+from typing import cast, Union
 from typing import Union
 
 
 def _get_kwargs(
     organization: str,
     *,
+    items_per_page: Union[Unset, int] = 100,
     page: Union[Unset, int] = 1,
-    items_per_page: Union[Unset, int] = 5,
-    q: Union[Unset, str] = UNSET,
-    filter_: Union[Unset, str] = UNSET,
-    sort_by: Union[Unset, list[str]] = UNSET,
-    descending: Union[Unset, list[bool]] = UNSET,
+    ordering: Union[Unset, list[str]] = UNSET,
+    name: Union[None, Unset, str] = UNSET,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
 
-    params["page"] = page
-
     params["items_per_page"] = items_per_page
 
-    params["q"] = q
+    params["page"] = page
 
-    params["filter"] = filter_
+    json_ordering: Union[Unset, list[str]] = UNSET
+    if not isinstance(ordering, Unset):
+        json_ordering = ordering
 
-    json_sort_by: Union[Unset, list[str]] = UNSET
-    if not isinstance(sort_by, Unset):
-        json_sort_by = sort_by
+    params["ordering"] = json_ordering
 
-    params["sortBy[]"] = json_sort_by
-
-    json_descending: Union[Unset, list[bool]] = UNSET
-    if not isinstance(descending, Unset):
-        json_descending = descending
-
-    params["descending[]"] = json_descending
+    json_name: Union[None, Unset, str]
+    if isinstance(name, Unset):
+        json_name = UNSET
+    else:
+        json_name = name
+    params["name"] = json_name
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -113,12 +109,10 @@ def sync_detailed(
     organization: str,
     *,
     client: Union[AuthenticatedClient, Client],
+    items_per_page: Union[Unset, int] = 100,
     page: Union[Unset, int] = 1,
-    items_per_page: Union[Unset, int] = 5,
-    q: Union[Unset, str] = UNSET,
-    filter_: Union[Unset, str] = UNSET,
-    sort_by: Union[Unset, list[str]] = UNSET,
-    descending: Union[Unset, list[bool]] = UNSET,
+    ordering: Union[Unset, list[str]] = UNSET,
+    name: Union[None, Unset, str] = UNSET,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, ProjectPagination]]:
     """Get Projects
 
@@ -126,12 +120,10 @@ def sync_detailed(
 
     Args:
         organization (str):
+        items_per_page (Union[Unset, int]):  Default: 100.
         page (Union[Unset, int]):  Default: 1.
-        items_per_page (Union[Unset, int]):  Default: 5.
-        q (Union[Unset, str]):
-        filter_ (Union[Unset, str]):
-        sort_by (Union[Unset, list[str]]):
-        descending (Union[Unset, list[bool]]):
+        ordering (Union[Unset, list[str]]):
+        name (Union[None, Unset, str]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -143,12 +135,10 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         organization=organization,
-        page=page,
         items_per_page=items_per_page,
-        q=q,
-        filter_=filter_,
-        sort_by=sort_by,
-        descending=descending,
+        page=page,
+        ordering=ordering,
+        name=name,
     )
 
     response = client.get_httpx_client().request(
@@ -162,12 +152,10 @@ def sync(
     organization: str,
     *,
     client: Union[AuthenticatedClient, Client],
+    items_per_page: Union[Unset, int] = 100,
     page: Union[Unset, int] = 1,
-    items_per_page: Union[Unset, int] = 5,
-    q: Union[Unset, str] = UNSET,
-    filter_: Union[Unset, str] = UNSET,
-    sort_by: Union[Unset, list[str]] = UNSET,
-    descending: Union[Unset, list[bool]] = UNSET,
+    ordering: Union[Unset, list[str]] = UNSET,
+    name: Union[None, Unset, str] = UNSET,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, ProjectPagination]]:
     """Get Projects
 
@@ -175,12 +163,10 @@ def sync(
 
     Args:
         organization (str):
+        items_per_page (Union[Unset, int]):  Default: 100.
         page (Union[Unset, int]):  Default: 1.
-        items_per_page (Union[Unset, int]):  Default: 5.
-        q (Union[Unset, str]):
-        filter_ (Union[Unset, str]):
-        sort_by (Union[Unset, list[str]]):
-        descending (Union[Unset, list[bool]]):
+        ordering (Union[Unset, list[str]]):
+        name (Union[None, Unset, str]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -193,12 +179,10 @@ def sync(
     return sync_detailed(
         organization=organization,
         client=client,
-        page=page,
         items_per_page=items_per_page,
-        q=q,
-        filter_=filter_,
-        sort_by=sort_by,
-        descending=descending,
+        page=page,
+        ordering=ordering,
+        name=name,
     ).parsed
 
 
@@ -206,12 +190,10 @@ async def asyncio_detailed(
     organization: str,
     *,
     client: Union[AuthenticatedClient, Client],
+    items_per_page: Union[Unset, int] = 100,
     page: Union[Unset, int] = 1,
-    items_per_page: Union[Unset, int] = 5,
-    q: Union[Unset, str] = UNSET,
-    filter_: Union[Unset, str] = UNSET,
-    sort_by: Union[Unset, list[str]] = UNSET,
-    descending: Union[Unset, list[bool]] = UNSET,
+    ordering: Union[Unset, list[str]] = UNSET,
+    name: Union[None, Unset, str] = UNSET,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, ProjectPagination]]:
     """Get Projects
 
@@ -219,12 +201,10 @@ async def asyncio_detailed(
 
     Args:
         organization (str):
+        items_per_page (Union[Unset, int]):  Default: 100.
         page (Union[Unset, int]):  Default: 1.
-        items_per_page (Union[Unset, int]):  Default: 5.
-        q (Union[Unset, str]):
-        filter_ (Union[Unset, str]):
-        sort_by (Union[Unset, list[str]]):
-        descending (Union[Unset, list[bool]]):
+        ordering (Union[Unset, list[str]]):
+        name (Union[None, Unset, str]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -236,12 +216,10 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         organization=organization,
-        page=page,
         items_per_page=items_per_page,
-        q=q,
-        filter_=filter_,
-        sort_by=sort_by,
-        descending=descending,
+        page=page,
+        ordering=ordering,
+        name=name,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -253,12 +231,10 @@ async def asyncio(
     organization: str,
     *,
     client: Union[AuthenticatedClient, Client],
+    items_per_page: Union[Unset, int] = 100,
     page: Union[Unset, int] = 1,
-    items_per_page: Union[Unset, int] = 5,
-    q: Union[Unset, str] = UNSET,
-    filter_: Union[Unset, str] = UNSET,
-    sort_by: Union[Unset, list[str]] = UNSET,
-    descending: Union[Unset, list[bool]] = UNSET,
+    ordering: Union[Unset, list[str]] = UNSET,
+    name: Union[None, Unset, str] = UNSET,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, ProjectPagination]]:
     """Get Projects
 
@@ -266,12 +242,10 @@ async def asyncio(
 
     Args:
         organization (str):
+        items_per_page (Union[Unset, int]):  Default: 100.
         page (Union[Unset, int]):  Default: 1.
-        items_per_page (Union[Unset, int]):  Default: 5.
-        q (Union[Unset, str]):
-        filter_ (Union[Unset, str]):
-        sort_by (Union[Unset, list[str]]):
-        descending (Union[Unset, list[bool]]):
+        ordering (Union[Unset, list[str]]):
+        name (Union[None, Unset, str]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -285,11 +259,9 @@ async def asyncio(
         await asyncio_detailed(
             organization=organization,
             client=client,
-            page=page,
             items_per_page=items_per_page,
-            q=q,
-            filter_=filter_,
-            sort_by=sort_by,
-            descending=descending,
+            page=page,
+            ordering=ordering,
+            name=name,
         )
     ).parsed

@@ -3,7 +3,7 @@ from farmbase_client import AuthenticatedClient
 from farmbase_client.api.contacts import contacts_create_contact, contacts_patch_contact
 from farmbase_client.models import ContactCreate, ContactPatch, ContactRead
 
-from farmwise.context import UserContext
+from farmwise.dependencies import UserContext
 from farmwise.settings import settings
 from farmwise.tools.utils import copy_doc, join_with
 

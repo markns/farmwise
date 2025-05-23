@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -18,7 +18,7 @@ from .models import (
     ContactPatch,
     ContactRead,
 )
-from .service import create, delete, get, get_by_phone_number, get_or_create, patch
+from .service import create, delete, get, get_by_phone_number, patch
 
 router = APIRouter()
 
@@ -77,18 +77,39 @@ async def create_contact(
     return contact
 
 
-@router.put(
-    "",
+# @router.put(
+#     "",
+#     response_model=ContactRead,
+#     summary="Get or create a new contact.",
+#     # dependencies=[Depends(PermissionsDependency([ContactCreatePermission]))],
+# )
+# async def get_or_create_contact(
+#     db_session: DbSession,
+#     organization: CurrentOrganization,
+#     contact_in: ContactCreate,
+# ):
+#     return await get_or_create(db_session=db_session, organization=organization, contact_in=contact_in)
+
+
+@router.get(
+    "/by-phone",
     response_model=ContactRead,
-    summary="Get or create a new contact.",
-    # dependencies=[Depends(PermissionsDependency([ContactCreatePermission]))],
+    summary="Get a single contact by phone number.",
 )
-async def get_or_create_contact(
+async def get_contact_by_phone(
     db_session: DbSession,
-    organization: CurrentOrganization,
-    contact_in: ContactCreate,
+    phone: Annotated[str, Query(description="Phone number in E.164 format")],
 ):
-    return await get_or_create(db_session=db_session, organization=organization, contact_in=contact_in)
+    stmt = select(Contact).options(selectinload(Contact.organization))
+    filter_set = ContactFilterSet(db_session, stmt)
+    result = await filter_set.filter({"phone": phone})
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    if len(result) > 1:
+        raise HTTPException(status_code=409, detail="Multiple contacts found with this phone number")
+
+    return result[0]
 
 
 @router.get(

@@ -47,7 +47,7 @@ async def get_by_name(*, db_session: AsyncSession, name: str) -> Optional[Contac
 
 
 async def get_by_phone_number(*, db_session: AsyncSession, phone_number: str) -> Optional[Contact]:
-    """Returns a contact based on the given contact name."""
+    """Returns a contact based on the given contact phone number."""
     result = await db_session.execute(select(Contact).where(Contact.phone_number == phone_number))
     return result.scalar_one_or_none()
 

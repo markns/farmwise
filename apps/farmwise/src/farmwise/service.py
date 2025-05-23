@@ -36,6 +36,9 @@ async def invoke(
     context: UserContextDep,
     chat_state: ChatStateDep,
 ):
+    if context.new_user:
+        logger.info(f"NEW USER: {user_input.user_id}")
+
     if chat_state.last_agent:
         agent = agents[chat_state.last_agent.name]
     else:

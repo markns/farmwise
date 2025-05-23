@@ -3,7 +3,7 @@ from typing import Any
 
 from agents import Agent, RunContextWrapper, RunHooks, Tool, Usage
 
-from farmwise.context import UserContext
+from farmwise.dependencies import UserContext
 
 
 async def on_seat_booking_handoff(context: RunContextWrapper[UserContext]) -> None:

@@ -1,12 +1,14 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise_schema.schema import WhatsappResponse
-from farmwise.context import UserContext
+
+from farmwise.dependencies import UserContext
 from farmwise.tools.farmbase import update_contact
 from farmwise.tools.tools import suitability_index
 
+
 def crop_suitability_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    return f'''{RECOMMENDED_PROMPT_PREFIX}
+    return f"""{RECOMMENDED_PROMPT_PREFIX}
 You are an agent that gives advice on which agricultural crops are most suitable for a given area.
 specific locations in Kenya.
 
@@ -18,7 +20,8 @@ specific locations in Kenya.
 If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the triage agent.
 
 These are the details of the current user: {ctx.context}
-'''
+"""
+
 
 crop_suitability_agent: Agent[UserContext] = Agent(
     name="Crop Suitability Agent",

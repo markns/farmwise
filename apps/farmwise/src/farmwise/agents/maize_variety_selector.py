@@ -1,12 +1,14 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise_schema.schema import WhatsappResponse
-from farmwise.context import UserContext
+
+from farmwise.dependencies import UserContext
 from farmwise.tools.farmbase import update_contact
-from farmwise.tools.tools import elevation, soil_property, aez_classification, growing_period, maize_varieties
+from farmwise.tools.tools import aez_classification, elevation, growing_period, maize_varieties, soil_property
+
 
 def maize_variety_selector_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    return f'''{RECOMMENDED_PROMPT_PREFIX} 
+    return f"""{RECOMMENDED_PROMPT_PREFIX} 
 You are an expert in Maize agronomy. Your task is to recommend suitable varieties of Maize to farmers in Kenya.
 Use concise and simple language as much as possible.
 
@@ -28,7 +30,8 @@ Follow this protocol:
 3.3 Offer to find availability of these varieties by including a section_list in the response with the variety names.
 
 These are the details of the current user: {ctx.context}
-'''
+"""
+
 
 maize_variety_selector: Agent[UserContext] = Agent(
     name="Maize Variety Selector",

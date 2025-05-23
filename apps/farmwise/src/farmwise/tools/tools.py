@@ -9,7 +9,7 @@ from farmbase_client import AuthenticatedClient
 from farmbase_client.api.gaez import gaez_aez_classification, gaez_growing_period, gaez_suitability_index
 from farmbase_client.models import SuitabilityIndexResponse
 
-from farmwise.context import UserContext
+from farmwise.dependencies import UserContext
 from farmwise.settings import settings
 from farmwise.tools.utils import copy_doc
 

@@ -14,7 +14,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
 from farmbase.models import FarmbaseBase, Location, Pagination, PrimaryKey, TimeStampMixin
-from farmbase.organization.models import Organization
+from farmbase.organization.models import Organization, OrganizationRead
 from farmbase.validators import must_not_be_blank
 
 # TODO: use this pattern to add other contact types. eg. farmers
@@ -74,6 +74,7 @@ class ContactBase(FarmbaseBase):
     name: str = Field(description="The full name of the contact")
     location: Optional[Location] = Field(default=None, description="Contact's geographical location")
 
+
     @field_validator("location", mode="before")
     @classmethod
     def validate_location(cls, data: Any) -> Any:
@@ -114,6 +115,7 @@ class ContactRead(ContactBase):
 
     id: PrimaryKey = Field(description="Unique identifier of the contact")
     phone_number: str = Field(description="Contact's phone number")
+    organization: OrganizationRead = Field(description="The organization the contact belongs to")
     created_at: datetime = Field(description="Timestamp when the contact was created")
     updated_at: datetime = Field(description="Timestamp when the contact was last updated")
 
