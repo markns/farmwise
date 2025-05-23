@@ -1,9 +1,9 @@
-from datetime import date, datetime
-from typing import Any, List, Optional
+from __future__ import annotations
 
-from geoalchemy2 import Geometry, WKBElement
-from geoalchemy2.shape import to_shape
-from pydantic import Field, field_serializer, field_validator
+from datetime import date, datetime
+from typing import List, Optional
+
+from pydantic import Field, field_validator
 from sqlalchemy import (
     Date,
     ForeignKey,
@@ -15,34 +15,13 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
-from farmbase.enums import ContactRole
-from farmbase.models import FarmbaseBase, Location, Pagination, PrimaryKey, TimeStampMixin
+from farmbase.enums import ContactRole, Gender
+from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
 from farmbase.organization.models import Organization, OrganizationRead
 from farmbase.validators import must_not_be_blank
 
 # TODO: use this pattern to add other contact types. eg. farmers
 # https://docs.sqlalchemy.org/en/20/orm/queryguide/_inheritance_setup.html
-
-#
-# class Contact(Base):
-#     __tablename__ = "contact"
-#     __repr_attrs__ = ["name", "phone_number"]
-#
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     name: Mapped[str] = mapped_column()
-#
-#     # TODO: use PhoneNumber libraries for sqlalchemy and pydantic
-#     phone_number: Mapped[str] = mapped_column(unique=True)
-#     # _phone_number = Column(Unicode(20))
-#     # country_code: Mapped[str] = mapped_column()
-#     # phone_number = orm.composite(SQLPhoneNumber, _phone_number, country_code)
-#
-#     organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id))
-#     organization = relationship("Organization")
-#
-#     location: Mapped[Optional[WKBElement]] = mapped_column(
-#         Geometry(geometry_type="POINT", srid=4326, spatial_index=True), nullable=True
-#     )
 
 
 class Contact(Base, TimeStampMixin):
@@ -50,15 +29,18 @@ class Contact(Base, TimeStampMixin):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     phone_number: Mapped[str | None] = mapped_column(String(50), unique=True, nullable=True)
-    preferred_form_of_address: Mapped[str] = mapped_column(String(255), nullable=False)
-    date_of_birth: Mapped[date] = mapped_column(Date)
-    estimated_age: Mapped[int] = mapped_column(Integer)
+    preferred_form_of_address: Mapped[str] = mapped_column(String(255), nullable=True)
+    gender: Mapped[Gender] = mapped_column(SqlEnum(Gender, name="gender_enum"), nullable=True)
+    date_of_birth: Mapped[date] = mapped_column(Date, nullable=True)
+    estimated_age: Mapped[int] = mapped_column(Integer, nullable=True)
     # TODO: we might want to change Contact to a hierarchy in future.
-    role: Mapped[ContactRole] = mapped_column(SqlEnum(ContactRole, name="contact_role_enum"), nullable=False)
+    role: Mapped[ContactRole] = mapped_column(SqlEnum(ContactRole, name="contact_role_enum"), nullable=True)
     email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
-    location: Mapped[Optional[WKBElement]] = mapped_column(
-        Geometry(geometry_type="POINT", srid=4326, from_text="ST_GeomFromEWKT", name="geometry"), nullable=True
-    )
+
+    # TODO: Location will move elsewhere
+    # location: Mapped[Optional[WKBElement]] = mapped_column(
+    #     Geometry(geometry_type="POINT", srid=4326, from_text="ST_GeomFromEWKT", name="geometry"), nullable=True
+    # )
 
     # Relationships
     organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id))
@@ -79,25 +61,34 @@ class Contact(Base, TimeStampMixin):
 class ContactBase(FarmbaseBase):
     """Base model for Contact data."""
 
-    name: str = Field(description="The full name of the contact")
-    location: Optional[Location] = Field(default=None, description="Contact's geographical location")
+    name: str = Field(description="The whatsapp name of the contact")
+    preferred_form_of_address: Optional[str] = Field(
+        default=None, description="Preferred form of address of the contact"
+    )
+    gender: Optional[Gender] = Field(default=None, description="Contact's gender")
+    date_of_birth: Optional[date] = Field(default=None, description="Contact's date of birth")
+    estimated_age: Optional[int] = Field(default=None, description="Contact's estimated age")
+    role: Optional[ContactRole] = Field(default=None, description="Role of the contact")
+    email: Optional[str] = Field(default=None, description="Contact's email address")
 
-    @field_validator("location", mode="before")
-    @classmethod
-    def validate_location(cls, data: Any) -> Any:
-        if isinstance(data, WKBElement):
-            point = to_shape(data)
-            return {"longitude": point.x, "latitude": point.y}
-        # If data is already a dictionary or another compatible type, pass it through.
-        return data
+    # TODO: Location will move elsewhere
+    # @field_validator("location", mode="before")
+    # @classmethod
+    # def validate_location(cls, data: Any) -> Any:
+    #     if isinstance(data, WKBElement):
+    #         point = to_shape(data)
+    #         return {"longitude": point.x, "latitude": point.y}
+    #     # If data is already a dictionary or another compatible type, pass it through.
+    #     return data
 
 
 class ContactBaseWrite(ContactBase):
-    @field_serializer("location")
-    def serialize_location(self, location: Location):
-        if location is None:
-            return None
-        return location.to_ewkt()
+    ...
+    # @field_serializer("location")
+    # def serialize_location(self, location: Location):
+    #     if location is None:
+    #         return None
+    #     return location.to_ewkt()
 
 
 class ContactCreate(ContactBaseWrite):

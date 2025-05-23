@@ -104,23 +104,6 @@ async def create(*, db_session: AsyncSession, contact_in: ContactCreate, organiz
     return contact
 
 
-async def get_or_create(*, db_session: AsyncSession, organization: Organization, contact_in: ContactCreate) -> Contact:
-    contact = await get_by_phone_number(db_session=db_session, phone_number=contact_in.phone_number)
-    if contact:
-        return contact
-        # stmt = select(Contact).where(Contact.id == contact_in.id)
-    else:
-        #     filters = contact_in.model_dump(exclude={"id", "organization"})
-        #     stmt = select(Contact).filter_by(**filters)
-        #
-        # result = await db_session.execute(stmt)
-        # instance = result.scalars().first()
-        # if instance:
-        #     return instance
-
-        return await create(db_session=db_session, contact_in=contact_in, organization=organization)
-
-
 async def patch(*, db_session: AsyncSession, contact: Contact, contact_in: ContactPatch) -> Contact:
     """Patches a contact."""
     contact_data = contact.dict()

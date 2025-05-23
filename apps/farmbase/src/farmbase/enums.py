@@ -105,3 +105,8 @@ class ContactRole(FarmbaseEnum):
     FARMER = "farmer"
     EXTENSION_OFFICER = "extension_officer"
     OTHER = "other"
+
+
+class Gender(FarmbaseEnum):
+    MALE = "male"
+    FEMALE = "female"

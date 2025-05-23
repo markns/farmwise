@@ -1,21 +1,11 @@
 from agents import RunContextWrapper, function_tool
 from farmbase_client import AuthenticatedClient
-from farmbase_client.api.contacts import contacts_create_contact, contacts_patch_contact
-from farmbase_client.models import ContactCreate, ContactPatch, ContactRead
+from farmbase_client.api.contacts import contacts_patch_contact
+from farmbase_client.models import ContactPatch, ContactRead
 
 from farmwise.dependencies import UserContext
 from farmwise.settings import settings
-from farmwise.tools.utils import copy_doc, join_with
-
-
-@function_tool
-@copy_doc(contacts_create_contact.asyncio)
-async def create_contact(ctx: RunContextWrapper[UserContext], contact_in: ContactCreate) -> ContactRead:
-    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
-        result = await contacts_create_contact.asyncio(
-            client=client, organization=ctx.context.organization, body=contact_in
-        )
-        return result
+from farmwise.tools.utils import join_with
 
 
 @function_tool(
