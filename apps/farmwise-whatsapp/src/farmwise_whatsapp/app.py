@@ -85,11 +85,15 @@ async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
                 ],
             ),
         )
-    else:
+    elif response.buttons:
+        if len(response.buttons) > 3:
+            logger.warning(f"Max allowed buttons: 3. {response}")
         await msg.reply_text(
             _convert_md_to_whatsapp(response.content),
-            buttons=[Button(b.title, b.callback_data) for b in response.buttons],
+            buttons=[Button(b.title, b.callback_data) for b in response.buttons[:3]],
         )
+    else:
+        await msg.reply_text(_convert_md_to_whatsapp(response.content))
 
 
 # TODO: Chat opened is not being triggered...
