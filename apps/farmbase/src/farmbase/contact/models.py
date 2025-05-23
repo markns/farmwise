@@ -35,6 +35,7 @@ class Contact(Base, TimeStampMixin):
     estimated_age: Mapped[int] = mapped_column(Integer, nullable=True)
     # TODO: we might want to change Contact to a hierarchy in future.
     role: Mapped[ContactRole] = mapped_column(SqlEnum(ContactRole, name="contact_role_enum"), nullable=True)
+    experience: Mapped[int] = mapped_column(Integer, nullable=True)
     email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
 
     # TODO: Location will move elsewhere
@@ -61,7 +62,6 @@ class Contact(Base, TimeStampMixin):
 class ContactBase(FarmbaseBase):
     """Base model for Contact data."""
 
-    name: str = Field(description="The whatsapp name of the contact")
     preferred_form_of_address: Optional[str] = Field(
         default=None, description="Preferred form of address of the contact"
     )
@@ -69,6 +69,7 @@ class ContactBase(FarmbaseBase):
     date_of_birth: Optional[date] = Field(default=None, description="Contact's date of birth")
     estimated_age: Optional[int] = Field(default=None, description="Contact's estimated age")
     role: Optional[ContactRole] = Field(default=None, description="Role of the contact")
+    experience: Optional[int] = Field(default=None, description="Contact's work experience in years")
     email: Optional[str] = Field(default=None, description="Contact's email address")
 
     # TODO: Location will move elsewhere
@@ -92,6 +93,7 @@ class ContactBaseWrite(ContactBase):
 
 
 class ContactCreate(ContactBaseWrite):
+    name: str = Field(description="The whatsapp name of the contact")
     phone_number: str = Field(description="Contact's phone number")
 
 
@@ -112,6 +114,7 @@ class ContactRead(ContactBase):
     """Model for reading Contact data."""
 
     id: PrimaryKey = Field(description="Unique identifier of the contact")
+    name: str = Field(description="The WhatsApp name of the contact")
     phone_number: str = Field(description="Contact's phone number")
     organization: OrganizationRead = Field(description="The organization the contact belongs to")
     created_at: datetime = Field(description="Timestamp when the contact was created")
