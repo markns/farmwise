@@ -13,9 +13,10 @@ from pywa_async import WhatsApp, filters, types
 from pywa_async.types.base_update import BaseUserUpdateAsync
 
 from .core.config import settings
+from .utils import _convert_md_to_whatsapp
 
 # Intercept standard logging and route to loguru
-logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
+logging.basicConfig(handlers=[InterceptHandler()], level=logging.INFO, force=True)
 
 
 # TODO: load these commands from the FarmWise service
@@ -62,11 +63,6 @@ wa = WhatsApp(
 agent_client = AgentClient(base_url=settings.AGENT_URL)
 
 
-def _convert_md_to_whatsapp(response: str) -> str:
-    """Convert a markdown string to WhatsApp markdown."""
-    return response.replace("**", "*").replace("__", "_")
-
-
 async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
     if Action.request_location in response.actions:
         await msg.reply_location_request(response.content)
@@ -98,10 +94,11 @@ async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
 #  Welcome messages are currently not functioning as intended.
 #  https://developers.facebook.com/community/threads/1842836979827258/?post_id=1842836983160591
 @wa.on_chat_opened
-async def chat_opened_handler(client: WhatsApp, chat_opened: types.ChatOpened):
+async def chat_opened(client: WhatsApp, chat_opened: types.ChatOpened):
     logger.info(f"CHAT OPENED USER: {chat_opened}")
     # TODO: Do we already want to register a user here?
-    await chat_opened.reply_text(f"""Hi {chat_opened.from_user.name}! 👋 You’re now connected to FarmWise – your trusted partner for smart farming advice.
+    await chat_opened.reply_text(f"""
+Hi {chat_opened.from_user.name}! 👋 You’re now connected to FarmWise – your trusted partner for smart farming advice.
 
 Here’s what you can do:
 ✅ Get tailored recommendations for your crops
@@ -129,11 +126,6 @@ async def location_handler(_: WhatsApp, msg: types.Message):
     await _send_response(response, msg)
 
 
-@wa.on_raw_update
-async def raw_update_handler(_: WhatsApp, update: dict):
-    logger.warning(f"RAW UPDATE: {update}")
-
-
 @wa.on_message(filters.text)
 async def message_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"MESSAGE USER: {msg}")
@@ -151,7 +143,7 @@ async def message_handler(_: WhatsApp, msg: types.Message):
 @wa.on_callback_selection
 async def callback_handler(_: WhatsApp, sel: types.CallbackSelection):
     logger.info(f"CALLBACK SELECTION USER: {sel}")
-    await msg.indicate_typing()
+    await sel.indicate_typing()
     response = await agent_client.ainvoke(
         message=sel.data,
         user_id=sel.from_user.wa_id,
@@ -161,14 +153,8 @@ async def callback_handler(_: WhatsApp, sel: types.CallbackSelection):
     await _send_response(response, sel)
 
 
-# Function to encode the image
-def encode_image(image_path):
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode("utf-8")
-
-
 @wa.on_message(filters.image)
-async def on_image(_: WhatsApp, msg: types.Message):
+async def image_handler(_: WhatsApp, msg: types.Message):
     await msg.indicate_typing()
     img_bytes = await msg.image.download(in_memory=True)
     img_b64 = base64.b64encode(img_bytes).decode("utf-8")
@@ -183,3 +169,8 @@ async def on_image(_: WhatsApp, msg: types.Message):
     )
     logger.info(f"AGENT: {response}")
     await _send_response(response, msg)
+
+
+@wa.on_raw_update
+async def raw_update_handler(_: WhatsApp, update: dict):
+    logger.warning(f"RAW UPDATE: {update}")
