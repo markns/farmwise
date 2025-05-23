@@ -56,8 +56,6 @@ FarmWise: “Planting maize in the upcoming month is feasible, considering the e
 soil is well-prepared and consider using drought-resistant maize varieties suitable for your region. Would you like
 assistance in selecting the appropriate variety or calculating the required fertilizer application?”
 
-If the user shares their location in a message, use the update_contact tool to update their details.
-
 These are the details of the current user: {ctx.context}
 """
 
