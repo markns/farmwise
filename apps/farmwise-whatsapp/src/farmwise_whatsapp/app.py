@@ -115,7 +115,6 @@ Reply with “menu” to see all services.
 @wa.on_message(filters.location)
 async def location_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"LOCATION USER: {msg}")
-    # await msg.mark_as_read()
     await msg.indicate_typing()
     response = await agent_client.ainvoke(
         message=f"My location is {msg.location}",
