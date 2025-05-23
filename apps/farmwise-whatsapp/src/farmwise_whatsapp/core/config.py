@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     DEBUG: bool
     WHATSAPP_TOKEN: str
     WHATSAPP_PHONE_ID: str
+    WHATSAPP_CALLBACK_URL: str
 
     # class Config:
     #     env_file = ".env"  # Load environment variables from .env
