@@ -76,9 +76,9 @@ async def invoke(
     with AuthenticatedClient(base_url="http://127.0.0.1:8000/api/v1", token="fdsfds") as client:
         await create_run_result.asyncio(
             client=client,
-            organization=context.organization,
+            organization=context.contact.organization.slug,
             body=RunResultCreate(
-                contact_id=context.user_id,
+                contact_id=context.contact.id,
                 created_at=datetime.now(UTC),
                 input=result.input,
                 final_output=result.final_output,
