@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import datetime
 from typing import List, Optional
 
 from geoalchemy2 import Geometry, WKBElement
 from pydantic import Field as PydanticField
 from sqlalchemy import (
-    DateTime,
     ForeignKey,
     Integer,
     String,
@@ -18,18 +16,16 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from farmbase.contact.models import Contact, ContactRead
 from farmbase.database.core import Base
 from farmbase.farm.field.models import Field
-from farmbase.models import FarmbaseBase, Pagination, PrimaryKey
+from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
 
 
-class Farm(Base):
+class Farm(Base, TimeStampMixin):
     __tablename__ = "farm"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     farm_name: Mapped[str] = mapped_column(String(255), nullable=False)
     location: Mapped[Optional[WKBElement]] = mapped_column(
         Geometry(geometry_type="POINT", srid=4326, from_text="ST_GeomFromEWKT", name="geometry"), nullable=True
     )
-
-    date_registered: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Relationships
     fields: Mapped[list["Field"]] = relationship(back_populates="farm")
@@ -70,9 +66,6 @@ class FarmBase(FarmbaseBase):
     farm_name: str = PydanticField(description="The name of the farm")
     # farm_name: str = PydanticField(description="The name of the farm")
     # address: Optional[str] = PydanticField(default=None, description="The address of the farm")
-    date_registered: Optional[datetime.datetime] = PydanticField(
-        default=None, description="The date the farm was registered"
-    )
 
 
 class FarmCreate(FarmBase):
@@ -86,7 +79,6 @@ class FarmUpdate(FarmbaseBase):
 
     farm_name: Optional[str] = PydanticField(default=None, description="Updated name of the farm")
     # address: Optional[str] = PydanticField(default=None, description="Updated address of the farm")
-    date_registered: Optional[datetime.datetime] = PydanticField(default=None, description="Updated registration date")
 
 
 class FarmContactBase(FarmbaseBase):

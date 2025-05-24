@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from farmbase.farm.models import Farm, FarmContact, FarmCreate, FarmUpdate, FarmContactCreate, FarmContactUpdate
+from farmbase.farm.models import Farm, FarmContact, FarmContactCreate, FarmContactUpdate, FarmCreate, FarmUpdate
 
 
 async def get_farm(*, db_session: AsyncSession, farm_id: int) -> Optional[Farm]:
@@ -26,7 +26,15 @@ async def create_farm(*, db_session: AsyncSession, farm_in: FarmCreate) -> Farm:
     farm = Farm(**farm_in.model_dump())
     db_session.add(farm)
     await db_session.commit()
-    return farm
+    await db_session.refresh(farm)  # Ensure we get the ID
+
+    # Re-query with selectinload to populate relationships
+    result = await db_session.execute(
+        select(Farm)
+        .where(Farm.id == farm.id)
+        .options(selectinload(Farm.contact_associations).selectinload(FarmContact.contact))
+    )
+    return result.scalar_one()
 
 
 async def update_farm(*, db_session: AsyncSession, farm: Farm, farm_in: FarmUpdate) -> Farm:
@@ -49,9 +57,7 @@ async def delete_farm(*, db_session: AsyncSession, farm_id: int) -> None:
 async def get_farm_contact(*, db_session: AsyncSession, farm_contact_id: int) -> Optional[FarmContact]:
     """Fetch a farm contact by its ID."""
     result = await db_session.execute(
-        select(FarmContact)
-        .where(FarmContact.id == farm_contact_id)
-        .options(selectinload(FarmContact.contact))
+        select(FarmContact).where(FarmContact.id == farm_contact_id).options(selectinload(FarmContact.contact))
     )
     return result.scalars().first()
 
@@ -64,7 +70,9 @@ async def create_farm_contact(*, db_session: AsyncSession, farm_contact_in: Farm
     return farm_contact
 
 
-async def update_farm_contact(*, db_session: AsyncSession, farm_contact: FarmContact, farm_contact_in: FarmContactUpdate) -> FarmContact:
+async def update_farm_contact(
+    *, db_session: AsyncSession, farm_contact: FarmContact, farm_contact_in: FarmContactUpdate
+) -> FarmContact:
     """Update an existing farm contact."""
     data = farm_contact_in.model_dump(exclude_none=True)
     for field, value in data.items():

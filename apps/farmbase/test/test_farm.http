@@ -1,0 +1,10 @@
+### Get farms
+GET http://127.0.0.1:8000/api/v1/default/farms
+### Create farm
+POST http://127.0.0.1:8000/api/v1/default/farms
+Content-Type: application/json
+
+{
+  "farm_name": "Maggie's farm"
+}
+###

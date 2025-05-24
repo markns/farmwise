@@ -19,7 +19,7 @@ class FarmFilterSet(BaseFilterSet[Farm]):
     ordering = OrderingFilter(
         id=OrderingField(Farm.id),
         farm_name=OrderingField(Farm.farm_name),
-        date_registered=OrderingField(Farm.date_registered),
+        # date_registered=OrderingField(Farm.date_registered),
     )
 
 
