@@ -38,11 +38,6 @@ class Contact(Base, TimeStampMixin):
     experience: Mapped[int] = mapped_column(Integer, nullable=True)
     email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
 
-    # TODO: Location will move elsewhere
-    # location: Mapped[Optional[WKBElement]] = mapped_column(
-    #     Geometry(geometry_type="POINT", srid=4326, from_text="ST_GeomFromEWKT", name="geometry"), nullable=True
-    # )
-
     # Relationships
     organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id))
     organization = relationship("Organization")

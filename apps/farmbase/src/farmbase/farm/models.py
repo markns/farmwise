@@ -3,16 +3,16 @@ from __future__ import annotations
 import datetime
 from typing import List, Optional
 
+from geoalchemy2 import Geometry, WKBElement
 from pydantic import Field as PydanticField
 from sqlalchemy import (
-    TEXT,
     DateTime,
     ForeignKey,
     Integer,
     String,
     UniqueConstraint,
 )
-from sqlalchemy.ext.associationproxy import association_proxy  # For simpler many-to-many access if needed
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.contact.models import Contact, ContactRead
@@ -25,7 +25,10 @@ class Farm(Base):
     __tablename__ = "farm"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     farm_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    address: Mapped[str | None] = mapped_column(TEXT, nullable=True)
+    location: Mapped[Optional[WKBElement]] = mapped_column(
+        Geometry(geometry_type="POINT", srid=4326, from_text="ST_GeomFromEWKT", name="geometry"), nullable=True
+    )
+
     date_registered: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Relationships
@@ -47,9 +50,7 @@ class FarmContact(Base):
     __tablename__ = "farm_contact"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     farm_id: Mapped[int] = mapped_column(ForeignKey(Farm.id), nullable=False)
-    contact_id: Mapped[int] = mapped_column(
-        ForeignKey(Contact.id), nullable=False
-    )
+    contact_id: Mapped[int] = mapped_column(ForeignKey(Contact.id), nullable=False)
     role: Mapped[str] = mapped_column(String(100), nullable=False)
 
     __table_args__ = (UniqueConstraint("farm_id", "contact_id", "role", name="uq_farm_contact_role"),)
@@ -67,7 +68,8 @@ class FarmBase(FarmbaseBase):
     """Base model for Farm data."""
 
     farm_name: str = PydanticField(description="The name of the farm")
-    address: Optional[str] = PydanticField(default=None, description="The address of the farm")
+    # farm_name: str = PydanticField(description="The name of the farm")
+    # address: Optional[str] = PydanticField(default=None, description="The address of the farm")
     date_registered: Optional[datetime.datetime] = PydanticField(
         default=None, description="The date the farm was registered"
     )
@@ -83,7 +85,7 @@ class FarmUpdate(FarmbaseBase):
     """Model for updating an existing Farm."""
 
     farm_name: Optional[str] = PydanticField(default=None, description="Updated name of the farm")
-    address: Optional[str] = PydanticField(default=None, description="Updated address of the farm")
+    # address: Optional[str] = PydanticField(default=None, description="Updated address of the farm")
     date_registered: Optional[datetime.datetime] = PydanticField(default=None, description="Updated registration date")
 
 

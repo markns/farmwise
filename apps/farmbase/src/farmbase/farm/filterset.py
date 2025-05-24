@@ -15,7 +15,7 @@ from .models import Farm, FarmContact
 
 class FarmFilterSet(BaseFilterSet[Farm]):
     farm_name = SearchFilter(Farm.farm_name)
-    address = SearchFilter(Farm.address)
+    # address = SearchFilter(Farm.address)
     ordering = OrderingFilter(
         id=OrderingField(Farm.id),
         farm_name=OrderingField(Farm.farm_name),
@@ -25,7 +25,7 @@ class FarmFilterSet(BaseFilterSet[Farm]):
 
 class FarmQueryParams(PaginationParams):
     farm_name: str | None = Field(None)
-    address: str | None = Field(None)
+    # address: str | None = Field(None)
 
 
 class FarmContactFilterSet(BaseFilterSet[FarmContact]):
