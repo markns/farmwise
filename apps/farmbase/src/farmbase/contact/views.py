@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Query
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -100,16 +100,11 @@ async def get_contact_by_phone(
     db_session: DbSession,
     phone: Annotated[str, Query(description="Phone number in E.164 format")],
 ):
-    stmt = select(Contact).options(selectinload(Contact.organization))
-    filter_set = ContactFilterSet(db_session, stmt)
-    result = await filter_set.filter({"phone": phone})
-
+    result = await get_by_phone_number(db_session=db_session, phone_number=phone)
     if not result:
         raise EntityDoesNotExistError(message="Contact not found")
-    if len(result) > 1:
-        raise HTTPException(status_code=409, detail="Multiple contacts found with this phone number")
 
-    return result[0]
+    return result
 
 
 @router.get(
