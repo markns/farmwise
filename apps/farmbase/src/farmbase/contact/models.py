@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date
 from typing import List, Optional
 
 from pydantic import Field, field_validator
@@ -96,8 +96,6 @@ class ContactRead(ContactBase):
     name: str = Field(description="The WhatsApp name of the contact")
     phone_number: str = Field(description="Contact's phone number")
     organization: OrganizationRead = Field(description="The organization the contact belongs to")
-    created_at: datetime = Field(description="Timestamp when the contact was created")
-    updated_at: datetime = Field(description="Timestamp when the contact was last updated")
 
 
 class ContactPagination(Pagination):
