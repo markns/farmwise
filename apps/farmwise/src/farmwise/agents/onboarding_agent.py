@@ -83,6 +83,8 @@ Example:
 """
 
 
+# TODO: possible/better to do this as a workflow?
+
 onboarding_agent: Agent[UserContext] = Agent(
     name="Onboarding Agent",
     handoff_description="This agent is used for onboarding new users into the system",
