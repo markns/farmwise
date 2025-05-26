@@ -1,7 +1,6 @@
 from typing import Any, List, Optional
 
 from pydantic import Field, field_validator
-from pydantic.color import Color
 from slugify import slugify
 from sqlalchemy import Column
 from sqlalchemy.event import listen
@@ -44,9 +43,9 @@ class OrganizationBase(FarmbaseBase):
     name: str
     description: Optional[str] = Field(None, nullable=True)
     default: Optional[bool] = Field(False, nullable=True)
-    banner_enabled: Optional[bool] = Field(False, nullable=True)
-    banner_color: Optional[Color] = Field(None, nullable=True)
-    banner_text: Optional[str] = Field(None, nullable=True)
+    # banner_enabled: Optional[bool] = Field(False, nullable=True)
+    # banner_color: Optional[Color] = Field(None, nullable=True)
+    # banner_text: Optional[str] = Field(None, nullable=True)
 
     @field_validator("name")
     @classmethod
@@ -61,9 +60,9 @@ class OrganizationCreate(OrganizationBase):
 class OrganizationUpdate(FarmbaseBase):
     description: Optional[str] = Field(None, nullable=True)
     default: Optional[bool] = Field(False, nullable=True)
-    banner_enabled: Optional[bool] = Field(False, nullable=True)
-    banner_color: Optional[Color] = Field(None, nullable=True)
-    banner_text: Optional[str] = Field(None, nullable=True)
+    # banner_enabled: Optional[bool] = Field(False, nullable=True)
+    # banner_color: Optional[Color] = Field(None, nullable=True)
+    # banner_text: Optional[str] = Field(None, nullable=True)
 
 
 class OrganizationRead(OrganizationBase):
