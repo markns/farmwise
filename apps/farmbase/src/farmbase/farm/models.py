@@ -168,3 +168,12 @@ class FarmContactPagination(Pagination):
     items: List[FarmContactRead] = PydanticField(
         default_factory=list, description="List of farm contacts in the current page"
     )
+
+
+# Resolve forward references and ensure Pydantic models are fully built
+from farmbase.contact.models import ContactRead
+
+FarmContactRead.model_rebuild()
+FarmRead.model_rebuild()
+FarmPagination.model_rebuild()
+FarmContactPagination.model_rebuild()
