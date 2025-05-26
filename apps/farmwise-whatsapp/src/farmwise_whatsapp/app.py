@@ -81,7 +81,7 @@ async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
                             for row in section.rows[:10]
                         ],
                     )
-                    for section in response.section_list.sections
+                    for section in response.section_list.sections[:10]
                 ],
             ),
         )
