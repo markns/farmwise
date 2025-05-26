@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from enum import Enum
 
 from farmwise_client import AgentClient
-from farmwise_schema.schema import Action, WhatsappResponse
+from farmwise_schema.schema import Action, WhatsAppResponse
 from fastapi import FastAPI
 from loguru import logger
 from loguru_logging_intercept import InterceptHandler
@@ -63,7 +63,7 @@ wa = WhatsApp(
 agent_client = AgentClient(base_url=settings.AGENT_URL)
 
 
-async def _send_response(response: WhatsappResponse, msg: BaseUserUpdateAsync):
+async def _send_response(response: WhatsAppResponse, msg: BaseUserUpdateAsync):
     if Action.request_location in response.actions:
         await msg.reply_location_request(response.content)
     elif response.section_list:

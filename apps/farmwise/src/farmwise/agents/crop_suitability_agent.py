@@ -1,6 +1,6 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
-from farmwise_schema.schema import WhatsappResponse
+from farmwise_schema.schema import WhatsAppResponse
 
 from farmwise.dependencies import UserContext
 from farmwise.tools.farmbase import update_contact
@@ -28,6 +28,6 @@ crop_suitability_agent: Agent[UserContext] = Agent(
     handoff_description="A helpful agent that can answer questions about crop suitability.",
     instructions=crop_suitability_agent_instructions,
     tools=[suitability_index, update_contact],
-    output_type=WhatsappResponse,
+    output_type=WhatsAppResponse,
     model="gpt-4.1",
 )

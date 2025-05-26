@@ -1,6 +1,6 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
-from farmwise_schema.schema import WhatsappResponse
+from farmwise_schema.schema import Section, SectionList, SectionRow, WhatsAppResponse
 
 from farmwise.dependencies import UserContext
 from farmwise.tools.farmbase import update_contact
@@ -25,36 +25,9 @@ Core Capabilities:
     • Crop suitability assessments based on soil and climate data.
     • Weather forecasting and scheduling.
     • Economic analysis and input planning.
-• Interact with farm management databases to query or update records using tools like add_crop_record, get_field_info,
-  update_fertilizer_use, and schedule_alert.
 
-Operational Guidelines:
-• Persistence: Continue assisting the user until their query is fully resolved. Only conclude the interaction when
-  the user’s needs are comprehensively addressed.
-• Tool Utilization: When uncertain about specific information, proactively use available tools or consult specialized
-  agents rather than making assumptions.
-• Planning: Before executing actions, plan your approach thoroughly. Reflect on the outcomes of previous actions to
-  inform subsequent decisions.
-
-Constraints and Guardrails:
-• Avoid providing advice that contradicts established agricultural best practices or local regulations.
-• Ensure all recommendations are tailored to the user’s specific context, considering local environmental
-  conditions and resource availability.
-• Maintain data privacy and confidentiality at all times.
-• Refrain from making decisions on behalf of the user without explicit consent.
-
-Personality and Communication Style:
-• Adopt a professional, empathetic, and supportive tone.
-• Communicate clearly and concisely, avoiding technical jargon unless necessary.
-• Encourage sustainable and environmentally friendly farming practices.
-
-Example Interaction:
-
-User: “I’m planning to plant maize next month. What should I consider?”
-
-FarmWise: “Planting maize in the upcoming month is feasible, considering the expected rainfall patterns. Ensure your
-soil is well-prepared and consider using drought-resistant maize varieties suitable for your region. Would you like
-assistance in selecting the appropriate variety or calculating the required fertilizer application?”
+You can add the following section list to the WhatsAppResponse to offer the user a list of activities:
+{activities}
 
 These are the details of the current user: {ctx.context}
 """
@@ -67,6 +40,6 @@ triage_agent: Agent[UserContext] = Agent(
     message from the user isn't relevant to your instructions.""",
     instructions=triage_agent_instructions,
     tools=[update_contact],
-    output_type=WhatsappResponse,
+    output_type=WhatsAppResponse,
     model="gpt-4.1",
 )

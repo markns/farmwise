@@ -1,6 +1,6 @@
 from agents import Agent
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
-from farmwise_schema.schema import WhatsappResponse
+from farmwise_schema.schema import WhatsAppResponse
 
 from farmwise.dependencies import UserContext
 from farmwise.tools.farmbase import update_contact
@@ -46,7 +46,7 @@ Routine for Crop Pest and Disease Diagnosis Agent
 
 If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the triage agent.
 """,
-    output_type=WhatsappResponse,
+    output_type=WhatsAppResponse,
     tools=[update_contact],
     model="gpt-4.1",
 )

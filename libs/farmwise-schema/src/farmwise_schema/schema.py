@@ -118,7 +118,7 @@ class SectionList(BaseModel):
     sections: list[Section]
 
 
-class WhatsappResponse(BaseModel):
+class WhatsAppResponse(BaseModel):
     content: str | None = Field(description="Content of the response.")
     actions: list[Action] = Field(
         description="Actions that can be requested from the client. Should be left empty unless specified.",

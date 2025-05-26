@@ -5,7 +5,7 @@ import httpx
 from farmwise_schema.schema import (
     ServiceMetadata,
     UserInput,
-    WhatsappResponse,
+    WhatsAppResponse,
 )
 
 
@@ -81,7 +81,7 @@ class AgentClient:
         image: str = None,
         user_name: str | None = None,
         agent_config: dict[str, Any] | None = None,
-    ) -> WhatsappResponse:
+    ) -> WhatsAppResponse:
         """
         Invoke the agent asynchronously. Only the final message is returned.
 
@@ -115,7 +115,7 @@ class AgentClient:
             except httpx.HTTPError as e:
                 raise AgentClientError(f"Error: {e}")
 
-        return WhatsappResponse.model_validate(response.json())
+        return WhatsAppResponse.model_validate(response.json())
 
     # def invoke(
     #     self,

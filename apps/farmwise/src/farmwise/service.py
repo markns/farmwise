@@ -4,7 +4,7 @@ from agents import Agent, Runner, RunResult, gen_trace_id, set_default_openai_ke
 from farmbase_client import AuthenticatedClient
 from farmbase_client.api.runresult import runresult_create_run_result as create_run_result
 from farmbase_client.models import AgentBase, ChatState, RunResultCreate
-from farmwise_schema.schema import ServiceMetadata, UserInput, WhatsappResponse
+from farmwise_schema.schema import ServiceMetadata, UserInput, WhatsAppResponse
 from fastapi import APIRouter, FastAPI
 from loguru import logger
 from openai.types.responses import EasyInputMessageParam, ResponseInputImageParam, ResponseInputTextParam
@@ -86,7 +86,7 @@ async def run_agent(
     return result.final_output
 
 
-@router.post("/invoke", response_model=WhatsappResponse)
+@router.post("/invoke", response_model=WhatsAppResponse)
 async def invoke(
     user_input: UserInput,
     context: UserContextDep,
