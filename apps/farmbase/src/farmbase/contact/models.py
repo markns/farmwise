@@ -67,24 +67,8 @@ class ContactBase(FarmbaseBase):
     experience: Optional[int] = Field(default=None, description="Contact's work experience in years")
     email: Optional[str] = Field(default=None, description="Contact's email address")
 
-    # TODO: Location will move elsewhere
-    # @field_validator("location", mode="before")
-    # @classmethod
-    # def validate_location(cls, data: Any) -> Any:
-    #     if isinstance(data, WKBElement):
-    #         point = to_shape(data)
-    #         return {"longitude": point.x, "latitude": point.y}
-    #     # If data is already a dictionary or another compatible type, pass it through.
-    #     return data
 
-
-class ContactBaseWrite(ContactBase):
-    ...
-    # @field_serializer("location")
-    # def serialize_location(self, location: Location):
-    #     if location is None:
-    #         return None
-    #     return location.to_ewkt()
+class ContactBaseWrite(ContactBase): ...
 
 
 class ContactCreate(ContactBaseWrite):

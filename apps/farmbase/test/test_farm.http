@@ -5,14 +5,25 @@ POST http://127.0.0.1:8000/api/v1/default/farms
 Content-Type: application/json
 
 {
-  "farm_name": "Maggie's farm"
+  "farm_name": "Bobs's farm"
 }
-###
+### Create farm with location
 POST http://127.0.0.1:8000/api/v1/default/farms
 Content-Type: application/json
 
 {
   "farm_name": "Maggie's farm",
+  "location": {
+    "latitude": 0.1,
+    "longitude": 0.1
+  }
+}
+### Create farm with contacts
+POST http://127.0.0.1:8000/api/v1/default/farms
+Content-Type: application/json
+
+{
+  "farm_name": "Rafiki farm",
   "contacts": [
     {
       "contact_id": 1,
