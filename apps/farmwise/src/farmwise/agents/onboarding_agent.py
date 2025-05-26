@@ -3,7 +3,7 @@ from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise_schema.schema import WhatsappResponse
 
 from farmwise.dependencies import UserContext
-from farmwise.tools.farmbase import update_contact
+from farmwise.tools.farmbase import create_farm, update_contact
 
 
 def onboarding_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
@@ -67,18 +67,20 @@ Interpretation:
 • The user’s response may indicate their gender.
 • If unclear, it’s acceptable to ask respectfully for clarification, by adding buttons Male and Female to the response
 
-Step 6: Confirm Collected Information
-Summarize the information gathered to ensure accuracy.
-
-⸻
-🔁 Iterative Refinement
+Step 6: Update Contact
 Once the role, preferred form of address, gender and estimated age have been obtained, 
 use the update_contact tool to save it. 
-
 If any information is missing or unclear, continue the conversation to gather the necessary details.
-
 Example:
 “Thanks for the information you’ve provided. Could you tell me more about [specific detail] to complete your profile?”
+
+Step 7: Create Farm
+If the user is a farmer, ask the user to share their location by adding 
+the request_location action to the response. This will allow the farmer to access localised weather forecasts, 
+accurate seed recommendations, warnings of local crop pests, and notification of local training events.
+After gathering the location, use the create_farm tool to record the information and associate the farmer with the farm
+The name of the farm should simply be the farmer's name with Farm. For example if the user's name is Hudson Ndege, the 
+name of the farm should be Hudson Ndege Farm. 
 
 """
 
@@ -89,7 +91,7 @@ onboarding_agent: Agent[UserContext] = Agent(
     name="Onboarding Agent",
     handoff_description="This agent is used for onboarding new users into the system",
     instructions=onboarding_agent_instructions,
-    tools=[update_contact],
+    tools=[update_contact, create_farm],
     output_type=WhatsappResponse,
     model="gpt-4.1",
 )

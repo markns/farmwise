@@ -24,7 +24,6 @@ def _get_kwargs(
     page: Union[Unset, int] = 1,
     ordering: Union[Unset, list[str]] = UNSET,
     farm_name: Union[None, Unset, str] = UNSET,
-    address: Union[None, Unset, str] = UNSET,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
 
@@ -44,13 +43,6 @@ def _get_kwargs(
     else:
         json_farm_name = farm_name
     params["farm_name"] = json_farm_name
-
-    json_address: Union[None, Unset, str]
-    if isinstance(address, Unset):
-        json_address = UNSET
-    else:
-        json_address = address
-    params["address"] = json_address
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -121,7 +113,6 @@ def sync_detailed(
     page: Union[Unset, int] = 1,
     ordering: Union[Unset, list[str]] = UNSET,
     farm_name: Union[None, Unset, str] = UNSET,
-    address: Union[None, Unset, str] = UNSET,
 ) -> Response[Union[ErrorResponse, FarmPagination, HTTPValidationError]]:
     """List Farms
 
@@ -133,7 +124,6 @@ def sync_detailed(
         page (Union[Unset, int]):  Default: 1.
         ordering (Union[Unset, list[str]]):
         farm_name (Union[None, Unset, str]):
-        address (Union[None, Unset, str]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -149,7 +139,6 @@ def sync_detailed(
         page=page,
         ordering=ordering,
         farm_name=farm_name,
-        address=address,
     )
 
     response = client.get_httpx_client().request(
@@ -167,7 +156,6 @@ def sync(
     page: Union[Unset, int] = 1,
     ordering: Union[Unset, list[str]] = UNSET,
     farm_name: Union[None, Unset, str] = UNSET,
-    address: Union[None, Unset, str] = UNSET,
 ) -> Optional[Union[ErrorResponse, FarmPagination, HTTPValidationError]]:
     """List Farms
 
@@ -179,7 +167,6 @@ def sync(
         page (Union[Unset, int]):  Default: 1.
         ordering (Union[Unset, list[str]]):
         farm_name (Union[None, Unset, str]):
-        address (Union[None, Unset, str]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -196,7 +183,6 @@ def sync(
         page=page,
         ordering=ordering,
         farm_name=farm_name,
-        address=address,
     ).parsed
 
 
@@ -208,7 +194,6 @@ async def asyncio_detailed(
     page: Union[Unset, int] = 1,
     ordering: Union[Unset, list[str]] = UNSET,
     farm_name: Union[None, Unset, str] = UNSET,
-    address: Union[None, Unset, str] = UNSET,
 ) -> Response[Union[ErrorResponse, FarmPagination, HTTPValidationError]]:
     """List Farms
 
@@ -220,7 +205,6 @@ async def asyncio_detailed(
         page (Union[Unset, int]):  Default: 1.
         ordering (Union[Unset, list[str]]):
         farm_name (Union[None, Unset, str]):
-        address (Union[None, Unset, str]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -236,7 +220,6 @@ async def asyncio_detailed(
         page=page,
         ordering=ordering,
         farm_name=farm_name,
-        address=address,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -252,7 +235,6 @@ async def asyncio(
     page: Union[Unset, int] = 1,
     ordering: Union[Unset, list[str]] = UNSET,
     farm_name: Union[None, Unset, str] = UNSET,
-    address: Union[None, Unset, str] = UNSET,
 ) -> Optional[Union[ErrorResponse, FarmPagination, HTTPValidationError]]:
     """List Farms
 
@@ -264,7 +246,6 @@ async def asyncio(
         page (Union[Unset, int]):  Default: 1.
         ordering (Union[Unset, list[str]]):
         farm_name (Union[None, Unset, str]):
-        address (Union[None, Unset, str]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -282,6 +263,5 @@ async def asyncio(
             page=page,
             ordering=ordering,
             farm_name=farm_name,
-            address=address,
         )
     ).parsed
