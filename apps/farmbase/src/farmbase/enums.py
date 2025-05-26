@@ -107,6 +107,13 @@ class ContactRole(FarmbaseEnum):
     OTHER = "other"
 
 
+class FarmContactRole(FarmbaseEnum):
+    OWNER = "owner"
+    FAMILY = "family"
+    WORKER = "worker"
+    ADVISOR = "advisor"
+
+
 class Gender(FarmbaseEnum):
     MALE = "male"
     FEMALE = "female"

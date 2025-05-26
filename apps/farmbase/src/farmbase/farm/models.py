@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from geoalchemy2 import Geometry, WKBElement
 from pydantic import Field as PydanticField
+from sqlalchemy import Enum as SqlEnum
 from sqlalchemy import (
     ForeignKey,
     Integer,
@@ -15,6 +16,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.contact.models import Contact, ContactRead
 from farmbase.database.core import Base
+from farmbase.enums import FarmContactRole
 from farmbase.farm.field.models import Field
 from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
 
@@ -47,7 +49,9 @@ class FarmContact(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     farm_id: Mapped[int] = mapped_column(ForeignKey(Farm.id), nullable=False)
     contact_id: Mapped[int] = mapped_column(ForeignKey(Contact.id), nullable=False)
-    role: Mapped[str] = mapped_column(String(100), nullable=False)
+    role: Mapped[FarmContactRole] = mapped_column(
+        SqlEnum(FarmContactRole, name="farm_contact_role_enum"), nullable=False
+    )
 
     __table_args__ = (UniqueConstraint("farm_id", "contact_id", "role", name="uq_farm_contact_role"),)
 
@@ -68,10 +72,20 @@ class FarmBase(FarmbaseBase):
     # address: Optional[str] = PydanticField(default=None, description="The address of the farm")
 
 
+class FarmContactLink(FarmbaseBase):
+    """Model for linking a contact when creating a farm."""
+
+    contact_id: PrimaryKey = PydanticField(description="ID of the contact to link")
+    role: str = PydanticField(description="Role of the contact in the farm")
+
+
 class FarmCreate(FarmBase):
     """Model for creating a new Farm."""
 
-    pass
+    contacts: List[FarmContactLink] = PydanticField(
+        default_factory=list,
+        description="List of contacts to link to the farm upon creation",
+    )
 
 
 class FarmUpdate(FarmbaseBase):
@@ -86,7 +100,7 @@ class FarmContactBase(FarmbaseBase):
 
     farm_id: PrimaryKey = PydanticField(description="ID of the farm")
     contact_id: PrimaryKey = PydanticField(description="ID of the contact")
-    role: str = PydanticField(description="Role of the contact in the farm")
+    role: FarmContactRole = PydanticField(description="Role of the contact in the farm")
 
 
 class FarmContactCreate(FarmContactBase):
@@ -98,7 +112,7 @@ class FarmContactCreate(FarmContactBase):
 class FarmContactUpdate(FarmbaseBase):
     """Model for updating an existing FarmContact."""
 
-    role: Optional[str] = PydanticField(default=None, description="Updated role of the contact in the farm")
+    role: Optional[FarmContactRole] = PydanticField(default=None, description="Updated role of the contact in the farm")
 
 
 class FarmContactRead(FarmContactBase):

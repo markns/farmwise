@@ -23,12 +23,26 @@ async def get_farm(*, db_session: AsyncSession, farm_id: int) -> Optional[Farm]:
 
 async def create_farm(*, db_session: AsyncSession, farm_in: FarmCreate) -> Farm:
     """Create a new farm."""
-    farm = Farm(**farm_in.model_dump())
+    farm_data = farm_in.model_dump(exclude={"contacts"})
+    farm = Farm(**farm_data)
     db_session.add(farm)
-    await db_session.commit()
-    await db_session.refresh(farm)  # Ensure we get the ID
+    # Flush to generate farm ID
+    await db_session.flush()
 
-    # Re-query with selectinload to populate relationships
+    # Link provided contacts to the new farm
+    for contact_link in farm_in.contacts:
+        db_session.add(
+            FarmContact(
+                farm_id=farm.id,
+                contact_id=contact_link.contact_id,
+                role=contact_link.role,
+            )
+        )
+
+    # Commit all changes
+    await db_session.commit()
+
+    # Re-query with relationships
     result = await db_session.execute(
         select(Farm)
         .where(Farm.id == farm.id)
