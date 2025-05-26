@@ -3,52 +3,42 @@ from typing import Optional, Sequence
 from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql.expression import true
+from sqlalchemy.orm import selectinload
 
+from ..farm.models import FarmContact
 from ..organization.models import Organization
 from .models import Contact, ContactCreate, ContactPatch, ContactRead
 
 
 async def get(*, db_session: AsyncSession, contact_id: int) -> Contact | None:
     """Returns a contact based on the given contact id."""
-    result = await db_session.execute(select(Contact).where(Contact.id == contact_id))
-    return result.scalars().first()
-
-
-async def get_default(*, db_session: AsyncSession) -> Optional[Contact]:
-    """Returns the default contact."""
-    result = await db_session.execute(select(Contact).where(Contact.default == true()))
-    return result.scalars().one_or_none()
-
-
-async def get_default_or_raise(*, db_session: AsyncSession) -> Contact:
-    """Returns the default contact or raises a ValidationError if one doesn't exist."""
-    contact = await get_default(db_session=db_session)
-
-    if not contact:
-        raise ValidationError.from_exception_data(
-            "ContactRead",
-            [
-                {
-                    "loc": ("contact",),
-                    "msg": "No default contact defined.",
-                    "type": "value_error.not_found",
-                }
-            ],
+    result = await db_session.execute(
+        select(Contact)
+        .options(
+            selectinload(Contact.farm_associations).selectinload(FarmContact.farm),
         )
-    return contact
+        .where(Contact.id == contact_id)
+    )
+    return result.scalar_one()
 
 
 async def get_by_name(*, db_session: AsyncSession, name: str) -> Optional[Contact]:
     """Returns a contact based on the given contact name."""
     result = await db_session.execute(select(Contact).where(Contact.name == name))
-    # TODO: refactor to scalar_one_or_none()
-    return result.scalars().one_or_none()
+    return result.scalar_one_or_none()
 
 
 async def get_by_phone_number(*, db_session: AsyncSession, phone_number: str) -> Optional[Contact]:
     """Returns a contact based on the given contact phone number."""
-    result = await db_session.execute(select(Contact).where(Contact.phone_number == phone_number))
+    result = await db_session.execute(
+        select(Contact)
+        .options(
+            selectinload(Contact.farm_associations).selectinload(FarmContact.farm),
+            # TODO: don't know why this selectinload is required, whereas for get it's not.
+            selectinload(Contact.organization),
+        )
+        .where(Contact.phone_number == phone_number)
+    )
     return result.scalar_one_or_none()
 
 

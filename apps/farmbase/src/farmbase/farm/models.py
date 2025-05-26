@@ -17,13 +17,13 @@ from sqlalchemy import (
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from farmbase.contact.models import Contact, ContactRead
 from farmbase.database.core import Base
 from farmbase.enums import FarmContactRole
 from farmbase.farm.field.models import Field
 from farmbase.models import FarmbaseBase, Location, Pagination, PrimaryKey, TimeStampMixin
 
 if TYPE_CHECKING:
+    from farmbase.contact.models import Contact, ContactRead
     from farmbase.farm.field.models import FieldGroup
     from farmbase.farm.harvest.models import StorageLocation
     from farmbase.farm.note.models import Note
@@ -33,9 +33,6 @@ class Farm(Base, TimeStampMixin):
     __tablename__ = "farm"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     farm_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    # location: Mapped[Optional[WKBElement]] = mapped_column(
-    #     Geometry(geometry_type="POINT", srid=4326, from_text="ST_GeomFromEWKT", name="geometry"), nullable=True
-    # )
     location: Mapped[Optional[WKBElement]] = mapped_column(
         Geometry(geometry_type="POINT", srid=4326, spatial_index=True), nullable=True
     )
@@ -59,7 +56,7 @@ class FarmContact(Base):
     __tablename__ = "farm_contact"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     farm_id: Mapped[int] = mapped_column(ForeignKey(Farm.id), nullable=False)
-    contact_id: Mapped[int] = mapped_column(ForeignKey(Contact.id), nullable=False)
+    contact_id: Mapped[int] = mapped_column(ForeignKey("contact.id"), nullable=False)
     role: Mapped[FarmContactRole] = mapped_column(
         SqlEnum(FarmContactRole, name="farm_contact_role_enum"), nullable=False
     )
@@ -147,14 +144,14 @@ class FarmContactRead(FarmContactBase):
     """Model for reading FarmContact data."""
 
     id: PrimaryKey = PydanticField(description="Unique identifier of the farm contact association")
-    contact: ContactRead = PydanticField(description="Contact details")
+    contact: "ContactRead" = PydanticField(description="Contact details")
 
 
 class FarmRead(FarmBase):
     """Model for reading Farm data."""
 
     id: PrimaryKey = PydanticField(description="Unique identifier of the farm")
-    contacts: Optional[List[ContactRead]] = PydanticField(
+    contacts: Optional[List["ContactRead"]] = PydanticField(
         default_factory=list, description="List of contacts associated with the farm"
     )
 

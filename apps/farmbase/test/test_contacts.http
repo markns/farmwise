@@ -40,6 +40,9 @@ Content-Type: application/json
 ###
 GET http://127.0.0.1:8000/api/v1/default/contacts/1
 Content-Type: application/json
+###
+GET http://127.0.0.1:8000/api/v1/default/contacts/by-phone?phone=31657775781
+Content-Type: application/json
 
 ###
 GET http://127.0.0.1:8000/api/v1/default/contacts

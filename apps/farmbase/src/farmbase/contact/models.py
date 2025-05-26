@@ -15,7 +15,8 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
-from farmbase.enums import ContactRole, Gender
+from farmbase.enums import ContactRole, Gender, FarmContactRole
+from farmbase.farm.models import FarmBase
 from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
 from farmbase.organization.models import Organization, OrganizationRead
 from farmbase.validators import must_not_be_blank
@@ -89,6 +90,13 @@ class ContactPatch(ContactBaseWrite):
         return v
 
 
+class FarmSummary(FarmBase):
+    """Minimal representation of a Farm for ContactRead."""
+
+    id: PrimaryKey = Field(description="Unique identifier of the farm")
+    role: FarmContactRole = Field(description="Contact's role on the farm")
+
+
 class ContactRead(ContactBase):
     """Model for reading Contact data."""
 
@@ -96,6 +104,10 @@ class ContactRead(ContactBase):
     name: str = Field(description="The WhatsApp name of the contact")
     phone_number: str = Field(description="Contact's phone number")
     organization: OrganizationRead = Field(description="The organization the contact belongs to")
+    farms: List[FarmSummary] = Field(
+        default_factory=list,
+        description="List of farms associated with the contact",
+    )
 
 
 class ContactPagination(Pagination):

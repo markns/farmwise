@@ -17,6 +17,7 @@ from .models import (
     ContactPagination,
     ContactPatch,
     ContactRead,
+    FarmSummary,
 )
 from .service import create, delete, get, get_by_phone_number, patch
 
@@ -77,20 +78,6 @@ async def create_contact(
     return contact
 
 
-# @router.put(
-#     "",
-#     response_model=ContactRead,
-#     summary="Get or create a new contact.",
-#     # dependencies=[Depends(PermissionsDependency([ContactCreatePermission]))],
-# )
-# async def get_or_create_contact(
-#     db_session: DbSession,
-#     organization: CurrentOrganization,
-#     contact_in: ContactCreate,
-# ):
-#     return await get_or_create(db_session=db_session, organization=organization, contact_in=contact_in)
-
-
 @router.get(
     "/by-phone",
     response_model=ContactRead,
@@ -104,7 +91,18 @@ async def get_contact_by_phone(
     if not result:
         raise EntityDoesNotExistError(message="Contact not found")
 
-    return result
+    contact_read = ContactRead(
+        id=result.id,
+        name=result.name,
+        phone_number=result.phone_number,
+        organization=result.organization,
+        farms=[
+            FarmSummary(id=f.farm.id, farm_name=f.farm.farm_name, location=f.farm.location, role=f.role)
+            for f in result.farm_associations
+        ],
+    )
+
+    return contact_read
 
 
 @router.get(
@@ -115,6 +113,7 @@ async def get_contact_by_phone(
 async def get_contact(db_session: DbSession, contact_id: PrimaryKey):
     """Get a contact."""
     contact = await get(db_session=db_session, contact_id=contact_id)
+    #  {contact.farms}
     if not contact:
         raise EntityDoesNotExistError(message="A contact with this id does not exist.")
     return contact

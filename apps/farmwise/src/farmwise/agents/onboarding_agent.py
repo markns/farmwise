@@ -80,7 +80,7 @@ the request_location action to the response. This will allow the farmer to acces
 accurate seed recommendations, warnings of local crop pests, and notification of local training events.
 After gathering the location, use the create_farm tool to record the information and associate the farmer with the farm
 The name of the farm should simply be the farmer's name with Farm. For example if the user's name is Hudson Ndege, the 
-name of the farm should be Hudson Ndege Farm. 
+name of the farm should be Hudson Ndege's Farm. 
 
 """
 
