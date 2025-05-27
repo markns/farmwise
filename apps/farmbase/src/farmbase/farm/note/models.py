@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import datetime
 from datetime import date
 from datetime import datetime as _datetime
-from typing import Any, List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List, Optional
 
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
@@ -11,7 +10,6 @@ from pydantic import Field as PydanticField
 from pydantic import field_validator
 from sqlalchemy import (
     TEXT,
-    DateTime,
     ForeignKey,
     Integer,
     String,
@@ -27,6 +25,7 @@ from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
 if TYPE_CHECKING:
     from farmbase.farm.models import Farm
 
+
 class Note(Base, TimeStampMixin):
     __tablename__ = "note"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -39,7 +38,6 @@ class Note(Base, TimeStampMixin):
     )
     image_path: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
     contact_id_created_by: Mapped[Optional[int]] = mapped_column(ForeignKey("contact.id"), nullable=True)
-    date_created: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     tags: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
     # Relationships
