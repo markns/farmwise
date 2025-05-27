@@ -8,6 +8,7 @@ from farmbase.database.core import DbSession
 from farmbase.models import PrimaryKey
 
 from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
+from ..farm.models import FarmSummary
 from ..organization.service import CurrentOrganization
 from .filterset import ContactFilterSet, ContactQueryParams
 from .flows import contact_init_flow
@@ -17,7 +18,6 @@ from .models import (
     ContactPagination,
     ContactPatch,
     ContactRead,
-    FarmSummary,
 )
 from .service import create, delete, get, get_by_phone_number, patch
 

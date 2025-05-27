@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import Field, field_validator
 from sqlalchemy import (
@@ -15,12 +15,13 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
-from farmbase.enums import ContactRole, FarmContactRole, Gender
-from farmbase.farm.models import FarmBase
+from farmbase.enums import ContactRole, Gender
 from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
 from farmbase.organization.models import Organization, OrganizationRead
 from farmbase.validators import must_not_be_blank
 
+if TYPE_CHECKING:
+    from farmbase.farm.models import FarmSummary
 # TODO: use this pattern to add other contact types. eg. farmers
 # https://docs.sqlalchemy.org/en/20/orm/queryguide/_inheritance_setup.html
 
@@ -90,13 +91,6 @@ class ContactPatch(ContactBaseWrite):
         return v
 
 
-class FarmSummary(FarmBase):
-    """Minimal representation of a Farm for ContactRead."""
-
-    id: PrimaryKey = Field(description="Unique identifier of the farm")
-    role: FarmContactRole = Field(description="Contact's role on the farm")
-
-
 class ContactRead(ContactBase):
     """Model for reading Contact data."""
 
@@ -104,7 +98,7 @@ class ContactRead(ContactBase):
     name: str = Field(description="The WhatsApp name of the contact")
     phone_number: str = Field(description="Contact's phone number")
     organization: OrganizationRead = Field(description="The organization the contact belongs to")
-    farms: List[FarmSummary] = Field(
+    farms: List["FarmSummary"] = Field(
         default_factory=list,
         description="List of farms associated with the contact",
     )

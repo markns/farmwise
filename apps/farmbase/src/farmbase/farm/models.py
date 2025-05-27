@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import Any, List, Optional
 
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
-from loguru import logger
 from pydantic import Field as PydanticField
 from pydantic import field_serializer, field_validator
 from sqlalchemy import Enum as SqlEnum
@@ -17,16 +16,13 @@ from sqlalchemy import (
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from farmbase.contact.models import Contact, ContactRead
 from farmbase.database.core import Base
 from farmbase.enums import FarmContactRole
-from farmbase.farm.field.models import Field
+from farmbase.farm.field.models import Field, FieldGroup
+from farmbase.farm.harvest.models import StorageLocation
+from farmbase.farm.note.models import Note
 from farmbase.models import FarmbaseBase, Location, Pagination, PrimaryKey, TimeStampMixin
-
-if TYPE_CHECKING:
-    from farmbase.contact.models import Contact, ContactRead
-    from farmbase.farm.field.models import FieldGroup
-    from farmbase.farm.harvest.models import StorageLocation
-    from farmbase.farm.note.models import Note
 
 
 class Farm(Base, TimeStampMixin):
@@ -81,7 +77,6 @@ class FarmBase(FarmbaseBase):
     @field_validator("location", mode="before")
     @classmethod
     def validate_location(cls, data: Any) -> Any:
-        logger.info(f"Validating location: {type(data)} {data}")
         if isinstance(data, WKBElement):
             point = to_shape(data)
             return {"longitude": point.x, "latitude": point.y}
@@ -147,13 +142,17 @@ class FarmContactRead(FarmContactBase):
     contact: "ContactRead" = PydanticField(description="Contact details")
 
 
+class FarmSummary(FarmBase):
+    """Minimal representation of a Farm for ContactRead."""
+
+    id: PrimaryKey = PydanticField(description="Unique identifier of the farm")
+    role: FarmContactRole = PydanticField(description="Contact's role on the farm")
+
+
 class FarmRead(FarmBase):
     """Model for reading Farm data."""
 
     id: PrimaryKey = PydanticField(description="Unique identifier of the farm")
-    contacts: Optional[List["ContactRead"]] = PydanticField(
-        default_factory=list, description="List of contacts associated with the farm"
-    )
 
 
 class FarmPagination(Pagination):
@@ -171,7 +170,6 @@ class FarmContactPagination(Pagination):
 
 
 # Resolve forward references and ensure Pydantic models are fully built
-from farmbase.contact.models import ContactRead
 
 FarmContactRead.model_rebuild()
 FarmRead.model_rebuild()

@@ -29,6 +29,11 @@ Content-Type: application/json
       "contact_id": 1,
       "role": "owner"
     }
-  ]
+  ],
+  "location": {
+    "latitude": -0.365739,
+    "longitude": 35.809071
+  }
+
 }
 

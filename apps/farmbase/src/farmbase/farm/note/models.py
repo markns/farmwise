@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from datetime import date
 from datetime import datetime as _datetime
-from typing import Any, List, Optional
+from typing import Any, List, Optional, TYPE_CHECKING
 
 from geoalchemy2 import Geometry, WKBElement
 from geoalchemy2.shape import to_shape
@@ -21,16 +21,17 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from farmbase.contact.models import Contact
 from farmbase.database.core import Base
 from farmbase.farm.field.models import Field
-from farmbase.farm.models import Farm
 from farmbase.farm.planting.models import Planting
 from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
 
+if TYPE_CHECKING:
+    from farmbase.farm.models import Farm
 
 class Note(Base, TimeStampMixin):
     __tablename__ = "note"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     field_id: Mapped[Optional[int]] = mapped_column(ForeignKey(Field.id), nullable=True)
-    farm_id: Mapped[int] = mapped_column(ForeignKey(Farm.id), nullable=False)
+    farm_id: Mapped[int] = mapped_column(ForeignKey("farm.id"), nullable=False)
     planting_id: Mapped[Optional[int]] = mapped_column(ForeignKey(Planting.id), nullable=True)
     note_text: Mapped[str] = mapped_column(TEXT, nullable=False)
     location: Mapped[Optional[WKBElement]] = mapped_column(
