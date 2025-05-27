@@ -1,6 +1,8 @@
+import functools
 from collections import UserDict
+from typing import Callable
 
-from agents import RunContextWrapper, handoff
+from agents import HandoffInputData, RunContextWrapper, handoff
 from farmwise_schema.schema import AgentInfo
 from loguru import logger
 from pydantic import BaseModel, Field
@@ -24,11 +26,26 @@ async def on_handoff(ctx: RunContextWrapper[None], input_data: HandoffInfo):
     logger.debug(f"Handoff to '{input_data.agent_name}' because '{input_data.reason}'")
 
 
+def _apply_handoff_filters(
+    functions: list[Callable[[HandoffInputData], HandoffInputData]], initial_data
+) -> HandoffInputData:
+    result = initial_data
+    for func in functions:
+        result = func(result)
+    return result
+
+
 triage_agent_handoff = handoff(
     agent=triage_agent,
     on_handoff=on_handoff,
     input_type=HandoffInfo,
-    input_filter=handoff_filters.remove_whatsapp_interactivity,
+    input_filter=functools.partial(
+        _apply_handoff_filters,
+        [
+            handoff_filters.remove_whatsapp_interactivity,
+            handoff_filters.remove_images,
+        ],
+    ),
 )
 crop_pathogen_diagnosis_agent_handoff = handoff(
     agent=crop_pathogen_diagnosis_agent,
@@ -57,9 +74,9 @@ handoffs = [
 ]
 
 triage_agent.handoffs = handoffs
-maize_variety_selector.handoffs = handoffs
-crop_suitability_agent.handoffs = handoffs
-crop_pathogen_diagnosis_agent.handoffs = handoffs
+maize_variety_selector.handoffs = [triage_agent_handoff]
+crop_suitability_agent.handoffs = [triage_agent_handoff]
+crop_pathogen_diagnosis_agent.handoffs = [triage_agent_handoff]
 onboarding_agent.handoffs = [triage_agent_handoff]
 
 ONBOARDING_AGENT = onboarding_agent.name
