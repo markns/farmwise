@@ -14,13 +14,23 @@ from farmwise.agents import DEFAULT_AGENT, ONBOARDING_AGENT, agents, get_all_age
 from farmwise.dependencies import ChatStateDep, UserContext, UserContextDep
 from farmwise.hooks import LoggingHooks
 from farmwise.settings import settings
-from farmwise.utils import create_openai_file
 
 set_default_openai_key(settings.OPENAI_API_KEY.get_secret_value())
 client = OpenAI(api_key=settings.OPENAI_API_KEY.get_secret_value())
 
 app = FastAPI(debug=settings.is_dev())
 router = APIRouter()
+
+
+def create_openai_file(file_path):
+    # This is more useful than sending base64, as it means the base64 does not get
+    # sent back and forth repeatedly
+    with open(file_path, "rb") as file_content:
+        result = client.files.create(
+            file=file_content,
+            purpose="vision",
+        )
+        return result.id
 
 
 @app.get("/health")

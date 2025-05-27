@@ -3,8 +3,6 @@ from __future__ import annotations
 import base64
 from pathlib import Path
 
-from farmwise.service import client
-
 
 def copy_doc(from_func):
     def decorator(to_func):
@@ -35,14 +33,3 @@ def image_to_data_url(file_path: str) -> str:
     with file.open("rb") as image_file:
         encoded = base64.b64encode(image_file.read()).decode("utf-8")
         return f"data:{mime_type};base64,{encoded}"
-
-
-def create_openai_file(file_path):
-    # This is more useful than sending base64, as it means the base64 does not get
-    # sent back and forth repeatedly
-    with open(file_path, "rb") as file_content:
-        result = client.files.create(
-            file=file_content,
-            purpose="vision",
-        )
-        return result.id
