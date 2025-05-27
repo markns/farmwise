@@ -1,0 +1,12 @@
+###
+GET http://127.0.0.1:8000/api/v1/default/notes
+Content-Type: application/json
+
+###
+POST http://127.0.0.1:8000/api/v1/default/notes
+Content-Type: application/json
+
+{
+  "farm_id": 1,
+  "note_text": "look at this wriggly worm"
+}
