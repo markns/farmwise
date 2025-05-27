@@ -23,9 +23,12 @@ def _from_ewkt(ewkt_string) -> WKBElement:
 def validate_location(data: Any) -> Any:
     if isinstance(data, WKBElement):
         point: WKBElement = to_shape(data)
+        print(f"wkb {point}")
         return {"longitude": point.x, "latitude": point.y}
     elif isinstance(data, str):
         point = _from_ewkt(data)
+        print(f"str {point}")
         return {"longitude": point.x, "latitude": point.y}
     # If data is already a dictionary or another compatible type, pass it through.
+    print(f"data {data}")
     return data

@@ -74,17 +74,29 @@ class FarmBase(FarmbaseBase):
     farm_name: str = PydanticField(description="The name of the farm")
     location: Optional[Location] = PydanticField(default=None, description="Location of the farm")
 
-    @field_validator("location", mode="before")
-    @classmethod
-    def validate_location(cls, data: Any) -> Any:
-        validators.validate_location(data)
-
 
 class FarmContactLink(FarmbaseBase):
     """Model for linking a contact when creating a farm."""
 
     contact_id: PrimaryKey = PydanticField(description="ID of the contact to link")
     role: FarmContactRole = PydanticField(description="Role of the contact in the farm")
+
+
+class FarmRead(FarmBase):
+    """Model for reading Farm data."""
+
+    id: PrimaryKey = PydanticField(description="Unique identifier of the farm")
+
+    @field_validator("location", mode="before")
+    @classmethod
+    def validate_location(cls, data: Any) -> Any:
+        return validators.validate_location(data)
+
+
+class FarmPagination(Pagination):
+    """Model for a paginated list of farms."""
+
+    items: List[FarmRead] = PydanticField(default_factory=list, description="List of farms in the current page")
 
 
 class FarmWriteBase(FarmBase):
@@ -143,18 +155,6 @@ class FarmSummary(FarmBase):
 
     id: PrimaryKey = PydanticField(description="Unique identifier of the farm")
     role: FarmContactRole = PydanticField(description="Contact's role on the farm")
-
-
-class FarmRead(FarmBase):
-    """Model for reading Farm data."""
-
-    id: PrimaryKey = PydanticField(description="Unique identifier of the farm")
-
-
-class FarmPagination(Pagination):
-    """Model for paginated list of farms."""
-
-    items: List[FarmRead] = PydanticField(default_factory=list, description="List of farms in the current page")
 
 
 class FarmContactPagination(Pagination):

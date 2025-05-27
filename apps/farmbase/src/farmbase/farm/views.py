@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status
+from loguru import logger
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -56,6 +57,7 @@ async def create_farm(
     farm_in: FarmCreate,
 ):
     """Create a new farm."""
+    logger.debug(f"creating farm {farm_in}")
     return await service.create_farm(db_session=db_session, farm_in=farm_in)
 
 
