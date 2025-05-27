@@ -7,6 +7,11 @@ POST http://127.0.0.1:8000/api/v1/default/notes
 Content-Type: application/json
 
 {
-  "farm_id": 1,
-  "note_text": "look at this wriggly worm"
+  "farm_id": 5,
+  "note_text": "look at this wriggly worm",
+  "contact_id_created_by": 1,
+  "location": {
+    "latitude": -0.365739,
+    "longitude": 35.809071
+  }
 }

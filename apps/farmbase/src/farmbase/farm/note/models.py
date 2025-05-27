@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 from datetime import date
-from datetime import datetime as _datetime
 from typing import TYPE_CHECKING, Any, List, Optional
 
 from geoalchemy2 import Geometry, WKBElement
-from geoalchemy2.shape import to_shape
 from pydantic import Field as PydanticField
-from pydantic import field_validator
+from pydantic import field_serializer, field_validator
 from sqlalchemy import (
     TEXT,
     ForeignKey,
@@ -16,11 +14,12 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from farmbase import validators
 from farmbase.contact.models import Contact
 from farmbase.database.core import Base
 from farmbase.farm.field.models import Field
 from farmbase.farm.planting.models import Planting
-from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
+from farmbase.models import FarmbaseBase, Location, Pagination, PrimaryKey, TimeStampMixin
 
 if TYPE_CHECKING:
     from farmbase.farm.models import Farm
@@ -29,15 +28,15 @@ if TYPE_CHECKING:
 class Note(Base, TimeStampMixin):
     __tablename__ = "note"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    field_id: Mapped[Optional[int]] = mapped_column(ForeignKey(Field.id), nullable=True)
     farm_id: Mapped[int] = mapped_column(ForeignKey("farm.id"), nullable=False)
+    contact_id_created_by: Mapped[int] = mapped_column(ForeignKey("contact.id"))
+    field_id: Mapped[Optional[int]] = mapped_column(ForeignKey(Field.id), nullable=True)
     planting_id: Mapped[Optional[int]] = mapped_column(ForeignKey(Planting.id), nullable=True)
     note_text: Mapped[str] = mapped_column(TEXT, nullable=False)
     location: Mapped[Optional[WKBElement]] = mapped_column(
         Geometry(geometry_type="POINT", srid=4326, name="geometry"), nullable=True
     )
     image_path: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
-    contact_id_created_by: Mapped[Optional[int]] = mapped_column(ForeignKey("contact.id"), nullable=True)
     tags: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
     # Relationships
@@ -53,29 +52,29 @@ class Note(Base, TimeStampMixin):
 class NoteBase(FarmbaseBase):
     field_id: Optional[int] = PydanticField(default=None, description="ID of the field where the note was made")
     farm_id: int = PydanticField(..., description="ID of the farm where the note was made")
+    contact_id_created_by: Optional[PrimaryKey] = PydanticField(
+        ..., description="ID of the contact who created the note"
+    )
     planting_id: Optional[int] = PydanticField(default=None, description="ID of the planting associated with the note")
     note_text: str = PydanticField(..., description="Text content of the note")
-    location: Optional[str] = PydanticField(default=None, description="Coordinates in EWKT format")
+    location: Optional[Location] = PydanticField(default=None, description="Location for the note")
     image_path: Optional[str] = PydanticField(default=None, description="Path to an image for the note")
-    contact_id_created_by: Optional[PrimaryKey] = PydanticField(
-        default=None, description="ID of the contact who created the note"
-    )
     tags: Optional[str] = PydanticField(default=None, description="Tags for the note")
 
     @field_validator("location", mode="before")
     @classmethod
     def validate_location(cls, data: Any) -> Any:
-        if isinstance(data, WKBElement):
-            point = to_shape(data)
-            return {"longitude": point.x, "latitude": point.y}
-        # If data is already a dictionary or another compatible type, pass it through.
-        return data
+        return validators.validate_location(data)
 
 
 class NoteCreate(NoteBase):
     """Model for creating a new Note."""
 
-    pass
+    @field_serializer("location")
+    def serialize_location(self, location: Location):
+        if location is None:
+            return None
+        return location.to_ewkt()
 
 
 class NoteUpdate(FarmbaseBase):
@@ -86,9 +85,9 @@ class NoteUpdate(FarmbaseBase):
     planting_id: Optional[int] = PydanticField(default=None)
     note_date: Optional[date] = PydanticField(default=None)
     note_text: Optional[str] = PydanticField(default=None)
-    location_coordinates: Optional[str] = PydanticField(default=None)
+    location: Optional[Location] = PydanticField(default=None)
     image_path: Optional[str] = PydanticField(default=None)
-    contact_id_created_by: Optional[PrimaryKey] = PydanticField(default=None)
+    # contact_id_created_by: Optional[PrimaryKey] = PydanticField(default=None)
     tags: Optional[str] = PydanticField(default=None)
 
 
@@ -96,7 +95,6 @@ class NoteRead(NoteBase):
     """Model for reading Note data."""
 
     id: PrimaryKey = PydanticField(..., description="Unique identifier of the note")
-    date_created: _datetime = PydanticField(..., description="Timestamp when the note was created")
 
 
 class NotePagination(Pagination):

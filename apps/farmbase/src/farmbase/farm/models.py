@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any, List, Optional
 
 from geoalchemy2 import Geometry, WKBElement
-from geoalchemy2.shape import to_shape
 from pydantic import Field as PydanticField
 from pydantic import field_serializer, field_validator
 from sqlalchemy import Enum as SqlEnum
@@ -16,6 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from farmbase import validators
 from farmbase.contact.models import Contact, ContactRead
 from farmbase.database.core import Base
 from farmbase.enums import FarmContactRole
@@ -77,11 +77,7 @@ class FarmBase(FarmbaseBase):
     @field_validator("location", mode="before")
     @classmethod
     def validate_location(cls, data: Any) -> Any:
-        if isinstance(data, WKBElement):
-            point = to_shape(data)
-            return {"longitude": point.x, "latitude": point.y}
-        # If data is already a dictionary or another compatible type, pass it through.
-        return data
+        validators.validate_location(data)
 
 
 class FarmContactLink(FarmbaseBase):

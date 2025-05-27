@@ -56,8 +56,8 @@ async def create_farm(*, db_session: AsyncSession, farm_in: FarmCreate) -> Farm:
 async def update_farm(*, db_session: AsyncSession, farm: Farm, farm_in: FarmUpdate) -> Farm:
     """Update an existing farm."""
     data = farm_in.model_dump(exclude_none=True)
-    if getattr(farm_in, "location", None) is not None:
-        data["location"] = farm_in.location.to_ewkt()
+    # if getattr(farm_in, "location", None) is not None:
+    #     data["location"] = farm_in.location.to_ewkt()
     for field, value in data.items():
         setattr(farm, field, value)
     await db_session.commit()
