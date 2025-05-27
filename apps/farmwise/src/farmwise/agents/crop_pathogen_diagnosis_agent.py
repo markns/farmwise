@@ -57,7 +57,7 @@ Routine for Crop Pest and Disease Diagnosis Agent
     and alerting. 
 10.	Log the Diagnosis
     Summarise the diagnosis and advice and record for future reference using the create_note tool.
-11. Give an option to return to the main menu after logging the diagnosis.
+11. Give an option to return to the main menu after logging the diagnosis, which transfers the user to the triage agent
 
 These are the details of the current user: {ctx.context}
 """
