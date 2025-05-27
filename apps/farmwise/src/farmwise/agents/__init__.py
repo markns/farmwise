@@ -5,6 +5,7 @@ from farmwise_schema.schema import AgentInfo
 from loguru import logger
 from pydantic import BaseModel, Field
 
+from . import handoff_filters
 from .crop_pathogen_diagnosis_agent import crop_pathogen_diagnosis_agent
 from .crop_suitability_agent import crop_suitability_agent
 from .maize_variety_selector import maize_variety_selector
@@ -23,12 +24,30 @@ async def on_handoff(ctx: RunContextWrapper[None], input_data: HandoffInfo):
     logger.debug(f"Handoff to '{input_data.agent_name}' because '{input_data.reason}'")
 
 
-triage_agent_handoff = handoff(agent=triage_agent, on_handoff=on_handoff, input_type=HandoffInfo)
-crop_pathogen_diagnosis_agent_handoff = handoff(
-    agent=crop_pathogen_diagnosis_agent, on_handoff=on_handoff, input_type=HandoffInfo
+triage_agent_handoff = handoff(
+    agent=triage_agent,
+    on_handoff=on_handoff,
+    input_type=HandoffInfo,
+    input_filter=handoff_filters.remove_whatsapp_interactivity,
 )
-crop_suitability_agent_handoff = handoff(agent=crop_suitability_agent, on_handoff=on_handoff, input_type=HandoffInfo)
-maize_variety_selector_handoff = handoff(agent=maize_variety_selector, on_handoff=on_handoff, input_type=HandoffInfo)
+crop_pathogen_diagnosis_agent_handoff = handoff(
+    agent=crop_pathogen_diagnosis_agent,
+    on_handoff=on_handoff,
+    input_type=HandoffInfo,
+    input_filter=handoff_filters.remove_whatsapp_interactivity,
+)
+crop_suitability_agent_handoff = handoff(
+    agent=crop_suitability_agent,
+    on_handoff=on_handoff,
+    input_type=HandoffInfo,
+    input_filter=handoff_filters.remove_whatsapp_interactivity,
+)
+maize_variety_selector_handoff = handoff(
+    agent=maize_variety_selector,
+    on_handoff=on_handoff,
+    input_type=HandoffInfo,
+    input_filter=handoff_filters.remove_whatsapp_interactivity,
+)
 
 handoffs = [
     triage_agent_handoff,
