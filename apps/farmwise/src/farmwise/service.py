@@ -57,7 +57,12 @@ async def run_agent(
         content.append(ResponseInputTextParam(text=user_input.message, type="input_text"))
     if user_input.image:
         file_id = create_openai_file(user_input.image)
-        content.append(ResponseInputImageParam(detail="auto", file_id=file_id, type="input_image"))
+        content.extend(
+            [
+                ResponseInputImageParam(detail="auto", file_id=file_id, type="input_image"),
+                ResponseInputTextParam(text=f"image_path={user_input.image}", type="input_text"),
+            ]
+        )
 
     input_items.append(
         EasyInputMessageParam(
