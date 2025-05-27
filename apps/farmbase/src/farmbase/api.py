@@ -10,6 +10,7 @@ from farmbase.chatstate.views import router as chatstate_router
 from farmbase.contact.views import router as contact_router
 from farmbase.data.crops.views import router as crops_router
 from farmbase.data.gaez.views import router as gaez_router
+from farmbase.farm.note.views import router as note_router
 from farmbase.farm.views import router as farm_router
 from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
@@ -66,6 +67,7 @@ authenticated_organization_api_router.include_router(runresult_router, prefix="/
 
 authenticated_organization_api_router.include_router(products_router, prefix="/products", tags=["products"])
 authenticated_organization_api_router.include_router(farm_router, prefix="/farms", tags=["farms"])
+authenticated_organization_api_router.include_router(note_router, prefix="/notes", tags=["notes"])
 
 
 @api_router.get("/healthcheck", include_in_schema=False)
