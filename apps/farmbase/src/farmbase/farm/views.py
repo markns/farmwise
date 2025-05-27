@@ -8,7 +8,12 @@ from farmbase.database.core import DbSession
 from farmbase.models import PrimaryKey
 
 from . import service
-from .filterset import FarmContactFilterSet, FarmContactQueryParams, FarmFilterSet, FarmQueryParams
+from .filterset import (
+    FarmContactFilterSet,
+    FarmContactQueryParams,
+    FarmFilterSet,
+    FarmQueryParams,
+)
 from .models import (
     Farm,
     FarmContact,
