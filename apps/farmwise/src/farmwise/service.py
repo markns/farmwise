@@ -7,14 +7,17 @@ from farmbase_client.models import AgentBase, ChatState, RunResultCreate
 from farmwise_schema.schema import ServiceMetadata, UserInput, WhatsAppResponse
 from fastapi import APIRouter, FastAPI
 from loguru import logger
+from openai import OpenAI
 from openai.types.responses import EasyInputMessageParam, ResponseInputImageParam, ResponseInputTextParam
 
 from farmwise.agents import DEFAULT_AGENT, ONBOARDING_AGENT, agents, get_all_agent_info
 from farmwise.dependencies import ChatStateDep, UserContext, UserContextDep
 from farmwise.hooks import LoggingHooks
 from farmwise.settings import settings
+from farmwise.utils import create_openai_file
 
 set_default_openai_key(settings.OPENAI_API_KEY.get_secret_value())
+client = OpenAI(api_key=settings.OPENAI_API_KEY.get_secret_value())
 
 app = FastAPI(debug=settings.is_dev())
 router = APIRouter()
@@ -39,22 +42,19 @@ async def run_agent(
 ):
     input_items = chat_state.input_list
 
+    content = []
+    if user_input.message:
+        content.append(ResponseInputTextParam(text=user_input.message, type="input_text"))
     if user_input.image:
-        input_items.append(
-            EasyInputMessageParam(
-                content=[
-                    ResponseInputTextParam(text=user_input.message, type="input_text"),
-                    ResponseInputImageParam(
-                        detail="auto", image_url=f"data:image/jpeg;base64,{user_input.image}", type="input_image"
-                    ),
-                ],
-                role="user",
-            ),
+        file_id = create_openai_file(user_input.image)
+        content.append(ResponseInputImageParam(detail="auto", file_id=file_id, type="input_image"))
+
+    input_items.append(
+        EasyInputMessageParam(
+            content=content,
+            role="user",
         )
-    else:
-        input_items.append(
-            EasyInputMessageParam(content=user_input.message, role="user"),
-        )
+    )
 
     trace_id = gen_trace_id()
     hooks = LoggingHooks()

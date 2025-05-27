@@ -11,7 +11,7 @@ from farmbase_client.models import SuitabilityIndexResponse
 
 from farmwise.dependencies import UserContext
 from farmwise.settings import settings
-from farmwise.tools.utils import copy_doc
+from farmwise.utils import copy_doc
 
 
 @function_tool

@@ -1,4 +1,3 @@
-import base64
 import logging
 from contextlib import asynccontextmanager
 from enum import Enum
@@ -175,14 +174,14 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
 @wa.on_message(filters.image)
 async def image_handler(_: WhatsApp, msg: types.Message):
     await msg.indicate_typing()
-    img_bytes = await msg.image.download(in_memory=True)
-    img_b64 = base64.b64encode(img_bytes).decode("utf-8")
+    # download image to disk (saves file and returns the file path)
+    file_path = await msg.image.download(settings.IMAGE_DOWNLOAD_DIR)
+    logger.info(f"Image downloaded to {file_path}")
 
     await msg.mark_as_read()
     response = await agent_client.ainvoke(
-        # FIXME: This borks when no caption is provided.
         message=msg.caption,
-        image=img_b64,
+        image=file_path,
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
     )

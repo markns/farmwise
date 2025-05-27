@@ -41,7 +41,7 @@ class ServiceMetadata(BaseModel):
 class UserInput(BaseModel):
     """Basic user input for the agent."""
 
-    message: str = Field(
+    message: str | None = Field(
         description="User input to the agent.",
         examples=["What is the weather in Tokyo?"],
     )

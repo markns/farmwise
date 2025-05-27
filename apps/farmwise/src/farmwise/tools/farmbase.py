@@ -7,7 +7,7 @@ from farmbase_client.models import ContactPatch, ContactRead, FarmCreate, FarmRe
 
 from farmwise.dependencies import UserContext
 from farmwise.settings import settings
-from farmwise.tools.utils import join_with
+from farmwise.utils import join_with
 
 
 @function_tool(
