@@ -50,12 +50,12 @@ class Note(Base, TimeStampMixin):
 
 
 class NoteBase(FarmbaseBase):
-    field_id: Optional[int] = PydanticField(default=None, description="ID of the field where the note was made")
+    # field_id: Optional[int] = PydanticField(default=None, description="ID of the field where the note was made")
     farm_id: int = PydanticField(..., description="ID of the farm where the note was made")
     contact_id_created_by: Optional[PrimaryKey] = PydanticField(
         ..., description="ID of the contact who created the note"
     )
-    planting_id: Optional[int] = PydanticField(default=None, description="ID of the planting associated with the note")
+    # planting_id: Optional[int] = PydanticField(default=None, description="ID of the planting associated with the note")
     note_text: str = PydanticField(..., description="Text content of the note")
     location: Optional[Location] = PydanticField(default=None, description="Location for the note")
     image_path: Optional[str] = PydanticField(default=None, description="Path to an image for the note")

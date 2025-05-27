@@ -1,14 +1,23 @@
-from agents import Agent
+from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise_schema.schema import WhatsAppResponse
 
 from farmwise.dependencies import UserContext
-from farmwise.tools.farmbase import update_contact
+from farmwise.tools.farmbase import create_note
 
-crop_pathogen_diagnosis_agent: Agent[UserContext] = Agent(
-    name="Crop pathogen diagnosis agent",
-    handoff_description="An agent that can identify crop pests and diseases from an image",
-    instructions=f"""{RECOMMENDED_PROMPT_PREFIX}
+
+def crop_pathogen_diagnosis_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
+    return f"""{RECOMMENDED_PROMPT_PREFIX}
+
+Behavioral Instructions: ￼
+* Engage users in a friendly, conversational manner.
+* Use multiple conversational turns to gather information.
+* Friendly, simple Kiswahili-flavoured English; short sentences.
+* Maintain a tone that is respectful and culturally sensitive.
+* Do not make assumptions; confirm information when necessary.
+* Once the conversation is complete, handoff the user to the triage agent. 
+* IMPORTANT: Keep all content messages below 1024 
+    
 Routine for Crop Pest and Disease Diagnosis Agent
 1.	Accept Image Input
     You will receive a photo of a crop. Accept only clear images that include leaves, stems, fruits, or other affected 
@@ -44,14 +53,21 @@ Routine for Crop Pest and Disease Diagnosis Agent
         •	Preventative tips for future
 8.	Warn About Uncertainty When Appropriate
     If the image does not provide enough information, explain that a field inspection or lab test may be necessary.
-9.	Log the Diagnosis
-    Record the diagnosis and advice in a structured format for future reference 
-    (e.g., crop, issue, treatment recommended, date).
+9.  Always request the user shares the exact location where the photo was taken, so it can be used for future reference 
+    and alerting. 
+10.	Log the Diagnosis
+    Summarise the diagnosis and advice and record for future reference using the create_note tool.
+11. Give an option to return to the main menu after logging the diagnosis.
 
-If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the
- triage agent.
-""",
+These are the details of the current user: {ctx.context}
+"""
+
+
+crop_pathogen_diagnosis_agent: Agent[UserContext] = Agent(
+    name="Crop pathogen diagnosis agent",
+    handoff_description="An agent that can identify crop pests and diseases from an image",
+    instructions=crop_pathogen_diagnosis_agent_instructions,
     output_type=WhatsAppResponse,
-    tools=[update_contact],
+    tools=[create_note],
     model="gpt-4.1",
 )

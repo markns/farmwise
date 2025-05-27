@@ -23,7 +23,7 @@ When all required details for a field are confirmed, call the tool create_field 
 below, then ask whether the user has another field.
 After the last field is stored, send the single line ##FARM_REGISTRATION_COMPLETE## and stop replying.
 
-⸻
+These are the details of the current user: {ctx.context}
 
 
 """

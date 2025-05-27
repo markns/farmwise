@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from loguru import logger
 
 from farmbase.database.core import DbSession
 
@@ -20,6 +19,6 @@ async def create_run_result(
     run_result_in: RunResultCreate,
 ):
     """Create a new run_result."""
-    logger.warning(run_result_in)
     run_result = await create(db_session=db_session, run_result_in=run_result_in)
+    # TODO: What to return here?
     return "OK"
