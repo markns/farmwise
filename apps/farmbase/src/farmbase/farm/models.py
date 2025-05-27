@@ -74,6 +74,11 @@ class FarmBase(FarmbaseBase):
     farm_name: str = PydanticField(description="The name of the farm")
     location: Optional[Location] = PydanticField(default=None, description="Location of the farm")
 
+    @field_validator("location", mode="before")
+    @classmethod
+    def validate_location(cls, data: Any) -> Any:
+        return validators.validate_location(data)
+
 
 class FarmContactLink(FarmbaseBase):
     """Model for linking a contact when creating a farm."""
@@ -86,11 +91,6 @@ class FarmRead(FarmBase):
     """Model for reading Farm data."""
 
     id: PrimaryKey = PydanticField(description="Unique identifier of the farm")
-
-    @field_validator("location", mode="before")
-    @classmethod
-    def validate_location(cls, data: Any) -> Any:
-        return validators.validate_location(data)
 
 
 class FarmPagination(Pagination):
