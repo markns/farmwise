@@ -15,7 +15,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
-from farmbase.enums import ContactRole, Gender, FarmContactRole
+from farmbase.enums import ContactRole, FarmContactRole, Gender
 from farmbase.farm.models import FarmBase
 from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
 from farmbase.organization.models import Organization, OrganizationRead

@@ -61,14 +61,6 @@ async def get_by_name_or_raise(*, db_session: AsyncSession, contact_in: ContactR
     return contact
 
 
-async def get_by_name_or_default(*, db_session: AsyncSession, contact_in: ContactRead) -> Contact:
-    """Returns a contact based on a name or the default if not specified."""
-    if contact_in:
-        if contact_in.name:
-            return await get_by_name_or_raise(db_session=db_session, contact_in=contact_in)
-    return await get_default_or_raise(db_session=db_session)
-
-
 async def get_all(*, db_session: AsyncSession) -> Sequence[Contact]:
     """Returns all contacts."""
     result = await db_session.execute(select(Contact))
@@ -91,7 +83,9 @@ async def create(*, db_session: AsyncSession, contact_in: ContactCreate, organiz
 
     db_session.add(contact)
     await db_session.commit()
-    return contact
+    await db_session.flush()
+
+    return await get(db_session=db_session, contact_id=contact.id)
 
 
 async def patch(*, db_session: AsyncSession, contact: Contact, contact_in: ContactPatch) -> Contact:

@@ -36,10 +36,23 @@ async def get_contacts(
     total = await filter_set.count(params_d)
     contacts = await filter_set.filter(params_d)
     return ContactPagination(
-        items=contacts,
+        items=[_to_contact_read(c) for c in contacts],
         items_per_page=query_params.items_per_page,
         page=query_params.page,
         total=total,
+    )
+
+
+def _to_contact_read(contact: Contact) -> ContactRead:
+    return ContactRead(
+        id=contact.id,
+        name=contact.name,
+        phone_number=contact.phone_number,
+        organization=contact.organization,
+        farms=[
+            FarmSummary(id=f.farm.id, farm_name=f.farm.farm_name, location=f.farm.location, role=f.role)
+            for f in contact.farm_associations
+        ],
     )
 
 
@@ -75,7 +88,7 @@ async def create_contact(
     # )
     contact = await create(db_session=db_session, contact_in=contact_in, organization=organization)
     await contact_init_flow(db_session=db_session, contact_id=contact.id, organization=organization)
-    return contact
+    return _to_contact_read(contact)
 
 
 @router.get(
@@ -87,22 +100,11 @@ async def get_contact_by_phone(
     db_session: DbSession,
     phone: Annotated[str, Query(description="Phone number in E.164 format")],
 ):
-    result = await get_by_phone_number(db_session=db_session, phone_number=phone)
-    if not result:
+    contact = await get_by_phone_number(db_session=db_session, phone_number=phone)
+    if not contact:
         raise EntityDoesNotExistError(message="Contact not found")
 
-    contact_read = ContactRead(
-        id=result.id,
-        name=result.name,
-        phone_number=result.phone_number,
-        organization=result.organization,
-        farms=[
-            FarmSummary(id=f.farm.id, farm_name=f.farm.farm_name, location=f.farm.location, role=f.role)
-            for f in result.farm_associations
-        ],
-    )
-
-    return contact_read
+    return _to_contact_read(contact)
 
 
 @router.get(
@@ -113,10 +115,9 @@ async def get_contact_by_phone(
 async def get_contact(db_session: DbSession, contact_id: PrimaryKey):
     """Get a contact."""
     contact = await get(db_session=db_session, contact_id=contact_id)
-    #  {contact.farms}
     if not contact:
         raise EntityDoesNotExistError(message="A contact with this id does not exist.")
-    return contact
+    return _to_contact_read(contact)
 
 
 @router.patch(
@@ -134,7 +135,7 @@ async def patch_contact(
     if not contact:
         raise EntityDoesNotExistError(message="A contact with this id does not exist.")
     contact = await patch(db_session=db_session, contact=contact, contact_in=contact_in)
-    return contact
+    return _to_contact_read(contact)
 
 
 @router.delete(
