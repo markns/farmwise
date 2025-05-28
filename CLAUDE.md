@@ -10,7 +10,6 @@ This is a multi-app workspace built with Python and uv for dependency management
 - `apps/farmbase/` - Main FastAPI backend application with multi-tenant architecture
 - `apps/farmwise/` - AI agent service for agricultural guidance
 - `apps/farmwise-whatsapp/` - WhatsApp integration service
-- `apps/farmwise-streamlit/` - Streamlit web interface
 
 **Libraries:**
 - `libs/farmbase-client/` - Auto-generated API client for farmbase
