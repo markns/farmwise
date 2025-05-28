@@ -8,7 +8,7 @@ from farmbase.database.core import DbSession
 from farmbase.models import PrimaryKey
 
 from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
-from ..farm.models import FarmSummary
+from ..farm.models import FarmContact, FarmSummary
 from ..organization.service import CurrentOrganization
 from .filterset import ContactFilterSet, ContactQueryParams
 from .flows import contact_init_flow
@@ -30,7 +30,9 @@ async def get_contacts(
     query_params: Annotated[ContactQueryParams, Query()],
 ):
     """Get all contacts."""
-    stmt = select(Contact).options(selectinload(Contact.organization))
+    stmt = select(Contact).options(
+        selectinload(Contact.farm_associations).selectinload(FarmContact.farm), selectinload(Contact.organization)
+    )
     filter_set = ContactFilterSet(db_session, stmt)
     params_d = query_params.model_dump(exclude_none=True)
     total = await filter_set.count(params_d)
