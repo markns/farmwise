@@ -114,12 +114,33 @@
               </v-tooltip>
             </template>
             <template #item.data-table-actions="{ item }">
-              <raw-farmer-viewer :value="item.raw"/>
+              <div class="d-flex align-center">
+                <v-tooltip location="top">
+                  <template #activator="{ props }">
+                    <v-btn
+                      icon
+                      variant="text"
+                      color="primary"
+                      size="small"
+                      @click="openChatDrawer(item.id)"
+                      class="mr-2"
+                      v-bind="props"
+                    >
+                      <v-icon>mdi-chat</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>View Chat History</span>
+                </v-tooltip>
+                <raw-farmer-viewer :value="item.raw"/>
+              </div>
             </template>
           </v-data-table-server>
         </v-card>
       </v-col>
     </v-row>
+    
+    <!-- Chat Drawer -->
+    <chat-drawer ref="chatDrawer" />
   </v-container>
 </template>
 
@@ -133,6 +154,7 @@ import RawFarmerViewer from "@/farmer/RawFarmerViewer.vue"
 import RouterUtils from "@/router/utils"
 import FarmerPopover from "@/farmer/FarmerPopover.vue"
 import TableFilterDialog from "@/farmer/TableFilterDialog.vue"
+import ChatDrawer from "@/farmer/ChatDrawer.vue"
 
 export default {
   name: "FarmerInstanceTable",
@@ -142,6 +164,7 @@ export default {
     RawFarmerViewer,
     FarmerPopover,
     TableFilterDialog,
+    ChatDrawer,
   },
 
   data() {
@@ -194,6 +217,10 @@ export default {
 
   methods: {
     ...mapActions("farmer", ["getAllInstances"]),
+    
+    openChatDrawer(contactId) {
+      this.$refs.chatDrawer.open(contactId)
+    },
   },
 
   created() {
