@@ -46,16 +46,23 @@ async def get_contacts(
 
 
 def _to_contact_read(contact: Contact) -> ContactRead:
-    return ContactRead(
-        id=contact.id,
-        name=contact.name,
-        phone_number=contact.phone_number,
-        organization=contact.organization,
-        farms=[
-            FarmSummary(id=f.farm.id, farm_name=f.farm.farm_name, location=f.farm.location, role=f.role)
-            for f in contact.farm_associations
-        ],
-    )
+    # Build a dict of fields for ContactRead from the ORM object, excluding farms
+    data: dict = {}
+    for field in ContactRead.model_fields:
+        if field == "farms":
+            continue
+        data[field] = getattr(contact, field)
+    # Manually construct farm summaries with roles
+    data["farms"] = [
+        FarmSummary(
+            id=assoc.farm.id,
+            farm_name=assoc.farm.farm_name,
+            location=assoc.farm.location,
+            role=assoc.role,
+        )
+        for assoc in contact.farm_associations
+    ]
+    return ContactRead(**data)
 
 
 @router.post(

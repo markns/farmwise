@@ -35,8 +35,8 @@
             :loading="loading"
             loading-text="Loading... Please wait"
           >
-<!--            <template #item.case="{ value }">
-              <case-popover v-if="value" :value="value" />
+          <!--            <template #item.case="{ value }">
+            <case-popover v-if="value" :value="value" />
             </template>
             <template #item.farmer="{ value }">
               <farmer-popover :value="value" />
@@ -64,6 +64,37 @@
                 }}
               </v-chip>
             </template>-->
+          <template #item.email="{ value }">
+            {{ value }}
+          </template>
+          <template #item.preferred_form_of_address="{ value }">
+            {{ value }}
+          </template>
+          <template #item.gender="{ value }">
+            {{ value }}
+          </template>
+          <template #item.date_of_birth="{ value }">
+            {{ value }}
+          </template>
+          <template #item.estimated_age="{ value }">
+            {{ value }}
+          </template>
+          <template #item.role="{ value }">
+            {{ value }}
+          </template>
+          <template #item.experience="{ value }">
+            {{ value }}
+          </template>
+          <template #item.organization\.name="{ item }">
+            <v-chip small>{{ item.organization.name }}</v-chip>
+          </template>
+          <template #item.farms="{ value }">
+            <v-row>
+              <v-chip v-for="farm in value" :key="farm.id" class="mr-2" small>
+                {{ farm.farm_name }}
+              </v-chip>
+            </v-row>
+          </template>
             <template #item.created_at="{ value }">
               <v-tooltip location="bottom">
                 <template #activator="{ props }">
@@ -116,12 +147,13 @@ export default {
       headers: [
         { title: "Name", value: "name", sortable: true },
         { title: "Phone Number", value: "phone_number", sortable: true },
-        { title: "Location", value: "location", sortable: false },
-        // { title: "Farmer Definition", value: "farmer", sortable: false },
-        // { title: "Filter Action", value: "filter_action", sortable: true },
-        // { title: "Project", value: "farmer.project.display_name", sortable: true },
-        { title: "Created At", value: "created_at" },
-        { title: "Updated At", value: "updated_at" },
+        { title: "Preferred Form Of Address", value: "preferred_form_of_address", sortable: false },
+        { title: "Gender", value: "gender", sortable: true },
+        { title: "Role", value: "role", sortable: true },
+        { title: "Date Of Birth", value: "date_of_birth", sortable: true },
+        { title: "Estimated Age", value: "estimated_age", sortable: true },
+        { title: "Experience", value: "experience", sortable: true },
+        { title: "Farms", value: "farms", sortable: false },
         { title: "", value: "data-table-actions", sortable: false, align: "end" },
       ],
     }
