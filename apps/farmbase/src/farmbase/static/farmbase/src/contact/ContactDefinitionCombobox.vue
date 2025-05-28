@@ -15,7 +15,7 @@
     item-value="id"
     multiple
     no-filter
-    v-model="farmerDefinitions"
+    v-model="contactDefinitions"
   >
     <template #chip="{ item, props }">
       <v-menu v-model="menu" origin="overlap">
@@ -64,7 +64,7 @@
     <template #no-data>
       <v-list-item>
         <v-list-item-title>
-          No farmer definition matching "
+          No contact definition matching "
           <strong>{{ search }}</strong>
         </v-list-item-title>
       </v-list-item>
@@ -77,11 +77,11 @@ import { cloneDeep, debounce } from "lodash"
 import { initials } from "@/filters"
 import { mergeProps } from "vue"
 
-import FarmerApi from "@/farmer/api"
+import ContactApi from "@/contact/api"
 import SearchUtils from "@/search/utils"
 
 export default {
-  name: "FarmerDefinitionCombobox",
+  name: "ContactDefinitionCombobox",
   props: {
     modelValue: {
       type: Array,
@@ -91,13 +91,13 @@ export default {
     },
     label: {
       type: String,
-      default: "Farmer Definitions",
+      default: "Contact Definitions",
     },
     project: {
       type: [Object],
       default: null,
     },
-    defaultFarmers: {
+    defaultContacts: {
       type: [Object],
       default: null,
     },
@@ -118,19 +118,19 @@ export default {
   },
 
   computed: {
-    farmerDefinitions: {
+    contactDefinitions: {
       get() {
         return cloneDeep(this.modelValue)
       },
       set(value) {
         this.search = null
-        const farmerDefinitions = value.filter((v) => {
+        const contactDefinitions = value.filter((v) => {
           if (typeof v === "string") {
             return false
           }
           return true
         })
-        this.$emit("update:modelValue", farmerDefinitions)
+        this.$emit("update:modelValue", contactDefinitions)
       },
     },
   },
@@ -156,7 +156,7 @@ export default {
         filterOptions = SearchUtils.createParametersFromTableOptions({ ...filterOptions })
       }
 
-      FarmerApi.getAll(filterOptions).then((response) => {
+      ContactApi.getAll(filterOptions).then((response) => {
         this.items = response.data.items
         this.loading = false
       })
@@ -168,8 +168,8 @@ export default {
 
   created() {
     this.fetchData()
-    if (this.defaultFarmer) {
-      this.filters = [this.defaultFarmer]
+    if (this.defaultContact) {
+      this.filters = [this.defaultContact]
     }
     this.$watch(
       (vm) => [vm.project],

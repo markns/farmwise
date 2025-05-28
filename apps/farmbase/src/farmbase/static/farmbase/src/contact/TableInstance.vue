@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row no-gutters>
       <v-col>
-        <div class="text-h5">Farmers</div>
+        <div class="text-h5">Contacts</div>
       </v-col>
       <v-col class="text-right">
         <table-filter-dialog/>
@@ -35,16 +35,16 @@
               :loading="loading"
               loading-text="Loading... Please wait"
           >
-            <template #item.farmer="{ item }">
-              <farmer-popover :value="item"/>
+            <template #item.contact="{ item }">
+              <contact-popover :value="item"/>
             </template>
 
             <!--            <template #item.case="{ value }">
               <case-popover v-if="value" :value="value" />
               </template>
 
-              <template #item.farmer.project.display_name="{ item, value }">
-                <v-chip size="small" :color="item.farmer.project.color">
+              <template #item.contact.project.display_name="{ item, value }">
+                <v-chip size="small" :color="item.contact.project.color">
                   {{ value }}
                 </v-chip>
               </template>
@@ -131,7 +131,7 @@
                   </template>
                   <span>View Chat History</span>
                 </v-tooltip>
-<!--                <raw-farmer-viewer :value="item.raw"/>-->
+<!--                <raw-contact-viewer :value="item.raw"/>-->
               </div>
             </template>
           </v-data-table-server>
@@ -150,19 +150,19 @@ import {mapActions} from "vuex"
 import {formatDate, formatRelativeDate} from "@/filters"
 
 import CasePopover from "@/case/CasePopover.vue"
-import RawFarmerViewer from "@/farmer/RawFarmerViewer.vue"
+import RawContactViewer from "@/contact/RawContactViewer.vue"
 import RouterUtils from "@/router/utils"
-import FarmerPopover from "@/farmer/FarmerPopover.vue"
-import TableFilterDialog from "@/farmer/TableFilterDialog.vue"
-import ChatDrawer from "@/farmer/ChatDrawer.vue"
+import ContactPopover from "@/contact/ContactPopover.vue"
+import TableFilterDialog from "@/contact/TableFilterDialog.vue"
+import ChatDrawer from "@/contact/ChatDrawer.vue"
 
 export default {
-  name: "FarmerInstanceTable",
+  name: "ContactInstanceTable",
 
   components: {
     CasePopover,
-    RawFarmerViewer,
-    FarmerPopover,
+    RawContactViewer,
+    ContactPopover,
     TableFilterDialog,
     ChatDrawer,
   },
@@ -170,9 +170,8 @@ export default {
   data() {
     return {
       headers: [
-        {title: "Farmer", value: "farmer", sortable: false},
+        {title: "Contact", value: "contact", sortable: false},
         {title: "Phone Number", value: "phone_number", sortable: true},
-        {title: "Preferred Form Of Address", value: "preferred_form_of_address", sortable: false},
         {title: "Gender", value: "gender", sortable: true},
         {title: "Role", value: "role", sortable: true},
         {title: "Date Of Birth", value: "date_of_birth", sortable: true},
@@ -189,11 +188,11 @@ export default {
   },
 
   computed: {
-    ...mapFields("farmer", [
+    ...mapFields("contact", [
       "instanceTable.loading",
       "instanceTable.options.descending",
       "instanceTable.options.filters",
-      "instanceTable.options.filters.farmer",
+      "instanceTable.options.filters.contact",
       "instanceTable.options.itemsPerPage",
       "instanceTable.options.page",
       // "instanceTable.options.q",
@@ -216,7 +215,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("farmer", ["getAllInstances"]),
+    ...mapActions("contact", ["getAllInstances"]),
     
     openChatDrawer(contactId) {
       this.$refs.chatDrawer.open(contactId)
@@ -247,7 +246,7 @@ export default {
           vm.descending,
           vm.created_at,
           vm.project,
-          vm.farmer,
+          vm.contact,
         ],
         () => {
           this.page = 1

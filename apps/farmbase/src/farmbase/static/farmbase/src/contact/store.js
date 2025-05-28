@@ -2,7 +2,7 @@ import { getField, updateField } from "vuex-map-fields"
 import { debounce } from "lodash"
 
 import SearchUtils from "@/search/utils"
-import FarmerApi from "@/farmer/api"
+import ContactApi from "@/contact/api"
 
 const getDefaultSelectedState = () => {
   return {
@@ -30,7 +30,7 @@ const getDefaultSelectedState = () => {
     owner: null,
     project: null,
     runbook: null,
-    farmer_definition: null,
+    contact_definition: null,
     source: null,
     tags: [],
     variant: null,
@@ -45,7 +45,7 @@ const state = {
   },
   dialogs: {
     showCreateEdit: false,
-    showRawFarmerDialog: false,
+    showRawContactDialog: false,
     showRemove: false,
     showHistory: false,
   },
@@ -83,7 +83,7 @@ const state = {
           start: null,
           end: null,
         },
-        farmer: [],
+        contact: [],
       },
       q: "",
       page: 1,
@@ -106,8 +106,8 @@ const getters = {
 const actions = {
   getAll: debounce(({ commit, state }) => {
     commit("SET_TABLE_LOADING", "primary")
-    let params = SearchUtils.createParametersFromTableOptions({ ...state.table.options }, "farmer")
-    return FarmerApi.getAll(params)
+    let params = SearchUtils.createParametersFromTableOptions({ ...state.table.options }, "contact")
+    return ContactApi.getAll(params)
       .then((response) => {
         commit("SET_TABLE_LOADING", false)
         commit("SET_TABLE_ROWS", response.data)
@@ -120,9 +120,9 @@ const actions = {
     commit("SET_INSTANCE_TABLE_LOADING", "primary")
     let params = SearchUtils.createParametersFromTableOptions(
       { ...state.instanceTable.options },
-      "farmer"
+      "contact"
     )
-    return FarmerApi.getAllInstances(params)
+    return ContactApi.getAllInstances(params)
       .then((response) => {
         commit("SET_INSTANCE_TABLE_LOADING", false)
         commit("SET_INSTANCE_TABLE_ROWS", response.data)
@@ -132,25 +132,25 @@ const actions = {
       })
   }, 500),
   get({ commit, state }) {
-    return FarmerApi.get(state.selected.id).then((response) => {
+    return ContactApi.get(state.selected.id).then((response) => {
       commit("SET_SELECTED", response.data)
     })
   },
-  createEditShow({ commit }, farmer) {
-    if (farmer) {
-      commit("SET_SELECTED", farmer)
+  createEditShow({ commit }, contact) {
+    if (contact) {
+      commit("SET_SELECTED", contact)
     }
     commit("SET_DIALOG_CREATE_EDIT", true)
   },
-  showHistory({ commit }, farmer) {
-    if (farmer) {
-      commit("SET_SELECTED", farmer)
+  showHistory({ commit }, contact) {
+    if (contact) {
+      commit("SET_SELECTED", contact)
     }
     commit("SET_DIALOG_HISTORY", true)
   },
-  removeShow({ commit }, farmer) {
+  removeShow({ commit }, contact) {
     commit("SET_DIALOG_DELETE", true)
-    commit("SET_SELECTED", farmer)
+    commit("SET_SELECTED", contact)
   },
   closeCreateEdit({ commit }) {
     commit("SET_DIALOG_CREATE_EDIT", false)
@@ -167,14 +167,14 @@ const actions = {
   save({ commit, dispatch }) {
     commit("SET_SELECTED_LOADING", true)
     if (!state.selected.id) {
-      return FarmerApi.create(state.selected)
+      return ContactApi.create(state.selected)
         .then(() => {
           commit("SET_SELECTED_LOADING", false)
           dispatch("closeCreateEdit")
           dispatch("getAll")
           commit(
             "notification_backend/addBeNotification",
-            { text: "Farmer Definition created successfully.", type: "success" },
+            { text: "Contact Definition created successfully.", type: "success" },
             { root: true }
           )
         })
@@ -182,14 +182,14 @@ const actions = {
           commit("SET_SELECTED_LOADING", false)
         })
     } else {
-      return FarmerApi.update(state.selected.id, state.selected)
+      return ContactApi.update(state.selected.id, state.selected)
         .then(() => {
           commit("SET_SELECTED_LOADING", false)
           dispatch("closeCreateEdit")
           dispatch("getAll")
           commit(
             "notification_backend/addBeNotification",
-            { text: "Farmer Definition updated successfully.", type: "success" },
+            { text: "Contact Definition updated successfully.", type: "success" },
             { root: true }
           )
         })
@@ -199,12 +199,12 @@ const actions = {
     }
   },
   remove({ commit, dispatch }) {
-    return FarmerApi.delete(state.selected.id).then(function () {
+    return ContactApi.delete(state.selected.id).then(function () {
       dispatch("closeRemove")
       dispatch("getAll")
       commit(
         "notification_backend/addBeNotification",
-        { text: "Farmer Definition deleted successfully.", type: "success" },
+        { text: "Contact Definition deleted successfully.", type: "success" },
         { root: true }
       )
     })

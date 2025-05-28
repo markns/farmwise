@@ -1,43 +1,19 @@
 import { getField, updateField } from "vuex-map-fields"
-import FarmerFilterApi from "@/farmer/filter/api"
+import ContactEngagementApi from "@/contact/engagement/api"
 
 const getDefaultSelectedState = () => {
   return {
-    expression: null,
-    description: null,
     name: null,
-    action: "snooze",
-    expiration: null,
-    window: null,
+    description: null,
+    require_mfa: false,
+    entity_type: null,
+    message: null,
   }
 }
 
 const state = {
   selected: {
     ...getDefaultSelectedState(),
-  },
-  dialogs: {
-    showCreateEdit: false,
-  },
-  table: {
-    rows: {
-      items: [],
-      total: null,
-    },
-    options: {
-      filters: {
-        created_at: {
-          start: null,
-          end: null,
-        },
-      },
-      q: "",
-      page: 1,
-      itemsPerPage: 25,
-      sortBy: ["created_at"],
-      descending: [true],
-    },
-    loading: false,
   },
 }
 
@@ -52,17 +28,17 @@ const getters = {
 const actions = {
   save({ commit, state }) {
     commit("SET_SELECTED_LOADING", true)
+    console.log("%O", state.selected)
     if (!state.selected.id) {
-      return FarmerFilterApi.create(state.selected)
+      return ContactEngagementApi.create(state.selected)
         .then((resp) => {
           commit(
             "notification_backend/addBeNotification",
-            { text: "Farmer filter created successfully.", type: "success" },
+            { text: "Contact engagement created successfully.", type: "success" },
             { root: true }
           )
           commit("SET_SELECTED_LOADING", false)
           commit("RESET_SELECTED")
-          commit("SET_DIALOG_CREATE_EDIT", false)
           return resp.data
         })
         .catch((err) => {
@@ -76,11 +52,11 @@ const actions = {
           commit("SET_SELECTED_LOADING", false)
         })
     } else {
-      return FarmerFilterApi.update(state.selected.id, state.selected)
+      return ContactEngagementApi.update(state.selected.id, state.selected)
         .then(() => {
           commit(
             "notification_backend/addBeNotification",
-            { text: "Farmer filter updated successfully.", type: "success" },
+            { text: "Contact engagement updated successfully.", type: "success" },
             { root: true }
           )
           commit("SET_SELECTED_LOADING", false)
@@ -97,9 +73,9 @@ const actions = {
         })
     }
   },
-  createEditShow({ commit }, farmer) {
-    if (farmer) {
-      commit("SET_SELECTED", farmer)
+  createEditShow({ commit }, contact) {
+    if (contact) {
+      commit("SET_SELECTED", contact)
     }
     commit("SET_DIALOG_CREATE_EDIT", true)
   },
@@ -122,9 +98,6 @@ const mutations = {
   },
   SET_TABLE_ROWS(state, value) {
     state.table.rows = value
-  },
-  SET_DIALOG_CREATE_EDIT(state, value) {
-    state.dialogs.showCreateEdit = value
   },
 
   RESET_SELECTED(state) {

@@ -7,7 +7,7 @@
     </template>
     <v-card>
       <v-card-title>
-        <span class="text-h5">Create Farmer Engagement Filter</span>
+        <span class="text-h5">Create Contact Engagement Filter</span>
         <v-spacer />
       </v-card-title>
       <v-stepper v-model="step">
@@ -24,7 +24,7 @@
           <v-stepper-window-item :value="1">
             <v-card>
               <v-card-text>
-                Define the entity types that will be used to match with existing farmer instances.
+                Define the entity types that will be used to match with existing contact instances.
                 <v-tabs v-model="activeTab" color="primary" align-tabs="end">
                   <v-tab>Basic</v-tab>
                 </v-tabs>
@@ -34,7 +34,7 @@
                       <entity-type-select
                         v-model="entity_type"
                         :project="project"
-                        :farmerDefinition="selected"
+                        :contactDefinition="selected"
                       />
                       <v-textarea
                         v-model="message"
@@ -116,7 +116,7 @@ export default {
       rules: { required },
     }
   },
-  name: "FarmerEngagementDialog",
+  name: "ContactEngagementDialog",
   data() {
     return {
       activeTab: 0,
@@ -128,7 +128,7 @@ export default {
     EntityTypeSelect,
   },
   computed: {
-    ...mapFields("farmerEngagement", [
+    ...mapFields("contactEngagement", [
       "selected",
       "selected.name",
       "selected.description",
@@ -140,7 +140,7 @@ export default {
     ]),
   },
   methods: {
-    ...mapActions("farmerEngagement", ["save"]),
+    ...mapActions("contactEngagement", ["save"]),
     saveEngagement() {
       // reset local data
       this.save().then((engagement) => {

@@ -7,7 +7,7 @@
     </template>
     <v-card>
       <v-card-title>
-        <span class="text-h5">Farmer Data</span>
+        <span class="text-h5">Contact Data</span>
       </v-card-title>
       <v-card-text>
         <div style="height: 800px">
@@ -26,7 +26,7 @@
 import MonacoEditor from "@/components/MonacoEditor.vue"
 
 export default {
-  name: "RawFarmerViewer",
+  name: "RawContactViewer",
 
   props: {
     value: {

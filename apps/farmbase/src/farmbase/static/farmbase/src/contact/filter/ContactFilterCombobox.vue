@@ -81,7 +81,7 @@
           </v-list-item>
         </template>
         <template #append>
-          <farmer-filter-create-dialog @save="createFilter" :farmerDefinition="farmerDefinition" />
+          <contact-filter-create-dialog @save="createFilter" :contactDefinition="contactDefinition" />
         </template>
       </v-combobox>
     </v-row>
@@ -93,12 +93,12 @@ import { cloneDeep, debounce } from "lodash"
 import { initials } from "@/filters"
 import { mergeProps } from "vue"
 
-import FarmerApi from "@/farmer/api"
+import ContactApi from "@/contact/api"
 import SearchUtils from "@/search/utils"
-import FarmerFilterCreateDialog from "@/farmer/filter/FarmerFilterCreateDialog.vue"
+import ContactFilterCreateDialog from "@/contact/filter/ContactFilterCreateDialog.vue"
 
 export default {
-  name: "FarmerFilterCombobox",
+  name: "ContactFilterCombobox",
   props: {
     modelValue: {
       type: Array,
@@ -108,19 +108,19 @@ export default {
     },
     label: {
       type: String,
-      default: "Farmer Filters",
+      default: "Contact Filters",
     },
     project: {
       type: Object,
       required: true,
     },
-    farmerDefinition: {
+    contactDefinition: {
       type: Object,
       required: true,
     },
   },
 
-  components: { FarmerFilterCreateDialog },
+  components: { ContactFilterCreateDialog },
 
   data() {
     return {
@@ -177,7 +177,7 @@ export default {
         filterOptions = SearchUtils.createParametersFromTableOptions({ ...filterOptions })
       }
 
-      FarmerApi.getAllFilters(filterOptions).then((response) => {
+      ContactApi.getAllFilters(filterOptions).then((response) => {
         this.items = response.data.items
         this.loading = false
       })

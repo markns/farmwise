@@ -9,20 +9,20 @@ export default {
     })
   },
 
-  get(farmerId) {
-    return API.get(`${resource}/${farmerId}`)
+  get(contactId) {
+    return API.get(`${resource}/${contactId}`)
   },
 
   create(payload) {
     return API.post(`${resource}`, payload)
   },
 
-  update(farmerId, payload) {
-    return API.put(`${resource}/${farmerId}`, payload)
+  update(contactId, payload) {
+    return API.put(`${resource}/${contactId}`, payload)
   },
 
-  delete(farmerId) {
-    return API.delete(`${resource}/${farmerId}`)
+  delete(contactId) {
+    return API.delete(`${resource}/${contactId}`)
   },
 
   getAllFilters(options) {
@@ -37,11 +37,11 @@ export default {
     })
   },
 
-  // getInstances(farmerId) {
-  //   return API.get(`${resource}/${farmerId}`)
+  // getInstances(contactId) {
+  //   return API.get(`${resource}/${contactId}`)
   // },
 
-  getInstance(farmerId, instanceId) {
-    return API.get(`${resource}/${farmerId}/${instanceId}`)
+  getInstance(contactId, instanceId) {
+    return API.get(`${resource}/${contactId}/${instanceId}`)
   },
 }

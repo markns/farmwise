@@ -30,6 +30,21 @@ Content-Type: application/json
   "email": null
 }
 ###
+POST http://127.0.0.1:8000/api/v1/default/contacts
+Content-Type: application/json
+
+{
+  "name": "Charlie Dimmock",
+  "phone_number": "254748256531",
+  "preferred_form_of_address": "Charlie",
+  "gender": "female",
+  "date_of_birth": null,
+  "estimated_age": 56,
+  "role": "extension_officer",
+  "experience": 20,
+  "email": null
+}
+###
 # This is get or create
 PUT http://127.0.0.1:8000/api/v1/default/contacts
 Content-Type: application/json

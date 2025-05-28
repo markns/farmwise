@@ -7,7 +7,7 @@
     </template>
     <v-card>
       <v-card-title>
-        <span class="text-h5">Create Farmer Filter</span>
+        <span class="text-h5">Create Contact Filter</span>
         <v-spacer />
       </v-card-title>
       <v-stepper v-model="step">
@@ -25,7 +25,7 @@
           <v-stepper-window-item :value="1">
             <v-card>
               <v-card-text>
-                Define the entity and entity types that will be used to match with existing farmer
+                Define the entity and entity types that will be used to match with existing contact
                 instances.
                 <v-tabs v-model="activeTab" color="primary" align-tabs="end">
                   <v-tab>Basic</v-tab>
@@ -47,7 +47,7 @@
                     <span v-if="action === 'deduplicate'">
                       <entity-type-filter-combobox
                         :project="project"
-                        :farmerDefinition="farmerDefinition"
+                        :contactDefinition="contactDefinition"
                         v-model="filters.entity_type"
                         label="Entity Types"
                       />
@@ -97,7 +97,7 @@
                   :loading="previewRowsLoading"
                 >
                   <template #item.data-table-actions="{ item }">
-                    <raw-farmer-viewer :value="item" />
+                    <raw-contact-viewer :value="item" />
                   </template>
                 </v-data-table>
               </v-card-text>
@@ -162,21 +162,21 @@ import { mapActions } from "vuex"
 import { mapFields } from "vuex-map-fields"
 
 import SearchUtils from "@/search/utils"
-import FarmerApi from "@/farmer/api"
+import ContactApi from "@/contact/api"
 import EntityTypeFilterCombobox from "@/entity_type/EntityTypeFilterCombobox.vue"
 import EntityFilterCombobox from "@/entity/EntityFilterCombobox.vue"
-import RawFarmerViewer from "@/farmer/RawFarmerViewer.vue"
+import RawContactViewer from "@/contact/RawContactViewer.vue"
 
-import ExpirationInput from "@/farmer/filter/ExpirationInput.vue"
+import ExpirationInput from "@/contact/filter/ExpirationInput.vue"
 export default {
   setup() {
     return {
       rules: { required },
     }
   },
-  name: "FarmerFilterCreateDialog",
+  name: "ContactFilterCreateDialog",
   props: {
-    farmerDefinition: {
+    contactDefinition: {
       type: Object,
       required: true,
     },
@@ -189,7 +189,7 @@ export default {
         renderValidationDecorations: "on",
       },
       previewFields: [
-        { text: "Name", value: "farmer.name", sortable: false },
+        { text: "Name", value: "contact.name", sortable: false },
         { text: "Case", value: "case.name", sortable: false },
         { text: "", value: "data-table-actions", sortable: false, align: "end" },
       ],
@@ -210,12 +210,12 @@ export default {
   components: {
     EntityFilterCombobox,
     EntityTypeFilterCombobox,
-    RawFarmerViewer,
+    RawContactViewer,
     ExpirationInput,
     MonacoEditor,
   },
   computed: {
-    ...mapFields("farmerFilter", [
+    ...mapFields("contactFilter", [
       "selected",
       "selected.description",
       "selected.expression",
@@ -237,7 +237,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions("farmerFilter", ["closeCreateEditDialog", "save"]),
+    ...mapActions("contactFilter", ["closeCreateEditDialog", "save"]),
     saveFilter() {
       // reset local data
       this.save().then((filter) => {
@@ -257,7 +257,7 @@ export default {
         params = { filter: JSON.stringify(this.expression) }
         this.previewRowsLoading = "error"
       }
-      return FarmerApi.getAllInstances(params).then((response) => {
+      return ContactApi.getAllInstances(params).then((response) => {
         this.previewRows = response.data
         this.previewRowsLoading = false
       })

@@ -5,7 +5,7 @@
         <v-list-item lines="two">
           <v-list-item-title v-if="id" class="text-h6"> Edit </v-list-item-title>
           <v-list-item-title v-else class="text-h6"> New </v-list-item-title>
-          <v-list-item-subtitle>Farmer Definition</v-list-item-subtitle>
+          <v-list-item-subtitle>Contact Definition</v-list-item-subtitle>
 
           <template #append>
             <v-btn
@@ -31,9 +31,9 @@
               <v-row no-gutters>
                 <v-col cols="12">
                   <v-checkbox
-                    v-model="default_farmer"
+                    v-model="default_contact"
                     label="Default"
-                    hint="Whether this farmer definition is the default or not."
+                    hint="Whether this contact definition is the default or not."
                     persistent-hint
                   />
                 </v-col>
@@ -41,7 +41,7 @@
                   <v-checkbox
                     v-model="enabled"
                     label="Enabled"
-                    hint="Determines whether this farmer definition is currently active and should be used to process farmers."
+                    hint="Determines whether this contact definition is currently active and should be used to process contacts."
                     persistent-hint
                   />
                 </v-col>
@@ -50,7 +50,7 @@
                     v-model="name"
                     label="Name (required)"
                     persistent-hint
-                    hint="A human readable display name for this farmer."
+                    hint="A human readable display name for this contact."
                     clearable
                     name="Name"
                     :rules="[rules.required]"
@@ -62,7 +62,7 @@
                     label="Description"
                     rows="1"
                     auto-grow
-                    hint="A short description of the farmer."
+                    hint="A short description of the contact."
                     persistent-hint
                     clearable
                     name="Description"
@@ -84,7 +84,7 @@
                   <v-text-field
                     v-model="variant"
                     label="Variant"
-                    hint="The same farmer can have multiple variants with different definitions."
+                    hint="The same contact can have multiple variants with different definitions."
                     persistent-hint
                     clearable
                     name="variant"
@@ -94,7 +94,7 @@
                   <v-text-field
                     v-model="owner"
                     label="Owner (required)"
-                    hint="Typically the team or owner that produces the farmer."
+                    hint="Typically the team or owner that produces the contact."
                     persistent-hint
                     clearable
                     name="owner"
@@ -105,7 +105,7 @@
                   <v-text-field
                     v-model="external_id"
                     label="External ID (required)"
-                    hint="This ID will be used to correctly associate incoming farmers to this definition."
+                    hint="This ID will be used to correctly associate incoming contacts to this definition."
                     persistent-hint
                     clearable
                     name="externalId"
@@ -116,7 +116,7 @@
                   <v-text-field
                     v-model="lifecycle"
                     label="Lifecycle"
-                    hint="The lifecycle stage of the farmer."
+                    hint="The lifecycle stage of the contact."
                     persistent-hint
                     name="lifecycle"
                     readonly
@@ -126,7 +126,7 @@
                   <v-text-field
                     v-model="external_url"
                     label="External URL"
-                    hint="This is a reference to an external app or documentation for this farmer."
+                    hint="This is a reference to an external app or documentation for this contact."
                     persistent-hint
                     clearable
                     name="externalURL"
@@ -136,7 +136,7 @@
                   <tag-filter-auto-complete
                     label="Tags"
                     v-model="tags"
-                    model="farmer"
+                    model="contact"
                     :model-id="id"
                     :project="project"
                     show-copy
@@ -156,7 +156,7 @@
                     <v-icon v-bind="props">mdi-help-circle-outline</v-icon>
                   </template>
                   The following options allow you to configure the type of case that Dispatch will
-                  create when it encounters this farmer.
+                  create when it encounters this contact.
                 </v-tooltip>
               </template>
             </v-toolbar>
@@ -166,7 +166,7 @@
                   <v-checkbox
                     v-model="create_case"
                     label="Create Case"
-                    hint="Determines whether this farmer is eligible for case creation (farmers could still be associated with existing cases via FarmerFilters)."
+                    hint="Determines whether this contact is eligible for case creation (contacts could still be associated with existing cases via ContactFilters)."
                     persistent-hint
                   />
                 </v-col>
@@ -199,11 +199,11 @@
                   />
                 </v-col>
                 <v-col cols="12">
-                  <farmer-engagement-combobox
+                  <contact-engagement-combobox
                     v-model="engagements"
                     label="Engagement(s)"
                     :project="project"
-                    :farmerDefinition="selected"
+                    :contactDefinition="selected"
                   />
                 </v-col>
               </v-row>
@@ -281,7 +281,7 @@
                     <v-icon v-bind="props">mdi-help-circle-outline</v-icon>
                   </template>
                   The follow options allow you to control which entities should be pulled from the
-                  farmer.
+                  contact.
                 </v-tooltip>
               </template>
             </v-toolbar>
@@ -289,7 +289,7 @@
               <entity-type-filter-combobox
                 v-model="entity_types"
                 :project="project"
-                :farmerDefinition="selected"
+                :contactDefinition="selected"
                 label="Add Entity Types"
               />
             </v-card-text>
@@ -304,16 +304,16 @@
                   <template #activator="{ props }">
                     <v-icon v-bind="props">mdi-help-circle-outline</v-icon>
                   </template>
-                  Defines a farmer filter allowing you to take either a "Snooze" or "Deduplication"
-                  action for any match farmer matching the filter.
+                  Defines a contact filter allowing you to take either a "Snooze" or "Deduplication"
+                  action for any match contact matching the filter.
                 </v-tooltip>
               </template>
             </v-toolbar>
             <v-card-text>
-              <farmer-filter-combobox
+              <contact-filter-combobox
                 v-model="filters"
                 :project="project"
-                :farmerDefinition="selected"
+                :contactDefinition="selected"
               />
             </v-card-text>
           </v-card>
@@ -350,8 +350,8 @@ import CasePrioritySelect from "@/case/priority/CasePrioritySelect.vue"
 import CaseTypeSelect from "@/case/type/CaseTypeSelect.vue"
 import EntityTypeFilterCombobox from "@/entity_type/EntityTypeFilterCombobox.vue"
 import ServiceSelect from "@/service/ServiceSelect.vue"
-import FarmerEngagementCombobox from "@/farmer/engagement/FarmerEngagementCombobox.vue"
-import FarmerFilterCombobox from "@/farmer/filter/FarmerFilterCombobox.vue"
+import ContactEngagementCombobox from "@/contact/engagement/ContactEngagementCombobox.vue"
+import ContactFilterCombobox from "@/contact/filter/ContactFilterCombobox.vue"
 import TagFilterAutoComplete from "@/tag/TagPicker.vue"
 import WorkflowCombobox from "@/workflow/WorkflowCombobox.vue"
 
@@ -361,21 +361,21 @@ export default {
       rules: { required },
     }
   },
-  name: "FarmerNewEditDialog",
+  name: "ContactNewEditDialog",
 
   components: {
     CasePrioritySelect,
     CaseTypeSelect,
     EntityTypeFilterCombobox,
     ServiceSelect,
-    FarmerEngagementCombobox,
-    FarmerFilterCombobox,
+    ContactEngagementCombobox,
+    ContactFilterCombobox,
     TagFilterAutoComplete,
     WorkflowCombobox,
   },
 
   computed: {
-    ...mapFields("farmer", [
+    ...mapFields("contact", [
       "dialogs.showCreateEdit",
       "selected.runbook",
       "selected",
@@ -401,19 +401,19 @@ export default {
       "selected.oncall_service",
       "selected.owner",
       "selected.project",
-      "selected.farmer_definition",
+      "selected.contact_definition",
       "selected.source",
       "selected.tags",
       "selected.variant",
       "selected.workflows",
     ]),
-    ...mapFields("farmer", {
-      default_farmer: "selected.default",
+    ...mapFields("contact", {
+      default_contact: "selected.default",
     }),
   },
 
   methods: {
-    ...mapActions("farmer", ["save", "closeCreateEdit"]),
+    ...mapActions("contact", ["save", "closeCreateEdit"]),
   },
 
   created() {

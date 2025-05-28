@@ -3,7 +3,7 @@
     <template #prepend>
       <v-list-item lines="two">
         <v-list-item-title class="text-h6"> History </v-list-item-title>
-        <v-list-item-subtitle>Farmer Definition</v-list-item-subtitle>
+        <v-list-item-subtitle>Contact Definition</v-list-item-subtitle>
 
         <template #append>
           <v-btn icon variant="text" color="secondary" @click="closeHistory()">
@@ -12,13 +12,13 @@
         </template>
       </v-list-item>
       <template v-if="events && events.length">
-        <v-timeline density="compact" clipped class="farmer-timeline">
+        <v-timeline density="compact" clipped class="contact-timeline">
           <v-timeline-item
             v-for="event in sortedEvents"
             :icon="iconItem(event)"
             :key="event.id"
             dot-color="blue"
-            class="farmer-event"
+            class="contact-event"
           >
             <template #icon>
               <v-icon color="white" />
@@ -75,10 +75,10 @@ export default {
     return { snakeToCamel, formatToUTC, formatToTimeZones }
   },
 
-  name: "FarmerHistoryDialog",
+  name: "ContactHistoryDialog",
 
   computed: {
-    ...mapFields("farmer", ["dialogs.showHistory", "selected.events", "selected"]),
+    ...mapFields("contact", ["dialogs.showHistory", "selected.events", "selected"]),
 
     sortedEvents: function () {
       return this.events.slice().sort((a, b) => new Date(a.started_at) - new Date(b.started_at))
@@ -86,10 +86,10 @@ export default {
   },
 
   methods: {
-    ...mapActions("farmer", ["save", "closeHistory"]),
+    ...mapActions("contact", ["save", "closeHistory"]),
     iconItem(event) {
-      if (event.description == "Farmer created") return "mdi-alert-plus-outline"
-      if (event.description == "Farmer deleted") return "mdi-alert-minute-outline"
+      if (event.description == "Contact created") return "mdi-alert-plus-outline"
+      if (event.description == "Contact deleted") return "mdi-alert-minute-outline"
       return "mdi-swap-horizontal"
     },
   },

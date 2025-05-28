@@ -5,8 +5,8 @@
     <v-row no-gutters>
       <v-col>
         <v-alert closable icon="mdi-school" prominent text type="info">
-          Farmer definitions determine how a farmer is processed. Allowing you to map case types,
-          snooze and duplication rules for each farmer.
+          Contact definitions determine how a contact is processed. Allowing you to map case types,
+          snooze and duplication rules for each contact.
         </v-alert>
       </v-col>
     </v-row>
@@ -104,11 +104,11 @@
 <script>
 import { mapFields } from "vuex-map-fields"
 import { mapActions } from "vuex"
-import NewEditDialog from "@/farmer/NewEditDialog.vue"
+import NewEditDialog from "@/contact/NewEditDialog.vue"
 import HistoryViewer from "./HistoryViewer.vue"
 
 export default {
-  name: "FarmerTable",
+  name: "ContactTable",
   components: { NewEditDialog, HistoryViewer },
   props: {
     name: {
@@ -135,7 +135,7 @@ export default {
     }
   },
   computed: {
-    ...mapFields("farmer", [
+    ...mapFields("contact", [
       "table.loading",
       "table.options.descending",
       "table.options.filters.project",
@@ -149,7 +149,7 @@ export default {
     ...mapFields("auth", ["currentUser.projects"]),
   },
   methods: {
-    ...mapActions("farmer", ["getAll", "createEditShow", "removeShow", "showHistory"]),
+    ...mapActions("contact", ["getAll", "createEditShow", "removeShow", "showHistory"]),
   },
   created() {
     this.project = [{ name: this.$route.query.project }]

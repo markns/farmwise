@@ -1,14 +1,14 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="farmerInstances"
+    :items="contactInstances"
     :items-per-page="25"
     :footer-props="{
       'items-per-page-options': [25, 50, 100],
     }"
   >
-    <template #item.farmer="{ value }">
-      <farmer-popover :value="value" />
+    <template #item.contact="{ value }">
+      <contact-popover :value="value" />
     </template>
     <template #item.entities="{ value }">
       <v-row>
@@ -26,11 +26,11 @@
       </v-tooltip>
     </template>
     <template #item.data-table-actions="{ item }">
-      <v-btn icon variant="text" @click="showRun({ type: 'farmer', data: item })">
+      <v-btn icon variant="text" @click="showRun({ type: 'contact', data: item })">
         <v-icon>mdi-play-circle-outline</v-icon>
       </v-btn>
       <workflow-run-modal />
-      <raw-farmer-viewer :value="item" />
+      <raw-contact-viewer :value="item" />
     </template>
   </v-data-table>
 </template>
@@ -40,19 +40,19 @@ import { mapFields } from "vuex-map-fields"
 import { mapActions } from "vuex"
 import { formatRelativeDate, formatDate } from "@/filters"
 
-import FarmerPopover from "@/farmer/FarmerPopover.vue"
-import RawFarmerViewer from "@/farmer/RawFarmerViewer.vue"
+import ContactPopover from "@/contact/ContactPopover.vue"
+import RawContactViewer from "@/contact/RawContactViewer.vue"
 import WorkflowRunModal from "@/workflow/RunModal.vue"
 
 export default {
-  name: "FarmerInstanceTab",
+  name: "ContactInstanceTab",
   components: {
-    FarmerPopover,
-    RawFarmerViewer,
+    ContactPopover,
+    RawContactViewer,
     WorkflowRunModal,
   },
   props: {
-    inputFarmerInstances: {
+    inputContactInstances: {
       type: Array,
       default: () => [],
     },
@@ -62,7 +62,7 @@ export default {
       menu: false,
       workflowRunDialog: false,
       headers: [
-        { title: "Farmer", key: "farmer", sortable: false },
+        { title: "Contact", key: "contact", sortable: false },
         { title: "Entities", key: "entities", sortable: false },
         { title: "Created At", key: "created_at" },
         { title: "", key: "data-table-actions", sortable: false, align: "end" },
@@ -73,12 +73,12 @@ export default {
     return { formatRelativeDate, formatDate }
   },
   computed: {
-    ...mapFields("case_management", ["selected.farmer_instances"]),
-    farmerInstances() {
-      if (this.inputFarmerInstances.length) {
-        return this.inputFarmerInstances
+    ...mapFields("case_management", ["selected.contact_instances"]),
+    contactInstances() {
+      if (this.inputContactInstances.length) {
+        return this.inputContactInstances
       }
-      return this.farmer_instances
+      return this.contact_instances
     },
   },
   methods: {

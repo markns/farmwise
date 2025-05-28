@@ -106,7 +106,7 @@
 import { initials } from "@/filters"
 
 export default {
-  name: "FarmerPopover",
+  name: "ContactPopover",
 
   data: () => ({
     menu: false,

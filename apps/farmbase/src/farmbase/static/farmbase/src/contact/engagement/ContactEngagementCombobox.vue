@@ -3,7 +3,7 @@
     <v-col cols="12" sm="11">
       <base-combobox
         :label="label"
-        :api="farmerEngagementApi"
+        :api="contactEngagementApi"
         :project="project"
         v-model="engagements"
       >
@@ -54,7 +54,7 @@
       </base-combobox>
     </v-col>
     <v-col cols="12" sm="1">
-      <farmer-engagement-create-dialog @save="createItem" />
+      <contact-engagement-create-dialog @save="createItem" />
     </v-col>
   </v-row>
 </template>
@@ -62,14 +62,14 @@
 <script>
 import { mergeProps } from "vue"
 import BaseCombobox from "@/components/BaseCombobox.vue"
-import FarmerEngagementApi from "@/farmer/engagement/api"
-import FarmerEngagementCreateDialog from "@/farmer/engagement/FarmerEngagementCreateDialog.vue"
+import ContactEngagementApi from "@/contact/engagement/api"
+import ContactEngagementCreateDialog from "@/contact/engagement/ContactEngagementCreateDialog.vue"
 
 export default {
-  name: "FarmerEngagementCombobox",
+  name: "ContactEngagementCombobox",
   components: {
     BaseCombobox,
-    FarmerEngagementCreateDialog,
+    ContactEngagementCreateDialog,
   },
   props: {
     modelValue: {
@@ -90,7 +90,7 @@ export default {
   },
   data() {
     return {
-      farmerEngagementApi: FarmerEngagementApi,
+      contactEngagementApi: ContactEngagementApi,
       items: [],
     }
   },

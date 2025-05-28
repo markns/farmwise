@@ -7,11 +7,11 @@
     </template>
     <v-card>
       <v-card-title>
-        <span class="text-h5">Farmer Instance Filters</span>
+        <span class="text-h5">Contact Instance Filters</span>
       </v-card-title>
       <v-list density="compact">
         <v-list-item>
-          <farmer-definition-combobox v-model="local_farmer" label="Farmer Definitions" />
+          <contact-definition-combobox v-model="local_contact" label="Contact Definitions" />
         </v-list-item>
       </v-list>
       <v-card-actions>
@@ -26,33 +26,33 @@
 import { sum } from "lodash"
 import { mapFields } from "vuex-map-fields"
 
-import FarmerDefinitionCombobox from "@/farmer/FarmerDefinitionCombobox.vue"
+import ContactDefinitionCombobox from "@/contact/ContactDefinitionCombobox.vue"
 
 export default {
-  name: "FarmerInstanceTableFilterDialog",
+  name: "ContactInstanceTableFilterDialog",
 
   components: {
-    FarmerDefinitionCombobox,
+    ContactDefinitionCombobox,
   },
 
   data() {
     return {
       display: false,
-      local_farmer: [],
+      local_contact: [],
     }
   },
 
   computed: {
-    ...mapFields("farmer", ["instanceTable.options.filters.farmer"]),
+    ...mapFields("contact", ["instanceTable.options.filters.contact"]),
     numFilters: function () {
-      return sum([this.farmer.length])
+      return sum([this.contact.length])
     },
   },
 
   methods: {
     applyFilters() {
       // we set the filter values
-      this.farmer = this.local_farmer
+      this.contact = this.local_contact
 
       // we close the dialog
       this.display = false

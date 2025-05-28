@@ -62,7 +62,7 @@
                     :color="getContactRoleColor(contact.role)"
                     size="small"
                     class="ma-1"
-                    @click="navigateToFarmer(contact.id)"
+                    @click="navigateToContact(contact.id)"
                     style="cursor: pointer;"
                 >
                   {{ contact.name }}
@@ -89,7 +89,7 @@
                   </template>
                   <span>View Notes</span>
                 </v-tooltip>
-<!--                <raw-farmer-viewer :value="item.raw"/>-->
+<!--                <raw-contact-viewer :value="item.raw"/>-->
               </div>
 
 <!--              <v-menu location="right" origin="overlap">-->
@@ -120,11 +120,11 @@ import {mapFields} from "vuex-map-fields"
 import {mapActions} from "vuex"
 import NotesDrawer from "./NotesDrawer.vue"
 import LocationPopover from "./LocationPopover.vue"
-import RawFarmerViewer from "@/farmer/RawFarmerViewer.vue";
+import RawContactViewer from "@/contact/RawContactViewer.vue";
 
 export default {
   name: "FarmsTable",
-  components: {RawFarmerViewer, NotesDrawer, LocationPopover},
+  components: {RawContactViewer, NotesDrawer, LocationPopover},
   props: {
     name: {
       type: String,
@@ -169,9 +169,9 @@ export default {
           return "grey"
       }
     },
-    navigateToFarmer(contactId) {
+    navigateToContact(contactId) {
       this.$router.push({
-        name: "FarmerInstanceTable",
+        name: "ContactInstanceTable",
         params: {organization: this.$route.params.organization},
         query: {contact_id: contactId}
       })

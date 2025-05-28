@@ -9,7 +9,7 @@
               :prepend-icon="route.meta.icon"
               :title="route.meta.title"
             />
-            <v-divider v-if="route.name === 'farmers'" />
+            <v-divider v-if="route.name === 'contacts'" />
           </template>
           <v-list-item
             @click.stop="toggleMiniNav()"
@@ -57,7 +57,7 @@
         >
           <v-tooltip v-if="mini" activator="parent" location="right" :text="route.meta.title" />
         </v-list-item>
-        <v-divider v-if="route.name === 'farmers'" />
+        <v-divider v-if="route.name === 'contacts'" />
       </template>
       <v-list-item
         @click.stop="toggleMiniNav()"

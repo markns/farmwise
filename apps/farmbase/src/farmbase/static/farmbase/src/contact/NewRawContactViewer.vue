@@ -324,8 +324,8 @@ const editorOptions = {
       :dialog="dialog"
       :newEntityTypeJpath="newEntityTypeJpath"
       :editorValue="raw_str"
-      :farmerId="value.farmer.id"
-      :farmerObj="props.value"
+      :contactId="value.contact.id"
+      :contactObj="props.value"
       @update:dialog="closeDialog"
       @new-entity-type="addNewEntityType($event)"
     />
