@@ -1,6 +1,7 @@
 from datetime import UTC, datetime
 
 from agents import Agent, Runner, RunResult, gen_trace_id, set_default_openai_key, trace
+from agents.voice import SingleAgentVoiceWorkflow, TTSModelSettings, VoicePipeline, VoicePipelineConfig
 from farmbase_client import AuthenticatedClient
 from farmbase_client.api.runresult import runresult_create_run_result as create_run_result
 from farmbase_client.models import AgentBase, ChatState, RunResultCreate
@@ -11,6 +12,7 @@ from openai import OpenAI
 from openai.types.responses import EasyInputMessageParam, ResponseInputImageParam, ResponseInputTextParam
 
 from farmwise.agents import DEFAULT_AGENT, ONBOARDING_AGENT, agents, get_all_agent_info
+from farmwise.audio import load_oga_as_audio_input, write_stream_to_ogg
 from farmwise.dependencies import ChatStateDep, UserContext, UserContextDep
 from farmwise.hooks import LoggingHooks
 from farmwise.settings import settings
@@ -117,6 +119,26 @@ async def invoke(
 
     logger.info(f"USER: {user_input.message} AGENT: {agent.name} CONTEXT: {context}")
     return await run_agent(agent, context, user_input, chat_state)
+
+
+@router.post("/invoke_voice", response_model=str)
+async def invoke_voice(user_input: UserInput):
+    agent = agents[DEFAULT_AGENT]
+
+    audio_input = load_oga_as_audio_input(user_input.voice)
+
+    print(f"loaded audio input {audio_input}")
+    pipeline = VoicePipeline(
+        workflow=SingleAgentVoiceWorkflow(agent),
+        config=VoicePipelineConfig(workflow_name="FarmWise", tts_settings=TTSModelSettings(voice="onyx")),
+    )
+
+    result = await pipeline.run(audio_input)
+
+    output_path = user_input.voice.replace(".oga", "_response.oga")
+    await write_stream_to_ogg(result.stream(), output_path)
+
+    return output_path
 
 
 app.include_router(router)

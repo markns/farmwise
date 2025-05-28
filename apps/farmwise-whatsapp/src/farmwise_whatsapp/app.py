@@ -122,7 +122,7 @@ Reply with “menu” to see all services.
 async def location_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"LOCATION USER: {msg}")
     await msg.indicate_typing()
-    response = await agent_client.ainvoke(
+    response = await agent_client.invoke(
         message=f"My location is {msg.location}",
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
@@ -135,7 +135,7 @@ async def location_handler(_: WhatsApp, msg: types.Message):
 async def message_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"MESSAGE USER: {msg}")
     await msg.indicate_typing()
-    response = await agent_client.ainvoke(
+    response = await agent_client.invoke(
         message=msg.text,
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
@@ -149,7 +149,7 @@ async def message_handler(_: WhatsApp, msg: types.Message):
 async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
     logger.info(f"CALLBACK SELECTION USER: {sel}")
     await sel.indicate_typing()
-    response = await agent_client.ainvoke(
+    response = await agent_client.invoke(
         message=sel.data,
         user_id=sel.from_user.wa_id,
         user_name=sel.from_user.name,
@@ -162,7 +162,7 @@ async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
 async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
     logger.info(f"CALLBACK BUTTON USER: {btn}")
     await btn.indicate_typing()
-    response = await agent_client.ainvoke(
+    response = await agent_client.invoke(
         message=btn.data,
         user_id=btn.from_user.wa_id,
         user_name=btn.from_user.name,
@@ -179,14 +179,32 @@ async def image_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"Image downloaded to {file_path}")
 
     await msg.mark_as_read()
-    response = await agent_client.ainvoke(
+    response = await agent_client.invoke(
         message=msg.caption,
-        image=file_path,
+        voice=file_path,
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
     )
     logger.info(f"AGENT: {response}")
     await _send_response(response, msg)
+
+
+@wa.on_message(filters.voice)
+async def voice_handler(_: WhatsApp, msg: types.Message):
+    await msg.indicate_typing()
+    # download image to disk (saves file and returns the file path)
+    file_path = await msg.audio.download(settings.VOICE_DOWNLOAD_DIR)
+    logger.info(f"Voice note downloaded to {file_path}")
+
+    await msg.mark_as_read()
+    response = await agent_client.invoke_voice(
+        voice=file_path,
+        user_id=msg.from_user.wa_id,
+        user_name=msg.from_user.name,
+    )
+    logger.info(f"AGENT: {response}")
+
+    await msg.reply_audio(audio=response.strip('"'))
 
 
 @wa.on_raw_update

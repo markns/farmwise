@@ -43,17 +43,19 @@ class UserInput(BaseModel):
 
     message: str | None = Field(
         description="User input to the agent.",
+        default=None,
         examples=["What is the weather in Tokyo?"],
     )
-    # TODO: Use eg. Image object from pywa, rather than `str`
     image: str | None = Field(
-        description="Image to send to the agent.",
+        description="Image path to send to the agent.",
         default=None,
-        # examples=["https://example.com/image.jpg"],
     )
-    user_id: str | None = Field(
+    voice: str | None = Field(
+        description="Voice path to send to the agent.",
+        default=None,
+    )
+    user_id: str = Field(
         description="User ID to persist and continue a multi-turn conversation.",
-        # default=None,
         examples=["+254748256530", "847c6285-8fc9-4560-a83f-4e6285809254"],
     )
     timestamp: datetime = Field(

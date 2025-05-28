@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     WHATSAPP_PHONE_ID: str
     WHATSAPP_CALLBACK_URL: str
     IMAGE_DOWNLOAD_DIR: str
+    VOICE_DOWNLOAD_DIR: str
 
     # class Config:
     #     env_file = ".env"  # Load environment variables from .env
