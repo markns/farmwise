@@ -1,4 +1,5 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 from enum import Enum
 
@@ -175,13 +176,14 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
 async def image_handler(_: WhatsApp, msg: types.Message):
     await msg.indicate_typing()
     # download image to disk (saves file and returns the file path)
-    file_path = await msg.image.download(settings.IMAGE_DOWNLOAD_DIR)
+    file_path = await msg.image.download(os.path.join(settings.DOWNLOAD_DIR, "images"))
     logger.info(f"Image downloaded to {file_path}")
+    url = file_path.replace(settings.DOWNLOAD_DIR, f"{settings.MEDIA_SERVER}")
 
     await msg.mark_as_read()
     response = await agent_client.invoke(
         message=msg.caption,
-        voice=file_path,
+        image=url,
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
     )
@@ -193,12 +195,13 @@ async def image_handler(_: WhatsApp, msg: types.Message):
 async def voice_handler(_: WhatsApp, msg: types.Message):
     await msg.indicate_typing()
     # download image to disk (saves file and returns the file path)
-    file_path = await msg.audio.download(settings.VOICE_DOWNLOAD_DIR)
+    file_path = await msg.audio.download(os.path.join(settings.DOWNLOAD_DIR, "voice"))
     logger.info(f"Voice note downloaded to {file_path}")
+    url = file_path.replace(settings.DOWNLOAD_DIR, f"{settings.MEDIA_SERVER}")
 
     await msg.mark_as_read()
     response = await agent_client.invoke_voice(
-        voice=file_path,
+        voice=url,
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
     )

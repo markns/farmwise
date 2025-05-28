@@ -1,5 +1,7 @@
+import io
 from datetime import UTC, datetime
 
+import requests
 from agents import Agent, Runner, RunResult, gen_trace_id, set_default_openai_key, trace
 from agents.voice import SingleAgentVoiceWorkflow, TTSModelSettings, VoicePipeline, VoicePipelineConfig
 from farmbase_client import AuthenticatedClient
@@ -24,15 +26,31 @@ app = FastAPI(debug=settings.is_dev())
 router = APIRouter()
 
 
-def create_openai_file(file_path):
+def create_openai_file(file_url):
     # This is more useful than sending base64, as it means the base64 does not get
     # sent back and forth repeatedly
-    with open(file_path, "rb") as file_content:
-        result = client.files.create(
-            file=file_content,
-            purpose="vision",
-        )
-        return result.id
+
+    response = requests.get(file_url)
+    response.raise_for_status()
+
+    # Determine a filename from the URL (or default to something)
+    filename = file_url.split("/")[-1] or "upload.jpg"
+
+    # Make sure the filename has a supported extension
+    if not any(filename.lower().endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".gif", ".webp"]):
+        raise ValueError(f"Unsupported file extension in: {filename}")
+
+    file_like = io.BytesIO(response.content)
+    file_like.name = filename  # This is critical — OpenAI expects a `.name` attribute
+
+    logger.debug(f"Sending file {filename} from {file_url} to OpenAI")
+    logger.debug(f"Sending file from {file_url} to OpenAI")
+    result = client.files.create(
+        file=file_like,
+        purpose="vision",
+    )
+    logger.debug(f"Created file {result}")
+    return result.id
 
 
 @app.get("/health")
