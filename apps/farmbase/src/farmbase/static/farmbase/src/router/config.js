@@ -270,7 +270,7 @@ export const protectedRoute = [
       name: "contacts",
       meta: {
         title: "Contacts",
-        icon: "mdi-beekeeper",
+        icon: "mdi-account",
         group: "contacts",
         requiresAuth: true,
         menu: true,

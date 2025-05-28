@@ -199,9 +199,3 @@ export default {
   },
 }
 </script>
-
-<style>
-.mdi-barn {
-  color: white !important;
-}
-</style>
