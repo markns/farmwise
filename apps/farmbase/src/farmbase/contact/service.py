@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from ..farm.models import FarmContact
+from ..farm.models import Farm, FarmContact
 from ..organization.models import Organization
 from .models import Contact, ContactCreate, ContactPatch, ContactRead
 
@@ -67,10 +67,19 @@ async def get_all(*, db_session: AsyncSession) -> Sequence[Contact]:
     return result.scalars().all()
 
 
-async def get_all_with_location(*, db_session: AsyncSession) -> Sequence[Contact]:
+async def get_all_with_location(*, db_session: AsyncSession) -> Sequence[tuple[Contact, Farm]]:
     """Returns all contacts."""
-    result = await db_session.execute(select(Contact).where(Contact.location.is_not(None)))
-    return result.scalars().all()
+    stmt = (
+        select(Contact, Farm)
+        .join(Contact.farm_associations)
+        .join(FarmContact.farm)
+        .where(Farm.location.is_not(None))
+        .options(selectinload(Contact.farm_associations).selectinload(FarmContact.farm))
+        .distinct()
+    )
+
+    result = await db_session.execute(stmt)
+    return result.all()
 
 
 async def create(*, db_session: AsyncSession, contact_in: ContactCreate, organization: Organization) -> Contact:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import TYPE_CHECKING, List, Optional
+from typing import List, Optional
 
 from pydantic import Field, field_validator
 from sqlalchemy import (
@@ -20,8 +20,6 @@ from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
 from farmbase.organization.models import Organization, OrganizationRead
 from farmbase.validators import must_not_be_blank
 
-if TYPE_CHECKING:
-    from farmbase.farm.models import FarmSummary
 # TODO: use this pattern to add other contact types. eg. farmers
 # https://docs.sqlalchemy.org/en/20/orm/queryguide/_inheritance_setup.html
 

@@ -2,7 +2,7 @@ from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from temporalio import activity
 
-from .shared import Contact
+from .shared import SimpleContact
 
 
 class WhatsAppActivities:
@@ -10,7 +10,7 @@ class WhatsAppActivities:
         self.whatsapp = whatsapp_client
 
     @activity.defn
-    async def send_whatsapp_template(self, contact: Contact, template_name: str, values: list[str]):
+    async def send_whatsapp_template(self, contact: SimpleContact, template_name: str, values: list[str]):
         from loguru import logger
         from pywa_async.types import Template
         from pywa_async.types.sent_message import SentTemplate
@@ -37,7 +37,7 @@ class WhatsAppActivities:
         # return resp
 
     @activity.defn
-    async def save_message(self, contact: Contact, text: str):
+    async def save_message(self, contact: SimpleContact, text: str):
         from farmbase.auth.models import FarmbaseUserOrganization
         from farmbase.database.core import engine
         from farmbase.message.models import Message

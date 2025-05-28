@@ -3,9 +3,25 @@ POST http://127.0.0.1:8000/api/v1/default/contacts
 Content-Type: application/json
 
 {
-  "name": "Mark",
+  "name": "Mark Nuttall-Smith",
   "phone_number": "31657775781",
   "preferred_form_of_address": "Mark",
+  "gender": "male",
+  "date_of_birth": null,
+  "estimated_age": 40,
+  "role": "farmer",
+  "experience": 2,
+  "email": null
+}
+
+###
+POST http://127.0.0.1:8000/api/v1/default/contacts
+Content-Type: application/json
+
+{
+  "name": "Hudson Ndege",
+  "phone_number": "254748256530",
+  "preferred_form_of_address": "Hudson",
   "gender": "male",
   "date_of_birth": null,
   "estimated_age": 40,

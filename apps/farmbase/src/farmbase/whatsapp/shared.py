@@ -7,7 +7,7 @@ with workflow.unsafe.imports_passed_through():
 
 
 # TODO: Maybe can use ContactRead here?
-class Contact(BaseModel):
+class SimpleContact(BaseModel):
     id: int
     phone_number: str
     name: str

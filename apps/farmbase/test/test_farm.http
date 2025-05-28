@@ -24,17 +24,16 @@ POST http://127.0.0.1:8000/api/v1/default/farms
 Content-Type: application/json
 
 {
-  "farm_name": "Rafiki farm",
+  "farm_name": "Ndege farm",
   "contacts": [
     {
-      "contact_id": 1,
+      "contact_id": 2,
       "role": "owner"
     }
   ],
   "location": {
-    "latitude": -0.365739,
-    "longitude": 35.809071
+    "latitude": -0.364739,
+    "longitude": 35.810071
   }
-
 }
 

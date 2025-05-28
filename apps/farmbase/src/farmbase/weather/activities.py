@@ -3,7 +3,7 @@ from python_weather.forecast import Forecast
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from temporalio import activity
 
-from ..whatsapp.shared import Contact
+from ..whatsapp.shared import SimpleContact
 from .shared import ForecastDetails, ForecastSummary
 
 
@@ -30,11 +30,16 @@ class WeatherActivities:
         async with async_session_factory() as session:
             contacts = await get_all_with_location(db_session=session)
 
-        def _get_contact(c):
-            point = to_shape(c.location)
-            return Contact(id=c.id, phone_number=c.phone_number, name=c.name, location=f"{point.y},{point.x}")
+        def _get_contact(contact, farm):
+            point = to_shape(farm.location)
+            return SimpleContact(
+                id=contact.id,
+                phone_number=contact.phone_number,
+                name=contact.name,
+                location=f"{point.y},{point.x}",
+            )
 
-        return [_get_contact(c) for c in contacts]
+        return [_get_contact(*c) for c in contacts]
 
     @activity.defn
     async def summarize_forecast(self, forecast: ForecastDetails) -> ForecastSummary:
@@ -54,7 +59,7 @@ class WeatherActivities:
         return response.output_parsed
 
     @activity.defn
-    async def get_weather_forecast(self, contact: Contact) -> ForecastDetails:
+    async def get_weather_forecast(self, contact: SimpleContact) -> ForecastDetails:
         """
         Fetches and displays the current weather and a 3-day forecast for a given location.
 
