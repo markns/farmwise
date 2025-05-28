@@ -131,7 +131,7 @@
                   </template>
                   <span>View Chat History</span>
                 </v-tooltip>
-                <raw-farmer-viewer :value="item.raw"/>
+<!--                <raw-farmer-viewer :value="item.raw"/>-->
               </div>
             </template>
           </v-data-table-server>

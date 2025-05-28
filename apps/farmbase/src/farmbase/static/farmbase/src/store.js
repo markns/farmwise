@@ -36,6 +36,7 @@ import search from "@/search/store"
 import service from "@/service/store"
 import service_feedback from "@/feedback/service/store"
 import farmer from "@/farmer/store"
+import farm from "@/farm/store"
 import signal from "@/signal/store"
 import signalEngagement from "@/signal/engagement/store"
 import signalFilter from "@/signal/filter/store"
@@ -97,6 +98,7 @@ export default createStore({
     sourceTransport,
     sourceType,
     farmer,
+    farm,
     signal,
     signalEngagement,
     signalFilter,

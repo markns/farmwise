@@ -243,6 +243,28 @@ export const protectedRoute = [
     //   ],
     // },
     {
+      path: "farms",
+      component: DefaultLayout,
+      name: "farms",
+      meta: {
+        title: "Farms",
+        icon: "mdi-barn",
+        group: "farms",
+        requiresAuth: true,
+        menu: true,
+        showEditSheet: false,
+      },
+      redirect: { name: "FarmsTable" },
+      children: [
+        {
+          path: "/:organization/farms",
+          name: "FarmsTable",
+          meta: { title: "List" },
+          component: () => import("@/farm/Farms.vue"),
+        },
+      ],
+    },
+    {
       path: "farmers",
       component: DefaultLayout,
       name: "farmers",
@@ -264,6 +286,7 @@ export const protectedRoute = [
         },
       ],
     },
+
     {
       path: "data",
       component: DefaultLayout,
