@@ -1,7 +1,19 @@
 <template>
   <v-app-bar flat style="border-bottom: 1px solid #d2d2d2 !important" color="background0">
     <template #prepend>
-      <router-link :to="{ name: 'IncidentOverview' }" style="text-decoration: none">
+      <router-link
+        :to="{ name: 'IncidentOverview' }"
+        style="text-decoration: none"
+        class="d-flex align-center"
+      >
+        <v-img
+          src="../farmwise.png"
+          alt="Farmwise Logo"
+          height="32"
+          width="32"
+          class="mr-2"
+          contain
+        />
         <span class="button font-weight-bold">F A R M W I S E</span>
       </router-link>
     </template>
