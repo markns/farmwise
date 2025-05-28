@@ -4,7 +4,7 @@ from typing import Any, List, Optional
 
 from geoalchemy2 import Geometry, WKBElement
 from pydantic import Field as PydanticField
-from pydantic import field_serializer, field_validator
+from pydantic import conint, field_serializer, field_validator
 from sqlalchemy import Enum as SqlEnum
 from sqlalchemy import (
     ForeignKey,
@@ -47,6 +47,24 @@ class Farm(Base, TimeStampMixin):
     def __repr__(self):
         return f"<Farm(id={self.id}, farm_name='{self.farm_name}')>"
 
+    def to_farm_read(self) -> FarmRead:
+        # Build a dict of fields for FarmRead from the ORM object, excluding farms
+        data: dict = {}
+        for field in FarmRead.model_fields:
+            if field == "contacts":
+                continue
+            data[field] = getattr(self, field)
+        # Manually construct contact summaries with roles
+        data["contacts"] = [
+            ContactSummary(
+                id=assoc.contact.id,
+                name=assoc.contact.name,
+                role=assoc.role,
+            )
+            for assoc in self.contact_associations
+        ]
+        return FarmRead(**data)
+
 
 class FarmContact(Base):
     __tablename__ = "farm_contact"
@@ -87,10 +105,22 @@ class FarmContactLink(FarmbaseBase):
     role: FarmContactRole = PydanticField(description="Role of the contact in the farm")
 
 
+class ContactSummary(FarmbaseBase):
+    id: conint(lt=2147483647, gt=0) | None = PydanticField(
+        None, description="Unique identifier of the contact", title="Id"
+    )
+    name: str = PydanticField(..., description="Name of the contact", title="Name")
+    role: FarmContactRole = PydanticField(..., description="Role of the contact in the farm", title="Role")
+
+
 class FarmRead(FarmBase):
     """Model for reading Farm data."""
 
     id: PrimaryKey = PydanticField(description="Unique identifier of the farm")
+    contacts: List[ContactSummary] = PydanticField(
+        default_factory=list,
+        description="List of contacts associated with the farm",
+    )
 
 
 class FarmPagination(Pagination):

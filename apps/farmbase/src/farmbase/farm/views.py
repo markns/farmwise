@@ -44,7 +44,7 @@ async def list_farms(
     total = await filter_set.count(params_d)
     farms = await filter_set.filter(params_d)
     return FarmPagination(
-        items=farms,
+        items=[f.to_farm_read() for f in farms],
         items_per_page=query_params.items_per_page,
         page=query_params.page,
         total=total,
@@ -58,7 +58,8 @@ async def create_farm(
 ):
     """Create a new farm."""
     logger.debug(f"creating farm {farm_in}")
-    return await service.create_farm(db_session=db_session, farm_in=farm_in)
+    farm = await service.create_farm(db_session=db_session, farm_in=farm_in)
+    return farm.to_farm_read()
 
 
 @router.get("/{farm_id}", response_model=FarmRead)
@@ -73,7 +74,7 @@ async def get_farm(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=[{"msg": "Farm not found."}],
         )
-    return farm
+    return farm.to_farm_read()
 
 
 @router.put("/{farm_id}", response_model=FarmRead)
@@ -89,7 +90,8 @@ async def update_farm(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=[{"msg": "Farm not found."}],
         )
-    return await service.update_farm(db_session=db_session, farm=farm, farm_in=farm_in)
+    farm = await service.update_farm(db_session=db_session, farm=farm, farm_in=farm_in)
+    return farm.to_farm_read()
 
 
 @router.delete("/{farm_id}", response_model=None)
