@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, Tuple, List
+from typing import List, Optional, Tuple
 from uuid import UUID
 
 from farmbase_client import AuthenticatedClient as FarmbaseClient

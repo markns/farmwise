@@ -3,11 +3,6 @@
 # from farmbase_client.models import Animal, SexEnum
 # from farmbase_client.services.animals_service import animals_create_animal
 #
-from farmbase_client import AuthenticatedClient as FarmbaseClient
-from farmbase_client.api.farms import farms_create_farm
-from farmbase_client.api.fields import fields_create_field
-from farmbase_client.models import FarmCreate, FieldCreate
-
 # api_config = APIConfig(base_path = "http://127.0.0.1:8000")
 #
 # def create_animal(context: Context, **kwargs):
@@ -22,7 +17,6 @@ from farmbase_client.models import FarmCreate, FieldCreate
 #     print(r)
 from uuid import UUID
 
-from farmbase_client.api.fields import fields_create_field
 from farmbase_client.models import FieldCreate
 
 

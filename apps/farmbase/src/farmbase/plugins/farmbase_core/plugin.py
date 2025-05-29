@@ -1,12 +1,12 @@
 import base64
 import json
-from loguru import logger
 
 import requests
 from fastapi import HTTPException
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import JWTError, jwt
 from jose.exceptions import JWKError
+from loguru import logger
 from starlette.requests import Request
 from starlette.status import HTTP_401_UNAUTHORIZED
 

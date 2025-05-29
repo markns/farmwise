@@ -1,7 +1,7 @@
-from loguru import logger
 import traceback
 from importlib.metadata import entry_points
 
+from loguru import logger
 from sqlalchemy.exc import SQLAlchemyError
 
 from farmbase.plugins.base import plugins, register

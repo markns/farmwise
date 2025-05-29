@@ -1,11 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import ValidationError
 from slugify import slugify
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import selectinload
 
 from farmbase.auth.permissions import (
     OrganizationOwnerPermission,
@@ -19,7 +18,7 @@ from farmbase.project import flows as project_flows
 from farmbase.project import service as project_service
 from farmbase.project.models import ProjectCreate
 
-from .filterset import OrganizationQueryParams, OrganizationFilterSet
+from .filterset import OrganizationFilterSet, OrganizationQueryParams
 from .models import (
     Organization,
     OrganizationCreate,

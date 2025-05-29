@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import true
 
 from farmbase.auth.models import FarmbaseUser, FarmbaseUserOrganization
-from farmbase.database.core import engine, DbSession
+from farmbase.database.core import DbSession, engine
 from farmbase.database.manage import init_schema
 from farmbase.enums import UserRoles
 

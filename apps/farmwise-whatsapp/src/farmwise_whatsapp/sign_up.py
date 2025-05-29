@@ -289,6 +289,6 @@ try:
         flow_json=SIGN_UP_FLOW_JSON,
     )
     print("Flow updated successfully")
-except FlowUpdatingError as e:
+except FlowUpdatingError:
     print("Flow updating failed")
     print(wa.get_flow(flow_id=flow_id).validation_errors)

@@ -1,7 +1,6 @@
 import os
 
 from pywa import WhatsApp
-from pywa.types import Template
 
 wa = WhatsApp(
     phone_id=os.environ.get("WHATSAPP_PHONE_ID"),  # The phone id you got from the API Setup
