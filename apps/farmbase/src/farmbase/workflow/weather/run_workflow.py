@@ -5,7 +5,7 @@ from temporalio import workflow
 from temporalio.client import Client, WorkflowFailureError
 from workflows import SendWeatherWorkflow
 
-from farmbase.weather.shared import DEFAULT_TASK_QUEUE
+from .shared import DEFAULT_TASK_QUEUE
 
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use

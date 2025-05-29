@@ -3,8 +3,8 @@ from datetime import timedelta
 from temporalio import workflow
 from temporalio.common import RetryPolicy
 
-from farmbase.weather.activities import WeatherActivities
-from farmbase.whatsapp.activities import WhatsAppActivities
+from ..whatsapp.activities import WhatsAppActivities
+from .activities import WeatherActivities
 
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use

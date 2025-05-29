@@ -7,10 +7,10 @@ from temporalio import workflow
 from temporalio.client import Client
 from temporalio.worker import Worker
 
-from farmbase.weather.activities import WeatherActivities
-from farmbase.weather.shared import DEFAULT_TASK_QUEUE
-from farmbase.weather.workflows import SendWeatherWorkflow
-from farmbase.whatsapp.activities import WhatsAppActivities
+from ..whatsapp.activities import WhatsAppActivities
+from .activities import WeatherActivities
+from .shared import DEFAULT_TASK_QUEUE
+from .workflows import SendWeatherWorkflow
 
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use

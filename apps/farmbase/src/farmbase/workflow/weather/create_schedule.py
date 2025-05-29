@@ -8,8 +8,8 @@ from temporalio.client import (
     ScheduleState,
 )
 
-from farmbase.weather.shared import DEFAULT_TASK_QUEUE
-from farmbase.weather.workflows import SendWeatherWorkflow
+from .shared import DEFAULT_TASK_QUEUE
+from .workflows import SendWeatherWorkflow
 
 
 async def main():
