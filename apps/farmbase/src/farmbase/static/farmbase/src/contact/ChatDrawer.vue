@@ -13,31 +13,31 @@
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-card-title>
-      
+
       <v-divider />
-      
+
       <v-card-text v-if="loading" class="text-center">
         <v-progress-circular indeterminate />
         <div class="mt-2">Loading chat history...</div>
       </v-card-text>
-      
+
       <v-card-text v-else-if="error" class="text-center">
         <v-alert type="error" variant="tonal">
           {{ error }}
         </v-alert>
       </v-card-text>
-      
+
       <v-card-text v-else class="chat-content">
         <div v-if="chatState?.last_agent" class="mb-4">
           <v-chip color="primary" variant="tonal">
             Last Agent: {{ chatState.last_agent.name }}
           </v-chip>
         </div>
-        
+
         <div v-if="chatState?.input_list?.length === 0" class="text-center text-grey">
           No chat history available
         </div>
-        
+
         <div v-else class="chat-messages">
           <div
             v-for="(item, index) in filteredInputList"
@@ -50,7 +50,7 @@
                   {{ item.role }}
                 </v-chip>
               </v-card-subtitle>
-              
+
               <v-card-text class="pt-0">
                 <div v-if="item.content && Array.isArray(item.content)">
                   <div
@@ -94,14 +94,14 @@ import api from "@/api"
 
 export default {
   name: "ChatDrawer",
-  
+
   props: {
     contactId: {
       type: Number,
       default: null,
     },
   },
-  
+
   data() {
     return {
       isOpen: false,
@@ -110,18 +110,18 @@ export default {
       chatState: null,
     }
   },
-  
+
   computed: {
     filteredInputList() {
       if (!this.chatState?.input_list) return []
-      
+
       // Filter out function_call and function_call_output items
-      return this.chatState.input_list.filter(item => 
+      return this.chatState.input_list.filter(item =>
         item.type !== 'function_call' && item.type !== 'function_call_output'
       )
     },
   },
-  
+
   methods: {
     async open(contactId) {
       this.isOpen = true
@@ -129,17 +129,17 @@ export default {
         await this.loadChatState(contactId)
       }
     },
-    
+
     close() {
       this.isOpen = false
       this.chatState = null
       this.error = null
     },
-    
+
     async loadChatState(contactId) {
       this.loading = true
       this.error = null
-      
+
       try {
         const response = await api.get(`/chatstate?contact_id=${contactId}`)
         this.chatState = response.data
@@ -150,7 +150,7 @@ export default {
         this.loading = false
       }
     },
-    
+
     getRoleColor(role) {
       switch (role) {
         case 'user':
@@ -163,7 +163,7 @@ export default {
           return 'grey'
       }
     },
-    
+
     getMessageClass(role) {
       return {
         'user-message': role === 'user',
