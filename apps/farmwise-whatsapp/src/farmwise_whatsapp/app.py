@@ -207,7 +207,7 @@ async def voice_handler(_: WhatsApp, msg: types.Message):
     )
     logger.info(f"AGENT: {response}")
 
-    await msg.reply_audio(audio=response.strip('"'))
+    await msg.reply_audio(audio=response.replace(settings.MEDIA_SERVER, f"{settings.DOWNLOAD_DIR}").strip('"'))
 
 
 @wa.on_raw_update
