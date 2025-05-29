@@ -11,4 +11,4 @@ class SimpleContact(BaseModel):
     id: int
     phone_number: str
     name: str
-    location: str
+    location: str | None = None

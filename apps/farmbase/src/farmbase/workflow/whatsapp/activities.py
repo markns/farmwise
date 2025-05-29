@@ -1,12 +1,17 @@
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import async_sessionmaker
-from temporalio import activity
+from temporalio import activity, workflow
 
 from .shared import SimpleContact
 
+# Always pass through external modules to the sandbox that you know are safe for
+# workflow use
+with workflow.unsafe.imports_passed_through():
+    from pywa_async import WhatsApp
+
 
 class WhatsAppActivities:
-    def __init__(self, whatsapp_client):
+    def __init__(self, whatsapp_client: WhatsApp):
         self.whatsapp = whatsapp_client
 
     @activity.defn
@@ -33,17 +38,29 @@ class WhatsAppActivities:
         # TODO: Log/alert when message sending failed.
         logger.info(f"Response for message to {contact.phone_number}: {resp}")
 
-        # TODO: Get message body somehow
-        # return resp
+    @activity.defn
+    async def send_whatsapp_message(self, contact: SimpleContact, message: str):
+        from loguru import logger
+        from pywa_async.types.sent_message import SentMessage
+
+        resp: SentMessage = await self.whatsapp.send_message(
+            to=contact.phone_number,
+            text=message,
+        )
+
+        # TODO: Log/alert when message sending failed.
+        logger.info(f"Response for message to {contact.phone_number}: {resp}")
 
     @activity.defn
     async def save_message(self, contact: SimpleContact, text: str):
         from farmbase.auth.models import FarmbaseUserOrganization
         from farmbase.database.core import engine
+        from farmbase.farm.models import FarmContact
         from farmbase.message.models import Message
 
         # TODO: fake import
         FarmbaseUserOrganization.organization
+        FarmContact.id
 
         organization = "default"
         schema = f"farmbase_organization_{organization}"
