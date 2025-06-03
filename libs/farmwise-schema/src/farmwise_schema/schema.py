@@ -131,6 +131,10 @@ class WhatsAppResponse(BaseModel):
     section_list: SectionList | None = Field(
         description="Section list with multiple choice options. Should be left null unless specified."
     )
+    debug_info: str | None = Field(
+        description="This field can be used by the LLM to tell the user that it's not clear how to respond, "
+        "and how the user can improve subsequent requests"
+    )
 
 
 # class ChatMessage(BaseModel):
