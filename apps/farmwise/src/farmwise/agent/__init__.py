@@ -3,9 +3,10 @@ from collections import UserDict
 from typing import Callable
 
 from agents import HandoffInputData, RunContextWrapper, handoff
-from farmwise_schema.schema import AgentInfo
 from loguru import logger
 from pydantic import BaseModel, Field
+
+from farmwise.schema import AgentInfo
 
 from . import handoff_filters
 from .crop_pathogen_diagnosis_agent import crop_pathogen_diagnosis_agent

@@ -8,14 +8,13 @@ This is a multi-app workspace built with Python and uv for dependency management
 
 **Core Applications:**
 - `apps/farmbase/` - Main FastAPI backend application with multi-tenant architecture
-- `apps/farmwise/` - AI agent service for agricultural guidance
-- `apps/farmwise-whatsapp/` - WhatsApp integration service
+- `apps/farmwise/` - AI agent service for agricultural guidance with integrated WhatsApp support
 
 **Libraries:**
 - `libs/farmbase-client/` - Auto-generated API client for farmbase
 - `libs/farmbase-agent-toolkit/` - Toolkit for AI agents to interact with farmbase
 - `libs/farmwise-client/` - Client library for farmwise service
-- `libs/farmwise-schema/` - Shared schemas and models
+- `libs/farmwise-schema/` - Shared schemas and models (deprecated - merged into farmwise app)
 
 ## Development Commands
 
@@ -63,8 +62,8 @@ docker-compose up db adminer
 # Run farmbase locally
 cd apps/farmbase && uv run fastapi dev src/farmbase/main.py
 
-# Run farmwise agent service
-cd apps/farmwise && uv run python src/farmwise/run_service.py
+# Run farmwise agent service with WhatsApp integration
+cd apps/farmwise && uv run python src/farmwise/main.py
 ```
 
 ## Architecture
@@ -87,10 +86,11 @@ cd apps/farmwise && uv run python src/farmwise/run_service.py
 - Plugin events can be registered to extend API functionality
 
 **AI Agent Framework:**
-- Farmwise provides specialized agricultural AI agents
+- Farmwise provides specialized agricultural AI agents with WhatsApp integration
 - Agents handle: crop pathogen diagnosis, variety selection, field registration, onboarding
 - Integration with farmbase via the agent toolkit
 - Support for triage and handoff between agents
+- WhatsApp handlers directly invoke the FarmwiseService class methods
 
 **Data Sources:**
 - GAEZ (Global Agro-ecological Zones) climate and soil data
@@ -115,3 +115,8 @@ Key environment variables for development:
 - `DATABASE_*` - PostgreSQL connection details
 - `SECRET_KEY` - JWT token signing
 - `FIRST_SUPERUSER*` - Initial admin account
+- `WHATSAPP_TOKEN` - WhatsApp Business API token
+- `WHATSAPP_PHONE_ID` - WhatsApp phone number ID
+- `WHATSAPP_CALLBACK_URL` - Webhook callback URL for WhatsApp
+- `DOWNLOAD_DIR` - Directory for media file downloads
+- `MEDIA_SERVER` - Media server URL for file serving

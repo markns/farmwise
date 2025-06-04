@@ -5,11 +5,11 @@ from farmbase_client.api.chatstate import chatstate_get_chat_state as get_chat_s
 from farmbase_client.api.contacts import contacts_create_contact as create_contact
 from farmbase_client.api.contacts import contacts_get_contact_by_phone as get_contact_by_phone
 from farmbase_client.models import ChatState, ContactCreate, ContactRead
-from farmwise_schema.schema import UserInput
 from fastapi import Depends
 from loguru import logger
 from pydantic import BaseModel, ValidationError
 
+from farmwise.schema import UserInput
 from farmwise.settings import settings
 
 

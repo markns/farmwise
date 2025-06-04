@@ -4,8 +4,9 @@ from agents import (
     HandoffInputData,
     TResponseInputItem,
 )
-from farmwise_schema.schema import WhatsAppResponse
 from loguru import logger
+
+from farmwise.schema import WhatsAppResponse
 
 
 def remove_whatsapp_interactivity(handoff_input_data: HandoffInputData) -> HandoffInputData:

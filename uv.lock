@@ -13,10 +13,7 @@ members = [
     "farmbase-agent-toolkit",
     "farmbase-client",
     "farmwise",
-    "farmwise-client",
     "farmwise-parent",
-    "farmwise-schema",
-    "farmwise-whatsapp",
 ]
 
 [[package]]
@@ -1507,10 +1504,11 @@ version = "0.1.0"
 source = { editable = "apps/farmwise" }
 dependencies = [
     { name = "farmbase-agent-toolkit" },
-    { name = "farmwise-schema" },
+    { name = "loguru-logging-intercept" },
     { name = "openai" },
     { name = "openai-agents" },
     { name = "pydub" },
+    { name = "pywa", extra = ["cryptography", "fastapi"] },
     { name = "sqlmodel" },
 ]
 
@@ -1524,37 +1522,13 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "farmbase-agent-toolkit", editable = "libs/farmbase-agent-toolkit" },
-    { name = "farmwise-schema", editable = "libs/farmwise-schema" },
+    { name = "loguru-logging-intercept", specifier = ">=0.1.5" },
     { name = "openai", specifier = ">=1.77.0" },
     { name = "openai-agents", specifier = ">=0.0.14" },
     { name = "pydub", specifier = ">=0.25.1" },
+    { name = "pywa", extras = ["cryptography", "fastapi"], specifier = ">=2.10.0" },
     { name = "sqlmodel", specifier = ">=0.0.24" },
 ]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "poethepoet", specifier = ">0" },
-    { name = "pytest", specifier = ">0" },
-    { name = "ruff", specifier = ">0" },
-]
-
-[[package]]
-name = "farmwise-client"
-version = "0.1.0"
-source = { editable = "libs/farmwise-client" }
-dependencies = [
-    { name = "farmwise-schema" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "poethepoet" },
-    { name = "pytest" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "farmwise-schema", editable = "libs/farmwise-schema" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1614,28 +1588,6 @@ dev = [
     { name = "pytest-cov" },
     { name = "pytest-env" },
     { name = "ruff" },
-]
-
-[[package]]
-name = "farmwise-schema"
-version = "0.1.0"
-source = { editable = "libs/farmwise-schema" }
-
-[[package]]
-name = "farmwise-whatsapp"
-version = "0.1.0"
-source = { editable = "apps/farmwise-whatsapp" }
-dependencies = [
-    { name = "farmwise-client" },
-    { name = "loguru-logging-intercept" },
-    { name = "pywa", extra = ["cryptography", "fastapi"] },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "farmwise-client", editable = "libs/farmwise-client" },
-    { name = "loguru-logging-intercept", specifier = ">=0.1.5" },
-    { name = "pywa", extras = ["cryptography", "fastapi"], specifier = ">=2.10.0" },
 ]
 
 [[package]]

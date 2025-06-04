@@ -1,18 +1,12 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union, cast
+from typing import Any, Optional, Union
 
 import httpx
 
-
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
-from ...models import ErrorResponse
-from ...models import HTTPValidationError
-from ...models import ProjectCreate
-from ...models import ProjectRead
-from typing import cast
+from ...client import AuthenticatedClient, Client
+from ...models import ErrorResponse, HTTPValidationError, ProjectCreate, ProjectRead
+from ...types import Response
 
 
 def _get_kwargs(

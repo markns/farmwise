@@ -6,10 +6,11 @@ readme = "README.md"
 requires-python = "<=3.13"
 dependencies = [
     "farmbase-agent-toolkit",
-    "farmwise-schema",
+    "loguru-logging-intercept>=0.1.5",
     "openai>=1.77.0",
     "openai-agents>=0.0.14",
     "pydub>=0.25.1",
+    "pywa[cryptography,fastapi]>=2.10.0",
     "sqlmodel>=0.0.24",
 ]
 
@@ -23,7 +24,6 @@ dev = [
 
 [tool.uv.sources]
 farmbase-agent-toolkit = { workspace = true }
-farmwise-schema = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

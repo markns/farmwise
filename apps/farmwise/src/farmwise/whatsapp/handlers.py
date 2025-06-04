@@ -1,19 +1,18 @@
 import logging
 import os
-from contextlib import asynccontextmanager
 from enum import Enum
 
-from farmwise_client import AgentClient
-from farmwise_schema.schema import Action, WhatsAppResponse
-from fastapi import FastAPI
 from loguru import logger
 from loguru_logging_intercept import InterceptHandler
 from pywa.types import Button, Command, Section, SectionList, SectionRow
 from pywa_async import WhatsApp, filters, types
 from pywa_async.types.base_update import BaseUserUpdateAsync
 
-from .core.config import settings
-from .utils import _convert_md_to_whatsapp
+from farmwise.dependencies import chat_state, user_context
+from farmwise.schema import Action, UserInput, WhatsAppResponse
+from farmwise.service import farmwise
+from farmwise.settings import settings
+from farmwise.whatsapp.utils import _convert_md_to_whatsapp
 
 # Intercept standard logging and route to loguru
 logging.basicConfig(handlers=[InterceptHandler()], level=logging.INFO, force=True)
@@ -24,43 +23,6 @@ class Commands(Enum):
     REGISTER_FIELD = Command(name="Register a field", description="Register a new field")
     SELECT_MAIZE_VARIETY = Command(name="Select a maize seed variety", description="Select a maize seed variety")
     SHOW_SUITABLE_CROPS = Command(name="Show suitable crops", description="Show suitable crops for a location")
-
-
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    print("Startup: Initializing resources...")
-
-    # Ice breakers don't allow emojis when set via API, so set these in the WhatsApp Manager
-    ice_breakers = [
-        "🌻 What crops are suitable for my area",
-        "🌤️ Give me a weather forecast",
-        "🌱 Calculate fertilizer for my field",
-    ]
-    # TODO: It's all or nothing with conversational automation, so we can't set commands and not ice breakers
-    # await wa.update_conversational_automation(
-    #     enable_chat_opened=True,
-    #     # ice_breakers=ice_breakers,
-    #     commands=[command.value for command in Commands],
-    # )
-
-    yield  # Run the application
-    print("Shutdown: Cleaning up resources...")
-
-
-app = FastAPI(lifespan=lifespan)
-
-wa = WhatsApp(
-    phone_id=settings.WHATSAPP_PHONE_ID,  # The phone id you got from the API Setup
-    token=settings.WHATSAPP_TOKEN,  # The token you got from the API Setup
-    server=app,
-    callback_url=settings.WHATSAPP_CALLBACK_URL,
-    verify_token="xyz123fdsfds",
-    app_id=1392339421934377,
-    app_secret="b8a5543a9bf425a0e87676641569b2b4",
-)
-
-# TODO: move to dependencies
-agent_client = AgentClient(base_url=settings.AGENT_URL)
 
 
 async def _send_response(response: WhatsAppResponse, msg: BaseUserUpdateAsync):
@@ -100,79 +62,103 @@ async def _send_response(response: WhatsAppResponse, msg: BaseUserUpdateAsync):
 #  https://developers.facebook.com/docs/whatsapp/cloud-api/phone-numbers/conversational-components#welcome-messages
 #  Welcome messages are currently not functioning as intended.
 #  https://developers.facebook.com/community/threads/1842836979827258/?post_id=1842836983160591
-@wa.on_chat_opened
+@WhatsApp.on_chat_opened
 async def chat_opened(client: WhatsApp, chat_opened: types.ChatOpened):
     logger.info(f"CHAT OPENED USER: {chat_opened}")
     # TODO: Do we already want to register a user here?
     await chat_opened.reply_text(f"""
-Hi {chat_opened.from_user.name}! 👋 You’re now connected to FarmWise – your trusted partner for smart farming advice.
+Hi {chat_opened.from_user.name}! 👋 You're now connected to FarmWise – your trusted partner for smart farming advice.
 
-Here’s what you can do:
+Here's what you can do:
 ✅ Get tailored recommendations for your crops
 ✅ Ask about pests, diseases, and weather risks
 ✅ Record planting and input data
 ✅ Get reminders for key farm activities
 
-Just type your question or send a photo, and we’ll help you grow better!
+Just type your question or send a photo, and we'll help you grow better!
 
-Reply with “menu” to see all services.
+Reply with "menu" to see all services.
     """)
 
 
-@wa.on_message(filters.location)
+@WhatsApp.on_message(filters.location)
 async def location_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"LOCATION USER: {msg}")
     await msg.indicate_typing()
-    response = await agent_client.invoke(
+
+    user_input = UserInput(
         message=f"My location is {msg.location}",
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
     )
+
+    context = await user_context(user_input)
+    chat_state_obj = await chat_state(context)
+
+    response = await farmwise.invoke(user_input, context, chat_state_obj)
     logger.info(f"AGENT: {response}")
     await _send_response(response, msg)
 
 
-@wa.on_message(filters.text)
+@WhatsApp.on_message(filters.text)
 async def message_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"MESSAGE USER: {msg}")
     await msg.indicate_typing()
-    response = await agent_client.invoke(
+
+    user_input = UserInput(
         message=msg.text,
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
     )
+
+    context = await user_context(user_input)
+    chat_state_obj = await chat_state(context)
+
+    response = await farmwise.invoke(user_input, context, chat_state_obj)
     # TODO: Add error handling here.
     logger.info(f"AGENT: {response}")
     await _send_response(response, msg)
 
 
-@wa.on_callback_selection
+@WhatsApp.on_callback_selection
 async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
     logger.info(f"CALLBACK SELECTION USER: {sel}")
     await sel.indicate_typing()
-    response = await agent_client.invoke(
+
+    user_input = UserInput(
         message=sel.data,
         user_id=sel.from_user.wa_id,
         user_name=sel.from_user.name,
     )
+
+    context = await user_context(user_input)
+    chat_state_obj = await chat_state(context)
+
+    response = await farmwise.invoke(user_input, context, chat_state_obj)
     logger.info(f"AGENT: {response}")
     await _send_response(response, sel)
 
 
-@wa.on_callback_button
+@WhatsApp.on_callback_button
 async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
     logger.info(f"CALLBACK BUTTON USER: {btn}")
     await btn.indicate_typing()
-    response = await agent_client.invoke(
+
+    user_input = UserInput(
         message=btn.data,
         user_id=btn.from_user.wa_id,
         user_name=btn.from_user.name,
     )
+
+    context = await user_context(user_input)
+    chat_state_obj = await chat_state(context)
+
+    response = await farmwise.invoke(user_input, context, chat_state_obj)
     logger.info(f"AGENT: {response}")
     await _send_response(response, btn)
 
 
-@wa.on_message(filters.image)
+@WhatsApp.on_message(filters.image)
 async def image_handler(_: WhatsApp, msg: types.Message):
     await msg.indicate_typing()
     # download image to disk (saves file and returns the file path)
@@ -181,35 +167,44 @@ async def image_handler(_: WhatsApp, msg: types.Message):
     url = file_path.replace(settings.DOWNLOAD_DIR, f"{settings.MEDIA_SERVER}")
 
     await msg.mark_as_read()
-    response = await agent_client.invoke(
+
+    user_input = UserInput(
         message=msg.caption,
         image=url,
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
     )
+
+    context = await user_context(user_input)
+    chat_state_obj = await chat_state(context)
+
+    response = await farmwise.invoke(user_input, context, chat_state_obj)
     logger.info(f"AGENT: {response}")
     await _send_response(response, msg)
 
 
-@wa.on_message(filters.voice)
+@WhatsApp.on_message(filters.voice)
 async def voice_handler(_: WhatsApp, msg: types.Message):
     await msg.indicate_typing()
-    # download image to disk (saves file and returns the file path)
+    # download voice note to disk (saves file and returns the file path)
     file_path = await msg.audio.download(os.path.join(settings.DOWNLOAD_DIR, "voice"))
     logger.info(f"Voice note downloaded to {file_path}")
     url = file_path.replace(settings.DOWNLOAD_DIR, f"{settings.MEDIA_SERVER}")
 
     await msg.mark_as_read()
-    response = await agent_client.invoke_voice(
+
+    user_input = UserInput(
         voice=url,
         user_id=msg.from_user.wa_id,
         user_name=msg.from_user.name,
     )
+
+    response = await farmwise.invoke_voice(user_input)
     logger.info(f"AGENT: {response}")
 
     await msg.reply_audio(audio=response.replace(settings.MEDIA_SERVER, f"{settings.DOWNLOAD_DIR}").strip('"'))
 
 
-@wa.on_raw_update
+@WhatsApp.on_raw_update
 async def raw_update_handler(_: WhatsApp, update: dict):
     logger.warning(f"RAW UPDATE: {update}")
