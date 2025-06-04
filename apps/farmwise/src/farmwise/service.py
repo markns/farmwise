@@ -13,7 +13,7 @@ from openai.types.responses import EasyInputMessageParam, ResponseInputImagePara
 
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input, write_stream_to_ogg
-from farmwise.dependencies import UserContext
+from farmwise.dependencies import UserContext, chat_state, user_context
 from farmwise.hooks import LoggingHooks
 from farmwise.schema import UserInput, WhatsAppResponse
 from farmwise.settings import settings
@@ -107,19 +107,17 @@ class FarmwiseService:
             )
 
         logger.info(f"ASSISTANT: {result.final_output}")
-        return result.final_output
+        # return result.final_output
 
-    async def invoke(
-        self,
-        user_input: UserInput,
-        context: UserContext,
-        chat_state: ChatState,
-    ) -> WhatsAppResponse:
+    async def invoke(self, user_input: UserInput) -> WhatsAppResponse:
+        context = await user_context(user_input)
+        chat_state_obj = await chat_state(context)
+
         if context.new_user:
             logger.info(f"NEW USER: {user_input.user_id}")
             agent = agents[ONBOARDING_AGENT]
-        elif chat_state.last_agent:
-            agent = agents[chat_state.last_agent.name]
+        elif chat_state_obj.last_agent:
+            agent = agents[chat_state_obj.last_agent.name]
         else:
             agent = agents[DEFAULT_AGENT]
 

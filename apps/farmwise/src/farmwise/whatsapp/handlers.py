@@ -8,7 +8,6 @@ from pywa.types import Button, Command, Section, SectionList, SectionRow
 from pywa_async import WhatsApp, filters, types
 from pywa_async.types.base_update import BaseUserUpdateAsync
 
-from farmwise.dependencies import chat_state, user_context
 from farmwise.schema import Action, UserInput, WhatsAppResponse
 from farmwise.service import farmwise
 from farmwise.settings import settings
@@ -92,10 +91,7 @@ async def location_handler(_: WhatsApp, msg: types.Message):
         user_name=msg.from_user.name,
     )
 
-    context = await user_context(user_input)
-    chat_state_obj = await chat_state(context)
-
-    response = await farmwise.invoke(user_input, context, chat_state_obj)
+    response = await farmwise.invoke(user_input)
     logger.info(f"AGENT: {response}")
     await _send_response(response, msg)
 
@@ -111,13 +107,11 @@ async def message_handler(_: WhatsApp, msg: types.Message):
         user_name=msg.from_user.name,
     )
 
-    context = await user_context(user_input)
-    chat_state_obj = await chat_state(context)
-
-    response = await farmwise.invoke(user_input, context, chat_state_obj)
+    response = await farmwise.invoke(user_input)
     # TODO: Add error handling here.
     logger.info(f"AGENT: {response}")
-    await _send_response(response, msg)
+    # for
+    # await _send_response(response, msg)
 
 
 @WhatsApp.on_callback_selection
@@ -131,10 +125,7 @@ async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
         user_name=sel.from_user.name,
     )
 
-    context = await user_context(user_input)
-    chat_state_obj = await chat_state(context)
-
-    response = await farmwise.invoke(user_input, context, chat_state_obj)
+    response = await farmwise.invoke(user_input)
     logger.info(f"AGENT: {response}")
     await _send_response(response, sel)
 
@@ -150,10 +141,7 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
         user_name=btn.from_user.name,
     )
 
-    context = await user_context(user_input)
-    chat_state_obj = await chat_state(context)
-
-    response = await farmwise.invoke(user_input, context, chat_state_obj)
+    response = await farmwise.invoke(user_input)
     logger.info(f"AGENT: {response}")
     await _send_response(response, btn)
 
@@ -175,10 +163,7 @@ async def image_handler(_: WhatsApp, msg: types.Message):
         user_name=msg.from_user.name,
     )
 
-    context = await user_context(user_input)
-    chat_state_obj = await chat_state(context)
-
-    response = await farmwise.invoke(user_input, context, chat_state_obj)
+    response = await farmwise.invoke(user_input)
     logger.info(f"AGENT: {response}")
     await _send_response(response, msg)
 
