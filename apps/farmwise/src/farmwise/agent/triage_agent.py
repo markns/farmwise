@@ -1,8 +1,8 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
-from farmwise.schema import Section, SectionList, SectionRow, WhatsAppResponse
 
 from farmwise.dependencies import UserContext
+from farmwise.schema import Section, SectionList, SectionRow, WhatsAppResponse
 from farmwise.tools.farmbase import update_contact
 
 
@@ -15,6 +15,7 @@ def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[
                 rows=[
                     SectionRow(title="Choose seed variety", callback_data="Choose seed variety"),
                     SectionRow(title="Crop suitability", callback_data="Crop suitability"),
+                    SectionRow(title="Soil advice", callback_data="Get soil advice"),
                     SectionRow(title="Disease & pest advice", callback_data="Disease & pest advice"),
                 ],
             ),

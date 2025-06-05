@@ -1,10 +1,10 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
-from farmwise.schema import Section, SectionList, SectionRow, WhatsAppResponse
 
 from farmwise.dependencies import UserContext
+from farmwise.schema import Section, SectionList, SectionRow, WhatsAppResponse
 from farmwise.tools.farmbase import update_contact
-from farmwise.tools.tools import aez_classification, elevation, growing_period, maize_varieties, soil_property
+from farmwise.tools.tools import aez_classification, elevation, growing_period, maize_varieties, soil_properties
 
 
 def maize_variety_selector_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
@@ -52,7 +52,7 @@ Follow this protocol:
 1.1 Request the farmer shares the location of their farm, unless it is already provided. 
     Add the action "location_request" to get the location.
 1.2 Determine altitude (metres above sea level) using the elevation tool.
-1.3 Determine soil ph using the soil_property tool.
+1.3 Determine soil ph using the soil_properties tool.
 1.4 Determine aez classification using the aez_classification tool.
 1.5 Determine local growing-season length using the growing_period tool.
 
@@ -76,7 +76,7 @@ maize_variety_selector: Agent[UserContext] = Agent(
     name="Maize Variety Selector",
     handoff_description="An agent that can recommend suitable varieties of Maize",
     instructions=maize_variety_selector_instructions,
-    tools=[elevation, soil_property, aez_classification, growing_period, maize_varieties, update_contact],
+    tools=[elevation, soil_properties, aez_classification, growing_period, maize_varieties, update_contact],
     output_type=WhatsAppResponse,
     model="gpt-4.1",
 )

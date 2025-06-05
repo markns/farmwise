@@ -1,5 +1,8 @@
 from __future__ import annotations as _annotations
 
+import asyncio
+from typing import Any
+
 import httpx
 from agents import (
     RunContextWrapper,
@@ -74,24 +77,42 @@ async def elevation(_: RunContextWrapper[UserContext], latitude: float, longitud
         return r.json()["elevation"][0]
 
 
-@function_tool
-async def soil_property(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> float:
-    """Fetch an estimate of a soil property for a given location.
-
-    Args:
-        latitude: The latitude of the location.
-        longitude: The longitude of the location.
-    """
+async def _fetch_property(
+    client: httpx.AsyncClient, latitude: float, longitude: float, property_name: str
+) -> dict[str, Any]:
     uri = "https://api.isda-africa.com/v1/soilproperty"
+    response = await client.get(
+        uri,
+        params={
+            "key": "AIzaSyCruMPt43aekqITCooCNWGombhbcor3cf4",  # TODO: replace with secure key management
+            "lat": latitude,
+            "lon": longitude,
+            "property": property_name,
+            "depth": "0-20",
+        },
+    )
+    response.raise_for_status()
+    return response.json().get("property", {}).get(property_name, [{}])[0]
+
+
+@function_tool
+async def soil_properties(latitude: float, longitude: float) -> dict[str, str]:
+    """Fetch soil properties for a given location."""
+    properties = [
+        "ph",
+        "texture_class",
+        "nitrogen_total",
+        "potassium_extractable",
+        "phosphorous_extractable",
+    ]
+
     async with httpx.AsyncClient() as client:
-        r = await client.get(
-            uri,
-            params={
-                "key": "AIzaSyCruMPt43aekqITCooCNWGombhbcor3cf4",  # todo: get own key
-                "lat": latitude,
-                "lon": longitude,
-                "property": "ph",
-                "depth": "0-20",
-            },
-        )
-        return r.json()["property"]["ph"][0]["value"]["value"]
+        tasks = [_fetch_property(client, latitude, longitude, prop) for prop in properties]
+        results = await asyncio.gather(*tasks)
+
+    resp = {}
+    for prop, result in zip(properties, results):
+        value = result.get("value", {}).get("value")
+        unit = result.get("value", {}).get("unit")
+        resp[prop] = f"{value} {unit}" if unit else str(value)
+    return resp

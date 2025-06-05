@@ -13,6 +13,7 @@ from .crop_pathogen_diagnosis_agent import crop_pathogen_diagnosis_agent
 from .crop_suitability_agent import crop_suitability_agent
 from .maize_variety_selector import maize_variety_selector
 from .onboarding_agent import onboarding_agent
+from .soil_advisory_agent import soil_advisor
 from .triage_agent import triage_agent
 
 
@@ -66,12 +67,19 @@ maize_variety_selector_handoff = handoff(
     input_type=HandoffInfo,
     input_filter=handoff_filters.remove_whatsapp_interactivity,
 )
+soil_advisor_handoff = handoff(
+    agent=soil_advisor,
+    on_handoff=on_handoff,
+    input_type=HandoffInfo,
+    input_filter=handoff_filters.remove_whatsapp_interactivity,
+)
 
 handoffs = [
     triage_agent_handoff,
     crop_pathogen_diagnosis_agent_handoff,
     crop_suitability_agent_handoff,
     maize_variety_selector_handoff,
+    soil_advisor_handoff,
 ]
 
 triage_agent.handoffs = handoffs
@@ -79,6 +87,7 @@ maize_variety_selector.handoffs = [triage_agent_handoff]
 crop_suitability_agent.handoffs = [triage_agent_handoff]
 crop_pathogen_diagnosis_agent.handoffs = [triage_agent_handoff]
 onboarding_agent.handoffs = [triage_agent_handoff]
+soil_advisor.handoffs = [triage_agent_handoff]
 
 ONBOARDING_AGENT = onboarding_agent.name
 DEFAULT_AGENT = triage_agent.name
@@ -107,6 +116,7 @@ agents = AgentDict(
         crop_suitability_agent.name: crop_suitability_agent,
         crop_pathogen_diagnosis_agent.name: crop_pathogen_diagnosis_agent,
         onboarding_agent.name: onboarding_agent,
+        soil_advisor.name: soil_advisor,
     },
 )
 
