@@ -93,7 +93,7 @@ async def location_handler(_: WhatsApp, msg: types.Message):
 
     response = await farmwise.invoke(user_input)
     async for event in response:
-        await _send_response(event.content, msg)
+        await _send_response(event.response, msg)
         if event.has_more:
             await msg.indicate_typing()
 
@@ -111,7 +111,7 @@ async def message_handler(_: WhatsApp, msg: types.Message):
 
     response = await farmwise.invoke(user_input)
     async for event in response:
-        await _send_response(event.content, msg)
+        await _send_response(event.response, msg)
         if event.has_more:
             await msg.indicate_typing()
 
@@ -129,7 +129,7 @@ async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
 
     response = await farmwise.invoke(user_input)
     async for event in response:
-        await _send_response(event.content, sel)
+        await _send_response(event.response, sel)
         if event.has_more:
             await sel.indicate_typing()
 
@@ -147,7 +147,7 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
 
     response = await farmwise.invoke(user_input)
     async for event in response:
-        await _send_response(event.content, btn)
+        await _send_response(event.response, btn)
         if event.has_more:
             await btn.indicate_typing()
 
@@ -171,7 +171,7 @@ async def image_handler(_: WhatsApp, msg: types.Message):
 
     response = await farmwise.invoke(user_input)
     async for event in response:
-        await _send_response(event.content, msg)
+        await _send_response(event.response, msg)
         if event.has_more:
             await msg.indicate_typing()
 
