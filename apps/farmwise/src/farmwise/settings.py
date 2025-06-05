@@ -6,7 +6,6 @@ from pydantic import (
     HttpUrl,
     SecretStr,
     TypeAdapter,
-    computed_field,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -25,14 +24,10 @@ class Settings(BaseSettings):
         validate_default=False,
     )
     MODE: str | None = None
-
     HOST: str = "0.0.0.0"
     PORT: int = 8001
-
     AUTH_SECRET: SecretStr | None = None
-
     OPENAI_API_KEY: SecretStr | None = None
-
     FARMBASE_ENDPOINT: str | None = None
     FARMBASE_API_KEY: SecretStr | None = None
     WHATSAPP_TOKEN: str
@@ -40,11 +35,6 @@ class Settings(BaseSettings):
     WHATSAPP_CALLBACK_URL: str
     DOWNLOAD_DIR: str
     MEDIA_SERVER: str
-
-    @computed_field
-    @property
-    def BASE_URL(self) -> str:
-        return f"http://{self.HOST}:{self.PORT}"
 
     def is_dev(self) -> bool:
         return self.MODE == "dev"
