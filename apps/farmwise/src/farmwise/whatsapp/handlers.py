@@ -92,8 +92,10 @@ async def location_handler(_: WhatsApp, msg: types.Message):
     )
 
     response = await farmwise.invoke(user_input)
-    logger.info(f"AGENT: {response}")
-    await _send_response(response, msg)
+    async for event in response:
+        await _send_response(event.content, msg)
+        if event.has_more:
+            await msg.indicate_typing()
 
 
 @WhatsApp.on_message(filters.text)
@@ -108,10 +110,10 @@ async def message_handler(_: WhatsApp, msg: types.Message):
     )
 
     response = await farmwise.invoke(user_input)
-    # TODO: Add error handling here.
-    logger.info(f"AGENT: {response}")
-    # for
-    # await _send_response(response, msg)
+    async for event in response:
+        await _send_response(event.content, msg)
+        if event.has_more:
+            await msg.indicate_typing()
 
 
 @WhatsApp.on_callback_selection
@@ -126,8 +128,10 @@ async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
     )
 
     response = await farmwise.invoke(user_input)
-    logger.info(f"AGENT: {response}")
-    await _send_response(response, sel)
+    async for event in response:
+        await _send_response(event.content, sel)
+        if event.has_more:
+            await sel.indicate_typing()
 
 
 @WhatsApp.on_callback_button
@@ -142,8 +146,10 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
     )
 
     response = await farmwise.invoke(user_input)
-    logger.info(f"AGENT: {response}")
-    await _send_response(response, btn)
+    async for event in response:
+        await _send_response(event.content, btn)
+        if event.has_more:
+            await btn.indicate_typing()
 
 
 @WhatsApp.on_message(filters.image)
@@ -164,8 +170,10 @@ async def image_handler(_: WhatsApp, msg: types.Message):
     )
 
     response = await farmwise.invoke(user_input)
-    logger.info(f"AGENT: {response}")
-    await _send_response(response, msg)
+    async for event in response:
+        await _send_response(event.content, msg)
+        if event.has_more:
+            await msg.indicate_typing()
 
 
 @WhatsApp.on_message(filters.voice)
@@ -192,4 +200,5 @@ async def voice_handler(_: WhatsApp, msg: types.Message):
 
 @WhatsApp.on_raw_update
 async def raw_update_handler(_: WhatsApp, update: dict):
-    logger.warning(f"RAW UPDATE: {update}")
+    # logger.warning(f"RAW UPDATE: {update}")
+    ...

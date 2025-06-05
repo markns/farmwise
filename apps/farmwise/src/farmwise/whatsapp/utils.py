@@ -8,4 +8,4 @@ def encode_image(image_path):
 
 def _convert_md_to_whatsapp(response: str) -> str:
     """Convert a markdown string to WhatsApp markdown."""
-    return response.replace("**", "*").replace("__", "_")
+    return response.replace("**", "*").replace("__", "_").strip()

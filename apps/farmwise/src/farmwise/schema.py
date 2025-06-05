@@ -123,18 +123,25 @@ class SectionList(BaseModel):
 class WhatsAppResponse(BaseModel):
     content: str | None = Field(description="Content of the response.")
     actions: list[Action] = Field(
+        default=[],
         description="Actions that can be requested from the client. Should be left empty unless specified.",
     )
     buttons: list[Button] = Field(
+        default=[],
         description="Buttons that can be added to the response. Should be left empty unless specified.",
     )
     section_list: SectionList | None = Field(
-        description="Section list with multiple choice options. Should be left null unless specified."
+        default=None, description="Section list with multiple choice options. Should be left null unless specified."
     )
-    debug_info: str | None = Field(
-        description="This field can be used by the LLM to tell the user that it's not clear how to respond, "
-        "and how the user can improve subsequent requests"
-    )
+    # debug_info: str | None = Field(
+    #     description="This field can be used by the LLM to tell the user that it's not clear how to respond, "
+    #     "and how the user can improve subsequent requests"
+    # )
+
+
+class ResponseEvent(BaseModel):
+    response: WhatsAppResponse
+    has_more: bool = True
 
 
 class Feedback(BaseModel):
