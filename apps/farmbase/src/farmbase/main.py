@@ -76,6 +76,7 @@ api.add_middleware(GZipMiddleware, minimum_size=1000)
 # TODO: Remove this later. Allow localhost:8080 to access API
 origins = [
     "http://localhost:8080",
+    "http://localhost:8082",
     "http://127.0.0.1:8080",
 ]
 
