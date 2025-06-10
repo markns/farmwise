@@ -5,20 +5,15 @@ from sqlalchemy.schema import CreateSchema
 from sqlalchemy_utils import create_database, database_exists
 
 from farmbase import config
+from farmbase.commodity.models import Commodity
 from farmbase.organization.models import Organization
 
 from ..farm.activity.models import ActivityType
-from ..farm.commodity.models import Commodity
-from ..farm.harvest.models import HarvestLoad
-from ..farm.note.models import Note
 from ..farm.platform.models import Platform
 from ..plugin.models import Plugin
 from ..project.models import Project
 from .core import Base, sessionmaker
 from .enums import FARMBASE_ORGANIZATION_SCHEMA_PREFIX
-
-Note.id
-HarvestLoad.id
 
 
 def version_schema(script_location: str):
@@ -86,25 +81,6 @@ def populate_static_data(session):
         print(f"{len(activity_types_to_add)} ActivityTypes added.")
     else:
         print("ActivityType data already exists.")
-
-    # Optionally, add some default commodities if desired
-    if not session.query(Commodity).first():
-        print("Populating static Commodity data...")
-        commodities_to_add = [
-            Commodity(commodity_name="Corn"),
-            Commodity(commodity_name="Soybeans"),
-            Commodity(commodity_name="Wheat"),
-            Commodity(commodity_name="Cotton"),
-            Commodity(commodity_name="Barley"),
-            Commodity(commodity_name="Sorghum"),
-            Commodity(commodity_name="Canola"),
-            Commodity(commodity_name="Alfalfa"),
-        ]
-        session.add_all(commodities_to_add)
-        session.commit()
-        print(f"{len(commodities_to_add)} Commodities added.")
-    else:
-        print("Commodity data already exists.")
 
     # Verify data
     print("\n--- Verification ---")

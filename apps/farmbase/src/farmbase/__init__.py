@@ -3,6 +3,25 @@ import os.path
 import traceback
 from subprocess import check_output
 
+from .auth.models import FarmbaseUser, FarmbaseUserOrganization, FarmbaseUserProject, MfaChallenge
+from .commodity.models import Commodity
+from .contact.models import Contact
+from .farm.activity.models import ActivityProduct, ActivityType, FarmActivity
+from .farm.field.models import BoundaryDefinitionActivity, Field, FieldGroup, FieldGroupMember
+from .farm.harvest.models import HarvestLoad, StorageLocation
+from .farm.models import Farm, FarmContact
+from .farm.note.models import Note
+from .farm.planting.models import Planting
+from .farm.platform.models import Platform
+from .geospatial.models import Region, Subregion
+from .market.models import Market, MarketPrice
+from .message.models import Message
+from .organization.models import Organization
+from .plugin.models import Plugin, PluginEvent, PluginInstance
+from .products.models import Manufacturer, Product
+from .project.models import Project
+from .runresult.models import Agent, ModelResponse, RunItem, RunResult
+
 try:
     VERSION = __import__("pkg_resources").get_distribution("farmbase").version
 except Exception:
@@ -56,3 +75,45 @@ def is_docker():
 
 __version__ = VERSION
 __build__ = get_revision()
+
+# By defining __all__, you are telling Python and PyCharm
+# what 'from farmbase.models import *' should import.
+# PyCharm sees this and marks the imports above as "used".
+__all__ = [
+    "FarmbaseUser",
+    "FarmbaseUserProject",
+    "FarmbaseUserOrganization",
+    "MfaChallenge",
+    "Farm",
+    "FarmContact",
+    "Note",
+    "FieldGroup",
+    "Field",
+    "FieldGroupMember",
+    "BoundaryDefinitionActivity",
+    "StorageLocation",
+    "HarvestLoad",
+    "ActivityType",
+    "FarmActivity",
+    "ActivityProduct",
+    "Planting",
+    "Platform",
+    "Commodity",
+    "Plugin",
+    "PluginEvent",
+    "PluginInstance",
+    "Contact",
+    "Message",
+    "Project",
+    "Manufacturer",
+    "Product",
+    "Agent",
+    "RunResult",
+    "ModelResponse",
+    "RunItem",
+    "Organization",
+    "Region",
+    "Subregion",
+    "Market",
+    "MarketPrice",
+]

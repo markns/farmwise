@@ -8,17 +8,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
 
-# from farmbase.farm.activity.models import FarmActivity
-from farmbase.farm.commodity.models import Commodity
-
-# from farmbase.farm.field.models import Field
-
 
 class Planting(Base):
     __tablename__ = "planting"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     field_id: Mapped[int] = mapped_column(ForeignKey("field.id"), nullable=False)
-    commodity_id: Mapped[int] = mapped_column(ForeignKey(Commodity.id), nullable=False)
+    commodity_id: Mapped[int] = mapped_column(ForeignKey("farmbase_core.commodity.id"), nullable=False)
     planting_year: Mapped[int] = mapped_column(Integer, nullable=False)
     acres_planted: Mapped[float] = mapped_column(DECIMAL(10, 2), nullable=False)
     planting_date: Mapped[Optional[datetime.date]] = mapped_column(Date, nullable=True)

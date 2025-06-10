@@ -14,7 +14,6 @@ config = context.config
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 
-
 config.file_config = RawConfigParser()
 config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_SYNC_URI)
 

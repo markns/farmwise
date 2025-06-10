@@ -175,3 +175,5 @@ cython_debug/
 
 .claude/
 plantix/
+scripts/kamis/data
+dbdump/

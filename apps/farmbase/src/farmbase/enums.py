@@ -22,7 +22,14 @@ class FarmbaseEnum(StrEnum):
         False depending on whether the value is a member or the value of a member
     """
 
-    pass  # No additional implementation needed
+    @classmethod
+    def _missing_(cls, value):
+        # Convert the incoming value to lowercase for comparison
+        lower_value = str(value).lower()
+        for member in cls:
+            if member.value.lower() == lower_value:
+                return member
+        return super()._missing_(value)  # Fallback to default behavior if not found
 
 
 class Visibility(FarmbaseEnum):
@@ -117,3 +124,4 @@ class FarmContactRole(FarmbaseEnum):
 class Gender(FarmbaseEnum):
     MALE = "male"
     FEMALE = "female"
+    CASTRATE = "castrate"

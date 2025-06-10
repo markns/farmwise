@@ -1328,6 +1328,15 @@ wheels = [
 ]
 
 [[package]]
+name = "et-xmlfile"
+version = "2.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d3/38/af70d7ab1ae9d4da450eeec1fa3918940a5fafb9055e934af8d6eb0c2313/et_xmlfile-2.0.0.tar.gz", hash = "sha256:dab3f4764309081ce75662649be815c4c9081e88f0837825f90fd28317d4da54", size = 17234 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c1/8b/5fe2cc11fee489817272089c4203e679c63b570a5aaeb18d852ae3cbba6a/et_xmlfile-2.0.0-py3-none-any.whl", hash = "sha256:7a91720bc756843502c3b7504c77b8fe44217c85c537d85037f0f536151b2caa", size = 18059 },
+]
+
+[[package]]
 name = "exceptiongroup"
 version = "1.2.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1360,6 +1369,7 @@ dependencies = [
     { name = "geoalchemy2" },
     { name = "geojson-pydantic" },
     { name = "geopandas" },
+    { name = "geopy" },
     { name = "loguru" },
     { name = "matplotlib" },
     { name = "pandas" },
@@ -1408,6 +1418,7 @@ requires-dist = [
     { name = "geoalchemy2", specifier = ">=0.17.1" },
     { name = "geojson-pydantic", specifier = ">=1.2.0" },
     { name = "geopandas", specifier = ">=1.0.1" },
+    { name = "geopy", specifier = ">=2.4.1" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "matplotlib", specifier = ">=3.10.1" },
     { name = "pandas", specifier = ">=2.2.3" },
@@ -1503,12 +1514,15 @@ name = "farmwise"
 version = "0.1.0"
 source = { editable = "apps/farmwise" }
 dependencies = [
+    { name = "babel" },
     { name = "farmbase-agent-toolkit" },
     { name = "loguru-logging-intercept" },
     { name = "openai" },
     { name = "openai-agents" },
+    { name = "openpyxl" },
     { name = "pydub" },
     { name = "pywa", extra = ["cryptography", "fastapi"] },
+    { name = "sqlalchemy-utils" },
     { name = "sqlmodel" },
 ]
 
@@ -1521,12 +1535,15 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "babel", specifier = ">=2.17.0" },
     { name = "farmbase-agent-toolkit", editable = "libs/farmbase-agent-toolkit" },
     { name = "loguru-logging-intercept", specifier = ">=0.1.5" },
     { name = "openai", specifier = ">=1.77.0" },
     { name = "openai-agents", specifier = ">=0.0.14" },
+    { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pydub", specifier = ">=0.25.1" },
     { name = "pywa", extras = ["cryptography", "fastapi"], specifier = ">=2.10.0" },
+    { name = "sqlalchemy-utils", specifier = ">=0.41.2" },
     { name = "sqlmodel", specifier = ">=0.0.24" },
 ]
 
@@ -1835,6 +1852,15 @@ wheels = [
 ]
 
 [[package]]
+name = "geographiclib"
+version = "2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/96/cd/90271fd195d79a9c2af0ca21632b297a6cc3e852e0413a2e4519e67be213/geographiclib-2.0.tar.gz", hash = "sha256:f7f41c85dc3e1c2d3d935ec86660dc3b2c848c83e17f9a9e51ba9d5146a15859", size = 36720 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9f/5a/a26132406f1f40cf51ea349a5f11b0a46cec02a2031ff82e391c2537247a/geographiclib-2.0-py3-none-any.whl", hash = "sha256:6b7225248e45ff7edcee32becc4e0a1504c606ac5ee163a5656d482e0cd38734", size = 40324 },
+]
+
+[[package]]
 name = "geojson-pydantic"
 version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1873,6 +1899,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/39/08/2cf5d85356e45b10b8d066cf4c3ba1e9e3185423c48104eed87e8afd0455/geopandas-1.0.1.tar.gz", hash = "sha256:b8bf70a5534588205b7a56646e2082fb1de9a03599651b3d80c99ea4c2ca08ab", size = 317736 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c4/64/7d344cfcef5efddf9cf32f59af7f855828e9d74b5f862eddf5bfd9f25323/geopandas-1.0.1-py3-none-any.whl", hash = "sha256:01e147d9420cc374d26f51fc23716ac307f32b49406e4bd8462c07e82ed1d3d6", size = 323587 },
+]
+
+[[package]]
+name = "geopy"
+version = "2.4.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "geographiclib" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0e/fd/ef6d53875ceab72c1fad22dbed5ec1ad04eb378c2251a6a8024bad890c3b/geopy-2.4.1.tar.gz", hash = "sha256:50283d8e7ad07d89be5cb027338c6365a32044df3ae2556ad3f52f4840b3d0d1", size = 117625 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e5/15/cf2a69ade4b194aa524ac75112d5caac37414b20a3a03e6865dfe0bd1539/geopy-2.4.1-py3-none-any.whl", hash = "sha256:ae8b4bc5c1131820f4d75fce9d4aaaca0c85189b3aa5d64c3dcaf5e3b7b882a7", size = 125437 },
 ]
 
 [[package]]
@@ -3735,6 +3773,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/11/12/6fc1d40fefab2ffadec37ea0d72d5d97f59b164a30160f365d189df1bfd6/openapi_python_client-0.24.0.tar.gz", hash = "sha256:dfc9249ea283f55a597fa3e44c8a6c0a196ba9198b0046531224f0377f1ad5e5", size = 123870 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a1/9a/edb183deaaf72f753b92929c01b23d73a1697cf9aaf790dd660b95c64d15/openapi_python_client-0.24.0-py3-none-any.whl", hash = "sha256:9a0cc6010d9175f17d0fe0c0c80352ddfb2bbae1a2417e1768d4c0cc95e725b4", size = 180371 },
+]
+
+[[package]]
+name = "openpyxl"
+version = "3.1.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "et-xmlfile" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3d/f9/88d94a75de065ea32619465d2f77b29a0469500e99012523b91cc4141cd1/openpyxl-3.1.5.tar.gz", hash = "sha256:cf0e3cf56142039133628b5acffe8ef0c12bc902d2aadd3e0fe5878dc08d1050", size = 186464 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c0/da/977ded879c29cbd04de313843e76868e6e13408a94ed6b987245dc7c8506/openpyxl-3.1.5-py2.py3-none-any.whl", hash = "sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2", size = 250910 },
 ]
 
 [[package]]
