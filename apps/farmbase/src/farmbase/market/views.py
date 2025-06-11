@@ -162,16 +162,10 @@ async def get_market_snapshot_endpoint(
         commodity = prices[0].commodity
 
         # Get consistent units and currency from the first non-null entry
-        wholesale_unit = None
-        wholesale_ccy = None
         retail_unit = None
         retail_ccy = None
 
         for price in prices:
-            if not wholesale_unit and price.wholesale_unit:
-                wholesale_unit = price.wholesale_unit
-            if not wholesale_ccy and price.wholesale_ccy:
-                wholesale_ccy = str(price.wholesale_ccy)
             if not retail_unit and price.retail_unit:
                 retail_unit = price.retail_unit
             if not retail_ccy and price.retail_ccy:
@@ -181,9 +175,6 @@ async def get_market_snapshot_endpoint(
             commodity=commodity,
             price_date=[price.date for price in prices],
             supply_volume=[price.supply_volume for price in prices],
-            wholesale_price=[price.wholesale_price for price in prices],
-            wholesale_unit=wholesale_unit,
-            wholesale_ccy=wholesale_ccy,
             retail_price=[price.retail_price for price in prices],
             retail_unit=retail_unit,
             retail_ccy=retail_ccy,

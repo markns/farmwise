@@ -88,13 +88,13 @@ class CommodityPriceSnapshot(FarmbaseBase):
     commodity: CommodityRead = Field(description="Commodity information")
     price_date: List[date] = Field(description="List of price dates")
     supply_volume: List[Optional[float]] = Field(description="List of supply volumes")
-    wholesale_price: List[Optional[float]] = Field(description="List of wholesale prices")
-    wholesale_unit: Optional[str] = Field(
-        default=None, description="Unit for wholesale price (consistent across dates)"
-    )
-    wholesale_ccy: Optional[str] = Field(
-        default=None, description="Currency for wholesale price (consistent across dates)"
-    )
+    # wholesale_price: List[Optional[float]] = Field(description="List of wholesale prices")
+    # wholesale_unit: Optional[str] = Field(
+    #     default=None, description="Unit for wholesale price (consistent across dates)"
+    # )
+    # wholesale_ccy: Optional[str] = Field(
+    #     default=None, description="Currency for wholesale price (consistent across dates)"
+    # )
     retail_price: List[Optional[float]] = Field(description="List of retail prices")
     retail_unit: Optional[str] = Field(default=None, description="Unit for retail price (consistent across dates)")
     retail_ccy: Optional[str] = Field(default=None, description="Currency for retail price (consistent across dates)")
