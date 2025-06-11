@@ -87,6 +87,32 @@
             <template #item.experience="{ value }">
               {{ value }}
             </template>
+            <template #item.product_interests="{ value }">
+              <div v-if="value" class="d-flex flex-column">
+                <div v-if="value.crops && value.crops.length > 0" class="mb-1">
+                  <v-chip-group>
+                    <v-chip v-for="crop in value.crops" :key="crop" size="x-small" color="green">
+                      {{ crop }}
+                    </v-chip>
+                  </v-chip-group>
+                </div>
+                <div v-if="value.livestock && value.livestock.length > 0" class="mb-1">
+                  <v-chip-group>
+                    <v-chip v-for="animal in value.livestock" :key="animal" size="x-small" color="brown">
+                      {{ animal }}
+                    </v-chip>
+                  </v-chip-group>
+                </div>
+                <div v-if="value.other && value.other.length > 0">
+                  <v-chip-group>
+                    <v-chip v-for="item in value.other" :key="item" size="x-small" color="blue">
+                      {{ item }}
+                    </v-chip>
+                  </v-chip-group>
+                </div>
+              </div>
+              <span v-else class="text-disabled">-</span>
+            </template>
             <template #item.organization\.name="{ item }">
               <v-chip small>{{ item.organization.name }}</v-chip>
             </template>
@@ -177,6 +203,7 @@ export default {
         {title: "Date Of Birth", value: "date_of_birth", sortable: true},
         {title: "Estimated Age", value: "estimated_age", sortable: true},
         {title: "Experience", value: "experience", sortable: true},
+        {title: "Product Interests", value: "product_interests", sortable: false},
         {title: "Farms", value: "farms", sortable: false},
         {title: "", value: "data-table-actions", sortable: false, align: "end"},
       ],

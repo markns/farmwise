@@ -1,8 +1,8 @@
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Literal, NotRequired
+from typing import Annotated, Any, Literal, NotRequired
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StringConstraints
 from typing_extensions import TypedDict
 
 
@@ -106,12 +106,12 @@ class Button(BaseModel):
 
 
 class SectionRow(BaseModel):
-    title: str
+    title: Annotated[str, StringConstraints(max_length=24)]
     callback_data: str
 
 
 class Section(BaseModel):
-    title: str
+    title: Annotated[str, StringConstraints(max_length=24)]
     rows: list[SectionRow]
 
 

@@ -28,6 +28,7 @@ def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[
             Section(
                 title="Settings",
                 rows=[
+                    SectionRow(title="Update product interests", callback_data="Update product interests"),
                     SectionRow(title="Show profile", callback_data="Show profile"),
                 ],
             ),

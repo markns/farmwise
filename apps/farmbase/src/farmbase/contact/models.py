@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from pydantic import Field, field_validator
 from sqlalchemy import (
+    JSON,
     Date,
     ForeignKey,
     Integer,
@@ -38,6 +39,9 @@ class Contact(Base, TimeStampMixin):
     experience: Mapped[int] = mapped_column(Integer, nullable=True)
     email: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
 
+    # Add JSON field for product interests
+    product_interests: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+
     # Relationships
     organization_id: Mapped[int] = mapped_column(ForeignKey(Organization.id))
     organization = relationship("Organization")
@@ -54,6 +58,12 @@ class Contact(Base, TimeStampMixin):
         return f"<Contact(id={self.id}, name='{self.name}')>"
 
 
+class ProductInterests(FarmbaseBase):
+    crops: List[str]
+    livestock: List[str]
+    other: List[str]
+
+
 class ContactBase(FarmbaseBase):
     """Base model for Contact data."""
 
@@ -66,6 +76,9 @@ class ContactBase(FarmbaseBase):
     role: Optional[ContactRole] = Field(default=None, description="Role of the contact")
     experience: Optional[int] = Field(default=None, description="Contact's work experience in years")
     email: Optional[str] = Field(default=None, description="Contact's email address")
+    product_interests: Optional[ProductInterests] = Field(
+        default=None, description="The crops, livestock and other farm products that the contact is interested in"
+    )
 
 
 class ContactBaseWrite(ContactBase): ...
