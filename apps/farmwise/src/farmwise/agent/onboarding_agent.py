@@ -1,8 +1,8 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
-from farmwise.schema import WhatsAppResponse
 
 from farmwise.dependencies import UserContext
+from farmwise.schema import WhatsAppResponse
 from farmwise.tools.farmbase import create_farm, update_contact
 
 
@@ -25,7 +25,7 @@ Behavioral Instructions: ￼
 * Once the conversation is complete, handoff the user to the triage agent. 
 * Stick to the Workflow below until all information is gathered.
 * Do not handoff until all information is gathered.
-* Internal checklist (do not reveal): occupation, age, gender, preferred_form_of_address.
+* Internal checklist (do not reveal): occupation, age, gender, product_interests, preferred_form_of_address.
 ⸻
 
 Conversation Workflow
@@ -67,14 +67,17 @@ Interpretation:
 • The user’s response may indicate their gender.
 • If unclear, it’s acceptable to ask respectfully for clarification, by adding buttons Male and Female to the response
 
-Step 6: Update Contact
+Step 6: Determine product interests
+Ask the user what crops and livestock they are interested in. 
+
+Step 7: Update Contact
 Once the role, preferred form of address, gender and estimated age have been obtained, 
 use the update_contact tool to save it. 
 If any information is missing or unclear, continue the conversation to gather the necessary details.
 Example:
 “Thanks for the information you’ve provided. Could you tell me more about [specific detail] to complete your profile?”
 
-Step 7: Create Farm
+Step 8: Create Farm
 If the user is a farmer, ask the user to share their location by adding 
 the request_location action to the response. This will allow the farmer to access localised weather forecasts, 
 accurate seed recommendations, warnings of local crop pests, and notification of local training events.
