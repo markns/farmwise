@@ -39,7 +39,7 @@ dependencies = [
     "temporalio>=1.11.1",
     "xarray[complete]>=2025.3.1",
     "python-weather>=2.0.7",
-    "geopy>=2.4.1",
+    "openpyxl>=3.1.5",
 ]
 
 [dependency-groups]
