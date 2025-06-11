@@ -31,19 +31,17 @@ class ActivityType(Base):
 class FarmActivity(Base):
     __tablename__ = "farm_activity"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    field_id: Mapped[Optional[int]] = mapped_column(ForeignKey("field.id"), nullable=True)  
-    planting_id: Mapped[Optional[int]] = mapped_column(ForeignKey(Planting.id), nullable=True)  
+    field_id: Mapped[Optional[int]] = mapped_column(ForeignKey("field.id"), nullable=True)
+    planting_id: Mapped[Optional[int]] = mapped_column(ForeignKey(Planting.id), nullable=True)
     activity_type_id: Mapped[int] = mapped_column(ForeignKey(ActivityType.id), nullable=False)
     status: Mapped[str] = mapped_column(String(50), nullable=False)
     activity_date: Mapped[datetime.date] = mapped_column(Date, nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(TEXT, nullable=True)  
+    description: Mapped[Optional[str]] = mapped_column(TEXT, nullable=True)
     date_logged: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
 
     # Relationships
     field: Mapped[Optional["Field"]] = relationship(back_populates="farm_activities")
-    planting: Mapped[Optional["Planting"]] = relationship(
-        back_populates="farm_activities"
-    )
+    planting: Mapped[Optional["Planting"]] = relationship(back_populates="farm_activities")
     activity_type: Mapped["ActivityType"] = relationship(back_populates="farm_activities")
     product_associations: Mapped[list["ActivityProduct"]] = relationship(
         back_populates="farm_activity", cascade="all, delete-orphan"
@@ -63,14 +61,16 @@ class ActivityProduct(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     farm_activity_id: Mapped[int] = mapped_column(ForeignKey(FarmActivity.id), nullable=False)
     product_id: Mapped[int] = mapped_column(ForeignKey(Product.id), nullable=False)
-    quantity_applied: Mapped[Optional[float]] = mapped_column(DECIMAL(10, 2), nullable=True)  
-    application_rate: Mapped[Optional[float]] = mapped_column(DECIMAL(10, 2), nullable=True)  
-    application_rate_unit: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)  
-    cost: Mapped[Optional[float]] = mapped_column(DECIMAL(10, 2), nullable=True)  
+    quantity_applied: Mapped[Optional[float]] = mapped_column(DECIMAL(10, 2), nullable=True)
+    application_rate: Mapped[Optional[float]] = mapped_column(DECIMAL(10, 2), nullable=True)
+    application_rate_unit: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    cost: Mapped[Optional[float]] = mapped_column(DECIMAL(10, 2), nullable=True)
 
     # Relationships
     farm_activity: Mapped["FarmActivity"] = relationship(back_populates="product_associations")
     product: Mapped["Product"] = relationship(back_populates="activity_associations")
 
     def __repr__(self):
-        return f"<ActivityProduct(id={self.id}, farm_activity_id={self.farm_activity_id}, product_id={self.product_id})>"
+        return (
+            f"<ActivityProduct(id={self.id}, farm_activity_id={self.farm_activity_id}, product_id={self.product_id})>"
+        )

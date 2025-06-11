@@ -75,9 +75,7 @@ class Field(Base):
 class FieldGroupMember(Base):
     __tablename__ = "field_group_member"
     field_id: Mapped[int] = mapped_column(ForeignKey(Field.id), primary_key=True)
-    field_group_id: Mapped[int] = mapped_column(
-        ForeignKey(FieldGroup.id), primary_key=True
-    )
+    field_group_id: Mapped[int] = mapped_column(ForeignKey(FieldGroup.id), primary_key=True)
 
     # Relationships to access the objects directly from the association object (optional)
     field: Mapped["Field"] = relationship(back_populates="field_group_associations")
@@ -92,9 +90,7 @@ class BoundaryDefinitionActivity(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     field_id: Mapped[int] = mapped_column(ForeignKey(Field.id), nullable=False)
     activity_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    platform_id: Mapped[int] = mapped_column(
-        ForeignKey(Platform.id), nullable=False
-    )
+    platform_id: Mapped[int] = mapped_column(ForeignKey(Platform.id), nullable=False)
     activity_timestamp: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     notes: Mapped[str | None] = mapped_column(TEXT, nullable=True)
 

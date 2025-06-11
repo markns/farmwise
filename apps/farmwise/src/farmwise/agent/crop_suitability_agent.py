@@ -1,8 +1,8 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
-from farmwise.schema import WhatsAppResponse
 
 from farmwise.dependencies import UserContext
+from farmwise.schema import WhatsAppResponse
 from farmwise.tools.farmbase import update_contact
 from farmwise.tools.tools import suitability_index
 

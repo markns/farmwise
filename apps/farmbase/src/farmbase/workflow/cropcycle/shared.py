@@ -10,6 +10,7 @@ with workflow.unsafe.imports_passed_through():
 
 class CropCycleEvent(BaseModel):
     """Represents a single crop cycle event"""
+
     event_type: str
     event_category: str
     title: str
@@ -24,6 +25,7 @@ class CropCycleEvent(BaseModel):
 
 class CropCycleWorkflowInput(BaseModel):
     """Input parameters for the crop cycle workflow"""
+
     contact_id: int
     contact_phone: str
     contact_name: str

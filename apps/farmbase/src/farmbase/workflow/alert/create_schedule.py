@@ -27,7 +27,9 @@ async def main():
                 cron_expressions=["0 * * * *"],  # Every hour at minute 0
                 time_zone_name="Africa/Nairobi",  # EAT timezone
             ),
-            state=ScheduleState(note="Farm alert workflow - runs every hour to check for new notes and send alerts to nearby farms."),
+            state=ScheduleState(
+                note="Farm alert workflow - runs every hour to check for new notes and send alerts to nearby farms."
+            ),
         ),
     )
     print("Farm alert schedule created successfully!")
