@@ -75,7 +75,7 @@ These are the details of the current user: {ctx.context}
 """
 
 
-soil_advisor: Agent[UserContext] = Agent(
+soil_advisor_agent: Agent[UserContext] = Agent(
     name="Soil advisor",
     handoff_description="An agent that can advises on soil management for farmers",
     instructions=soil_advisory_instructions,

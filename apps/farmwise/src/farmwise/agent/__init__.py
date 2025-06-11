@@ -12,8 +12,9 @@ from . import handoff_filters
 from .crop_pathogen_diagnosis_agent import crop_pathogen_diagnosis_agent
 from .crop_suitability_agent import crop_suitability_agent
 from .maize_variety_selector import maize_variety_selector
+from .market_price_agent import market_price_agent
 from .onboarding_agent import onboarding_agent
-from .soil_advisory_agent import soil_advisor
+from .soil_advisory_agent import soil_advisor_agent
 from .triage_agent import triage_agent
 
 
@@ -49,37 +50,22 @@ triage_agent_handoff = handoff(
         ],
     ),
 )
-crop_pathogen_diagnosis_agent_handoff = handoff(
-    agent=crop_pathogen_diagnosis_agent,
-    on_handoff=on_handoff,
-    input_type=HandoffInfo,
-    input_filter=handoff_filters.remove_whatsapp_interactivity,
-)
-crop_suitability_agent_handoff = handoff(
-    agent=crop_suitability_agent,
-    on_handoff=on_handoff,
-    input_type=HandoffInfo,
-    input_filter=handoff_filters.remove_whatsapp_interactivity,
-)
-maize_variety_selector_handoff = handoff(
-    agent=maize_variety_selector,
-    on_handoff=on_handoff,
-    input_type=HandoffInfo,
-    input_filter=handoff_filters.remove_whatsapp_interactivity,
-)
-soil_advisor_handoff = handoff(
-    agent=soil_advisor,
-    on_handoff=on_handoff,
-    input_type=HandoffInfo,
-    input_filter=handoff_filters.remove_whatsapp_interactivity,
-)
 
-handoffs = [
-    triage_agent_handoff,
-    crop_pathogen_diagnosis_agent_handoff,
-    crop_suitability_agent_handoff,
-    maize_variety_selector_handoff,
-    soil_advisor_handoff,
+handoffs = [triage_agent_handoff] + [
+    handoff(
+        agent=agent,
+        on_handoff=on_handoff,
+        input_type=HandoffInfo,
+        input_filter=handoff_filters.remove_whatsapp_interactivity,
+    )
+    for agent in (
+        crop_pathogen_diagnosis_agent,
+        crop_suitability_agent,
+        maize_variety_selector,
+        market_price_agent,
+        onboarding_agent,
+        soil_advisor_agent,
+    )
 ]
 
 triage_agent.handoffs = handoffs
@@ -87,7 +73,8 @@ maize_variety_selector.handoffs = [triage_agent_handoff]
 crop_suitability_agent.handoffs = [triage_agent_handoff]
 crop_pathogen_diagnosis_agent.handoffs = [triage_agent_handoff]
 onboarding_agent.handoffs = [triage_agent_handoff]
-soil_advisor.handoffs = [triage_agent_handoff]
+soil_advisor_agent.handoffs = [triage_agent_handoff]
+market_price_agent.handoffs = [triage_agent_handoff]
 
 ONBOARDING_AGENT = onboarding_agent.name
 DEFAULT_AGENT = triage_agent.name
@@ -116,7 +103,8 @@ agents = AgentDict(
         crop_suitability_agent.name: crop_suitability_agent,
         crop_pathogen_diagnosis_agent.name: crop_pathogen_diagnosis_agent,
         onboarding_agent.name: onboarding_agent,
-        soil_advisor.name: soil_advisor,
+        soil_advisor_agent.name: soil_advisor_agent,
+        market_price_agent.name: market_price_agent,
     },
 )
 

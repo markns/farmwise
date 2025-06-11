@@ -1,0 +1,29 @@
+### Get market snapshot for market ID 1
+GET http://localhost:8000/api/v1/markets/1/snapshot
+Accept: application/json
+
+### Get all markets (to see available market IDs)
+GET http://localhost:8000/api/v1/markets
+Accept: application/json
+
+### Get markets near Nairobi (latitude: -1.2921, longitude: 36.8219)
+GET http://localhost:8000/api/v1/markets?latitude=-1.2921&longitude=36.8219
+Accept: application/json
+
+### Get markets near Mombasa (latitude: -4.0435, longitude: 39.6682)
+GET http://localhost:8000/api/v1/markets?latitude=-4.0435&longitude=39.6682
+Accept: application/json
+
+#market_id,max
+#929,2023-01-31
+#1042,2023-03-01
+#865,2023-07-06
+#882,2023-10-31
+#1012,2024-06-20
+#1036,2024-08-30
+#1007,2024-10-10
+#1013,2025-06-05
+
+### Get market prices (to verify data exists)
+GET http://localhost:8000/api/v1/markets/prices
+Accept: application/json

@@ -20,8 +20,6 @@ from .schemas import (
 )
 from .service import (
     count_market_prices,
-    count_markets,
-    count_markets_near_location,
     create_market,
     create_market_price,
     delete_market,
@@ -67,24 +65,29 @@ async def get_markets(
     items_per_page: Annotated[int, Query(ge=1, le=100)] = 50,
     latitude: Annotated[float, Query(ge=-90, le=90)] = None,
     longitude: Annotated[float, Query(ge=-180, le=180)] = None,
+    price_within_days: int | None = None,
 ):
-    """Get all markets with pagination. Optionally filter by location within 50km of given lat/lon."""
+    """Get all markets with pagination. Optionally filter by location within 50km of given lat/lon
+    and with prices within a given recency"""
     offset = (page - 1) * items_per_page
 
     if latitude is not None and longitude is not None:
         markets = await get_markets_near_location(
-            db_session=db_session, latitude=latitude, longitude=longitude, limit=items_per_page, offset=offset
+            db_session=db_session,
+            latitude=latitude,
+            longitude=longitude,
+            limit=items_per_page,
+            offset=offset,
+            price_within_days=price_within_days,
         )
-        total = await count_markets_near_location(db_session=db_session, latitude=latitude, longitude=longitude)
     else:
         markets = await get_all_markets(db_session=db_session, limit=items_per_page, offset=offset)
-        total = await count_markets(db_session=db_session)
 
     return MarketPagination(
         items=[MarketRead.model_validate(market) for market in markets],
         items_per_page=items_per_page,
         page=page,
-        total=total,
+        total=len(markets),
     )
 
 

@@ -186,6 +186,7 @@ async def get_markets_near_location(
     distance_km: int = 50,
     limit: int = 100,
     offset: int = 0,
+    price_within_days: int | None = None,
 ) -> Sequence[Market]:
     """Returns markets within `distance_km` of the given latitude and longitude using PostGIS via GeoAlchemy2."""
     # Distance in metres
@@ -204,14 +205,32 @@ async def get_markets_near_location(
     # Ordering by actual distance
     distance_order = func.ST_Distance(market_loc_3857, point_geom)
 
-    result = await db_session.execute(
+    # 2. Subquery: latest date per market_id in market_prices
+    latest_date_sq = (
+        select(MarketPrice.market_id.label("mkt_id"), func.max(MarketPrice.date).label("max_date"))
+        .group_by(MarketPrice.market_id)
+        .subquery()
+    )
+
+    # 3. Build main query: join Market -> latest_date_sq, filter spatially…
+    stmt = (
         select(Market)
+        .join(latest_date_sq, Market.id == latest_date_sq.c.mkt_id)
         .where(Market.location.isnot(None))
         .where(distance_condition)
-        .order_by(distance_order)
-        .limit(limit)
-        .offset(offset)
     )
+
+    # 4. If price_within_days is given, add condition on latest date
+    if price_within_days is not None:
+        # Postgres: current_date - INTERVAL 'x days'
+        interval_text = text(f"INTERVAL '{price_within_days} days'")
+        cutoff_expr = func.current_date() - interval_text
+        stmt = stmt.where(latest_date_sq.c.max_date >= cutoff_expr)
+
+    # 5. Order, paginate
+    stmt = stmt.order_by(distance_order).limit(limit).offset(offset)
+
+    result = await db_session.execute(stmt)
     return result.scalars().all()
 
 

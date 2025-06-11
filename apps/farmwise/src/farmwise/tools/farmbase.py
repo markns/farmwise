@@ -2,8 +2,18 @@ from agents import RunContextWrapper, function_tool
 from farmbase_client import AuthenticatedClient
 from farmbase_client.api.contacts import contacts_patch_contact
 from farmbase_client.api.farms import farms_create_farm
+from farmbase_client.api.markets import markets_get_market_snapshot_endpoint, markets_get_markets
 from farmbase_client.api.notes import notes_create_note
-from farmbase_client.models import ContactPatch, ContactRead, FarmCreate, FarmRead, NoteCreate, NoteRead
+from farmbase_client.models import (
+    ContactPatch,
+    ContactRead,
+    FarmCreate,
+    FarmRead,
+    MarketPagination,
+    MarketSnapshotRead,
+    NoteCreate,
+    NoteRead,
+)
 
 from farmwise.dependencies import UserContext
 from farmwise.settings import settings
@@ -60,4 +70,28 @@ async def create_note(wrapper: RunContextWrapper[UserContext], note_create: Note
             organization=context.contact.organization.slug,
             body=note_create,
         )
+        return result
+
+
+@function_tool(
+    description_override="""
+Get the closest markets to a given coordinate
+"""
+)
+async def get_markets(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> MarketPagination:
+    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+        result = await markets_get_markets.asyncio(
+            client=client, items_per_page=10, latitude=latitude, longitude=longitude, price_within_days=30
+        )
+        return result
+
+
+@function_tool(
+    description_override="""
+Get a snapshot of market prices for a given market
+"""
+)
+async def get_market_price_snapshot(_: RunContextWrapper[UserContext], market_id: int) -> MarketSnapshotRead:
+    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+        result = await markets_get_market_snapshot_endpoint.asyncio(client=client, market_id=market_id)
         return result

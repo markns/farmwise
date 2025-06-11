@@ -22,6 +22,7 @@ def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[
             Section(
                 title="Farm Management",
                 rows=[
+                    SectionRow(title="Get market prices", callback_data="Get market prices"),
                     SectionRow(title="Register field", callback_data="Register field"),
                 ],
             ),
