@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from typing import Optional, Sequence
 
-from sqlalchemy import select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -176,3 +176,57 @@ async def get_market_snapshot(*, db_session: AsyncSession, market_id: int) -> Se
     )
 
     return result.scalars().all()
+
+
+async def get_markets_near_location(
+    *,
+    db_session: AsyncSession,
+    latitude: float,
+    longitude: float,
+    distance_km: int = 50,
+    limit: int = 100,
+    offset: int = 0,
+) -> Sequence[Market]:
+    """Returns markets within `distance_km` of the given latitude and longitude using PostGIS via GeoAlchemy2."""
+    # Distance in metres
+    distance_m = distance_km * 1000
+
+    # Build a POINT geometry in SRID 4326 and then transform to 3857
+    # Option A: using ST_MakePoint and ST_SetSRID
+    point_geom = func.ST_Transform(func.ST_SetSRID(func.ST_MakePoint(longitude, latitude), 4326), 3857)
+
+    # If Market.location is stored as Geometry with SRID 4326, transform it to 3857
+    market_loc_3857 = func.ST_Transform(Market.location, 3857)
+
+    # Spatial predicate: within distance
+    distance_condition = func.ST_DWithin(market_loc_3857, point_geom, distance_m)
+
+    # Ordering by actual distance
+    distance_order = func.ST_Distance(market_loc_3857, point_geom)
+
+    result = await db_session.execute(
+        select(Market)
+        .where(Market.location.isnot(None))
+        .where(distance_condition)
+        .order_by(distance_order)
+        .limit(limit)
+        .offset(offset)
+    )
+    return result.scalars().all()
+
+
+async def count_markets_near_location(*, db_session: AsyncSession, latitude: float, longitude: float) -> int:
+    """Returns the count of markets within 50km of the given latitude and longitude."""
+    # Create a point from the provided coordinates
+    point_wkt = f"POINT({longitude} {latitude})"
+
+    # Count markets within 50km
+    distance_condition = text(
+        f"ST_DWithin(ST_Transform(location, 3857), ST_Transform(ST_GeomFromText('{point_wkt}', 4326), 3857), 50000)"
+    )
+
+    result = await db_session.execute(
+        select(func.count(Market.id)).where(Market.location.isnot(None)).where(distance_condition)
+    )
+
+    return result.scalar_one()
