@@ -59,8 +59,8 @@ known-first-party = ["farmwise"]
 
 [tool.poe.tasks]
 # run with eg `uv run poe fmt`
-fmt = "ruff format"
-lint = "ruff check --fix"
+fmt = "ruff format apps"
+lint = "ruff check --fix apps"
 check = "pyright"
 test = "pytest"
 client-gen = "libs/farmbase-client/gen-client.sh"
