@@ -3,6 +3,7 @@ from collections import UserDict
 from typing import Callable
 
 from agents import HandoffInputData, RunContextWrapper, handoff
+from agents.extensions.handoff_filters import remove_all_tools
 from loguru import logger
 from pydantic import BaseModel, Field
 
@@ -44,10 +45,7 @@ triage_agent_handoff = handoff(
     input_type=HandoffInfo,
     input_filter=functools.partial(
         _apply_handoff_filters,
-        [
-            handoff_filters.remove_whatsapp_interactivity,
-            handoff_filters.remove_images,
-        ],
+        [handoff_filters.remove_whatsapp_interactivity, handoff_filters.remove_images, remove_all_tools],
     ),
 )
 
@@ -56,7 +54,10 @@ handoffs = [triage_agent_handoff] + [
         agent=agent,
         on_handoff=on_handoff,
         input_type=HandoffInfo,
-        input_filter=handoff_filters.remove_whatsapp_interactivity,
+        input_filter=functools.partial(
+            _apply_handoff_filters,
+            [handoff_filters.remove_whatsapp_interactivity, remove_all_tools],
+        ),
     )
     for agent in (
         crop_pathogen_diagnosis_agent,
