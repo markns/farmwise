@@ -7,6 +7,7 @@ from farmbase.models import PrimaryKey
 
 from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
 from .schemas import (
+    CommodityPriceSnapshot,
     MarketCreate,
     MarketPagination,
     MarketPriceCreate,
@@ -14,6 +15,7 @@ from .schemas import (
     MarketPriceRead,
     MarketPriceUpdate,
     MarketRead,
+    MarketSnapshotRead,
     MarketUpdate,
 )
 from .service import (
@@ -30,6 +32,7 @@ from .service import (
     get_market_price,
     get_market_prices_by_commodity,
     get_market_prices_by_market,
+    get_market_snapshot,
     update_market,
     update_market_price,
 )
@@ -128,6 +131,69 @@ async def delete_market_endpoint(
 
     await delete_market(db_session=db_session, market_id=market_id)
     return {"message": "Market deleted successfully"}
+
+
+@router.get("/{market_id}/snapshot", response_model=MarketSnapshotRead)
+async def get_market_snapshot_endpoint(
+    db_session: DbSession,
+    market_id: PrimaryKey,
+):
+    """Get market snapshot with latest prices (3 months) for each commodity traded in this market."""
+    market = await get_market(db_session=db_session, market_id=market_id)
+    if not market:
+        raise EntityDoesNotExistError(message="Market not found.")
+
+    market_prices = await get_market_snapshot(db_session=db_session, market_id=market_id)
+
+    # Group prices by commodity
+    from collections import defaultdict
+
+    grouped_prices = defaultdict(list)
+    for price in market_prices:
+        grouped_prices[price.commodity_id].append(price)
+
+    # Create commodity snapshots
+    commodity_snapshots = []
+    for commodity_id, prices in grouped_prices.items():
+        # Sort prices by date
+        prices.sort(key=lambda p: p.date or "")
+
+        # Extract the commodity (all prices have the same commodity)
+        commodity = prices[0].commodity
+
+        # Get consistent units and currency from the first non-null entry
+        wholesale_unit = None
+        wholesale_ccy = None
+        retail_unit = None
+        retail_ccy = None
+
+        for price in prices:
+            if not wholesale_unit and price.wholesale_unit:
+                wholesale_unit = price.wholesale_unit
+            if not wholesale_ccy and price.wholesale_ccy:
+                wholesale_ccy = str(price.wholesale_ccy)
+            if not retail_unit and price.retail_unit:
+                retail_unit = price.retail_unit
+            if not retail_ccy and price.retail_ccy:
+                retail_ccy = str(price.retail_ccy)
+
+        commodity_snapshot = CommodityPriceSnapshot(
+            commodity=commodity,
+            price_date=[price.date for price in prices],
+            supply_volume=[price.supply_volume for price in prices],
+            wholesale_price=[price.wholesale_price for price in prices],
+            wholesale_unit=wholesale_unit,
+            wholesale_ccy=wholesale_ccy,
+            retail_price=[price.retail_price for price in prices],
+            retail_unit=retail_unit,
+            retail_ccy=retail_ccy,
+        )
+        commodity_snapshots.append(commodity_snapshot)
+
+    return MarketSnapshotRead(
+        market=MarketRead.model_validate(market),
+        latest_prices=commodity_snapshots,
+    )
 
 
 # Market price endpoints

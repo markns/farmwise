@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from typing import Optional, Sequence
 
 from sqlalchemy import select
@@ -159,3 +160,19 @@ async def delete_market_price(*, db_session: AsyncSession, market_price_id: int)
     if market_price:
         await db_session.delete(market_price)
         await db_session.commit()
+
+
+async def get_market_snapshot(*, db_session: AsyncSession, market_id: int) -> Sequence[MarketPrice]:
+    """Returns all prices from the last 3 months for commodities traded in the given market."""
+    three_months_ago = date.today() - timedelta(days=90)
+
+    # Get all market prices for the market within the last 3 months
+    result = await db_session.execute(
+        select(MarketPrice)
+        .options(selectinload(MarketPrice.market), selectinload(MarketPrice.commodity))
+        .where(MarketPrice.market_id == market_id)
+        .where(MarketPrice.date >= three_months_ago)
+        .order_by(MarketPrice.commodity_id, MarketPrice.date)
+    )
+
+    return result.scalars().all()

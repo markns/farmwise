@@ -80,3 +80,30 @@ class MarketPricePagination(Pagination):
     """Model for paginated list of market prices."""
 
     items: List[MarketPriceRead] = Field(default_factory=list, description="List of market prices in the current page")
+
+
+class CommodityPriceSnapshot(FarmbaseBase):
+    """Model for commodity price data over time with arrays for each field."""
+
+    commodity: CommodityRead = Field(description="Commodity information")
+    price_date: List[date] = Field(description="List of price dates")
+    supply_volume: List[Optional[float]] = Field(description="List of supply volumes")
+    wholesale_price: List[Optional[float]] = Field(description="List of wholesale prices")
+    wholesale_unit: Optional[str] = Field(
+        default=None, description="Unit for wholesale price (consistent across dates)"
+    )
+    wholesale_ccy: Optional[str] = Field(
+        default=None, description="Currency for wholesale price (consistent across dates)"
+    )
+    retail_price: List[Optional[float]] = Field(description="List of retail prices")
+    retail_unit: Optional[str] = Field(default=None, description="Unit for retail price (consistent across dates)")
+    retail_ccy: Optional[str] = Field(default=None, description="Currency for retail price (consistent across dates)")
+
+
+class MarketSnapshotRead(FarmbaseBase):
+    """Model for reading Market snapshot data with latest prices for each commodity."""
+
+    market: MarketRead = Field(description="Market information")
+    latest_prices: List[CommodityPriceSnapshot] = Field(
+        description="Latest prices for each commodity in the market (last 3 months)"
+    )
