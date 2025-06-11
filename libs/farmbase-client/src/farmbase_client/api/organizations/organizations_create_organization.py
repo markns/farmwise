@@ -1,12 +1,18 @@
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, cast
 
 import httpx
 
-from ... import errors
+
 from ...client import AuthenticatedClient, Client
-from ...models import ErrorResponse, HTTPValidationError, OrganizationCreate, OrganizationRead
-from ...types import Response
+from ...types import Response, UNSET
+from ... import errors
+
+from ...models import ErrorResponse
+from ...models import HTTPValidationError
+from ...models import OrganizationCreate
+from ...models import OrganizationRead
+from typing import cast
 
 
 def _get_kwargs(
@@ -20,9 +26,8 @@ def _get_kwargs(
         "url": "/organizations",
     }
 
-    _body = body.to_dict()
+    _kwargs["json"] = body.to_dict()
 
-    _kwargs["json"] = _body
     headers["Content-Type"] = "application/json"
 
     _kwargs["headers"] = headers
