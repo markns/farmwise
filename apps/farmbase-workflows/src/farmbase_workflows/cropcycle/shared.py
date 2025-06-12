@@ -17,8 +17,8 @@ class CropCycleEvent(BaseModel):
     start_day: int
     end_day: int
     identifier: str
-    image_list: str | None = None
-    prevent_pathogens: str | None = None
+    image_list: dict | None = None
+    prevent_pathogens: list | None = None
     nutshell: str
     description: str
 

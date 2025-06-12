@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from temporalio import workflow
 from temporalio.common import RetryPolicy
 
+from ..whatsapp.activities import WhatsAppActivities
 from ..whatsapp.shared import SimpleContact
 from .activities import CropCycleActivities
 from .shared import CropCycleEvent
@@ -66,12 +67,22 @@ class CropCycleWorkflow:
 
     async def _send_event_message(self, contact: SimpleContact, event: CropCycleEvent, retry_policy: RetryPolicy):
         """Send WhatsApp template message for a crop cycle event"""
-        # await workflow.execute_activity_method(
-        #     WhatsAppActivities.send_whatsapp_template,
-        #     args=[contact, event.event_category, [event.title, event.nutshell, event.description]],
-        #     start_to_close_timeout=timedelta(seconds=10),
-        #     retry_policy=retry_policy,
-        # )
+
+        await workflow.execute_activity_method(
+            WhatsAppActivities.send_whatsapp_template,
+            args=[
+                contact,
+                "harvesting",
+                event.title,
+                [
+                    event.event_type,
+                    event.identifier.split("_")[0],  # todo: this is a hack
+                    event.description.replace("\n", "\r"),
+                ],
+            ],
+            start_to_close_timeout=timedelta(seconds=10),
+            retry_policy=retry_policy,
+        )
 
         # Log that the event was sent
         await workflow.execute_activity_method(

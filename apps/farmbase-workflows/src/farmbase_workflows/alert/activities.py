@@ -15,12 +15,12 @@ class AlertActivities:
     @activity.defn
     async def get_recent_notes(self) -> list[AlertDetails]:
         """Get notes created in the last hour."""
-        from farmbase.auth.models import FarmbaseUserOrganization
+        # from farmbase.auth.models import FarmbaseUserOrganization
         from farmbase.database.core import engine
         from farmbase.farm.models import Farm
         from farmbase.farm.note.models import Note
-
-        FarmbaseUserOrganization.organization
+        #
+        # FarmbaseUserOrganization.organization
 
         organization = "default"
         schema = f"farmbase_organization_{organization}"

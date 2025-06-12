@@ -3,8 +3,8 @@ from datetime import timedelta
 from temporalio import workflow
 from temporalio.common import RetryPolicy
 
-from ..whatsapp.activities import WhatsAppActivities
-from .activities import WeatherActivities
+from farmbase_workflows.weather.activities import WeatherActivities
+from farmbase_workflows.whatsapp.activities import WhatsAppActivities
 
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use
@@ -17,7 +17,7 @@ class SendWeatherWorkflow:
     @workflow.run
     async def run(self) -> str:
         retry_policy = RetryPolicy(
-            maximum_attempts=3,
+            maximum_attempts=1,
             maximum_interval=timedelta(seconds=2),
             non_retryable_error_types=[],
         )
@@ -44,7 +44,7 @@ class SendWeatherWorkflow:
             await workflow.execute_activity_method(
                 WhatsAppActivities.send_whatsapp_template,
                 # TODO: could used named params once https://github.com/david-lev/pywa/issues/115 is fixed
-                args=[contact, "weather_forecast", [forecast_summary.location] + forecast_summary.forecast],
+                args=[contact, "weather_forecast", None, [forecast_summary.location] + forecast_summary.forecast],
                 start_to_close_timeout=timedelta(seconds=10),
             )
 

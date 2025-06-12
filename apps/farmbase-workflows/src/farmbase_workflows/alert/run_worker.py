@@ -7,10 +7,10 @@ from temporalio import workflow
 from temporalio.client import Client
 from temporalio.worker import Worker
 
-from farmbase.workflow.cropcycle.activities import CropCycleActivities
-from farmbase.workflow.cropcycle.shared import CROP_CYCLE_TASK_QUEUE
-from farmbase.workflow.cropcycle.workflows import CropCycleWorkflow
-from farmbase.workflow.whatsapp.activities import WhatsAppActivities
+from farmbase_workflows.alert.activities import AlertActivities
+from farmbase_workflows.alert.workflows import FarmAlertWorkflow
+from farmbase_workflows.weather.shared import DEFAULT_TASK_QUEUE
+from farmbase_workflows.whatsapp.activities import WhatsAppActivities
 
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use
@@ -31,21 +31,23 @@ async def main():
         token=os.environ["WHATSAPP_TOKEN"],
     )
 
-    crop_cycle_activities = CropCycleActivities()
+    alert_activities = AlertActivities()
     whatsapp_activities = WhatsAppActivities(whatsapp_client=wa)
 
     async with Worker(
         client,
-        task_queue=CROP_CYCLE_TASK_QUEUE,
-        workflows=[CropCycleWorkflow],
+        task_queue=DEFAULT_TASK_QUEUE,
+        workflows=[FarmAlertWorkflow],
         activities=[
-            crop_cycle_activities.log_event_sent,
-            whatsapp_activities.send_whatsapp_template,
+            alert_activities.get_recent_notes,
+            alert_activities.find_nearby_farms,
+            alert_activities.generate_alert_message,
+            whatsapp_activities.send_whatsapp_message,
             whatsapp_activities.save_message,
         ],
     ):
         # Wait until interrupted
-        print("Crop cycle worker started, ctrl+c to exit")
+        print("Alert Worker started, ctrl+c to exit")
         await interrupt_event.wait()
         print("Shutting down")
 

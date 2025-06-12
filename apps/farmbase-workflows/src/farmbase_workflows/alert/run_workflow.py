@@ -4,8 +4,8 @@ import traceback
 from temporalio import workflow
 from temporalio.client import Client, WorkflowFailureError
 
-from farmbase.workflow.alert.workflows import FarmAlertWorkflow
-from farmbase.workflow.weather.shared import DEFAULT_TASK_QUEUE
+from farmbase_workflows.alert.workflows import FarmAlertWorkflow
+from farmbase_workflows.weather.shared import DEFAULT_TASK_QUEUE
 
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use

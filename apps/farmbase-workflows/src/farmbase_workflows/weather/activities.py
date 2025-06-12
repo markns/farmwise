@@ -10,14 +10,9 @@ from .shared import ForecastDetails, ForecastSummary
 class WeatherActivities:
     @activity.defn
     async def get_contacts_with_location(self):
-        from geoalchemy2.shape import to_shape
-
-        # TODO: fake import
-        from farmbase.auth.models import FarmbaseUserOrganization
         from farmbase.contact.service import get_all_with_location
         from farmbase.database.core import engine
-
-        FarmbaseUserOrganization.organization
+        from geoalchemy2.shape import to_shape
 
         organization = "default"
         schema = f"farmbase_organization_{organization}"

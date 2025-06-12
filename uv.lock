@@ -12,6 +12,7 @@ members = [
     "farmbase",
     "farmbase-agent-toolkit",
     "farmbase-client",
+    "farmbase-workflows",
     "farmwise",
     "farmwise-parent",
 ]
@@ -1505,6 +1506,103 @@ requires-dist = [{ name = "geojson-pydantic", specifier = ">=1.2.0" }]
 [package.metadata.requires-dev]
 dev = [
     { name = "poethepoet", specifier = ">0" },
+    { name = "pytest", specifier = ">0" },
+    { name = "ruff", specifier = ">0" },
+]
+
+[[package]]
+name = "farmbase-workflows"
+version = "0.1.0"
+source = { editable = "apps/farmbase-workflows" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "alembic" },
+    { name = "arcgis" },
+    { name = "asyncpg" },
+    { name = "email-validator" },
+    { name = "emails" },
+    { name = "fastapi", extra = ["standard"] },
+    { name = "geoalchemy2" },
+    { name = "geojson-pydantic" },
+    { name = "geopandas" },
+    { name = "loguru" },
+    { name = "matplotlib" },
+    { name = "openpyxl" },
+    { name = "pandas" },
+    { name = "passlib", extra = ["bcrypt"] },
+    { name = "phonenumbers" },
+    { name = "psycopg2-binary" },
+    { name = "pydantic-extra-types" },
+    { name = "pydantic-settings" },
+    { name = "pyjwt" },
+    { name = "python-jose" },
+    { name = "python-slugify" },
+    { name = "python-weather" },
+    { name = "rioxarray" },
+    { name = "schemathesis" },
+    { name = "sentry-sdk" },
+    { name = "slowapi" },
+    { name = "sqlalchemy", extra = ["asyncio"] },
+    { name = "sqlalchemy-filterset" },
+    { name = "sqlalchemy-utils" },
+    { name = "sqlmodel" },
+    { name = "tabulate" },
+    { name = "temporalio" },
+    { name = "xarray", extra = ["complete"] },
+    { name = "xvec" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "poethepoet" },
+    { name = "pymupdf" },
+    { name = "pytest" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiohttp", specifier = ">=3.11.18" },
+    { name = "alembic", specifier = ">=1.15.1" },
+    { name = "arcgis", specifier = ">=2.4.1" },
+    { name = "asyncpg", specifier = ">=0.30.0" },
+    { name = "email-validator", specifier = ">=2.2.0" },
+    { name = "emails", specifier = ">=0.6" },
+    { name = "fastapi", extras = ["standard"], specifier = ">=0.115.8" },
+    { name = "geoalchemy2", specifier = ">=0.17.1" },
+    { name = "geojson-pydantic", specifier = ">=1.2.0" },
+    { name = "geopandas", specifier = ">=1.0.1" },
+    { name = "loguru", specifier = ">=0.7.3" },
+    { name = "matplotlib", specifier = ">=3.10.1" },
+    { name = "openpyxl", specifier = ">=3.1.5" },
+    { name = "pandas", specifier = ">=2.2.3" },
+    { name = "passlib", extras = ["bcrypt"], specifier = ">=1.7.4" },
+    { name = "phonenumbers", specifier = ">=9.0.4" },
+    { name = "psycopg2-binary", specifier = ">=2.9.10" },
+    { name = "pydantic-extra-types", specifier = ">=2.10.4" },
+    { name = "pydantic-settings", specifier = ">=2.6.1" },
+    { name = "pyjwt", specifier = ">=2.10.1" },
+    { name = "python-jose", specifier = ">=3.4.0" },
+    { name = "python-slugify", specifier = ">=8.0.4" },
+    { name = "python-weather", specifier = ">=2.0.7" },
+    { name = "rioxarray", specifier = ">=0.19.0" },
+    { name = "schemathesis", specifier = ">=3.39.16" },
+    { name = "sentry-sdk", specifier = ">=2.23.1" },
+    { name = "slowapi", specifier = ">=0.1.9" },
+    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.39" },
+    { name = "sqlalchemy-filterset", specifier = ">=2.3.0" },
+    { name = "sqlalchemy-utils", specifier = ">=0.41.2" },
+    { name = "sqlmodel", specifier = ">=0.0.24" },
+    { name = "tabulate", specifier = ">=0.9.0" },
+    { name = "temporalio", specifier = ">=1.11.1" },
+    { name = "xarray", extras = ["complete"], specifier = ">=2025.3.1" },
+    { name = "xvec", specifier = ">=0.3.1" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "poethepoet", specifier = ">0" },
+    { name = "pymupdf", specifier = ">=1.25.5" },
     { name = "pytest", specifier = ">0" },
     { name = "ruff", specifier = ">0" },
 ]

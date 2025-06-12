@@ -15,18 +15,23 @@ class WhatsAppActivities:
         self.whatsapp = whatsapp_client
 
     @activity.defn
-    async def send_whatsapp_template(self, contact: SimpleContact, template_name: str, values: list[str]):
+    async def send_whatsapp_template(
+        self, contact: SimpleContact, template_name: str, header: str, body_values: list[str]
+    ):
         from loguru import logger
         from pywa_async.types import Template
         from pywa_async.types.sent_message import SentTemplate
 
+        body_values = [
+            Template.TextValue(s.replace("\n", " ").replace("\r", " ").replace("    ", " ")[:500]) for s in body_values
+        ]
         resp: SentTemplate = await self.whatsapp.send_template(
             to=contact.phone_number,
             template=Template(
                 name=template_name,
                 language=Template.Language.ENGLISH,
-                # header=Template.TextValue(value="15"),
-                body=[Template.TextValue(s) for s in values],
+                header=Template.TextValue(header.replace("\n", " ")) if header else None,
+                body=body_values,
                 # buttons=[
                 #   Template.UrlButtonValue(value="iphone15"),
                 #   Template.QuickReplyButtonData(data="unsubscribe_from_marketing_messages"),

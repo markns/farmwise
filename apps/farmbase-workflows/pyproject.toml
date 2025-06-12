@@ -1,5 +1,5 @@
 [project]
-name = "farmbase"
+name = "farmbase-workflows"
 version = "0.1.0"
 description = ""
 readme = "README.md"
@@ -36,6 +36,7 @@ dependencies = [
     "pydantic-extra-types>=2.10.4",
     "phonenumbers>=9.0.4",
     "loguru>=0.7.3",
+    "temporalio>=1.11.1",
     "xarray[complete]>=2025.3.1",
     "python-weather>=2.0.7",
     "openpyxl>=3.1.5",
@@ -43,20 +44,15 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "alembic-postgresql-enum>=1.7.0",
-    "pdfplumber>=0.11.6",
-    #    "basedpyright>0",
     "poethepoet>0",
     "pymupdf>=1.25.5",
     "pytest>0",
     "ruff>0",
 ]
 
-[project.entry-points."farmbase.plugins"]
-farmbase_basic_auth = "farmbase.plugins.farmbase_core.plugin:BasicAuthProviderPlugin"
-farmbase_header_auth = "farmbase.plugins.farmbase_core.plugin:HeaderAuthProviderPlugin"
 
 [tool.uv.sources]
+farmbase = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
