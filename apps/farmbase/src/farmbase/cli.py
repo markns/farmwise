@@ -7,29 +7,11 @@ import click
 import uvicorn
 
 from farmbase import __version__, config
-from farmbase.auth.models import FarmbaseUserOrganization
 from farmbase.config import FARMBASE_UI_URL
-from farmbase.contact.models import Contact
 from farmbase.enums import UserRoles
 from farmbase.exceptions.exceptions import FarmBaseApiError
 from farmbase.extensions import configure_extensions
-from farmbase.farm.models import Farm
-from farmbase.geospatial.models import Region
-from farmbase.market.models import Market
-from farmbase.message.models import Message
 from farmbase.plugin.models import PluginInstance
-from farmbase.products.models import Product
-from farmbase.runresult.models import Agent
-
-# TODO: How to import models more cleanly?
-Contact.id
-FarmbaseUserOrganization.farmbase_user
-Agent.id
-Message.id
-Product.id
-Farm.id
-Region.id
-Market.id
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
