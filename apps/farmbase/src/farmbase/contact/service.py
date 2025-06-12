@@ -75,7 +75,6 @@ async def get_all_with_location(*, db_session: AsyncSession) -> Sequence[tuple[C
         .join(FarmContact.farm)
         .where(Farm.location.is_not(None))
         .options(selectinload(Contact.farm_associations).selectinload(FarmContact.farm))
-        .distinct()
     )
 
     result = await db_session.execute(stmt)
