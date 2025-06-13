@@ -27,6 +27,10 @@ class Commands(Enum):
 async def _send_response(response: WhatsAppResponse, msg: BaseUserUpdateAsync):
     if Action.request_location in response.actions:
         await msg.reply_location_request(response.content)
+    elif response.image_url:
+        await msg.reply_image(image=response.image_url, caption=response.content)
+    # elif reponse.product:
+    #     await msg.reply_product()
     elif response.section_list:
         await msg.reply_text(
             text=_convert_md_to_whatsapp(response.content),

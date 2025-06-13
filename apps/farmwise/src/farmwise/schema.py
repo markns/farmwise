@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Annotated, Any, Literal, NotRequired
 
+from annotated_types import Len
 from pydantic import BaseModel, Field, StringConstraints
 from typing_extensions import TypedDict
 
@@ -112,7 +113,7 @@ class SectionRow(BaseModel):
 
 class Section(BaseModel):
     title: Annotated[str, StringConstraints(max_length=24)]
-    rows: list[SectionRow]
+    rows: Annotated[list[SectionRow], Len(min_length=1, max_length=10)]
 
 
 class SectionList(BaseModel):
@@ -126,6 +127,7 @@ class WhatsAppResponse(BaseModel):
         default=[],
         description="Actions that can be requested from the client. Should be left empty unless specified.",
     )
+    image_url: str | None = Field(default=None, description="An image url that should be sent to the user.")
     buttons: list[Button] = Field(
         default=[],
         description="Buttons that can be added to the response. Should be left empty unless specified.",
@@ -133,7 +135,8 @@ class WhatsAppResponse(BaseModel):
     section_list: SectionList | None = Field(
         default=None, description="Section list with multiple choice options. Should be left null unless specified."
     )
-    # debug_info: str | None = Field(
+    # product:
+    # TODO: debug_info: str | None = Field(
     #     description="This field can be used by the LLM to tell the user that it's not clear how to respond, "
     #     "and how the user can improve subsequent requests"
     # )
