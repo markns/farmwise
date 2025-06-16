@@ -48,10 +48,7 @@ async def text_to_speech(text) -> SynthesizeSpeechResponse:
         output_filename (str): The name of the output audio file.
     """
     # Instantiates a client
-    client = texttospeech.TextToSpeechAsyncClient.from_service_account_file(
-        "/Users/markns/workspace/farmwise/farmwise-462814-78c4e5f84e32.json"
-    )
-    # client = texttospeech.TextToSpeechAsyncClient(credentials=)
+    client = texttospeech.TextToSpeechAsyncClient()
 
     # Set the text input to be synthesized
     synthesis_input = texttospeech.SynthesisInput(text=text)
