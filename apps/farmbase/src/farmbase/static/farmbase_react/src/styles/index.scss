@@ -1,0 +1,49 @@
+// Global styles for Farmbase React app
+
+// Reset and base styles
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+// App root styles
+.app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+// Link styles similar to Vue app
+a {
+  color: rgb(25, 118, 210); // Material-UI primary color
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Page wrapper for consistent spacing
+.page-wrapper {
+  min-height: calc(100vh - 64px - 50px - 81px);
+}
+
+// Setting fab styles (if needed)
+.setting-fab {
+  top: 50% !important;
+  right: 0;
+  border-radius: 0;
+}
+
+// Import any additional styles from the original Vue app
+// These would need to be converted from the original SCSS files
