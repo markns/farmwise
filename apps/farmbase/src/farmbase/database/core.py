@@ -48,7 +48,7 @@ def create_db_engine(connection_string: str, echo=False):
 
 
 # Create the default engine with standard timeout
-engine = create_db_engine(config.SQLALCHEMY_DATABASE_URI, echo=True)
+engine = create_db_engine(config.SQLALCHEMY_DATABASE_URI, echo=False)
 engine_sync = create_db_engine(config.SQLALCHEMY_DATABASE_SYNC_URI, echo=True)
 
 # Enable query timing logging
