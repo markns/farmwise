@@ -10,9 +10,9 @@
         <span class="text-h5">Data Query Filters</span>
       </v-card-title>
       <v-list density="compact">
-        <v-list-item>
-          <project-combobox v-model="local_project" label="Projects" />
-        </v-list-item>
+<!--        <v-list-item>-->
+<!--          <project-combobox v-model="local_project" label="Projects" />-->
+<!--        </v-list-item>-->
         <v-list-item>
           <tag-type-filter-combobox v-model="local_tag_type" label="Tag Types" />
         </v-list-item>
@@ -45,9 +45,6 @@ export default {
   name: "QueryTableFilterDialog",
 
   components: {
-    ProjectCombobox,
-    TagFilterAutoComplete,
-    TagTypeFilterCombobox,
   },
 
   props: {

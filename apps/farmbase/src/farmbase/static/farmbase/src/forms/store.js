@@ -5,7 +5,6 @@ import { toUSD } from "@/filters"
 import SearchUtils from "@/search/utils"
 import FormsTypeApi from "@/forms/types/api"
 import FormsApi from "@/forms/api"
-import IncidentApi from "@/incident/api"
 
 const hasFormkitPro = import.meta.env.VITE_FORMKIT_PRO_PROJECT_KEY
 

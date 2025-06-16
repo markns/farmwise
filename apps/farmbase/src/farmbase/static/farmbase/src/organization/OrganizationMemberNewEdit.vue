@@ -99,9 +99,6 @@
                 <span class="text-subtitle-2">Settings</span>
               </v-col>
               <v-col cols="12">
-                <v-list-item>
-                  <project-combobox v-model="defaultProjects" label="Default Projects" />
-                </v-list-item>
               </v-col>
             </v-row>
           </v-container>
@@ -118,7 +115,6 @@ import { map } from "lodash"
 import { mapFields } from "vuex-map-fields"
 import { mapActions } from "vuex"
 
-import ProjectCombobox from "@/project/ProjectCombobox.vue"
 
 export default {
   setup() {
@@ -129,7 +125,6 @@ export default {
   name: "MemberEditSheet",
 
   components: {
-    ProjectCombobox,
   },
 
   computed: {

@@ -55,24 +55,12 @@
 <script>
 import { mapState } from "vuex"
 import { mapActions } from "vuex"
-import IncidentSummaryTable from "@/incident/IncidentSummaryTable.vue"
-import CaseSummaryTable from "@/case/CaseSummaryTable.vue"
-import TaskSummaryTable from "@/task/TaskSummaryTable.vue"
-import SourceSummaryTable from "@/data/source/SourceSummaryTable.vue"
 import QuerySummaryTable from "@/data/query/QuerySummaryTable.vue"
-import DocumentSummaryTable from "@/document/DocumentSummaryTable.vue"
-import TagSummaryTable from "@/tag/TagSummaryTable.vue"
 
 export default {
   name: "SearchResultList",
   components: {
-    IncidentSummaryTable,
-    CaseSummaryTable,
-    TaskSummaryTable,
-    DocumentSummaryTable,
-    SourceSummaryTable,
     QuerySummaryTable,
-    TagSummaryTable,
   },
   data() {
     return {}

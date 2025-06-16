@@ -12,7 +12,6 @@ const getDefaultSelectedState = () => {
     description: null,
     source: null,
     text: null,
-    project: null,
     language: null,
   }
 }

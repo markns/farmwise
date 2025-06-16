@@ -5,7 +5,7 @@
       <organization-banner />
       <v-app-bar flat style="border-bottom: 1px solid #d2d2d2 !important" color="background0">
         <template #prepend>
-          <router-link :to="{ name: 'IncidentOverview' }" style="text-decoration: none">
+          <router-link :to="{ name: 'FarmsTable' }" style="text-decoration: none">
             <span class="button font-weight-bold">F A R M W I S E</span>
           </router-link>
         </template>

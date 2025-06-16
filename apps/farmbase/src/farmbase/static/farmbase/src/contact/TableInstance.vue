@@ -175,7 +175,6 @@ import {mapFields} from "vuex-map-fields"
 import {mapActions} from "vuex"
 import {formatDate, formatRelativeDate} from "@/filters"
 
-import CasePopover from "@/case/CasePopover.vue"
 import RawContactViewer from "@/contact/RawContactViewer.vue"
 import RouterUtils from "@/router/utils"
 import ContactPopover from "@/contact/ContactPopover.vue"
@@ -186,7 +185,6 @@ export default {
   name: "ContactInstanceTable",
 
   components: {
-    CasePopover,
     RawContactViewer,
     ContactPopover,
     TableFilterDialog,

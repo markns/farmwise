@@ -2,7 +2,7 @@
   <v-app-bar flat style="border-bottom: 1px solid #d2d2d2 !important" color="background0">
     <template #prepend>
       <router-link
-        :to="{ name: 'IncidentOverview' }"
+        :to="{ name: 'FarmsTable' }"
         style="text-decoration: none"
         class="d-flex align-center"
       >

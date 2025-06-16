@@ -10,7 +10,6 @@ const getDefaultSelectedState = () => {
     id: null,
     email: null,
     loading: false,
-    projects: null,
     role: null,
     password: null,
   }
@@ -23,7 +22,6 @@ const state = {
     loggedIn: false,
     token: null,
     email: "",
-    projects: [],
     role: null,
     experimental_features: false,
   },
@@ -83,7 +81,6 @@ const actions = {
       })
     } else {
       return UserApi.update(state.selected.id, state.selected).then(() => {
-        commit("SET_USER_PROJECTS", state.selected.projects)
         dispatch("closeCreateEdit")
         dispatch("getAll")
         commit("SET_SELECTED_LOADING", false)
@@ -123,9 +120,8 @@ const actions = {
     commit("SET_BASIC_LOGIN_LOADING", true)
     UserApi.login(payload.email, payload.password).then(function (response) {
       commit("SET_USER_LOGIN", response.data.token)
-      commit("SET_USER_PROJECTS", response.data.projects)
       router.push({
-        name: "IncidentOverview",
+        name: "FarmsTable",
       })
     })
     commit("SET_BASIC_LOGIN_LOADING", false)
@@ -134,7 +130,7 @@ const actions = {
     UserApi.register(payload.email, payload.password).then(function (response) {
       commit("SET_USER_LOGIN", response.data.token)
       router.push({
-        name: "IncidentOverview",
+        name: "FarmsTable",
       })
     })
   },
@@ -210,9 +206,6 @@ const mutations = {
   },
   SET_USER_LOGOUT(state) {
     state.currentUser = { loggedIn: false }
-  },
-  SET_USER_PROJECTS(state, value) {
-    state.currentUser.projects = value
   },
 }
 

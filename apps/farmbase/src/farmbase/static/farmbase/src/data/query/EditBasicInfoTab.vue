@@ -46,9 +46,6 @@
 import { required } from "@/util/form"
 import { mapFields } from "vuex-map-fields"
 
-import TagFilterAutoComplete from "@/tag/TagPicker.vue"
-import ProjectSelect from "@/project/ProjectSelect.vue"
-import SourceSelect from "@/data/source/SourceSelect.vue"
 
 export default {
   setup() {
@@ -59,9 +56,6 @@ export default {
   name: "QueryDetailsTab",
 
   components: {
-    TagFilterAutoComplete,
-    ProjectSelect,
-    SourceSelect,
   },
 
   computed: {
