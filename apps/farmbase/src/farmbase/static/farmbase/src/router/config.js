@@ -140,7 +140,7 @@ export const protectedRoute = [
       path: "data",
       component: DefaultLayout,
       name: "Data",
-      // redirect: { name: "SourceTable" },
+      // redirect: { name: "QuerySummaryTable" },
       meta: {
         title: "Data",
         icon: "mdi-database",
