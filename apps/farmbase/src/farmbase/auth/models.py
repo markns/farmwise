@@ -266,7 +266,7 @@ class UserRegisterResponse(FarmbaseBase):
 
 
 class UserPagination(Pagination):
-    items: List[UserRead] = []
+    items: List[UserRead] = Field(default_factory=list, description="List of users in the current page")
 
 
 class MfaChallengeStatus(FarmbaseEnum):

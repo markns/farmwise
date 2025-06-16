@@ -1,11 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import ValidationError
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from farmbase.auth.permissions import (
     OrganizationMemberPermission,
     PermissionsDependency,
 )
-from farmbase.auth.service import CurrentUser, get_org_users
+from farmbase.auth.service import CurrentUser
 from farmbase.database.core import DbSession
 from farmbase.enums import UserRoles
 from farmbase.exceptions.exceptions import (
@@ -15,8 +19,11 @@ from farmbase.models import OrganizationSlug, PrimaryKey
 from farmbase.organization.models import OrganizationRead
 
 from ..config import FARMBASE_AUTH_REGISTRATION_ENABLED
+from .filterset import UserFilterSet, UserQueryParams
 from .models import (
     AdminPasswordReset,
+    FarmbaseUser,
+    FarmbaseUserOrganization,
     UserCreate,
     UserLogin,
     UserLoginResponse,
@@ -28,7 +35,7 @@ from .models import (
     UserRegisterResponse,
     UserUpdate,
 )
-from .service import create, get, get_by_email, get_org_users, update
+from .service import create, get, get_by_email, update
 
 auth_router = APIRouter()
 user_router = APIRouter()
@@ -47,36 +54,28 @@ user_router = APIRouter()
     ],
     response_model=UserPagination,
 )
-async def get_users(db_session: DbSession, organization: OrganizationSlug):
+async def get_users(
+    db_session: DbSession, organization: OrganizationSlug, query_params: Annotated[UserQueryParams, Query()]
+):
     """Gets all organization users."""
     # common["filter_spec"] = {"and": [{"model": "Organization", "op": "==", "field": "slug", "value": organization}]}
 
     # options = [selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization),
     #         selectinload(FarmbaseUser.projects).selectinload(FarmbaseUserProject.project)]
 
-    # TODO: filters and pagination is broken. Maybe this will work for the time being.
-    users = await get_org_users(db_session=db_session)
-    items = {
-        "items_per_page": len(users),
-        # "page": common["page"],
-        "items": users,
-        "total": len(users),
-    }
-
-    return {
-        "items": [
-            {
-                "id": u.id,
-                "email": u.email,
-                "projects": u.projects,
-                "role": await u.get_organization_role(organization),
-            }
-            for u in items["items"]
-        ],
-        "items_per_page": items["items_per_page"],
-        "page": items["page"],
-        "total": items["total"],
-    }
+    stmt = select(FarmbaseUser).options(
+        selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization)
+    )
+    filter_set = UserFilterSet(db_session, stmt)
+    params_d = query_params.model_dump(exclude_none=True)
+    total = await filter_set.count(params_d)
+    users = await filter_set.filter(params_d)
+    return UserPagination(
+        items=users,
+        items_per_page=query_params.items_per_page,
+        page=query_params.page,
+        total=total,
+    )
 
 
 @user_router.post(
