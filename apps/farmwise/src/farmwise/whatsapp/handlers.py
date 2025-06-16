@@ -7,8 +7,10 @@ from loguru_logging_intercept import InterceptHandler
 from pywa.types import Button, Command, Section, SectionList, SectionRow
 from pywa_async import WhatsApp, filters, types
 from pywa_async.types.base_update import BaseUserUpdateAsync
+from pywa_async.types.others import Contact as PywaContact
 
-from farmwise.schema import Action, UserInput, WhatsAppResponse
+from farmwise.schema import Action, AudioResponse, Contact, UserInput, WhatsAppResponse
+from farmwise.schema import SectionList as FarmwiseSectionList
 from farmwise.service import farmwise
 from farmwise.settings import settings
 from farmwise.whatsapp.utils import _convert_md_to_whatsapp
@@ -25,40 +27,115 @@ class Commands(Enum):
 
 
 async def _send_response(response: WhatsAppResponse, msg: BaseUserUpdateAsync):
+    """Send a WhatsApp response using the appropriate message type based on response content."""
+
+    # Priority 1: Location request (highest priority)
     if Action.request_location in response.actions:
         await msg.reply_location_request(response.content)
-    elif response.image_url:
-        await msg.reply_image(image=response.image_url, caption=response.content)
-    # elif reponse.product:
-    #     await msg.reply_product()
-    elif response.section_list:
-        await msg.reply_text(
-            text=_convert_md_to_whatsapp(response.content),
-            # todo: use pywa types directly in WhatsappResponse to prevent this reconstruction?
-            buttons=SectionList(
-                # TODO: Should have a better way of meeting the char and list size limits
-                response.section_list.button_title[:20],
-                sections=[
-                    Section(
-                        title=section.title[:24],
-                        rows=[
-                            SectionRow(title=row.title[:24], callback_data=row.callback_data)
-                            for row in section.rows[:10]
-                        ],
-                    )
-                    for section in response.section_list.sections[:10]
-                ],
-            ),
-        )
+        return
+
+    # Prepare interactive elements that can be used with various message types
+    buttons = None
+    section_list = None
+
+    if response.section_list:
+        section_list = _convert_to_pywa_section_list(response.section_list)
     elif response.buttons:
         if len(response.buttons) > 3:
             logger.warning(f"Max allowed buttons: 3. {response}")
-        await msg.reply_text(
-            _convert_md_to_whatsapp(response.content),
-            buttons=[Button(b.title[:20], b.callback_data) for b in response.buttons[:3]],
+        buttons = [Button(b.title[:20], b.callback_data) for b in response.buttons[:3]]
+
+    # Priority 2: Media messages (can include buttons/section_lists)
+    if response.image_url:
+        await msg.reply_image(
+            image=response.image_url,
+            caption=response.content,
+            buttons=section_list or buttons,
         )
-    else:
-        await msg.reply_text(_convert_md_to_whatsapp(response.content))
+        return
+
+    # Priority 3: Contact sharing
+    if response.contact:
+        contact = _convert_to_pywa_contact(response.contact)
+        await msg.reply_contact(contact=contact)
+        # If there are buttons/section_lists, send them in a follow-up text message
+        if section_list or buttons:
+            await msg.reply_text(
+                text=_convert_md_to_whatsapp(response.content) if response.content else "Choose an option:",
+                buttons=section_list or buttons,
+            )
+        return
+
+    # Priority 4: Product sharing
+    if response.product:
+        await msg.reply_product(
+            catalog_id=response.product.catalog_id,
+            sku=response.product.sku,
+            body=response.product.body,
+            footer=response.product.footer,
+        )
+        # If there are buttons/section_lists, send them in a follow-up text message
+        if section_list or buttons:
+            await msg.reply_text(
+                text=_convert_md_to_whatsapp(response.content) if response.content else "Choose an option:",
+                buttons=section_list or buttons,
+            )
+        return
+
+    # Priority 5: Interactive text messages with section lists or buttons
+    if section_list or buttons:
+        await msg.reply_text(
+            text=_convert_md_to_whatsapp(response.content),
+            buttons=section_list or buttons,
+        )
+        return
+
+    # Priority 6: Plain text message (default)
+    await msg.reply_text(_convert_md_to_whatsapp(response.content))
+
+
+def _convert_to_pywa_contact(contact: Contact) -> PywaContact:
+    """Convert our Contact model to pywa Contact type."""
+
+    # Create name object
+    name = PywaContact.Name(formatted_name=contact.name)
+
+    # Create phone list if phone is provided
+    phones = []
+    if contact.phone:
+        phones.append(PywaContact.Phone(phone=contact.phone, wa_id=contact.phone, type="MOBILE"))
+
+    # Create email list if email is provided
+    emails = []
+    if contact.email:
+        emails.append(PywaContact.Email(email=contact.email, type="WORK"))
+
+    # Create organization list if organization is provided
+    orgs = []
+    if contact.organization:
+        orgs.append(PywaContact.Org(company=contact.organization))
+
+    return PywaContact(
+        name=name,
+        phones=phones,
+        emails=emails,
+        orgs=orgs,
+    )
+
+
+def _convert_to_pywa_section_list(section_list: FarmwiseSectionList) -> SectionList:
+    """Convert our SectionList model to pywa SectionList type."""
+    return SectionList(
+        # TODO: Should have a better way of meeting the char and list size limits
+        section_list.button_title[:20],
+        sections=[
+            Section(
+                title=section.title[:24],
+                rows=[SectionRow(title=row.title[:24], callback_data=row.callback_data) for row in section.rows[:10]],
+            )
+            for section in section_list.sections[:10]
+        ],
+    )
 
 
 # TODO: Chat opened is not being triggered...
@@ -102,6 +179,10 @@ async def location_handler(_: WhatsApp, msg: types.Message):
             await msg.indicate_typing()
 
 
+async def _send_audio_response(response: AudioResponse, msg):
+    await msg.reply_audio(audio=response.audio, mime_type="audio/ogg")
+
+
 @WhatsApp.on_message(filters.text)
 async def message_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"MESSAGE USER: {msg}")
@@ -113,9 +194,16 @@ async def message_handler(_: WhatsApp, msg: types.Message):
         user_name=msg.from_user.name,
     )
 
-    response = await farmwise.invoke(user_input)
-    async for event in response:
-        await _send_response(event.response, msg)
+    response_events = await farmwise.invoke(user_input)
+    async for event in response_events:
+        match event.response:
+            case WhatsAppResponse():
+                await _send_response(event.response, msg)
+            case AudioResponse():
+                await _send_audio_response(event.response, msg)
+            case _:
+                print("Unknown response type")
+
         if event.has_more:
             await msg.indicate_typing()
 
@@ -131,9 +219,16 @@ async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
         user_name=sel.from_user.name,
     )
 
-    response = await farmwise.invoke(user_input)
-    async for event in response:
-        await _send_response(event.response, sel)
+    response_events = await farmwise.invoke(user_input)
+    async for event in response_events:
+        match event.response:
+            case WhatsAppResponse():
+                await _send_response(event.response, sel)
+            case AudioResponse():
+                await _send_audio_response(event.response, sel)
+            case _:
+                print("Unknown response type")
+
         if event.has_more:
             await sel.indicate_typing()
 
@@ -149,9 +244,16 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
         user_name=btn.from_user.name,
     )
 
-    response = await farmwise.invoke(user_input)
-    async for event in response:
-        await _send_response(event.response, btn)
+    response_events = await farmwise.invoke(user_input)
+    async for event in response_events:
+        match event.response:
+            case WhatsAppResponse():
+                await _send_response(event.response, btn)
+            case AudioResponse():
+                await _send_audio_response(event.response, btn)
+            case _:
+                print("Unknown response type")
+
         if event.has_more:
             await btn.indicate_typing()
 
@@ -173,9 +275,16 @@ async def image_handler(_: WhatsApp, msg: types.Message):
         user_name=msg.from_user.name,
     )
 
-    response = await farmwise.invoke(user_input)
-    async for event in response:
-        await _send_response(event.response, msg)
+    response_events = await farmwise.invoke(user_input)
+    async for event in response_events:
+        match event.response:
+            case WhatsAppResponse():
+                await _send_response(event.response, msg)
+            case AudioResponse():
+                await _send_audio_response(event.response, msg)
+            case _:
+                print("Unknown response type")
+
         if event.has_more:
             await msg.indicate_typing()
 
@@ -204,5 +313,4 @@ async def voice_handler(_: WhatsApp, msg: types.Message):
 
 @WhatsApp.on_raw_update
 async def raw_update_handler(_: WhatsApp, update: dict):
-    # logger.warning(f"RAW UPDATE: {update}")
-    ...
+    logger.warning(f"RAW UPDATE: {update}")

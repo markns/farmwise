@@ -19,6 +19,8 @@ from agents.voice import SingleAgentVoiceWorkflow, TTSModelSettings, VoicePipeli
 from farmbase_client import AuthenticatedClient
 from farmbase_client.api.runresult import runresult_create_run_result as create_run_result
 from farmbase_client.models import AgentBase, ChatState, RunResultCreate
+from google.cloud import texttospeech
+from google.cloud.texttospeech_v1 import SynthesizeSpeechResponse
 from loguru import logger
 from openai import OpenAI
 from openai.types.responses import (
@@ -32,8 +34,49 @@ from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input, write_stream_to_ogg
 from farmwise.dependencies import UserContext, chat_state, user_context
 from farmwise.hooks import LoggingHooks
-from farmwise.schema import ResponseEvent, UserInput, WhatsAppResponse
+from farmwise.schema import AudioResponse, ResponseEvent, UserInput, WhatsAppResponse
 from farmwise.settings import settings
+
+
+async def text_to_speech(text) -> SynthesizeSpeechResponse:
+    """
+    Synthesizes speech from the input string of text with a
+    South African English accent and saves it to a file.
+
+    Args:
+        text (str): The text to synthesize.
+        output_filename (str): The name of the output audio file.
+    """
+    # Instantiates a client
+    client = texttospeech.TextToSpeechAsyncClient.from_service_account_file(
+        "/Users/markns/workspace/farmwise/farmwise-462814-78c4e5f84e32.json"
+    )
+    # client = texttospeech.TextToSpeechAsyncClient(credentials=)
+
+    # Set the text input to be synthesized
+    synthesis_input = texttospeech.SynthesisInput(text=text)
+
+    # Build the voice request, select the language code ("en-ZA" for
+    # South African English) and the ssml voice gender ("NEUTRAL")
+    # You can also specify a specific voice name. To get a list of available
+    # voices, you can use client.list_voices().
+    voice = texttospeech.VoiceSelectionParams(
+        language_code="en-ZA",
+        ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
+        # Example of specifying a specific voice name:
+        # name="en-ZA-Standard-A",
+    )
+
+    # Select the type of audio file you want returned
+    audio_config = texttospeech.AudioConfig(
+        # Set the audio encoding to MP3
+        audio_encoding=texttospeech.AudioEncoding.OGG_OPUS
+    )
+
+    # Perform the text-to-speech request on the text input with the selected
+    # voice parameters and audio file type
+    response = await client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
+    return response
 
 
 async def _batch_stream_events(
@@ -69,8 +112,19 @@ async def _batch_stream_events(
             content = ItemHelpers.extract_last_content(event.item.raw_item)
             # TODO: content might be a ResponseOutputRefusal
             response = WhatsAppResponse.model_validate(json.loads(content))
+
+            full_content = response.content
             response.content = ready
-            yield ResponseEvent(response=response, has_more=False)
+            yield ResponseEvent(response=response, has_more=True)
+
+            logger.debug(f"Running text to speech for content: {full_content}")
+            speech = await text_to_speech(full_content)
+            yield ResponseEvent(
+                response=AudioResponse(
+                    audio=speech.audio_content,
+                ),
+                has_more=False,
+            )
 
 
 class FarmwiseService:
