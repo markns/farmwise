@@ -1,6 +1,5 @@
 import React from 'react'
-// import { RouteObject } from 'react-router-dom'
-import { DefaultLayout, DashboardLayout, BasicLayout } from '@/components/layouts'
+import { DefaultLayout, DashboardLayout } from '@/components/layouts'
 import { CircularProgress, Box } from '@mui/material'
 
 // Loading component for Suspense
@@ -25,18 +24,13 @@ const withSuspense = (Component: React.LazyExoticComponent<any>) => (
 )
 
 // Lazy load components
-const Login = React.lazy(() => import('@/auth/Login'))
-const Register = React.lazy(() => import('@/auth/Register'))
 const NotFound = React.lazy(() => import('@/views/error/NotFound'))
 const ServerError = React.lazy(() => import('@/views/error/Error'))
-const Mfa = React.lazy(() => import('@/auth/Mfa'))
 const Farms = React.lazy(() => import('@/farm/Farms'))
 const ContactInstanceTable = React.lazy(() => import('@/contact/TableInstance'))
 const OrganizationMemberTable = React.lazy(() => import('@/organization/OrganizationMemberTable'))
 const ResultList = React.lazy(() => import('@/search/ResultList'))
 
-const registrationEnabled = 
-  import.meta.env.VITE_DISPATCH_AUTH_REGISTRATION_ENABLED === 'false' ? false : true
 
 export interface RouteConfig {
   path?: string
@@ -55,29 +49,8 @@ export interface RouteConfig {
   }
 }
 
-const authPages: RouteConfig[] = [
-  {
-    path: 'login',
-    element: withSuspense(Login),
-    meta: { title: 'Login' },
-  },
-]
-
-if (registrationEnabled) {
-  authPages.push({
-    path: 'register',
-    element: withSuspense(Register),
-    meta: { title: 'Register' },
-  })
-}
 
 export const publicRoutes: RouteConfig[] = [
-  {
-    path: '/:organization/auth/*',
-    element: <BasicLayout />,
-    meta: { title: 'Auth', icon: 'mdi-view-comfy-outline', group: 'auth' },
-    children: authPages,
-  },
   {
     path: '/404',
     element: withSuspense(NotFound),
@@ -101,17 +74,6 @@ export const publicRoutes: RouteConfig[] = [
 ]
 
 export const protectedRoutes: RouteConfig[] = [
-  {
-    path: '/',
-    meta: { requiresAuth: true },
-    // Redirect will be handled in the component
-    element: <div>Redirecting...</div>,
-  },
-  {
-    path: '/:organization/mfa',
-    element: withSuspense(Mfa),
-    meta: { title: 'Farmbase MFA', requiresAuth: true },
-  },
   {
     path: '/:organization/dashboards',
     element: <DashboardLayout />,

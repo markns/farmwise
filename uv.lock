@@ -1377,6 +1377,7 @@ dependencies = [
     { name = "pandas" },
     { name = "passlib", extra = ["bcrypt"] },
     { name = "phonenumbers" },
+    { name = "propelauth-fastapi" },
     { name = "psycopg2-binary" },
     { name = "pydantic-extra-types" },
     { name = "pydantic-settings" },
@@ -1425,6 +1426,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.2.3" },
     { name = "passlib", extras = ["bcrypt"], specifier = ">=1.7.4" },
     { name = "phonenumbers", specifier = ">=9.0.4" },
+    { name = "propelauth-fastapi", specifier = ">=4.2.8" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "pydantic-extra-types", specifier = ">=2.10.4" },
     { name = "pydantic-settings", specifier = ">=2.6.1" },
@@ -4393,6 +4395,28 @@ wheels = [
 ]
 
 [[package]]
+name = "propelauth-fastapi"
+version = "4.2.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "propelauth-py" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/49/4a/6ab9ef59717aa0d7368d54cbe9f7894c060d58e1305dcd4403cdf164e466/propelauth-fastapi-4.2.8.tar.gz", hash = "sha256:f2648767d3192050121dff00c918aaf5e7bcd89ddef4aa8bdbded3c0d8ce52e8", size = 10033 }
+
+[[package]]
+name = "propelauth-py"
+version = "4.2.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "pyjwt", extra = ["crypto"] },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e4/d0/2a494f6d565dd4c6698dc80c72e7ec8cfdc379a492416eb74dc56a06f0f4/propelauth-py-4.2.8.tar.gz", hash = "sha256:5bceaf77aae42cdb6a7ed600315e2a337ff168a1cab3449f2e2fe59f1b789fc2", size = 30351 }
+
+[[package]]
 name = "proto-plus"
 version = "1.26.1"
 source = { registry = "https://pypi.org/simple" }
@@ -4717,6 +4741,11 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e7/46/bd74733ff231675599650d3e47f361794b22ef3e3770998dda30d3b63726/pyjwt-2.10.1.tar.gz", hash = "sha256:3cc5772eb20009233caf06e9d8a0577824723b44e6648ee0a2aedb6cf9381953", size = 87785 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/61/ad/689f02752eeec26aed679477e80e632ef1b682313be70793d798c1d5fc8f/PyJWT-2.10.1-py3-none-any.whl", hash = "sha256:dcdd193e30abefd5debf142f9adfcdd2b58004e644f25406ffaebd50bd98dacb", size = 22997 },
+]
+
+[package.optional-dependencies]
+crypto = [
+    { name = "cryptography" },
 ]
 
 [[package]]

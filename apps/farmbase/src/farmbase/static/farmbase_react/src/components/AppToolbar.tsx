@@ -1,113 +1,101 @@
 import React from 'react'
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Menu,
-  MenuItem,
-  Avatar,
-  Box,
-} from '@mui/material'
-import {
-  Menu as MenuIcon,
-  AccountCircle,
-  ExitToApp,
-} from '@mui/icons-material'
+import {AppBar, Avatar, Box, IconButton, Menu, MenuItem, Toolbar, Typography,} from '@mui/material'
+import {AccountCircle, ExitToApp, Menu as MenuIcon,} from '@mui/icons-material'
 // import { useNavigate } from 'react-router-dom'
-import { useAppStore } from '../stores/appStore'
-import { useAuthStore } from '../stores/authStore'
-import { getUserAvatarUrl } from '../stores/authStore'
+import {useAppStore} from '../stores/appStore'
+import {getUserAvatarUrl} from '../stores/authStore'
+import {useLogoutFunction, withAuthInfo, WithAuthInfoProps} from "@propelauth/react";
 
-const AppToolbar: React.FC = () => {
-  // const navigate = useNavigate()
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  
-  const toggleDrawer = useAppStore(state => state.toggleDrawer)
-  const setDrawerOpen = useAppStore(state => state.setDrawerOpen)
-  const currentUser = useAuthStore(state => state.currentUser)
-  const logout = useAuthStore(state => state.logout)
 
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
+// This version expects WithAuthInfoProps from PropelAuth
+const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+    const logoutFunction = useLogoutFunction()
+    const toggleDrawer = useAppStore(state => state.toggleDrawer)
+    const setDrawerOpen = useAppStore(state => state.setDrawerOpen)
 
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
+    const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget)
+    }
 
-  const handleLogout = () => {
-    logout()
-    handleClose()
-  }
+    const handleClose = () => {
+        setAnchorEl(null)
+    }
 
-  const handleDrawerToggle = () => {
-    setDrawerOpen(!toggleDrawer)
-  }
+    const handleLogout = () => {
+        // props. // <-- optional: if you're using PropelAuth's logout
+        logoutFunction(true)
+        handleClose()
+    }
 
-  const avatarUrl = getUserAvatarUrl(currentUser.email || '')
+    const handleDrawerToggle = () => {
+        setDrawerOpen(!toggleDrawer)
+    }
 
-  return (
-    <AppBar position="static" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-      <Toolbar>
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          onClick={handleDrawerToggle}
-          edge="start"
-          sx={{ mr: 2 }}
-        >
-          <MenuIcon />
-        </IconButton>
-        
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Farmbase
-        </Typography>
+    const avatarUrl = getUserAvatarUrl(auth.user?.email || '')
 
-        {currentUser.loggedIn && (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="body2" sx={{ mr: 2 }}>
-              {currentUser.email}
-            </Typography>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-            >
-              {avatarUrl ? (
-                <Avatar src={avatarUrl} sx={{ width: 32, height: 32 }} />
-              ) : (
-                <AccountCircle />
-              )}
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              <MenuItem onClick={handleLogout}>
-                <ExitToApp sx={{ mr: 1 }} />
-                Logout
-              </MenuItem>
-            </Menu>
-          </Box>
-        )}
-      </Toolbar>
-    </AppBar>
-  )
+    return (
+        <AppBar position="static" sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
+            <Toolbar>
+                <IconButton
+                    color="inherit"
+                    aria-label="open drawer"
+                    onClick={handleDrawerToggle}
+                    edge="start"
+                    sx={{mr: 2}}
+                >
+                    <MenuIcon/>
+                </IconButton>
+
+                <Typography variant="h6" component="div" sx={{flexGrow: 1}}>
+                    FarmBase
+                </Typography>
+
+                {auth.isLoggedIn && auth.user && (
+                    <Box sx={{display: 'flex', alignItems: 'center'}}>
+                        <Typography variant="body2" sx={{mr: 2}}>
+                            {auth.user.email}
+                        </Typography>
+                        <IconButton
+                            size="large"
+                            aria-label="account of current user"
+                            aria-controls="menu-appbar"
+                            aria-haspopup="true"
+                            onClick={handleMenu}
+                            color="inherit"
+                        >
+                            {avatarUrl ? (
+                                <Avatar src={avatarUrl} sx={{width: 32, height: 32}}/>
+                            ) : (
+                                <AccountCircle/>
+                            )}
+                        </IconButton>
+                        <Menu
+                            id="menu-appbar"
+                            anchorEl={anchorEl}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            keepMounted
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                        >
+                            <MenuItem onClick={handleLogout}>
+                                <ExitToApp sx={{mr: 1}}/>
+                                Logout
+                            </MenuItem>
+                        </Menu>
+                    </Box>
+                )}
+            </Toolbar>
+        </AppBar>
+    )
 }
 
-export default AppToolbar
+// Wrap with PropelAuth
+export default withAuthInfo(AppToolbar)

@@ -20,7 +20,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppStore } from '../stores/appStore'
 
-const drawerWidth = 240
+const drawerWidth = 200
 
 interface MenuItem {
   title: string

@@ -1,9 +1,6 @@
 import React from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { allRoutes, RouteConfig } from './config'
-// import { useAuthStore } from '@/stores/authStore'
-// import { useAppStore } from '@/stores/appStore'
-import ProtectedRoute from './ProtectedRoute'
 
 // Convert our custom RouteConfig to React Router's RouteObject
 const convertRoutes = (routes: RouteConfig[]): any[] => {
@@ -11,12 +8,7 @@ const convertRoutes = (routes: RouteConfig[]): any[] => {
     const { meta, ...routeProps } = route
     
     let element = routeProps.element
-    
-    // Wrap protected routes
-    if (meta?.requiresAuth) {
-      element = <ProtectedRoute>{element}</ProtectedRoute>
-    }
-    
+
     // Handle redirects
     if (route.path === '/') {
       element = <Navigate to="/default/farms" replace />
@@ -38,10 +30,6 @@ const convertRoutes = (routes: RouteConfig[]): any[] => {
 
 export const router = createBrowserRouter(convertRoutes(allRoutes))
 
-// Auth provider configuration
-const authProviderSlug = 
-  import.meta.env.VITE_DISPATCH_AUTHENTICATION_PROVIDER_SLUG || 'dispatch-auth-provider-basic'
-
 // Router guards equivalent - we'll handle this in components and hooks
 export const useRouterGuards = () => {
   React.useEffect(() => {
@@ -50,5 +38,5 @@ export const useRouterGuards = () => {
   }, [])
 }
 
-export { authProviderSlug }
+export {  }
 export default router

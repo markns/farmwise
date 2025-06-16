@@ -39,6 +39,7 @@ dependencies = [
     "xarray[complete]>=2025.3.1",
     "python-weather>=2.0.7",
     "openpyxl>=3.1.5",
+    "propelauth-fastapi>=4.2.8",
 ]
 
 [dependency-groups]
