@@ -6,10 +6,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import true
 
-from farmbase.auth.models import FarmbaseUser, FarmbaseUserOrganization
 from farmbase.database.core import DbSession, engine
 from farmbase.database.manage import init_schema
-from farmbase.enums import UserRoles
 
 from .models import Organization, OrganizationCreate, OrganizationRead, OrganizationUpdate
 
@@ -156,21 +154,3 @@ async def delete(*, db_session: AsyncSession, organization_id: int) -> None:
     if organization:
         await db_session.delete(organization)
         await db_session.commit()
-
-
-async def add_user(
-    *,
-    db_session: AsyncSession,
-    user: FarmbaseUser,
-    organization: Organization,
-    role: UserRoles = UserRoles.member,
-) -> None:
-    """Adds a user to an organization."""
-    db_session.add(
-        FarmbaseUserOrganization(
-            farmbase_user_id=user.id,
-            organization_id=organization.id,
-            role=role,
-        )
-    )
-    await db_session.commit()

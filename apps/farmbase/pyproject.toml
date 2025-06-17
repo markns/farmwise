@@ -54,8 +54,6 @@ dev = [
 ]
 
 [project.entry-points."farmbase.plugins"]
-farmbase_basic_auth = "farmbase.plugins.farmbase_core.plugin:BasicAuthProviderPlugin"
-farmbase_header_auth = "farmbase.plugins.farmbase_core.plugin:HeaderAuthProviderPlugin"
 
 [tool.uv.sources]
 

@@ -3,7 +3,6 @@ import os.path
 import traceback
 from subprocess import check_output
 
-from .auth.models import FarmbaseUser, FarmbaseUserOrganization, FarmbaseUserProject, MfaChallenge
 from .commodity.models import Commodity
 from .contact.models import Contact
 from .farm.activity.models import ActivityProduct, ActivityType, FarmActivity
@@ -19,7 +18,6 @@ from .message.models import Message
 from .organization.models import Organization
 from .plugin.models import Plugin, PluginEvent, PluginInstance
 from .products.models import Manufacturer, Product
-from .project.models import Project
 from .runresult.models import Agent, ModelResponse, RunItem, RunResult
 
 try:
@@ -80,10 +78,6 @@ __build__ = get_revision()
 # what 'from farmbase.models import *' should import.
 # PyCharm sees this and marks the imports above as "used".
 __all__ = [
-    "FarmbaseUser",
-    "FarmbaseUserProject",
-    "FarmbaseUserOrganization",
-    "MfaChallenge",
     "Farm",
     "FarmContact",
     "Note",
@@ -104,7 +98,6 @@ __all__ = [
     "PluginInstance",
     "Contact",
     "Message",
-    "Project",
     "Manufacturer",
     "Product",
     "Agent",

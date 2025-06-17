@@ -11,7 +11,6 @@ from farmbase.organization.models import Organization
 from ..farm.activity.models import ActivityType
 from ..farm.platform.models import Platform
 from ..plugin.models import Plugin
-from ..project.models import Project
 from .core import Base, sessionmaker
 from .enums import FARMBASE_ORGANIZATION_SCHEMA_PREFIX
 
@@ -159,27 +158,6 @@ def init_database(engine):
         )
         db_session.add(plugin)
     db_session.commit()
-
-    # we create the default project if it doesn't exist
-    project = db_session.query(Project).filter(Project.name == "default").one_or_none()
-    if not project:
-        print("Creating default project...")
-        project = Project(
-            name="default",
-            default=True,
-            description="Default Farmbase project.",
-            organization=organization,
-        )
-        db_session.add(project)
-        db_session.commit()
-
-        # we initialize the project with defaults
-        from farmbase.project import flows as project_flows
-
-        print("Initializing default project...")
-        project_flows.project_init_flow(
-            project_id=project.id, organization_slug=organization.slug, db_session=db_session
-        )
 
     populate_static_data(db_session)
 

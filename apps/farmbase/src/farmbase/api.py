@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
-from farmbase.auth.service import get_current_user
-from farmbase.auth.views import auth_router, user_router
+from farmbase.auth import auth
+from farmbase.auth.views import auth_router
 from farmbase.chatstate.views import router as chatstate_router
 from farmbase.commodity.views import router as commodity_router
 from farmbase.contact.views import router as contact_router
@@ -17,7 +17,6 @@ from farmbase.market.views import router as market_router
 from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
 from farmbase.products.views import router as products_router
-from farmbase.project.views import router as project_router
 from farmbase.runresult.views import router as runresult_router
 
 
@@ -29,6 +28,7 @@ class ErrorResponse(BaseModel):
     detail: Optional[List[ErrorMessage]]
 
 
+# WARNING: Don't use this unless you want unauthenticated routes
 api_router = APIRouter(
     default_response_class=JSONResponse,
     responses={
@@ -40,30 +40,27 @@ api_router = APIRouter(
     },
 )
 
-# WARNING: Don't use this unless you want unauthenticated routes
-authenticated_api_router = APIRouter()
+authenticated_api_router = APIRouter(dependencies=[Depends(auth.require_user)])
+
+
+def get_organization_path(organization: OrganizationSlug): ...
+
+
+authenticated_organization_api_router = APIRouter(
+    prefix="/{organization}", dependencies=[Depends(get_organization_path), Depends(auth.require_user)]
+)
+
 
 authenticated_api_router.include_router(gaez_router, prefix="/gaez", tags=["gaez"])
 authenticated_api_router.include_router(crops_router, prefix="/crop-varieties", tags=["crop-varieties"])
 
-
-def get_organization_path(organization: OrganizationSlug):
-    pass
-
-
-api_router.include_router(auth_router, prefix="/{organization}/auth", tags=["auth"])
+authenticated_organization_api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 
 # NOTE: All api routes should be authenticated by default
 authenticated_api_router.include_router(organization_router, prefix="/organizations", tags=["organizations"])
 
-authenticated_organization_api_router = APIRouter(
-    prefix="/{organization}", dependencies=[Depends(get_organization_path)]
-)
-
-authenticated_organization_api_router.include_router(project_router, prefix="/projects", tags=["projects"])
 authenticated_organization_api_router.include_router(contact_router, prefix="/contacts", tags=["contacts"])
 
-authenticated_organization_api_router.include_router(user_router, prefix="/users", tags=["users"])
 authenticated_organization_api_router.include_router(chatstate_router, prefix="/chatstate", tags=["chatstate"])
 authenticated_organization_api_router.include_router(runresult_router, prefix="/runresult", tags=["runresult"])
 
@@ -79,9 +76,6 @@ def healthcheck():
     return {"status": "ok"}
 
 
-api_router.include_router(authenticated_organization_api_router, dependencies=[Depends(get_current_user)])
+api_router.include_router(authenticated_organization_api_router)
 
-api_router.include_router(
-    authenticated_api_router,
-    dependencies=[Depends(get_current_user)],
-)
+api_router.include_router(authenticated_api_router)

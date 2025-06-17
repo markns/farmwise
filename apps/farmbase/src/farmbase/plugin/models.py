@@ -12,9 +12,10 @@ from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
 from farmbase.config import FARMBASE_ENCRYPTION_KEY
 from farmbase.database.core import Base
-from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, ProjectMixin
+from farmbase.models import FarmbaseBase, Pagination, PrimaryKey
 from farmbase.plugins.base import plugins
-from farmbase.project.models import ProjectRead
+
+# from farmbase.project.models import ProjectRead
 from farmbase.validators import must_not_be_blank
 
 
@@ -80,7 +81,7 @@ class PluginEvent(Base):
     )
 
 
-class PluginInstance(Base, ProjectMixin):
+class PluginInstance(Base):
     __tablename__ = "plugin_instance"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -190,7 +191,7 @@ class PluginInstanceRead(PluginBase):
     configuration: Optional[dict]
     configuration_schema: Any
     plugin: PluginRead
-    project: Optional[ProjectRead]
+    # project: Optional[ProjectRead]
     broken: Optional[bool]
 
 
@@ -199,7 +200,7 @@ class PluginInstanceReadMinimal(PluginBase):
     enabled: Optional[bool]
     configuration_schema: Any
     plugin: PluginRead
-    project: Optional[ProjectRead]
+    # project: Optional[ProjectRead]
     broken: Optional[bool]
 
 
@@ -207,7 +208,7 @@ class PluginInstanceCreate(PluginBase):
     enabled: Optional[bool]
     configuration: Optional[dict]
     plugin: PluginRead
-    project: ProjectRead
+    # project: ProjectRead
 
 
 class PluginInstanceUpdate(PluginBase):

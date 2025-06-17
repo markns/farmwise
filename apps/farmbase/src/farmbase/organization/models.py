@@ -4,7 +4,7 @@ from pydantic import Field, field_validator
 from slugify import slugify
 from sqlalchemy import Column
 from sqlalchemy.event import listen
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils import TSVectorType
 
 from farmbase.database.core import Base
@@ -24,8 +24,6 @@ class Organization(Base):
     banner_enabled: Mapped[bool] = mapped_column(nullable=True)
     banner_color: Mapped[str] = mapped_column(nullable=True)
     banner_text: Mapped[str] = mapped_column(nullable=True)
-
-    users: Mapped[List["FarmbaseUserOrganization"]] = relationship(back_populates="organization")
 
     search_vector = Column(TSVectorType("name", "description", weights={"name": "A", "description": "B"}))
 

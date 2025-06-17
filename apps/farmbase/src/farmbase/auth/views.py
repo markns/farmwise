@@ -1,333 +1,309 @@
-from typing import Annotated
+from fastapi import APIRouter, Depends
+from propelauth_py import User
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import ValidationError
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
+from farmbase.models import OrganizationSlug
 
-from farmbase.auth.permissions import (
-    OrganizationMemberPermission,
-    PermissionsDependency,
-)
-from farmbase.auth.service import CurrentUser
-from farmbase.database.core import DbSession
-from farmbase.enums import UserRoles
-from farmbase.exceptions.exceptions import (
-    InvalidConfigurationError,
-)
-from farmbase.models import OrganizationSlug, PrimaryKey
-from farmbase.organization.models import OrganizationRead
+from . import auth
 
-from ..config import FARMBASE_AUTH_REGISTRATION_ENABLED
-from .filterset import UserFilterSet, UserQueryParams
-from .models import (
-    AdminPasswordReset,
-    FarmbaseUser,
-    FarmbaseUserOrganization,
-    UserCreate,
-    UserLogin,
-    UserLoginResponse,
-    UserOrganization,
-    UserPagination,
-    UserPasswordUpdate,
-    UserRead,
-    UserRegister,
-    UserRegisterResponse,
-    UserUpdate,
-)
-from .service import create, get, get_by_email, update
+# from .models import UserRead
+# from .service import CurrentUser
 
 auth_router = APIRouter()
-user_router = APIRouter()
+# user_router = APIRouter()
+
+#
+# @user_router.get(
+#     "",
+#     dependencies=[
+#         Depends(
+#             PermissionsDependency(
+#                 [
+#                     OrganizationMemberPermission,
+#                 ]
+#             )
+#         )
+#     ],
+#     response_model=UserPagination,
+# )
+# async def get_users(
+#     db_session: DbSession, organization: OrganizationSlug, query_params: Annotated[UserQueryParams, Query()]
+# ):
+#     """Gets all organization users."""
+#     # common["filter_spec"] = {"and": [{"model": "Organization", "op": "==", "field": "slug", "value": organization}]}
+#
+#     # options = [selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization),
+#     #         selectinload(FarmbaseUser.projects).selectinload(FarmbaseUserProject.project)]
+#
+#     stmt = select(FarmbaseUser).options(
+#         selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization)
+#     )
+#     filter_set = UserFilterSet(db_session, stmt)
+#     params_d = query_params.model_dump(exclude_none=True)
+#     total = await filter_set.count(params_d)
+#     users = await filter_set.filter(params_d)
+#     return UserPagination(
+#         items=users,
+#         items_per_page=query_params.items_per_page,
+#         page=query_params.page,
+#         total=total,
+#     )
+#
+#
+# @user_router.post(
+#     "",
+#     response_model=UserRead,
+# )
+# async def create_user(
+#     user_in: UserCreate,
+#     organization: OrganizationSlug,
+#     db_session: DbSession,
+#     current_user: CurrentUser,
+# ):
+#     """Creates a new user."""
+#     user = await get_by_email(db_session=db_session, email=user_in.email)
+#     if user:
+#         raise ValidationError(
+#             [
+#                 ErrorWrapper(
+#                     InvalidConfigurationError(msg="A user with this email already exists."),
+#                     loc="email",
+#                 )
+#             ],
+#             model=UserCreate,
+#         )
+#
+#     current_user_organization_role = current_user.get_organization_role(organization)
+#     if current_user_organization_role != UserRoles.owner:
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail=[
+#                 {
+#                     "msg": "You don't have permissions to create a new user for this organization. Please, contact the organization's owner."
+#                 }
+#             ],
+#         )
+#
+#     user = await create(db_session=db_session, organization=organization, user_in=user_in)
+#     return user
+#
+#
+# @user_router.get("/{user_id}", response_model=UserRead)
+# async def get_user(db_session: DbSession, user_id: PrimaryKey):
+#     """Get a user."""
+#     user = await get(db_session=db_session, user_id=user_id)
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail=[{"msg": "A user with this id does not exist."}],
+#         )
+#
+#     return user
+
+#
+# @user_router.put(
+#     "/{user_id}",
+#     response_model=UserRead,
+# )
+# async def update_user(
+#     db_session: DbSession,
+#     user_id: PrimaryKey,
+#     organization: OrganizationSlug,
+#     user_in: UserUpdate,
+#     current_user: CurrentUser,
+# ):
+#     """Check if Current_user is Owner and is trying to edit another user"""
+#     current_user_organization_role = current_user.get_organization_role(organization)
+#     if current_user_organization_role != UserRoles.owner and current_user.id != user_id:
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail=[{"msg": "A user that is not an Owner is trying to update another user."}],
+#         )
+#     """Update a user."""
+#     user = await get(db_session=db_session, user_id=user_id)
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail=[{"msg": "A user with this id does not exist."}],
+#         )
+#
+#     if user_in.role:
+#         # New user role is provided
+#         user_organization_role = user.get_organization_role(organization)
+#         if user_organization_role != user_in.role:
+#             # New user role provided is different than current user role
+#             current_user_organization_role = current_user.get_organization_role(organization)
+#             if current_user_organization_role != UserRoles.owner:
+#                 raise HTTPException(
+#                     status_code=status.HTTP_403_FORBIDDEN,
+#                     detail=[
+#                         {
+#                             "msg": "You don't have permissions to update the user's role. Please, contact the organization's owner."
+#                         }
+#                     ],
+#                 )
+#
+#     # add organization information
+#     user_in.organizations = [UserOrganization(role=user_in.role, organization=OrganizationRead(name=organization))]
+#
+#     return await update(db_session=db_session, user=user, user_in=user_in)
+#
+#
+# @user_router.post("/{user_id}/change-password", response_model=UserRead)
+# async def change_password(
+#     db_session: DbSession,
+#     user_id: PrimaryKey,
+#     password_update: UserPasswordUpdate,
+#     current_user: CurrentUser,
+#     organization: OrganizationSlug,
+# ):
+#     """Change user password with proper validation"""
+#     user = await get(db_session=db_session, user_id=user_id)
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail=[{"msg": "A user with this id does not exist."}],
+#         )
+#
+#     # Only allow users to change their own password or owners to reset
+#     if user.id != current_user.id and not await current_user.is_owner(organization):
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail=[{"msg": "Not authorized to change other user passwords"}],
+#         )
+#
+#     # Validate current password if user is changing their own password
+#     if user.id == current_user.id:
+#         if not user.verify_password(password_update.current_password):
+#             raise HTTPException(
+#                 status_code=status.HTTP_400_BAD_REQUEST,
+#                 detail=[{"msg": "Invalid current password"}],
+#             )
+#
+#     # Set new password
+#     try:
+#         user.set_password(password_update.new_password)
+#         await db_session.commit()
+#     except ValueError as e:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail=[{"msg": str(e)}],
+#         ) from e
+#
+#     return user
+#
+#
+# @user_router.post("/{user_id}/reset-password", response_model=UserRead)
+# async def admin_reset_password(
+#     db_session: DbSession,
+#     user_id: PrimaryKey,
+#     password_reset: AdminPasswordReset,
+#     current_user: CurrentUser,
+#     organization: OrganizationSlug,
+# ):
+#     """Admin endpoint to reset user password"""
+#     # Verify current user is an owner
+#     if not await current_user.is_owner(organization):
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail=[{"msg": "Only owners can reset passwords"}],
+#         )
+#
+#     user = await get(db_session=db_session, user_id=user_id)
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail=[{"msg": "A user with this id does not exist."}],
+#         )
+#
+#     try:
+#         user.set_password(password_reset.new_password)
+#         await db_session.commit()
+#     except ValueError as e:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail=[{"msg": str(e)}],
+#         ) from e
+#
+#     return user
 
 
-@user_router.get(
-    "",
-    dependencies=[
-        Depends(
-            PermissionsDependency(
-                [
-                    OrganizationMemberPermission,
-                ]
-            )
-        )
-    ],
-    response_model=UserPagination,
-)
-async def get_users(
-    db_session: DbSession, organization: OrganizationSlug, query_params: Annotated[UserQueryParams, Query()]
-):
-    """Gets all organization users."""
-    # common["filter_spec"] = {"and": [{"model": "Organization", "op": "==", "field": "slug", "value": organization}]}
-
-    # options = [selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization),
-    #         selectinload(FarmbaseUser.projects).selectinload(FarmbaseUserProject.project)]
-
-    stmt = select(FarmbaseUser).options(
-        selectinload(FarmbaseUser.organizations).selectinload(FarmbaseUserOrganization.organization)
-    )
-    filter_set = UserFilterSet(db_session, stmt)
-    params_d = query_params.model_dump(exclude_none=True)
-    total = await filter_set.count(params_d)
-    users = await filter_set.filter(params_d)
-    return UserPagination(
-        items=users,
-        items_per_page=query_params.items_per_page,
-        page=query_params.page,
-        total=total,
-    )
+# @auth_router.get("/me", response_model=UserRead)
+# async def get_me(
+#     *,
+#     db_session: DbSession,
+#     current_user: CurrentUser,
+# ):
+#     return current_user
 
 
-@user_router.post(
-    "",
-    response_model=UserRead,
-)
-async def create_user(
-    user_in: UserCreate,
-    organization: OrganizationSlug,
-    db_session: DbSession,
-    current_user: CurrentUser,
-):
-    """Creates a new user."""
-    user = await get_by_email(db_session=db_session, email=user_in.email)
-    if user:
-        raise ValidationError(
-            [
-                ErrorWrapper(
-                    InvalidConfigurationError(msg="A user with this email already exists."),
-                    loc="email",
-                )
-            ],
-            model=UserCreate,
-        )
-
-    current_user_organization_role = current_user.get_organization_role(organization)
-    if current_user_organization_role != UserRoles.owner:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=[
-                {
-                    "msg": "You don't have permissions to create a new user for this organization. Please, contact the organization's owner."
-                }
-            ],
-        )
-
-    user = await create(db_session=db_session, organization=organization, user_in=user_in)
-    return user
+@auth_router.get("/whoami")
+async def root(*, organization: OrganizationSlug, current_user: User = Depends(auth.require_user)):
+    return {"user_id": f"{current_user}"}
 
 
-@user_router.get("/{user_id}", response_model=UserRead)
-async def get_user(db_session: DbSession, user_id: PrimaryKey):
-    """Get a user."""
-    user = await get(db_session=db_session, user_id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=[{"msg": "A user with this id does not exist."}],
-        )
-
-    return user
+# @auth_router.get("/myrole")
+# async def get_my_role(
+#     *,
+#     db_session: DbSession,
+#     current_user: CurrentUser,
+#     organization: OrganizationSlug,
+# ):
+#     return await current_user.get_organization_role(organization)
 
 
-@user_router.put(
-    "/{user_id}",
-    response_model=UserRead,
-)
-async def update_user(
-    db_session: DbSession,
-    user_id: PrimaryKey,
-    organization: OrganizationSlug,
-    user_in: UserUpdate,
-    current_user: CurrentUser,
-):
-    """Check if Current_user is Owner and is trying to edit another user"""
-    current_user_organization_role = current_user.get_organization_role(organization)
-    if current_user_organization_role != UserRoles.owner and current_user.id != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=[{"msg": "A user that is not an Owner is trying to update another user."}],
-        )
-    """Update a user."""
-    user = await get(db_session=db_session, user_id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=[{"msg": "A user with this id does not exist."}],
-        )
+# @auth_router.post("/login", response_model=UserLoginResponse)
+# async def login_user(
+#     user_in: UserLogin,
+#     organization: OrganizationSlug,
+#     db_session: DbSession,
+# ):
+#     user = await get_by_email(db_session=db_session, email=user_in.email)
+#     if user and user.verify_password(user_in.password):
+#         projects = []
+#         for user_project in user.projects:
+#             projects.append(
+#                 {
+#                     "project": user_project.project,
+#                     "default": user_project.default,
+#                     "role": user_project.role,
+#                 }
+#             )
+#         return {"projects": projects, "token": user.token}
+#
+#     raise HTTPException(
+#         status_code=status.HTTP_401_UNAUTHORIZED,
+#         detail="Invalid username or password.",
+#         # headers={"WWW-Authenticate": "Bearer"},
+#     )
+# raise ValidationError(
+#     [
+#         ErrorDetails(type="value_error", loc=("username",), msg="Invalid username.", input=None),
+#         ErrorDetails(type="value_error", loc=("password",), msg="Invalid password.", input=None),
+#     ],
+# model=UserLogin,
+# )
 
-    if user_in.role:
-        # New user role is provided
-        user_organization_role = user.get_organization_role(organization)
-        if user_organization_role != user_in.role:
-            # New user role provided is different than current user role
-            current_user_organization_role = current_user.get_organization_role(organization)
-            if current_user_organization_role != UserRoles.owner:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail=[
-                        {
-                            "msg": "You don't have permissions to update the user's role. Please, contact the organization's owner."
-                        }
-                    ],
-                )
-
-    # add organization information
-    user_in.organizations = [UserOrganization(role=user_in.role, organization=OrganizationRead(name=organization))]
-
-    return await update(db_session=db_session, user=user, user_in=user_in)
-
-
-@user_router.post("/{user_id}/change-password", response_model=UserRead)
-async def change_password(
-    db_session: DbSession,
-    user_id: PrimaryKey,
-    password_update: UserPasswordUpdate,
-    current_user: CurrentUser,
-    organization: OrganizationSlug,
-):
-    """Change user password with proper validation"""
-    user = await get(db_session=db_session, user_id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=[{"msg": "A user with this id does not exist."}],
-        )
-
-    # Only allow users to change their own password or owners to reset
-    if user.id != current_user.id and not await current_user.is_owner(organization):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=[{"msg": "Not authorized to change other user passwords"}],
-        )
-
-    # Validate current password if user is changing their own password
-    if user.id == current_user.id:
-        if not user.verify_password(password_update.current_password):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=[{"msg": "Invalid current password"}],
-            )
-
-    # Set new password
-    try:
-        user.set_password(password_update.new_password)
-        await db_session.commit()
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=[{"msg": str(e)}],
-        ) from e
-
-    return user
-
-
-@user_router.post("/{user_id}/reset-password", response_model=UserRead)
-async def admin_reset_password(
-    db_session: DbSession,
-    user_id: PrimaryKey,
-    password_reset: AdminPasswordReset,
-    current_user: CurrentUser,
-    organization: OrganizationSlug,
-):
-    """Admin endpoint to reset user password"""
-    # Verify current user is an owner
-    if not await current_user.is_owner(organization):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=[{"msg": "Only owners can reset passwords"}],
-        )
-
-    user = await get(db_session=db_session, user_id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=[{"msg": "A user with this id does not exist."}],
-        )
-
-    try:
-        user.set_password(password_reset.new_password)
-        await db_session.commit()
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=[{"msg": str(e)}],
-        ) from e
-
-    return user
-
-
-@auth_router.get("/me", response_model=UserRead)
-async def get_me(
-    *,
-    db_session: DbSession,
-    current_user: CurrentUser,
-):
-    return current_user
-
-
-@auth_router.get("/myrole")
-async def get_my_role(
-    *,
-    db_session: DbSession,
-    current_user: CurrentUser,
-    organization: OrganizationSlug,
-):
-    return await current_user.get_organization_role(organization)
-
-
-@auth_router.post("/login", response_model=UserLoginResponse)
-async def login_user(
-    user_in: UserLogin,
-    organization: OrganizationSlug,
-    db_session: DbSession,
-):
-    user = await get_by_email(db_session=db_session, email=user_in.email)
-    if user and user.verify_password(user_in.password):
-        projects = []
-        for user_project in user.projects:
-            projects.append(
-                {
-                    "project": user_project.project,
-                    "default": user_project.default,
-                    "role": user_project.role,
-                }
-            )
-        return {"projects": projects, "token": user.token}
-
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid username or password.",
-        # headers={"WWW-Authenticate": "Bearer"},
-    )
-    # raise ValidationError(
-    #     [
-    #         ErrorDetails(type="value_error", loc=("username",), msg="Invalid username.", input=None),
-    #         ErrorDetails(type="value_error", loc=("password",), msg="Invalid password.", input=None),
-    #     ],
-    # model=UserLogin,
-    # )
-
-
-async def register_user(
-    user_in: UserRegister,
-    organization: OrganizationSlug,
-    db_session: DbSession,
-):
-    user = await get_by_email(db_session=db_session, email=user_in.email)
-    if user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="A user with this email already exists.")
-        # raise ValidationError(
-        #     [
-        #         ErrorWrapper(
-        #             InvalidConfigurationError(msg="A user with this email already exists."),
-        #             loc="email",
-        #         )
-        #     ],
-        #     model=UserRegister,
-        # )
-
-    user = await create(db_session=db_session, organization=organization, user_in=user_in)
-    return user
+#
+# async def register_user(
+#     user_in: UserRegister,
+#     organization: OrganizationSlug,
+#     db_session: DbSession,
+# ):
+#     user = await get_by_email(db_session=db_session, email=user_in.email)
+#     if user:
+#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="A user with this email already exists.")
+#         # raise ValidationError(
+#         #     [
+#         #         ErrorWrapper(
+#         #             InvalidConfigurationError(msg="A user with this email already exists."),
+#         #             loc="email",
+#         #         )
+#         #     ],
+#         #     model=UserRegister,
+#         # )
+#
+#     user = await create(db_session=db_session, organization=organization, user_in=user_in)
+#     return user
 
 
 # @auth_router.post("/mfa", response_model=MfaPayloadResponse)
@@ -370,6 +346,6 @@ async def register_user(
 #     finally:
 #         logger.info("MFA check completed")
 
-
-if FARMBASE_AUTH_REGISTRATION_ENABLED:
-    register_user = auth_router.post("/register", response_model=UserRegisterResponse)(register_user)
+#
+# if FARMBASE_AUTH_REGISTRATION_ENABLED:
+#     register_user = auth_router.post("/register", response_model=UserRegisterResponse)(register_user)

@@ -16,16 +16,16 @@ OrganizationSlug = constr(pattern=r"^[\w]+(?:_[\w]+)*$", min_length=3)
 
 
 # SQLAlchemy models...
-class ProjectMixin(object):
-    """Project mixin"""
-
-    @declared_attr
-    def project_id(cls):  # noqa
-        return Column(Integer, ForeignKey("project.id", ondelete="CASCADE"))
-
-    @declared_attr
-    def project(cls):  # noqa
-        return relationship("Project")
+# class ProjectMixin(object):
+#     """Project mixin"""
+#
+#     @declared_attr
+#     def project_id(cls):  # noqa
+#         return Column(Integer, ForeignKey("project.id", ondelete="CASCADE"))
+#
+#     @declared_attr
+#     def project(cls):  # noqa
+#         return relationship("Project")
 
 
 class TimeStampMixin(object):
