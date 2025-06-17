@@ -40,6 +40,7 @@ ENV_TAGS = get_env_tags(ENV_TAG_LIST)
 FARMBASE_UI_URL = config("FARMBASE_UI_URL", default="http://localhost:8080")
 FARMBASE_ENCRYPTION_KEY = config("FARMBASE_ENCRYPTION_KEY", cast=Secret)
 
+FARMBASE_API_KEY = config("FARMBASE_API_KEY", cast=Secret)
 
 # authentication
 VITE_FARMBASE_AUTH_REGISTRATION_ENABLED = config("VITE_FARMBASE_AUTH_REGISTRATION_ENABLED", default="true")

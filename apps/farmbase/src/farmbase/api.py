@@ -4,8 +4,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
-from farmbase.auth import auth
-from farmbase.auth.views import auth_router
+from farmbase.auth import auth, authenticate_user_or_machine
 from farmbase.chatstate.views import router as chatstate_router
 from farmbase.commodity.views import router as commodity_router
 from farmbase.contact.views import router as contact_router
@@ -47,14 +46,12 @@ def get_organization_path(organization: OrganizationSlug): ...
 
 
 authenticated_organization_api_router = APIRouter(
-    prefix="/{organization}", dependencies=[Depends(get_organization_path), Depends(auth.require_user)]
+    prefix="/{organization}", dependencies=[Depends(get_organization_path), Depends(authenticate_user_or_machine)]
 )
 
 
 authenticated_api_router.include_router(gaez_router, prefix="/gaez", tags=["gaez"])
 authenticated_api_router.include_router(crops_router, prefix="/crop-varieties", tags=["crop-varieties"])
-
-authenticated_organization_api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 
 # NOTE: All api routes should be authenticated by default
 authenticated_api_router.include_router(organization_router, prefix="/organizations", tags=["organizations"])
