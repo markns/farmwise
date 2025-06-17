@@ -6,7 +6,6 @@ import { Snackbar, Alert } from '@mui/material'
 import router from './router'
 import { useNotificationStore } from './stores/notificationStore'
 import { useUpdateDetection } from './hooks/useUpdateDetection'
-import { useAuthInitialization } from './hooks/useAuthInitialization'
 
 // Create Material-UI theme
 const theme = createTheme({
@@ -26,8 +25,6 @@ const App: React.FC = () => {
   const notifications = useNotificationStore(state => state.notifications)
   const removeNotification = useNotificationStore(state => state.removeNotification)
   
-  // Initialize authentication state
-  useAuthInitialization()
 
   return (
     <ThemeProvider theme={theme}>

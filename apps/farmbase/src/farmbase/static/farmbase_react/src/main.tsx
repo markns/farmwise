@@ -14,6 +14,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <RequiredAuthProvider authUrl={VITE_AUTH_URL}>
             <App/>
-        </RequiredAuthProvider>,
+        </RequiredAuthProvider>
     </React.StrictMode>
 )

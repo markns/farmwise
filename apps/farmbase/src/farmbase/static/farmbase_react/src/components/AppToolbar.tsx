@@ -1,9 +1,8 @@
 import React from 'react'
-import {AppBar, Avatar, Box, IconButton, Menu, MenuItem, Toolbar, Typography,} from '@mui/material'
+import {AppBar,  Box, IconButton, Menu, MenuItem, Toolbar, Typography,} from '@mui/material'
 import {AccountCircle, ExitToApp, Menu as MenuIcon,} from '@mui/icons-material'
 // import { useNavigate } from 'react-router-dom'
 import {useAppStore} from '../stores/appStore'
-import {getUserAvatarUrl} from '../stores/authStore'
 import {useLogoutFunction, withAuthInfo, WithAuthInfoProps} from "@propelauth/react";
 
 
@@ -32,7 +31,7 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
         setDrawerOpen(!toggleDrawer)
     }
 
-    const avatarUrl = getUserAvatarUrl(auth.user?.email || '')
+    // const avatarUrl = getUserAvatarUrl(auth.user?.email || '')
 
     return (
         <AppBar position="static" sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
@@ -64,11 +63,11 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
                             onClick={handleMenu}
                             color="inherit"
                         >
-                            {avatarUrl ? (
-                                <Avatar src={avatarUrl} sx={{width: 32, height: 32}}/>
-                            ) : (
-                                <AccountCircle/>
-                            )}
+                            {/*{avatarUrl ? (*/}
+                            {/*    <Avatar src={avatarUrl} sx={{width: 32, height: 32}}/>*/}
+                            {/*) : (*/}
+                            <AccountCircle/>
+                            {/*)}*/}
                         </IconButton>
                         <Menu
                             id="menu-appbar"

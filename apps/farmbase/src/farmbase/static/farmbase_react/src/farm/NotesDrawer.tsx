@@ -16,7 +16,7 @@ import {
   EventBusy as NoteOffIcon,
 } from '@mui/icons-material'
 import { useParams } from 'react-router-dom'
-import { useFarmStore } from '@/stores/farmStore'
+import {useFarmStore} from '@/stores/farmStore'
 import type { Note } from '@/api/farm'
 import LocationChip from './LocationChip'
 

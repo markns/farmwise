@@ -1,6 +1,8 @@
+import React, { createContext, useContext } from 'react'
 import { create } from 'zustand'
 import { startTransition } from 'react'
-import { farmApi, type Farm, type FarmListOptions, type Note } from '@/api/farm'
+import { createFarmApi, type Farm, type FarmListOptions, type Note } from '@/api/farm'
+import { type ApiClient } from '@/api/client'
 import { useNotificationStore } from './notificationStore'
 import { debounce } from '@/utils'
 
@@ -78,7 +80,11 @@ const getDefaultSelectedState = (): FarmWithContacts => ({
   updated_at: '',
 })
 
-export const useFarmStore = create<FarmState>((set, get) => ({
+// Factory function to create farm store with authenticated API client
+export const createFarmStore = (apiClient: ApiClient) => {
+  const farmApi = createFarmApi(apiClient)
+  
+  return create<FarmState>((set, get) => ({
   selected: null,
   dialogs: {
     showCreateEdit: false,
@@ -347,6 +353,56 @@ export const useFarmStore = create<FarmState>((set, get) => ({
     // Trigger new data fetch
     get().getAll()
   },
-}))
+  }))
+}
 
-export default useFarmStore
+// Create context for sharing the store instance
+type FarmStoreType = ReturnType<typeof createFarmStore>
+const FarmStoreContext = createContext<FarmStoreType | null>(null)
+
+// Provider component that creates and shares a single store instance
+interface FarmStoreProviderProps {
+  apiClient: ApiClient
+  children: React.ReactNode
+}
+
+export const FarmStoreProvider: React.FC<FarmStoreProviderProps> = ({ apiClient, children }) => {
+  const storeRef = React.useRef<FarmStoreType>()
+  
+  if (!storeRef.current) {
+    storeRef.current = createFarmStore(apiClient)
+  }
+  
+  return React.createElement(
+    FarmStoreContext.Provider,
+    { value: storeRef.current },
+    children
+  )
+}
+
+// Hook to use the shared farm store
+export const useFarmStore = () => {
+  const store = useContext(FarmStoreContext)
+  if (!store) {
+    throw new Error('useFarmStore must be used within a FarmStoreProvider')
+  }
+  return store()
+}
+
+// Example usage:
+// 1. Wrap your app section with the provider:
+// const AppWithFarmStore = ({ apiClient }) => (
+//   <FarmStoreProvider apiClient={apiClient}>
+//     <Farms />
+//     <NotesDrawer />
+//     <FarmCreateEditDialog />
+//   </FarmStoreProvider>
+// )
+//
+// 2. Use the hook in components:
+// const Farms = () => {
+//   const { table, getAll, updateTableOptions } = useFarmStore()
+//   // ... component logic
+// }
+
+export default createFarmStore

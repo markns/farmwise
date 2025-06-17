@@ -18,7 +18,7 @@ import {
   Agriculture as FarmIcon,
 } from '@mui/icons-material'
 import { useForm, Controller } from 'react-hook-form'
-import { useFarmStore, type FarmWithContacts } from '@/stores/farmStore'
+import { useFarmStore } from '@/stores/farmStore'
 
 interface FarmFormData {
   farm_name: string
@@ -58,7 +58,7 @@ const FarmCreateEditDialog: React.FC = () => {
     dialogs,
     selected,
     closeCreateEdit,
-    save,
+    // save,
   } = useFarmStore()
 
   const isEdit = Boolean(selected?.id)
@@ -118,33 +118,33 @@ const FarmCreateEditDialog: React.FC = () => {
 
     try {
       // Update the selected farm with form data
-      if (selected) {
-        const farmData: FarmWithContacts = {
-          ...selected,
-          farm_name: data.farm_name,
-          name: data.farm_name,
-          description: data.description,
-          area: data.area ? Number(data.area) : undefined,
-          owner: data.owner,
-          location: (data.latitude && data.longitude) ? {
-            latitude: Number(data.latitude),
-            longitude: Number(data.longitude),
-            address: data.address || undefined,
-          } : undefined,
-        }
-        
-        // Temporarily update selected to match form data
-        const originalSelected = selected
-        useFarmStore.setState({ selected: farmData })
-        
-        try {
-          await save()
-        } catch (error) {
-          // Restore original state on error
-          useFarmStore.setState({ selected: originalSelected })
-          throw error
-        }
-      }
+      // if (selected) {
+      //   const farmData: FarmWithContacts = {
+      //     ...selected,
+      //     farm_name: data.farm_name,
+      //     name: data.farm_name,
+      //     description: data.description,
+      //     area: data.area ? Number(data.area) : undefined,
+      //     owner: data.owner,
+      //     location: (data.latitude && data.longitude) ? {
+      //       latitude: Number(data.latitude),
+      //       longitude: Number(data.longitude),
+      //       address: data.address || undefined,
+      //     } : undefined,
+      //   }
+      //
+      //   // Temporarily update selected to match form data
+      //   const originalSelected = selected
+      //   // useFarmStore.setState({ selected: farmData })
+      //
+      //   try {
+      //     await save()
+      //   } catch (error) {
+      //     // Restore original state on error
+      //     // useFarmStore.setState({ selected: originalSelected })
+      //     throw error
+      //   }
+      // }
     } catch (error) {
       console.error('Failed to save farm:', error)
     }

@@ -1,4 +1,4 @@
-import apiClient from './client'
+import { ApiClient } from './client'
 
 export interface Farm {
   id: string
@@ -51,12 +51,13 @@ export interface NotesListResponse {
 
 const resource = '/farms'
 
-export const farmApi = {
+// Factory function to create farm API with authenticated client
+export const createFarmApi = (client: ApiClient) => ({
   /**
    * Get all farms with optional filtering and pagination
    */
   async getAll(options: FarmListOptions = {}): Promise<FarmListResponse> {
-    const response = await apiClient.get(resource, { params: options })
+    const response = await client.get(resource, { params: options })
     return response.data
   },
 
@@ -64,7 +65,7 @@ export const farmApi = {
    * Get a specific farm by ID
    */
   async getFarm(farmId: string): Promise<Farm> {
-    const response = await apiClient.get(`${resource}/${farmId}`)
+    const response = await client.get(`${resource}/${farmId}`)
     return response.data
   },
 
@@ -72,7 +73,7 @@ export const farmApi = {
    * Create a new farm
    */
   async createFarm(payload: Partial<Farm>): Promise<Farm> {
-    const response = await apiClient.post(resource, payload)
+    const response = await client.post(resource, payload)
     return response.data
   },
 
@@ -80,7 +81,7 @@ export const farmApi = {
    * Update an existing farm
    */
   async updateFarm(farmId: string, payload: Partial<Farm>): Promise<Farm> {
-    const response = await apiClient.put(`${resource}/${farmId}`, payload)
+    const response = await client.put(`${resource}/${farmId}`, payload)
     return response.data
   },
 
@@ -88,14 +89,14 @@ export const farmApi = {
    * Delete a farm
    */
   async deleteFarm(farmId: string): Promise<void> {
-    await apiClient.delete(`${resource}/${farmId}`)
+    await client.delete(`${resource}/${farmId}`)
   },
 
   /**
    * Get notes for a specific farm
    */
   async getNotes(farmId: string, options: NotesListOptions = {}): Promise<NotesListResponse> {
-    const response = await apiClient.get('/notes', {
+    const response = await client.get('/notes', {
       params: { farm_id: farmId, ...options }
     })
     return response.data
@@ -105,7 +106,7 @@ export const farmApi = {
    * Create a note for a farm
    */
   async createNote(farmId: string, content: string): Promise<Note> {
-    const response = await apiClient.post('/notes', {
+    const response = await client.post('/notes', {
       farm_id: farmId,
       content
     })
@@ -116,7 +117,7 @@ export const farmApi = {
    * Update a note
    */
   async updateNote(noteId: string, content: string): Promise<Note> {
-    const response = await apiClient.put(`/notes/${noteId}`, { content })
+    const response = await client.put(`/notes/${noteId}`, { content })
     return response.data
   },
 
@@ -124,8 +125,23 @@ export const farmApi = {
    * Delete a note
    */
   async deleteNote(noteId: string): Promise<void> {
-    await apiClient.delete(`/notes/${noteId}`)
+    await client.delete(`/notes/${noteId}`)
   }
-}
+})
 
-export default farmApi
+// Backward compatibility - using singleton apiClient
+// export const farmApi = createFarmApi(apiClient)
+
+// Example usage with PropelAuth HOC:
+// import { withApiClient } from './client'
+// import { createFarmApi } from './farm'
+// 
+// const FarmComponent = ({ apiClient, ...props }) => {
+//   const farmApi = createFarmApi(apiClient)
+//   // Use farmApi methods here...
+//   return <div>Farm content</div>
+// }
+// 
+// export default withApiClient(FarmComponent)
+
+// export default farmApi

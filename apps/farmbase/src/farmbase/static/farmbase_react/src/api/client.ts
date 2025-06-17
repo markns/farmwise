@@ -1,19 +1,20 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { useAuthStore } from '@/stores/authStore'
+import React from 'react'
 import { useNotificationStore } from '@/stores/notificationStore'
+import { WithAuthInfoProps, withAuthInfo } from '@propelauth/react'
 
 export interface ApiConfig {
   baseURL?: string
   timeout?: number
+  accessToken?: string | null
 }
 
-class ApiClient {
+export class ApiClient {
   private instance: AxiosInstance
-  private authProviderSlug: string
+  private accessToken: string | null
 
   constructor(config: ApiConfig = {}) {
-    this.authProviderSlug = 
-      import.meta.env.VITE_DISPATCH_AUTHENTICATION_PROVIDER_SLUG || 'dispatch-auth-provider-basic'
+    this.accessToken = config.accessToken || null
 
     this.instance = axios.create({
       baseURL: config.baseURL || 'http://localhost:8000/api/v1',
@@ -21,6 +22,11 @@ class ApiClient {
     })
 
     this.setupInterceptors()
+  }
+
+  // Method to update the access token
+  setAccessToken(token: string | null) {
+    this.accessToken = token
   }
 
   private setupInterceptors() {
@@ -35,10 +41,8 @@ class ApiClient {
         }
 
         // Add auth token
-        const authState = useAuthStore.getState()
-        const token = authState.currentUser.token
-        if (token) {
-          config.headers['Authorization'] = `Bearer ${token}`
+        if (this.accessToken) {
+          config.headers['Authorization'] = `Bearer ${this.accessToken}`
         }
 
         return config
@@ -78,13 +82,12 @@ class ApiClient {
 
     // Handle authentication errors
     if (status === 401) {
-      if (this.authProviderSlug === 'dispatch-auth-provider-basic') {
-        // Redirect to login - this will be handled by the auth store
-        const { logout } = useAuthStore.getState()
-        logout()
-      } else {
-        window.location.reload()
-      }
+      // if (this.authProviderSlug === 'dispatch-auth-provider-basic') {
+        // Redirect to login - handled by PropelAuth
+        window.location.href = '/login'
+      // } else {
+      //   window.location.reload()
+      // }
       return
     }
 
@@ -153,6 +156,21 @@ class ApiClient {
   }
 }
 
-// Create and export a singleton instance
-export const apiClient = new ApiClient()
-export default apiClient
+// Create factory function for PropelAuth integration
+export const createApiClient = (accessToken?: string | null) => {
+  return new ApiClient({ accessToken })
+}
+
+// HOC to provide an authenticated API client via PropelAuth
+export const withApiClient = <P extends object>(
+  Component: React.ComponentType<P & { apiClient: ApiClient }>
+) => {
+  return withAuthInfo((props: WithAuthInfoProps & P) => {
+    const apiClient = createApiClient(props.accessToken)
+    return React.createElement(Component, { ...props, apiClient })
+  })
+}
+
+// Create and export a singleton instance (for backwards compatibility)
+// export const apiClient = new ApiClient()
+// export default apiClient
