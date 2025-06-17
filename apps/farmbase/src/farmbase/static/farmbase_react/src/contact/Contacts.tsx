@@ -4,7 +4,6 @@ import { withApiClient, type ApiClient } from '@/api/client'
 import TableInstance from './TableInstance'
 import ChatDrawer from './ChatDrawer'
 import ContactCreateEditDialog from './ContactCreateEditDialog'
-import ContactDeleteDialog from './ContactDeleteDialog'
 import ContactFilterDialog from './ContactFilterDialog'
 
 interface ContactsProps {
@@ -14,13 +13,12 @@ interface ContactsProps {
 // Inner component that renders all contact-related components
 const ContactsContent: React.FC = () => {
     return (
-        <>
+        <React.Fragment>
             <TableInstance />
             <ChatDrawer />
             <ContactCreateEditDialog />
-            <ContactDeleteDialog />
             <ContactFilterDialog />
-        </>
+        </React.Fragment>
     )
 }
 

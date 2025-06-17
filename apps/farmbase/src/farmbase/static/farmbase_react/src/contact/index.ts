@@ -2,7 +2,6 @@
 export { default as TableInstance } from './TableInstance'
 export { default as ContactPopover } from './ContactPopover'
 export { default as ContactCreateEditDialog } from './ContactCreateEditDialog'
-export { default as ContactDeleteDialog } from './ContactDeleteDialog'
 export { default as ChatDrawer } from './ChatDrawer'
 export { default as ContactFilterDialog } from './ContactFilterDialog'
 

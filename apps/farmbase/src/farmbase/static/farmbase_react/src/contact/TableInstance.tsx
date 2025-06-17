@@ -29,7 +29,6 @@ import { useContactStore, type Contact } from '@/stores/contactStore'
 import ContactPopover from './ContactPopover'
 import ChatDrawer from './ChatDrawer'
 import ContactCreateEditDialog from './ContactCreateEditDialog'
-import ContactDeleteDialog from './ContactDeleteDialog'
 import ContactFilterDialog from './ContactFilterDialog'
 
 const TableInstance: React.FC = () => {
@@ -386,7 +385,6 @@ const TableInstance: React.FC = () => {
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <ChatDrawer />
       <ContactCreateEditDialog />
-      <ContactDeleteDialog />
       <ContactFilterDialog />
       
       {/* Header */}

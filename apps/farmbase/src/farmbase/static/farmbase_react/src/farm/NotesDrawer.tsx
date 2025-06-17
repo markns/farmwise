@@ -75,7 +75,7 @@ const NotesDrawer: React.FC = () => {
           {/* Farm name */}
           {selected?.farm_name && (
             <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 3 }}>
-              {selected.farm_name}
+              {selected.farm_name || 'Unknown Farm'}
             </Typography>
           )}
 
