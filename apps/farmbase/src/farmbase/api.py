@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
-from farmbase.auth import auth, authenticate_user_or_machine
+from farmbase.auth import authenticate_user_or_machine
 from farmbase.chatstate.views import router as chatstate_router
 from farmbase.commodity.views import router as commodity_router
 from farmbase.contact.views import router as contact_router
@@ -39,7 +39,7 @@ api_router = APIRouter(
     },
 )
 
-authenticated_api_router = APIRouter(dependencies=[Depends(auth.require_user)])
+authenticated_api_router = APIRouter(dependencies=[Depends(authenticate_user_or_machine)])
 
 
 def get_organization_path(organization: OrganizationSlug): ...

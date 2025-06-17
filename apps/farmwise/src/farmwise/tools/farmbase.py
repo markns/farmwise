@@ -1,5 +1,4 @@
 from agents import RunContextWrapper, function_tool
-from farmbase_client import AuthenticatedClient
 from farmbase_client.api.contacts import contacts_patch_contact
 from farmbase_client.api.farms import farms_create_farm
 from farmbase_client.api.markets import markets_get_market_snapshot_endpoint, markets_get_markets
@@ -16,7 +15,7 @@ from farmbase_client.models import (
 )
 
 from farmwise.dependencies import UserContext
-from farmwise.settings import settings
+from farmwise.farmbase import FarmbaseClient
 from farmwise.utils import join_with
 
 
@@ -29,9 +28,9 @@ if the user mentions them in a message.
 )
 async def update_contact(wrapper: RunContextWrapper[UserContext], contact_in: ContactPatch) -> ContactRead:
     context = wrapper.context
-    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+    async with FarmbaseClient() as client:
         result = await contacts_patch_contact.asyncio(
-            client=client,
+            client=client.raw,
             organization=context.contact.organization.slug,
             contact_id=context.contact.id,
             body=contact_in,
@@ -47,9 +46,9 @@ Create a farm with an optional location, and associated contacts
 async def create_farm(wrapper: RunContextWrapper[UserContext], farm_create: FarmCreate) -> FarmRead:
     context = wrapper.context
 
-    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+    async with FarmbaseClient() as client:
         result = await farms_create_farm.asyncio(
-            client=client,
+            client=client.raw,
             organization=context.contact.organization.slug,
             body=farm_create,
         )
@@ -64,9 +63,9 @@ Create a note with an optional location. Use the current contact's ID for the co
 async def create_note(wrapper: RunContextWrapper[UserContext], note_create: NoteCreate) -> NoteRead:
     context = wrapper.context
 
-    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+    async with FarmbaseClient() as client:
         result = await notes_create_note.asyncio(
-            client=client,
+            client=client.raw,
             organization=context.contact.organization.slug,
             body=note_create,
         )
@@ -79,9 +78,9 @@ Get the closest markets to a given coordinate
 """
 )
 async def get_markets(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> MarketPagination:
-    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+    async with FarmbaseClient() as client:
         result = await markets_get_markets.asyncio(
-            client=client, items_per_page=10, latitude=latitude, longitude=longitude, price_within_days=30
+            client=client.raw, items_per_page=10, latitude=latitude, longitude=longitude, price_within_days=30
         )
         return result
 
@@ -92,6 +91,6 @@ Get a snapshot of market prices for a given market
 """
 )
 async def get_market_price_snapshot(_: RunContextWrapper[UserContext], market_id: int) -> MarketSnapshotRead:
-    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
-        result = await markets_get_market_snapshot_endpoint.asyncio(client=client, market_id=market_id)
+    async with FarmbaseClient() as client:
+        result = await markets_get_market_snapshot_endpoint.asyncio(client=client.raw, market_id=market_id)
         return result

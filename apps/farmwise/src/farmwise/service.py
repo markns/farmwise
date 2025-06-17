@@ -16,7 +16,6 @@ from agents import (
     trace,
 )
 from agents.voice import SingleAgentVoiceWorkflow, TTSModelSettings, VoicePipeline, VoicePipelineConfig
-from farmbase_client import AuthenticatedClient
 from farmbase_client.api.runresult import runresult_create_run_result as create_run_result
 from farmbase_client.models import AgentBase, ChatState, RunResultCreate
 from google.cloud import texttospeech
@@ -33,6 +32,7 @@ from openai.types.responses import (
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input, write_stream_to_ogg
 from farmwise.dependencies import UserContext, chat_state, user_context
+from farmwise.farmbase import FarmbaseClient
 from farmwise.hooks import LoggingHooks
 from farmwise.schema import AudioResponse, ResponseEvent, UserInput, WhatsAppResponse
 from farmwise.settings import settings
@@ -161,7 +161,7 @@ class FarmwiseService:
         user_input: UserInput,
         chat_state: ChatState,
     ) -> AsyncIterator[ResponseEvent]:
-        input_items = chat_state.input_list
+        input_items = chat_state.input_list or []
 
         content = []
         if user_input.message:
@@ -189,9 +189,9 @@ class FarmwiseService:
             async for event in _batch_stream_events(result.stream_events()):
                 yield event
 
-        with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+        async with FarmbaseClient() as client:
             await create_run_result.asyncio(
-                client=client,
+                client=client.raw,
                 organization=context.contact.organization.slug,
                 body=RunResultCreate(
                     contact_id=context.contact.id,

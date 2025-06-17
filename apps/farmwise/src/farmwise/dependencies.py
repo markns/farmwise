@@ -1,6 +1,5 @@
 from typing import Annotated
 
-from farmbase_client import AuthenticatedClient
 from farmbase_client.api.chatstate import chatstate_get_chat_state as get_chat_state
 from farmbase_client.api.contacts import contacts_create_contact as create_contact
 from farmbase_client.api.contacts import contacts_get_contact_by_phone as get_contact_by_phone
@@ -9,8 +8,8 @@ from fastapi import Depends
 from loguru import logger
 from pydantic import BaseModel, ValidationError
 
+from farmwise.farmbase import FarmbaseClient
 from farmwise.schema import UserInput
-from farmwise.settings import settings
 
 
 class UserContext(BaseModel):
@@ -20,11 +19,11 @@ class UserContext(BaseModel):
 
 # TODO: how does organization get set?
 async def user_context(user_input: UserInput, organization="default"):
-    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+    async with FarmbaseClient() as client:
         # TODO: Handle errors better, more consistently in farmbase.
         try:
             contact = await get_contact_by_phone.asyncio(
-                client=client,
+                client=client.raw,
                 organization=organization,
                 phone=user_input.user_id,
             )
@@ -36,7 +35,7 @@ async def user_context(user_input: UserInput, organization="default"):
             logger.warning(f"User not found: {e}")
 
             contact = await create_contact.asyncio(
-                client=client,
+                client=client.raw,
                 organization=organization,
                 body=ContactCreate(
                     name=user_input.user_name,
@@ -53,10 +52,10 @@ UserContextDep = Annotated[UserContext, Depends(user_context)]
 
 # TODO: Dependency caching can be used to get all state
 async def chat_state(context: UserContextDep) -> ChatState:
-    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
+    async with FarmbaseClient() as client:
         return await get_chat_state.asyncio(
             organization=context.contact.organization.slug,
-            client=client,
+            client=client.raw,
             contact_id=context.contact.id,
         )
 
