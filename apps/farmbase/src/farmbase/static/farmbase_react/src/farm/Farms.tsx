@@ -239,9 +239,20 @@ const FarmsContent: React.FC = () => {
                         sx={{
                             '& .MuiDataGrid-cell': {
                                 borderBottom: '1px solid rgba(224, 224, 224, 1)',
+                                display: 'flex',
+                                alignItems: 'center',
                             },
                             '& .MuiDataGrid-columnHeaders': {
                                 backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                            },
+                            '& .MuiDataGrid-cell--textLeft': {
+                                justifyContent: 'flex-start',
+                            },
+                            '& .MuiDataGrid-cell--textCenter': {
+                                justifyContent: 'center',
+                            },
+                            '& .MuiDataGrid-cell--textRight': {
+                                justifyContent: 'flex-end',
                             },
                             minHeight: 400,
                         }}

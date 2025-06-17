@@ -13,7 +13,6 @@ export interface Contact {
 }
 
 export interface FarmWithContacts extends Farm {
-  farm_name: string
   contacts?: Contact[]
 }
 
@@ -69,7 +68,6 @@ interface FarmState {
 
 const getDefaultSelectedState = (): FarmWithContacts => ({
   id: '',
-  name: '',
   farm_name: '',
   description: '',
   location: undefined,
@@ -141,8 +139,8 @@ export const createFarmStore = (apiClient: ApiClient) => {
             rows: {
               items: response.items.map(farm => ({
                 ...farm,
-                farm_name: farm.name,
-                contacts: [] // This would be populated from the actual API response
+                farm_name: farm.farm_name, // Map farm_name to name for DataGrid
+                contacts: farm.contacts || [] // Use actual contacts from API response
               })),
               total: response.total
             }
@@ -169,8 +167,8 @@ export const createFarmStore = (apiClient: ApiClient) => {
       set({
         selected: {
           ...farm,
-          farm_name: farm.name,
-          contacts: [] // This would be populated from the actual API response
+          farm_name: farm.farm_name, // Map farm_name to name for consistency
+          contacts: farm.contacts || [] // Use actual contacts from API response
         }
       })
     } catch (error) {

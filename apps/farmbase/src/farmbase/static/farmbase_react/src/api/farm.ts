@@ -1,8 +1,9 @@
 import { ApiClient } from './client'
+import {FarmWithContacts} from "@/stores/farmStore.ts";
 
 export interface Farm {
   id: string
-  name: string
+  farm_name: string
   description?: string
   location?: {
     latitude: number
@@ -24,7 +25,7 @@ export interface FarmListOptions {
 }
 
 export interface FarmListResponse {
-  items: Farm[]
+  items: FarmWithContacts[]
   total: number
 }
 
@@ -64,7 +65,7 @@ export const createFarmApi = (client: ApiClient) => ({
   /**
    * Get a specific farm by ID
    */
-  async getFarm(farmId: string): Promise<Farm> {
+  async getFarm(farmId: string): Promise<FarmWithContacts> {
     const response = await client.get(`${resource}/${farmId}`)
     return response.data
   },
@@ -129,9 +130,6 @@ export const createFarmApi = (client: ApiClient) => ({
   }
 })
 
-// Backward compatibility - using singleton apiClient
-// export const farmApi = createFarmApi(apiClient)
-
 // Example usage with PropelAuth HOC:
 // import { withApiClient } from './client'
 // import { createFarmApi } from './farm'
@@ -143,5 +141,3 @@ export const createFarmApi = (client: ApiClient) => ({
 // }
 // 
 // export default withApiClient(FarmComponent)
-
-// export default farmApi
