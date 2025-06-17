@@ -1,7 +1,8 @@
+import React, { createContext, useContext } from 'react'
 import { create } from 'zustand'
 import { startTransition } from 'react'
 import { 
-  contactApi, 
+  createContactApi, 
   type Contact, 
   type ContactListOptions, 
   type ContactListResponse,
@@ -10,6 +11,7 @@ import {
   type ChatState,
   type ContactInstance
 } from '@/api/contact'
+import { type ApiClient } from '@/api/client'
 import { useNotificationStore } from './notificationStore'
 import { debounce } from '@/utils'
 
@@ -92,7 +94,11 @@ interface ContactState {
   loadChatState: (contactId: string) => Promise<void>
 }
 
-export const useContactStore = create<ContactState>((set, get) => ({
+// Factory function to create contact store with authenticated API client
+export const createContactStore = (apiClient: ApiClient) => {
+  const contactApi = createContactApi(apiClient)
+  
+  return create<ContactState>((set, get) => ({
   selected: null,
   dialogs: {
     showCreateEdit: false,
@@ -517,7 +523,57 @@ export const useContactStore = create<ContactState>((set, get) => ({
       })
     }
   },
-}))
+  }))
+}
+
+// Create context for sharing the store instance
+type ContactStoreType = ReturnType<typeof createContactStore>
+const ContactStoreContext = createContext<ContactStoreType | null>(null)
+
+// Provider component that creates and shares a single store instance
+interface ContactStoreProviderProps {
+  apiClient: ApiClient
+  children: React.ReactNode
+}
+
+export const ContactStoreProvider: React.FC<ContactStoreProviderProps> = ({ apiClient, children }) => {
+  const storeRef = React.useRef<ContactStoreType>()
+  
+  if (!storeRef.current) {
+    storeRef.current = createContactStore(apiClient)
+  }
+  
+  return React.createElement(
+    ContactStoreContext.Provider,
+    { value: storeRef.current },
+    children
+  )
+}
+
+// Hook to use the shared contact store
+export const useContactStore = () => {
+  const store = useContext(ContactStoreContext)
+  if (!store) {
+    throw new Error('useContactStore must be used within a ContactStoreProvider')
+  }
+  return store()
+}
+
+// Example usage:
+// 1. Wrap your app section with the provider:
+// const AppWithContactStore = ({ apiClient }) => (
+//   <ContactStoreProvider apiClient={apiClient}>
+//     <TableInstance />
+//     <ChatDrawer />
+//     <ContactFilterDialog />
+//   </ContactStoreProvider>
+// )
+//
+// 2. Use the hook in components:
+// const TableInstance = () => {
+//   const { table, getAll, updateTableOptions } = useContactStore()
+//   // ... component logic
+// }
 
 export type { Contact, ContactListOptions, ContactEngagement, ContactFilter, ChatState, ContactInstance }
-export default useContactStore
+export default createContactStore

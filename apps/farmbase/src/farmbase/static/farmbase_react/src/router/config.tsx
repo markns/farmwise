@@ -27,7 +27,7 @@ const withSuspense = (Component: React.LazyExoticComponent<any>) => (
 const NotFound = React.lazy(() => import('@/views/error/NotFound'))
 const ServerError = React.lazy(() => import('@/views/error/Error'))
 const Farms = React.lazy(() => import('@/farm/Farms'))
-const ContactInstanceTable = React.lazy(() => import('@/contact/TableInstance'))
+const Contacts = React.lazy(() => import('@/contact/Contacts'))
 const OrganizationMemberTable = React.lazy(() => import('@/organization/OrganizationMemberTable'))
 const ResultList = React.lazy(() => import('@/search/ResultList'))
 
@@ -119,7 +119,7 @@ export const protectedRoutes: RouteConfig[] = [
     children: [
       {
         index: true,
-        element: withSuspense(ContactInstanceTable),
+        element: withSuspense(Contacts),
         meta: { title: 'List' },
       },
     ],

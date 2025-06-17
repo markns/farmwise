@@ -1,4 +1,4 @@
-import { apiClient } from './client'
+import { ApiClient } from './client'
 
 // Contact data types
 export interface Contact {
@@ -98,8 +98,8 @@ export interface ContactInstance {
   updated_at: string
 }
 
-// Contact API class
-class ContactApi {
+// Factory function to create contact API with authenticated client
+export const createContactApi = (client: ApiClient) => ({
   // Main contact operations
   async getAll(options: ContactListOptions = {}): Promise<ContactListResponse> {
     const params = new URLSearchParams()
@@ -123,28 +123,28 @@ class ContactApi {
       })
     }
 
-    const response = await apiClient.get(`/contacts?${params.toString()}`)
+    const response = await client.get(`/contacts?${params.toString()}`)
     return response.data
-  }
+  },
 
   async getContact(id: string): Promise<Contact> {
-    const response = await apiClient.get(`/contacts/${id}`)
+    const response = await client.get(`/contacts/${id}`)
     return response.data
-  }
+  },
 
   async createContact(contactData: Partial<Contact>): Promise<Contact> {
-    const response = await apiClient.post('/contacts', contactData)
+    const response = await client.post('/contacts', contactData)
     return response.data
-  }
+  },
 
   async updateContact(id: string, contactData: Partial<Contact>): Promise<Contact> {
-    const response = await apiClient.put(`/contacts/${id}`, contactData)
+    const response = await client.put(`/contacts/${id}`, contactData)
     return response.data
-  }
+  },
 
   async deleteContact(id: string): Promise<void> {
-    await apiClient.delete(`/contacts/${id}`)
-  }
+    await client.delete(`/contacts/${id}`)
+  },
 
   // Contact instances
   async getAllInstances(options: ContactListOptions = {}): Promise<ContactListResponse> {
@@ -154,70 +154,79 @@ class ContactApi {
     if (options.page) params.append('page', options.page.toString())
     if (options.itemsPerPage) params.append('itemsPerPage', options.itemsPerPage.toString())
 
-    const response = await apiClient.get(`/contacts?${params.toString()}`)
+    const response = await client.get(`/contacts?${params.toString()}`)
     return response.data
-  }
+  },
 
   async getContactInstance(contactId: string, instanceId: string): Promise<ContactInstance> {
-    const response = await apiClient.get(`/contacts/${contactId}/${instanceId}`)
+    const response = await client.get(`/contacts/${contactId}/${instanceId}`)
     return response.data
-  }
+  },
 
   // Contact engagements
   async getEngagements(contactId?: string): Promise<ContactEngagement[]> {
     const url = contactId 
       ? `/contacts/engagements?contact_id=${contactId}` 
       : '/contacts/engagements'
-    const response = await apiClient.get(url)
+    const response = await client.get(url)
     return response.data.items || response.data
-  }
+  },
 
   async createEngagement(engagementData: Partial<ContactEngagement>): Promise<ContactEngagement> {
-    const response = await apiClient.post('/contacts/engagements', engagementData)
+    const response = await client.post('/contacts/engagements', engagementData)
     return response.data
-  }
+  },
 
   async updateEngagement(id: string, engagementData: Partial<ContactEngagement>): Promise<ContactEngagement> {
-    const response = await apiClient.put(`/contacts/engagements/${id}`, engagementData)
+    const response = await client.put(`/contacts/engagements/${id}`, engagementData)
     return response.data
-  }
+  },
 
   async deleteEngagement(id: string): Promise<void> {
-    await apiClient.delete(`/contacts/engagements/${id}`)
-  }
+    await client.delete(`/contacts/engagements/${id}`)
+  },
 
   // Contact filters
   async getFilters(): Promise<ContactFilter[]> {
-    const response = await apiClient.get('/contacts/filters')
+    const response = await client.get('/contacts/filters')
     return response.data.items || response.data
-  }
+  },
 
   async createFilter(filterData: Partial<ContactFilter>): Promise<ContactFilter> {
-    const response = await apiClient.post('/contacts/filters', filterData)
+    const response = await client.post('/contacts/filters', filterData)
     return response.data
-  }
+  },
 
   async updateFilter(id: string, filterData: Partial<ContactFilter>): Promise<ContactFilter> {
-    const response = await apiClient.put(`/contacts/filters/${id}`, filterData)
+    const response = await client.put(`/contacts/filters/${id}`, filterData)
     return response.data
-  }
+  },
 
   async deleteFilter(id: string): Promise<void> {
-    await apiClient.delete(`/contacts/filters/${id}`)
-  }
+    await client.delete(`/contacts/filters/${id}`)
+  },
 
   // Chat functionality
   async getChatState(contactId: string): Promise<ChatState> {
-    const response = await apiClient.get(`/chatstate?contact_id=${contactId}`)
+    const response = await client.get(`/chatstate?contact_id=${contactId}`)
     return response.data
-  }
+  },
 
   // Utility methods
   async getFilterOptions(): Promise<Record<string, string[]>> {
-    const response = await apiClient.get('/contacts/filters/options')
+    const response = await client.get('/contacts/filters/options')
     return response.data
   }
-}
+})
 
-export const contactApi = new ContactApi()
-export default contactApi
+// Example usage with PropelAuth HOC:
+// import { withApiClient } from '@/api/client'
+// import { createContactApi } from '@/api/contact'
+//
+// const ContactComponent = ({ apiClient }) => {
+//   const contactApi = createContactApi(apiClient)
+//   // Use contactApi methods here...
+//   return <div>Contact content</div>
+// }
+//
+// export default withApiClient(ContactComponent)
