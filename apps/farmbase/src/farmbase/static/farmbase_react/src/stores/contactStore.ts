@@ -514,6 +514,7 @@ export const createContactStore = (apiClient: ApiClient) => {
   loadChatState: async (contactId: string) => {
     try {
       const chatState = await contactApi.getChatState(contactId)
+      console.log(chatState)
       set({ chatState })
     } catch (error) {
       const { addNotification } = useNotificationStore.getState()

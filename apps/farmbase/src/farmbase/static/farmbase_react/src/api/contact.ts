@@ -85,7 +85,7 @@ export interface ChatState {
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant' | 'system'
-  content: string
+  content: Record<string, any>[]
   timestamp: string
   metadata?: Record<string, any>
 }

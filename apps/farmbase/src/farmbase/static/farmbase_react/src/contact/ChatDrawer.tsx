@@ -56,9 +56,10 @@ const ChatDrawer: React.FC = () => {
     }
   }
 
-  const isImageUrl = (content: string): boolean => {
-    return /\.(jpg|jpeg|png|gif|webp)$/i.test(content) || content.startsWith('data:image/')
-  }
+  // const isImageUrl = (content: string): boolean => {
+  //   console.log(content)
+  //   return /\.(jpg|jpeg|png|gif|webp)$/i.test(content) || content.startsWith('data:image/')
+  // }
 
   return (
     <Drawer
@@ -95,8 +96,10 @@ const ChatDrawer: React.FC = () => {
             </Box>
           ) : (
             <List sx={{ p: 0 }}>
-              {chatState.messages.map((message, index) => (
-                <ListItem key={message.id || index} sx={{ px: 0, py: 1, alignItems: 'flex-start' }}>
+              {chatState.messages
+                  .filter(message => message.role !== undefined)
+                  .map((message, index) => (
+                <ListItem key={index} sx={{ px: 0, py: 1, alignItems: 'flex-start' }}>
                   <Box sx={{ width: '100%' }}>
                     {/* Message Header */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -135,40 +138,48 @@ const ChatDrawer: React.FC = () => {
                         border: `1px solid ${getRoleColor(message.role)}20`,
                       }}
                     >
-                      {/* Handle image content */}
-                      {isImageUrl(message.content) ? (
-                        <Box>
-                          <img 
-                            src={message.content} 
-                            alt="Chat image"
-                            style={{ 
-                              maxWidth: '100%', 
-                              maxHeight: '200px', 
-                              borderRadius: '4px' 
-                            }}
-                            onError={(e) => {
-                              // Fallback for broken images
-                              const target = e.currentTarget as HTMLImageElement
-                              target.style.display = 'none'
-                              const nextElement = target.nextElementSibling as HTMLElement
-                              if (nextElement) {
-                                nextElement.style.display = 'block'
-                              }
-                            }}
-                          />
-                          <Typography 
-                            variant="body2" 
-                            color="text.secondary"
-                            sx={{ display: 'none', fontStyle: 'italic' }}
-                          >
-                            [Image failed to load: {message.content}]
-                          </Typography>
-                        </Box>
-                      ) : (
+
+                      {message.content.map((content, _) => (
+
+                      // isImageUrl(content) ? (
+                      //   <Box>
+                      //     <img
+                      //       src={message.content}
+                      //       alt="Chat image"
+                      //       style={{
+                      //         maxWidth: '100%',
+                      //         maxHeight: '200px',
+                      //         borderRadius: '4px'
+                      //       }}
+                      //       onError={(e) => {
+                      //         // Fallback for broken images
+                      //         const target = e.currentTarget as HTMLImageElement
+                      //         target.style.display = 'none'
+                      //         const nextElement = target.nextElementSibling as HTMLElement
+                      //         if (nextElement) {
+                      //           nextElement.style.display = 'block'
+                      //         }
+                      //       }}
+                      //     />
+                      //     <Typography
+                      //       variant="body2"
+                      //       color="text.secondary"
+                      //       sx={{ display: 'none', fontStyle: 'italic' }}
+                      //     >
+                      //       [Image failed to load: {message.content}]
+                      //     </Typography>
+                      //   </Box>
+                      // ) : (
                         <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                          {message.content}
+                          {content.text}
                         </Typography>
-                      )}
+                      // )}
+
+                      ))
+
+                      }
+
+
 
                       {/* Message Metadata */}
                       {message.metadata && Object.keys(message.metadata).length > 0 && (

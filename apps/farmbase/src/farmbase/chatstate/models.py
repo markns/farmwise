@@ -9,4 +9,4 @@ from farmbase.runresult.models import AgentRead
 
 class ChatState(BaseModel):
     last_agent: AgentRead | None
-    input_list: List[dict[str, Any]] = Field(default_factory=list)
+    messages: List[dict[str, Any]] = Field(default_factory=list)
