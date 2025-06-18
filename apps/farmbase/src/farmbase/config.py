@@ -27,7 +27,6 @@ class Settings(BaseSettings):
     )
 
     # --- General ---
-    ENV: str = "local"
     FARMBASE_UI_URL: AnyHttpUrl = Field(default="http://localhost:8080")
     FARMBASE_ENCRYPTION_KEY: SecretStr
     FARMBASE_API_KEY: SecretStr
