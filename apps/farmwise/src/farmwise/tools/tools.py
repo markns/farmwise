@@ -8,29 +8,29 @@ from agents import (
     RunContextWrapper,
     function_tool,
 )
-from farmbase_client import AuthenticatedClient
-from farmbase_client.api.gaez import gaez_aez_classification, gaez_growing_period, gaez_suitability_index
-from farmbase_client.models import SuitabilityIndexResponse
 
+from farmbase_client.api.crop_varieties import crop_varieties_get_maize_varieties
+from farmbase_client.api.gaez import gaez_aez_classification, gaez_growing_period, gaez_suitability_index
+from farmbase_client.models import SuitabilityIndexResponse, CropVarietiesResponse
 from farmwise.dependencies import UserContext
-from farmwise.settings import settings
+from farmwise.farmbase import FarmbaseClient
 from farmwise.utils import copy_doc
 
 
 @function_tool
 @copy_doc(gaez_suitability_index.asyncio)
 async def suitability_index(
-    _: RunContextWrapper[UserContext], latitude: float, longitude: float
+        _: RunContextWrapper[UserContext], latitude: float, longitude: float
 ) -> SuitabilityIndexResponse:
-    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
-        return await gaez_suitability_index.asyncio(client=client, latitude=latitude, longitude=longitude)
+    async with FarmbaseClient() as client:
+        return await gaez_suitability_index.asyncio(client=client.raw, latitude=latitude, longitude=longitude)
 
 
 @function_tool
 @copy_doc(gaez_aez_classification.asyncio)
 async def aez_classification(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> str:
-    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
-        return await gaez_aez_classification.asyncio(client=client, latitude=latitude, longitude=longitude)
+    async with FarmbaseClient() as client:
+        return await gaez_aez_classification.asyncio(client=client.raw, latitude=latitude, longitude=longitude)
 
 
 # Refining the Spatial Scale for Maize Crop Agro-Climatological Suitability Conditions in a Region
@@ -47,19 +47,17 @@ async def aez_classification(_: RunContextWrapper[UserContext], latitude: float,
 @function_tool
 @copy_doc(gaez_growing_period.asyncio)
 async def growing_period(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> int:
-    with AuthenticatedClient(base_url=settings.FARMBASE_ENDPOINT, token=settings.FARMBASE_API_KEY) as client:
-        return await gaez_growing_period.asyncio(client=client, latitude=latitude, longitude=longitude)
+    async with FarmbaseClient() as client:
+        return await gaez_growing_period.asyncio(client=client.raw, latitude=latitude, longitude=longitude)
 
 
 @function_tool
-async def maize_varieties(_: RunContextWrapper[UserContext], altitude: float, growing_period_days: int) -> str:
-    #  TODO: use farmbase-client / farmbase_agent_toolkit
-    async with httpx.AsyncClient() as client:
-        r = await client.get(
-            "http://127.0.0.1:8000/api/v1/crop-varieties/maize",
-            params={"altitude": altitude, "growing_period": growing_period_days},
-        )
-        return r.json()
+@copy_doc(crop_varieties_get_maize_varieties.asyncio)
+async def maize_varieties(_: RunContextWrapper[UserContext], altitude: float,
+                          growing_period_days: int) -> CropVarietiesResponse:
+    async with FarmbaseClient() as client:
+        return await crop_varieties_get_maize_varieties.asyncio(client=client.raw, altitude=altitude,
+                                                                growing_period=growing_period_days)
 
 
 @function_tool
@@ -78,7 +76,7 @@ async def elevation(_: RunContextWrapper[UserContext], latitude: float, longitud
 
 
 async def _fetch_property(
-    client: httpx.AsyncClient, latitude: float, longitude: float, property_name: str
+        client: httpx.AsyncClient, latitude: float, longitude: float, property_name: str
 ) -> dict[str, Any]:
     uri = "https://api.isda-africa.com/v1/soilproperty"
     response = await client.get(
