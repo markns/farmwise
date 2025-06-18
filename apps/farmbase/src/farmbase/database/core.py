@@ -14,7 +14,7 @@ from sqlalchemy_filterset.filtersets import Model
 from sqlalchemy_utils import get_mapper
 from starlette.requests import Request
 
-from farmbase import config
+from farmbase.config import settings
 from farmbase.database.logging import SessionTracker
 
 
@@ -27,18 +27,18 @@ def create_db_engine(connection_string: str, echo=False):
     """
     url = make_url(connection_string)
 
-    # Use existing configuration values with fallbacks
+    # Use existing settingsuration values with fallbacks
     timeout_kwargs = {
         # Connection timeout - how long to wait for a connection from the pool
-        "pool_timeout": config.DATABASE_ENGINE_POOL_TIMEOUT,
+        "pool_timeout": settings.DATABASE_ENGINE_POOL_TIMEOUT,
         # Recycle connections after this many seconds
-        "pool_recycle": config.DATABASE_ENGINE_POOL_RECYCLE,
+        "pool_recycle": settings.DATABASE_ENGINE_POOL_RECYCLE,
         # Maximum number of connections to keep in the pool
-        "pool_size": config.DATABASE_ENGINE_POOL_SIZE,
+        "pool_size": settings.DATABASE_ENGINE_POOL_SIZE,
         # Maximum overflow connections allowed beyond pool_size
-        "max_overflow": config.DATABASE_ENGINE_MAX_OVERFLOW,
+        "max_overflow": settings.DATABASE_ENGINE_MAX_OVERFLOW,
         # Connection pre-ping to verify connection is still alive
-        "pool_pre_ping": config.DATABASE_ENGINE_POOL_PING,
+        "pool_pre_ping": settings.DATABASE_ENGINE_POOL_PING,
     }
 
     if "async" in url.drivername:
@@ -48,8 +48,8 @@ def create_db_engine(connection_string: str, echo=False):
 
 
 # Create the default engine with standard timeout
-engine = create_db_engine(config.SQLALCHEMY_DATABASE_URI, echo=False)
-engine_sync = create_db_engine(config.SQLALCHEMY_DATABASE_SYNC_URI, echo=True)
+engine = create_db_engine(settings.sqlalchemy_database_uri, echo=False)
+engine_sync = create_db_engine(settings.sqlalchemy_database_sync_uri, echo=True)
 
 # Enable query timing logging
 #

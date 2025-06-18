@@ -14,7 +14,7 @@ router = APIRouter()
 # crops_df = pd.read_csv("farmbase/data/kalro/crops.csv")
 # suitability_df = pd.read_pickle("farmbase/data/kalro/suitability.pkl")
 
-maize_df = pd.read_csv("data/maize/maize_varieties.csv")
+maize_df = pd.read_csv("gs://farmbase_data/maize/maize_varieties.csv")
 
 
 def maize_maturity_category(growing_season_days: float | int | None) -> str | None:

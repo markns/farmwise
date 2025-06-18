@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import StringEncryptedType, TSVectorType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
-from farmbase.config import FARMBASE_ENCRYPTION_KEY
+from farmbase.config import settings
 from farmbase.database.core import Base
 from farmbase.models import FarmbaseBase, Pagination, PrimaryKey
 from farmbase.plugins.base import plugins
@@ -86,7 +86,7 @@ class PluginInstance(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     enabled: Mapped[bool] = mapped_column(default=False)
-    _configuration = Column(StringEncryptedType(key=str(FARMBASE_ENCRYPTION_KEY), engine=AesEngine, padding="pkcs5"))
+    _configuration = Column(StringEncryptedType(key=str(settings.FARMBASE_ENCRYPTION_KEY), engine=AesEngine, padding="pkcs5"))
     plugin_id: Mapped[int] = mapped_column(ForeignKey(Plugin.id))
     plugin = relationship(Plugin, backref="instances")
 

@@ -3,7 +3,7 @@ from fastapi.security import APIKeyHeader
 from propelauth_fastapi import init_auth
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-from farmbase import config
+from farmbase.config import settings
 
 auth = init_auth(
     "https://6366051.propelauthtest.com",
@@ -18,7 +18,7 @@ api_key_scheme = APIKeyHeader(name="X-Farmbase-Key", auto_error=False)
 
 
 def verify_api_key(api_key: str = Security(api_key_scheme)):
-    if api_key == str(config.FARMBASE_API_KEY):
+    if api_key == settings.FARMBASE_API_KEY.get_secret_value():
         return {"machine": "trusted_client"}
     return None
 

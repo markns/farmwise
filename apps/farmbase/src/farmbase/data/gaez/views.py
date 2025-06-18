@@ -1,111 +1,161 @@
 import os
+from pprint import pprint
 from typing import Annotated
+from functools import lru_cache
 
+import gcsfs
 import xarray as xr
 from fastapi import APIRouter, Query
+from loguru import logger
+
 from rioxarray import rioxarray
 
 from farmbase.data.gaez.models import SuitabilityIndexResponse
 
 router = APIRouter()
 
+# --- GCS and Path Constants ---
+# The GCS filesystem object is lightweight and can be initialized globally.
+fs = gcsfs.GCSFileSystem()
 
-def _read_clr(filepath):
+# Define paths as constants for clarity
+CLASS_MAP_PATH = "gs://farmbase_data/gaez/GAEZ4_symbology_files/clr_files/AEZ_33classes.clr"
+AEZ_RASTER_PATH = "gs://farmbase_data/gaez/LR/aez/aez_v9v2red_ENSEMBLE_rcp4p5_2020s.tif"
+GROWING_PERIOD_RASTER_PATH = "gs://farmbase_data/gaez/res01/ENSEMBLE/rcp4p5/ld1_ENSEMBLE_rcp4p5_2020s.tif"
+SUITABILITY_RASTER_DIR = "gs://farmbase_data/gaez/res05/HadGEM2-ES/rcp4p5/2020sH"
+
+
+# --- Helper and Caching Functions ---
+
+def _read_clr(gcs_path):
+    """Helper function to read a GAEZ .clr file."""
     colormap = {}
-    with open(filepath, "r") as f:
+    with fs.open(gcs_path, 'r', encoding='utf-8') as f:
         for line in f:
             if line.strip() and not line.startswith("#"):
                 parts = line.split(maxsplit=5)
-                if len(parts) >= 4:
+                if len(parts) >= 5:  # Ensure we have enough parts for label
                     value = int(parts[0])
-                    label = parts[5].strip()
+                    # The label is the 6th part (index 5)
+                    label = parts[5].strip() if len(parts) > 5 else "Unknown"
                     colormap[value] = label
     return colormap
 
 
-clr_path = "data/gaez/GAEZ4_symbology_files/clr_files/AEZ_33classes.clr"
-class_map = _read_clr(clr_path)
+@lru_cache(maxsize=None)
+def get_class_map():
+    """
+    Loads the AEZ class map from GCS.
+    This function is cached, so it only runs once.
+    """
+    logger.info(f"Loading and caching class map from: {CLASS_MAP_PATH}")
+    return _read_clr(CLASS_MAP_PATH)
 
-aez_raster = rioxarray.open_rasterio("data/gaez/LR/aez/aez_v9v2red_ENSEMBLE_rcp4p5_2020s.tif")
-growing_period_raster = rioxarray.open_rasterio("data/gaez/res01/ENSEMBLE/rcp4p5/ld1_ENSEMBLE_rcp4p5_2020s.tif")
 
+@lru_cache(maxsize=None)
+def get_aez_raster():
+    """
+    Loads the AEZ raster from GCS.
+    This function is cached, so it only runs once.
+    """
+    logger.info(f"Loading and caching AEZ raster from: {AEZ_RASTER_PATH}")
+    return rioxarray.open_rasterio(AEZ_RASTER_PATH)
+
+
+@lru_cache(maxsize=None)
+def get_growing_period_raster():
+    """
+    Loads the growing period raster from GCS.
+    This function is cached, so it only runs once.
+    """
+    logger.info(f"Loading and caching growing period raster from: {GROWING_PERIOD_RASTER_PATH}")
+    return rioxarray.open_rasterio(GROWING_PERIOD_RASTER_PATH)
+
+
+@lru_cache(maxsize=None)
+def get_suitability_raster():
+    """
+    Loads, aligns, and stacks all crop suitability rasters.
+    This is a heavy operation and is cached to run only once.
+    """
+    logger.info(f"Loading and caching all suitability rasters from: {SUITABILITY_RASTER_DIR}")
+    # Note: Using fs.glob() to find files is more robust
+    raster_paths = fs.glob(os.path.join(SUITABILITY_RASTER_DIR, "suHr0_*.tif"))
+
+    # Prepend 'gs://' to make them valid URLs for rioxarray
+    full_raster_paths = [f"gs://{path}" for path in raster_paths]
+
+    rasters = [rioxarray.open_rasterio(path) for path in full_raster_paths]
+
+    # Align rasters to ensure they have the same spatial resolution and extents
+    aligned_rasters = xr.align(*rasters, join="exact")
+
+    # Extract crop codes from filenames for coordinates
+    raster_crop_codes = [os.path.basename(p).split('.')[0].split('_')[1] for p in full_raster_paths]
+
+    # Stack rasters along a new 'crop' dimension
+    stacked_raster = xr.concat(aligned_rasters, dim="crop")
+
+    # Assign meaningful labels to the new dimension
+    stacked_raster = stacked_raster.assign_coords(crop=raster_crop_codes)
+    return stacked_raster
+
+
+# --- API Endpoints ---
 
 @router.get("/aez_classification", response_model=str)
 def aez_classification(
-    latitude: Annotated[float, Query(description="The latitude coordinate")],
-    longitude: Annotated[float, Query(description="The longitude coordinate")],
+        latitude: Annotated[float, Query(description="The latitude coordinate")],
+        longitude: Annotated[float, Query(description="The longitude coordinate")],
 ):
     """Get the AEZ (Agro-Ecological Zone) classification for a given geographical coordinate."""
+    # Call the cached getter functions
+    raster = get_aez_raster()
+    class_map = get_class_map()
 
-    value = aez_raster.sel(x=longitude, y=latitude, method="nearest").item()
-    return class_map[value]
+    value = raster.sel(x=longitude, y=latitude, method="nearest").item()
+    return class_map.get(value, "Unknown Classification")
 
 
 @router.get("/growing_period", response_model=int)
 def growing_period(
-    latitude: Annotated[float, Query(description="The latitude coordinate")],
-    longitude: Annotated[float, Query(description="The longitude coordinate")],
+        latitude: Annotated[float, Query(description="The latitude coordinate")],
+        longitude: Annotated[float, Query(description="The longitude coordinate")],
 ):
     """Get the growing period length in days for a given geographical coordinate."""
+    # Call the cached getter function
+    raster = get_growing_period_raster()
+    return raster.sel(x=longitude, y=latitude, method="nearest").item()
 
-    # Ensure coordinates are named correctly and use the nearest match
-    return growing_period_raster.sel(x=longitude, y=latitude, method="nearest").item()
 
-
+# This can remain global as it's just a static dictionary
 crop_codes = {
-    "alf": "Alfalfa",
-    "ban": "Banana",
-    "brl": "Barley",
-    "cit": "Citrus",
-    "coc": "Cocoa",
-    "cof": "Coffee",
-    "con": "Coconut",
-    "cot": "Cotton",
-    "csv": "Cassava",
-    "flx": "Flax",
-    "grd": "Groundnut",
-    "jtr": "Jatropha",
-    "mze": "Maize",
-    "mis": "Miscanthus",
-    "nap": "Napier grass",
-    "olp": "Oil palm",
-    "olv": "Olive",
-    "rcg": "Reed canary grass",
-    "rsd": "Rapeseed",
-    "rub": "Rubber",
-    "sfl": "Sunflower",
-    "soy": "Soybean",
-    "spo": "Sweet potato",
-    "sub": "Sugarbeet",
-    "suc": "Sugarcane",
-    "swg": "Switchgrass",
-    "tea": "Tea",
-    "tob": "Tobacco",
-    "whe": "Wheat",
-    "wpo": "White potato",
-    "yam": "Yam",
+    "alf": "Alfalfa", "ban": "Banana", "brl": "Barley", "cit": "Citrus", "coc": "Cocoa",
+    "cof": "Coffee", "con": "Coconut", "cot": "Cotton", "csv": "Cassava", "flx": "Flax",
+    "grd": "Groundnut", "jtr": "Jatropha", "mze": "Maize", "mis": "Miscanthus",
+    "nap": "Napier grass", "olp": "Oil palm", "olv": "Olive", "rcg": "Reed canary grass",
+    "rsd": "Rapeseed", "rub": "Rubber", "sfl": "Sunflower", "soy": "Soybean",
+    "spo": "Sweet potato", "sub": "Sugarbeet", "suc": "Sugarcane", "swg": "Switchgrass",
+    "tea": "Tea", "tob": "Tobacco", "whe": "Wheat", "wpo": "White potato", "yam": "Yam",
 }
 
 
 @router.get("/suitability_index", response_model=SuitabilityIndexResponse)
 def suitability_index(
-    latitude: Annotated[float, Query(description="The latitude coordinate")],
-    longitude: Annotated[float, Query(description="The longitude coordinate")],
+        latitude: Annotated[float, Query(description="The latitude coordinate")],
+        longitude: Annotated[float, Query(description="The longitude coordinate")],
 ):
     """Get the crop suitability index values for a given geographical coordinate."""
+    # Call the cached getter function for the combined suitability raster
+    stacked_raster = get_suitability_raster()
 
-    file_path = "data/gaez/res05/HadGEM2-ES/rcp4p5/2020sH"
-    # variables = dict(zip(sdf.name, sdf.crop))
-    # # variables
-    rasters = [rioxarray.open_rasterio(os.path.join(file_path, f"suHr0_{v}.tif")) for v in crop_codes.keys()]
-    # Align rasters to ensure they have the same spatial resolution and extents
-    rasters = xr.align(*rasters, join="exact")
-    # Stack rasters along the band dimension
-    raster = xr.concat(rasters, dim="band")
-    # Assign meaningful labels to the band dimension
-    raster = raster.assign_coords(band=list(crop_codes.keys()))
-    # suitability_index
-    suitability_point = raster.sel(x=longitude, y=latitude, method="nearest")
+    # Select the data for the given point
+    suitability_point = stacked_raster.sel(x=longitude, y=latitude, method="nearest")
 
-    crops = [crop_codes[c] for c in suitability_point.band.values]
-    return SuitabilityIndexResponse(suitability_index=dict(zip(crops, suitability_point.values)))
+    # Create the response dictionary
+    response_data = {
+        crop_codes.get(crop_code.item(), "Unknown Crop"): value.item()
+        for crop_code, value in zip(suitability_point.crop, suitability_point.values)
+    }
+
+    return SuitabilityIndexResponse(suitability_index=response_data)

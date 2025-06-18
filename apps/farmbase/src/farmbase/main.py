@@ -1,5 +1,4 @@
 from contextvars import ContextVar
-from os import path
 from typing import Final, Optional
 from uuid import uuid1
 
@@ -13,15 +12,10 @@ from sqlalchemy.ext.asyncio import async_scoped_session, async_sessionmaker
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.requests import Request
-from starlette.responses import FileResponse
 from starlette.routing import compile_path
-from starlette.staticfiles import StaticFiles
 
 from .api import api_router
 from .common.utils.cli import install_plugin_events, install_plugins
-from .config import (
-    STATIC_DIR,
-)
 from .database.core import engine, get_schema_names
 from .database.logging import SessionTracker
 from .exceptions.handlers import register_error_handlers
@@ -40,19 +34,6 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# we create the ASGI for the frontend
-frontend = FastAPI(openapi_url="")
-frontend.add_middleware(GZipMiddleware, minimum_size=1000)
-
-
-@frontend.middleware("http")
-async def default_page(request, call_next):
-    response = await call_next(request)
-    if response.status_code == 404:
-        if STATIC_DIR:
-            return FileResponse(path.join(STATIC_DIR, "index.html"))
-    return response
-
 
 def custom_generate_unique_id(route: APIRoute) -> str:
     if not route.include_in_schema:
@@ -63,7 +44,7 @@ def custom_generate_unique_id(route: APIRoute) -> str:
 api = FastAPI(
     title="FarmBase",
     description="Welcome to FarmBase's API documentation! Here you will able to discover all of the ways you "
-    "can interact with the FarmBase API.",
+                "can interact with the FarmBase API.",
     root_path="/api/v1",
     docs_url=None,
     openapi_url="/docs/openapi.json",
@@ -236,9 +217,4 @@ install_plugin_events(api_router)
 # we add all API routes to the Web API framework
 api.include_router(api_router)
 
-# we mount the frontend and app
-if STATIC_DIR and path.isdir(STATIC_DIR):
-    frontend.mount("/", StaticFiles(directory=STATIC_DIR), name="app")
-
 app.mount("/api/v1", app=api)
-app.mount("/", app=frontend)
