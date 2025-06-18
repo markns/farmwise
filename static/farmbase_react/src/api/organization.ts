@@ -1,4 +1,7 @@
-import apiClient from './client'
+import { ApiClient } from './client'
+
+// Create a default API client instance for this module
+const apiClient = new ApiClient()
 
 export interface Organization {
   id: string

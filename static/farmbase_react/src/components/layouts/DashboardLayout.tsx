@@ -1,6 +1,6 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
-import { Box, Container, Grid } from '@mui/material'
+import { Box } from '@mui/material'
 import AppDrawer from '../AppDrawer'
 import AppToolbar from '../AppToolbar'
 import NotificationSnackbarsWrapper from '../NotificationSnackbarsWrapper'
@@ -13,14 +13,16 @@ const DashboardLayout: React.FC = () => {
       <AppToolbar />
       <Box sx={{ display: 'flex', flex: 1 }}>
         <AppDrawer />
-        <Box component="main" sx={{ flex: 1, overflow: 'auto', padding: 2 }}>
-          <Container maxWidth={false}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Outlet />
-              </Grid>
-            </Grid>
-          </Container>
+        <Box 
+          component="main" 
+          sx={{ 
+            flex: 1, 
+            overflow: 'auto', 
+            backgroundColor: '#f8f9fa',
+            minHeight: 'calc(100vh - 64px)',
+          }}
+        >
+          <Outlet />
         </Box>
       </Box>
       <NotificationSnackbarsWrapper />

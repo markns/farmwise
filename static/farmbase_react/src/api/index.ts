@@ -1,12 +1,11 @@
 // Export the main API client
-export { default as apiClient } from './client'
+export { ApiClient, createApiClient, withApiClient } from './client'
 
-// Export all API modules
-export * from './auth'
-export * from './farm'
-export * from './organization'
+// Export API modules selectively to avoid conflicts
+export { farmApi } from './farm'
+export { organizationApi } from './organization'
+export * from './contact'
 
-// Re-export default exports
-export { default as authApi } from './auth'
-export { default as farmApi } from './farm'
-export { default as organizationApi } from './organization'
+// Export types
+export type { Farm, FarmListOptions, FarmListResponse } from './farm'
+export type { Organization, OrganizationMember, OrganizationListOptions, OrganizationListResponse, MemberListOptions, MemberListResponse } from './organization'

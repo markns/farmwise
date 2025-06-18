@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react'
-import {Box, Button, Card, CardContent, Chip, Container, Tooltip, Typography,} from '@mui/material'
+import {Box, Button, Chip, Tooltip, Typography,} from '@mui/material'
 import {DataGrid, GridActionsCellItem, GridColDef, GridToolbar,} from '@mui/x-data-grid'
 import {Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon, Note as NoteIcon,} from '@mui/icons-material'
 import {useNavigate, useParams} from 'react-router-dom'
@@ -184,82 +184,156 @@ const FarmsContent: React.FC = () => {
     }
 
     return (
-        <Container maxWidth="xl" sx={{mt: 4, mb: 4}}>
+        <Box sx={{ p: 3, backgroundColor: '#f8f9fa', minHeight: '100%' }}>
             <NotesDrawer/>
             <FarmCreateEditDialog/>
             <FarmDeleteDialog/>
 
             {/* Header */}
-            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3}}>
-                <Typography variant="h4" component="h1">
-                    Farms
-                </Typography>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<AddIcon/>}
-                    onClick={() => createEditShow()}
+            <Box sx={{ mb: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography 
+                        variant="h4" 
+                        component="h1"
+                        sx={{ 
+                            fontWeight: 400,
+                            fontSize: '28px',
+                            color: '#3c4043',
+                            fontFamily: '"Google Sans", Roboto, sans-serif',
+                        }}
+                    >
+                        Farms
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon/>}
+                        onClick={() => createEditShow()}
+                        sx={{
+                            backgroundColor: '#1976d2',
+                            boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
+                            '&:hover': {
+                                backgroundColor: '#1565c0',
+                                boxShadow: '0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15)',
+                            },
+                            textTransform: 'none',
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            borderRadius: '4px',
+                            px: 3,
+                            py: 1,
+                        }}
+                    >
+                        CREATE FARM
+                    </Button>
+                </Box>
+                <Typography 
+                    variant="body2" 
+                    sx={{ 
+                        color: '#5f6368',
+                        fontSize: '14px',
+                        mb: 2,
+                    }}
                 >
-                    New Farm
-                </Button>
+                    Manage your farm resources and track agricultural operations
+                </Typography>
             </Box>
 
             {/* Data Table */}
-            <Card>
-                <CardContent sx={{p: 0}}>
-                    <DataGrid
-                        rows={table.rows.items}
-                        columns={columns}
-                        loading={table.loading}
-                        pagination
-                        paginationMode="server"
-                        sortingMode="server"
-                        rowCount={table.rows.total || 0}
-                        paginationModel={{
-                            page: table.options.page - 1, // DataGrid uses 0-based indexing
-                            pageSize: table.options.itemsPerPage,
-                        }}
-                        onPaginationModelChange={handlePaginationModelChange}
-                        onSortModelChange={handleSortModelChange}
-                        pageSizeOptions={[10, 25, 50, 100]}
-                        disableRowSelectionOnClick
-                        slots={{
-                            toolbar: GridToolbar,
-                        }}
-                        slotProps={{
-                            toolbar: {
-                                showQuickFilter: true,
-                                quickFilterProps: {debounceMs: 500},
-                            },
-                        }}
-                        onFilterModelChange={(model) => {
-                            const quickFilterValue = model.quickFilterValues?.[0] || ''
-                            updateTableOptions({q: quickFilterValue})
-                        }}
-                        sx={{
-                            '& .MuiDataGrid-cell': {
-                                borderBottom: '1px solid rgba(224, 224, 224, 1)',
-                                display: 'flex',
-                                alignItems: 'center',
-                            },
+            <Box
+                sx={{
+                    backgroundColor: '#ffffff',
+                    borderRadius: '8px',
+                    boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
+                    overflow: 'hidden',
+                }}
+            >
+                <DataGrid
+                    rows={table.rows.items}
+                    columns={columns}
+                    loading={table.loading}
+                    pagination
+                    paginationMode="server"
+                    sortingMode="server"
+                    rowCount={table.rows.total || 0}
+                    paginationModel={{
+                        page: table.options.page - 1, // DataGrid uses 0-based indexing
+                        pageSize: table.options.itemsPerPage,
+                    }}
+                    onPaginationModelChange={handlePaginationModelChange}
+                    onSortModelChange={handleSortModelChange}
+                    pageSizeOptions={[10, 25, 50, 100]}
+                    disableRowSelectionOnClick
+                    slots={{
+                        toolbar: GridToolbar,
+                    }}
+                    slotProps={{
+                        toolbar: {
+                            showQuickFilter: true,
+                            quickFilterProps: {debounceMs: 500},
+                        },
+                    }}
+                    onFilterModelChange={(model) => {
+                        const quickFilterValue = model.quickFilterValues?.[0] || ''
+                        updateTableOptions({q: quickFilterValue})
+                    }}
+                    sx={{
+                        border: 'none',
+                        '& .MuiDataGrid-main': {
                             '& .MuiDataGrid-columnHeaders': {
-                                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                backgroundColor: '#f8f9fa',
+                                borderBottom: '1px solid #e0e0e0',
+                                fontSize: '14px',
+                                fontWeight: 500,
+                                color: '#3c4043',
+                                '& .MuiDataGrid-columnHeaderTitle': {
+                                    fontWeight: 500,
+                                },
                             },
-                            '& .MuiDataGrid-cell--textLeft': {
-                                justifyContent: 'flex-start',
+                            '& .MuiDataGrid-cell': {
+                                borderBottom: '1px solid #f0f0f0',
+                                fontSize: '14px',
+                                color: '#3c4043',
+                                '&:focus': {
+                                    outline: 'none',
+                                },
                             },
-                            '& .MuiDataGrid-cell--textCenter': {
-                                justifyContent: 'center',
+                            '& .MuiDataGrid-row': {
+                                '&:hover': {
+                                    backgroundColor: '#f8f9fa',
+                                },
+                                '&.Mui-selected': {
+                                    backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(25, 118, 210, 0.12)',
+                                    },
+                                },
                             },
-                            '& .MuiDataGrid-cell--textRight': {
-                                justifyContent: 'flex-end',
+                        },
+                        '& .MuiDataGrid-toolbarContainer': {
+                            padding: '16px',
+                            borderBottom: '1px solid #e0e0e0',
+                            '& .MuiButton-root': {
+                                color: '#5f6368',
+                                fontSize: '14px',
+                                textTransform: 'none',
                             },
-                            minHeight: 400,
-                        }}
-                    />
-                </CardContent>
-            </Card>
-        </Container>
+                            '& .MuiInputBase-root': {
+                                fontSize: '14px',
+                            },
+                        },
+                        '& .MuiDataGrid-footerContainer': {
+                            borderTop: '1px solid #e0e0e0',
+                            backgroundColor: '#fafafa',
+                            '& .MuiTablePagination-root': {
+                                fontSize: '14px',
+                                color: '#5f6368',
+                            },
+                        },
+                        minHeight: 500,
+                    }}
+                />
+            </Box>
+        </Box>
     )
 }
 

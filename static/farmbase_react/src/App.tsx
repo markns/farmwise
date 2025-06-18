@@ -7,15 +7,99 @@ import router from './router'
 import { useNotificationStore } from './stores/notificationStore'
 import { useUpdateDetection } from './hooks/useUpdateDetection'
 
-// Create Material-UI theme
+// Create Material-UI theme matching Google Cloud Console
 const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#1976d2',
+      main: '#1976d2', // Google Blue
+      light: '#42a5f5',
+      dark: '#1565c0',
     },
     secondary: {
-      main: '#dc004e',
+      main: '#9c27b0',
+    },
+    background: {
+      default: '#f8f9fa',
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#3c4043',
+      secondary: '#5f6368',
+    },
+    divider: '#e0e0e0',
+  },
+  typography: {
+    fontFamily: '"Google Sans", "Roboto", "Helvetica", "Arial", sans-serif',
+    h1: {
+      fontFamily: '"Google Sans", "Roboto", sans-serif',
+      fontWeight: 400,
+    },
+    h2: {
+      fontFamily: '"Google Sans", "Roboto", sans-serif',
+      fontWeight: 400,
+    },
+    h3: {
+      fontFamily: '"Google Sans", "Roboto", sans-serif',
+      fontWeight: 400,
+    },
+    h4: {
+      fontFamily: '"Google Sans", "Roboto", sans-serif',
+      fontWeight: 400,
+    },
+    h5: {
+      fontFamily: '"Google Sans", "Roboto", sans-serif',
+      fontWeight: 500,
+    },
+    h6: {
+      fontFamily: '"Google Sans", "Roboto", sans-serif',
+      fontWeight: 500,
+    },
+    button: {
+      textTransform: 'none',
+      fontWeight: 500,
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          borderRadius: '4px',
+          fontSize: '14px',
+          fontWeight: 500,
+          padding: '8px 16px',
+        },
+        contained: {
+          boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
+          '&:hover': {
+            boxShadow: '0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15)',
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
+          borderRadius: '8px',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: '8px',
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: '16px',
+          fontSize: '12px',
+        },
+      },
     },
   },
 })

@@ -1,4 +1,7 @@
-// Global styles for Farmbase React app
+// Global styles for Farmbase React app - Google Cloud Console inspired
+
+// Import Google Fonts
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700&display=swap');
 
 // Reset and base styles
 * {
@@ -7,13 +10,15 @@
 
 body {
   margin: 0;
-  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  font-family: 'Google Sans', 'Roboto', 'Helvetica', 'Arial', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f8f9fa;
+  color: #3c4043;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-family: 'Roboto Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 // App root styles
@@ -21,29 +26,91 @@ code {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #f8f9fa;
 }
 
-// Link styles similar to Vue app
+// Link styles matching Google Cloud Console
 a {
-  color: rgb(25, 118, 210); // Material-UI primary color
+  color: #1976d2;
   text-decoration: none;
 
   &:hover {
     text-decoration: underline;
   }
+
+  &:visited {
+    color: #1976d2;
+  }
 }
 
 // Page wrapper for consistent spacing
 .page-wrapper {
-  min-height: calc(100vh - 64px - 50px - 81px);
+  min-height: calc(100vh - 64px);
+  background-color: #f8f9fa;
 }
 
-// Setting fab styles (if needed)
-.setting-fab {
-  top: 50% !important;
-  right: 0;
-  border-radius: 0;
+// Custom scrollbar styling (Google-like)
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-// Import any additional styles from the original Vue app
-// These would need to be converted from the original SCSS files
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+// Custom focus styles
+*:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+// Button focus styles
+button:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+// Hide default focus for buttons that will have custom focus styles
+.MuiButton-root:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #1976d2;
+}
+
+// Utility classes for Google Cloud Console styling
+.gcp-shadow {
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+}
+
+.gcp-shadow-hover:hover {
+  box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+}
+
+.gcp-border-radius {
+  border-radius: 8px;
+}
+
+.gcp-text-primary {
+  color: #3c4043;
+}
+
+.gcp-text-secondary {
+  color: #5f6368;
+}
+
+.gcp-bg-primary {
+  background-color: #ffffff;
+}
+
+.gcp-bg-secondary {
+  background-color: #f8f9fa;
+}

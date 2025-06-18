@@ -9,12 +9,10 @@ This is a multi-app workspace built with Python and uv for dependency management
 **Core Applications:**
 - `apps/farmbase/` - Main FastAPI backend application with multi-tenant architecture
 - `apps/farmwise/` - AI agent service for agricultural guidance with integrated WhatsApp support
+- `static/farmbase_react` - A SPA web console for managing resources in the FarmBase API. 
 
 **Libraries:**
 - `libs/farmbase-client/` - Auto-generated API client for farmbase
-- `libs/farmbase-agent-toolkit/` - Toolkit for AI agents to interact with farmbase
-- `libs/farmwise-client/` - Client library for farmwise service
-- `libs/farmwise-schema/` - Shared schemas and models (deprecated - merged into farmwise app)
 
 ## Development Commands
 
@@ -106,15 +104,13 @@ cd apps/farmwise && uv run python src/farmwise/main.py
 - **Import sorting:** Ruff isort with farmwise as first-party
 - **Database:** SQLModel/SQLAlchemy with async sessions
 - **API:** FastAPI with automatic OpenAPI generation
-- **Frontend:** Vue.js SPA with Vite build system
+- **Frontend:** React SPA with Vite build system
 
 ## Environment Variables
 
 Key environment variables for development:
 - `OPENAI_API_KEY` - Required for AI functionality
 - `DATABASE_*` - PostgreSQL connection details
-- `SECRET_KEY` - JWT token signing
-- `FIRST_SUPERUSER*` - Initial admin account
 - `WHATSAPP_TOKEN` - WhatsApp Business API token
 - `WHATSAPP_PHONE_ID` - WhatsApp phone number ID
 - `WHATSAPP_CALLBACK_URL` - Webhook callback URL for WhatsApp
