@@ -5,21 +5,16 @@ description = ""
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    #    "postmodern-greeter",
-    "geojson-pydantic>=1.2.0",
+    "attrs",
 ]
 
 [dependency-groups]
 dev = [
-#    "basedpyright>0",
+    "basedpyright>0",
     "poethepoet>0",
     "pytest>0",
     "ruff>0",
 ]
-
-#[tool.uv.sources]
-#postmodern-greeter = { workspace = true }
-#
 
 
 [build-system]

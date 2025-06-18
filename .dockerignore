@@ -1,6 +1,7 @@
 .git
 .gitignore
 .env
+.claude
 __pycache__
 *.pyo
 *.pyd
@@ -15,3 +16,12 @@ venv
 .ruff_cache
 
 checkpoints.db*
+data
+dbdump
+docs
+media
+notebooks
+plantix
+scripts
+static
+web

@@ -5,16 +5,13 @@ description = ""
 readme = "README.md"
 requires-python = "<=3.13"
 dependencies = [
-    "babel>=2.17.0",
-    "farmbase-agent-toolkit",
+    "farmbase-client",
     "google-cloud-texttospeech>=2.27.0",
     "loguru-logging-intercept>=0.1.5",
     "openai>=1.77.0",
-    "openai-agents>=0.0.14",
+    "openai-agents[voice]>=0.0.19",
     "pydub>=0.25.1",
     "pywa[cryptography,fastapi]>=2.10.0",
-    "sqlalchemy-utils>=0.41.2",
-    "sqlmodel>=0.0.24",
 ]
 
 [dependency-groups]
@@ -26,7 +23,7 @@ dev = [
 ]
 
 [tool.uv.sources]
-farmbase-agent-toolkit = { workspace = true }
+farmbase-client = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

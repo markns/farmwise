@@ -1,24 +1,24 @@
 [project]
 name = "farmwise-parent"
 version = "0.1.0"
-description = "Add your description here"
+description = "Empowering African Farmers with Smart Agriculture"
 readme = "README.md"
 requires-python = "<=3.13"
 
 dependencies = [
-    "dotenv~=0.9.9",
-    "fastapi~=0.115.8",
-    "pydantic~=2.10.6",
-    "pydantic-settings ~=2.6.1",
-    "typing_extensions~=4.12.2",
-    "python-dotenv~=1.0.1",
-    "uvicorn>=0.34.0",
-    "httpx>=0.28.1",
-    "google-genai>=1.11.0",
+#    "fastapi~=0.115.8",
+#    "pydantic~=2.10.6",
+#    "pydantic-settings ~=2.6.1",
+#    "typing_extensions~=4.12.2",
+    "python-dotenv",
+#    "uvicorn>=0.34.0",
+#    "httpx>=0.28.1",
+#    "google-genai>=1.11.0",
 ]
 
 [dependency-groups]
 dev = [
+    "basedpyright",
     "ruff",
     "jupyter",
     "pytest",
@@ -26,7 +26,7 @@ dev = [
     "pytest-env",
     "pytest-asyncio",
     "openapi-python-client",
-    "poethepoet>=0.32.2",
+    "poethepoet",
 ]
 
 [tool.ruff]
@@ -61,7 +61,7 @@ known-first-party = ["farmwise"]
 # run with eg `uv run poe fmt`
 fmt = "ruff format apps"
 lint = "ruff check --fix apps"
-check = "pyright"
+check = "basedpyright"
 test = "pytest"
 client-gen = "libs/farmbase-client/gen-client.sh"
 # run all the above
@@ -69,4 +69,4 @@ all = [{ ref = "fmt" }, { ref = "lint" }, { ref = "check" }, { ref = "test" }]
 
 
 [tool.uv.workspace]
-members = ["libs/*", "apps/*", "farmwise-whatsapp"]
+members = ["libs/*", "apps/*"]

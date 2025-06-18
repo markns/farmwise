@@ -21,30 +21,13 @@ ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 
 # Install dependencies
-
-# Install GDAL and build tools
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gdal-bin \
-    libgdal-dev \
-    gcc \
-    g++ \
-    python3-dev \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Ensure GDAL version is known to rasterio
-ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
-ENV C_INCLUDE_PATH=/usr/include/gdal
-ENV GDAL_VERSION=3.7.1
-
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-workspace --package=farmbase
+    uv sync --frozen --no-install-workspace --package=farmwise
 
 COPY . /workspace
+RUN uv sync --frozen --package=farmwise
 
-RUN uv sync --frozen --package=farmbase
-
-CMD ["fastapi", "run", "--workers", "4", "apps/farmbase/src/farmbase/main.py"]
+CMD ["fastapi", "run", "--workers", "4", "apps/farmwise/src/farmwise/app.py"]
