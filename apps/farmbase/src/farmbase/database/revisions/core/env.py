@@ -1,7 +1,7 @@
 from configparser import RawConfigParser
 
 from alembic import context
-from farmbase.config import SQLALCHEMY_DATABASE_SYNC_URI
+from farmbase.config import settings
 from farmbase.database.core import Base
 from loguru import logger
 from sqlalchemy import engine_from_config, pool, text
@@ -15,7 +15,7 @@ config = context.config
 
 
 config.file_config = RawConfigParser()
-config.set_main_option("sqlalchemy.url", str(SQLALCHEMY_DATABASE_SYNC_URI))
+config.set_main_option("sqlalchemy.url", str(settings.sqlalchemy_database_sync_uri))
 
 target_metadata = Base.metadata  # noqa
 

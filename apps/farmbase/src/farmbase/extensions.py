@@ -11,8 +11,6 @@ from sentry_sdk.integrations.modules import ModulesIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from sentry_sdk.integrations.stdlib import StdlibIntegration
 
-from .config import ENV, ENV_TAGS, SENTRY_DSN
-
 sentry_logging = LoggingIntegration(
     level=logging.INFO,  # Capture info and above as breadcrumbs
     event_level=logging.ERROR,  # Send errors as events
@@ -21,23 +19,23 @@ sentry_logging = LoggingIntegration(
 
 def configure_extensions():
     logger.debug("Configuring extensions...")
-    if SENTRY_DSN:
-        sentry_sdk.init(
-            dsn=str(SENTRY_DSN),
-            integrations=[
-                AioHttpIntegration(),
-                AtexitIntegration(),
-                DedupeIntegration(),
-                ExcepthookIntegration(),
-                ModulesIntegration(),
-                SqlalchemyIntegration(),
-                StdlibIntegration(),
-                sentry_logging,
-            ],
-            environment=ENV,
-            auto_enabling_integrations=False,
-        )
-        with sentry_sdk.configure_scope() as scope:
-            logger.debug(f"Using the following tags... ENV_TAGS: {ENV_TAGS}")
-            for k, v in ENV_TAGS.items():
-                scope.set_tag(k, v)
+    # if SENTRY_DSN:
+    #     sentry_sdk.init(
+    #         dsn=str(SENTRY_DSN),
+    #         integrations=[
+    #             AioHttpIntegration(),
+    #             AtexitIntegration(),
+    #             DedupeIntegration(),
+    #             ExcepthookIntegration(),
+    #             ModulesIntegration(),
+    #             SqlalchemyIntegration(),
+    #             StdlibIntegration(),
+    #             sentry_logging,
+    #         ],
+    #         environment=ENV,
+    #         auto_enabling_integrations=False,
+    #     )
+    #     with sentry_sdk.configure_scope() as scope:
+    #         logger.debug(f"Using the following tags... ENV_TAGS: {ENV_TAGS}")
+    #         for k, v in ENV_TAGS.items():
+    #             scope.set_tag(k, v)

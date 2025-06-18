@@ -1,7 +1,7 @@
 from configparser import RawConfigParser
 
 from alembic import context
-from farmbase.config import SQLALCHEMY_DATABASE_SYNC_URI
+from farmbase.config import settings
 from farmbase.database.core import Base
 from geoalchemy2 import alembic_helpers
 from loguru import logger
@@ -15,7 +15,7 @@ config = context.config
 # This line sets up loggers basically.
 
 config.file_config = RawConfigParser()
-config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_SYNC_URI)
+config.set_main_option("sqlalchemy.url", settings.sqlalchemy_database_sync_uri)
 
 target_metadata = Base.metadata
 

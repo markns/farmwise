@@ -7,6 +7,7 @@ from sqlalchemy_utils import create_database, database_exists
 from farmbase import config
 from farmbase.commodity.models import Commodity
 from farmbase.organization.models import Organization
+from ..config import settings
 
 from ..farm.activity.models import ActivityType
 from ..farm.platform.models import Platform
@@ -19,7 +20,7 @@ def version_schema(script_location: str):
     """Applies alembic versioning to schema."""
 
     # add it to alembic table
-    alembic_cfg = AlembicConfig(config.ALEMBIC_INI_PATH)
+    alembic_cfg = AlembicConfig(settings.ALEMBIC_INI_PATH)
     alembic_cfg.set_main_option("script_location", script_location)
     alembic_command.stamp(alembic_cfg, "head")
 
@@ -96,9 +97,8 @@ def populate_static_data(session):
 
 def init_database(engine):
     """Initializes the database."""
-    if not database_exists(str(config.SQLALCHEMY_DATABASE_SYNC_URI)):
-        print(f"Creating database {config.SQLALCHEMY_DATABASE_SYNC_URI}...")
-        create_database(str(config.SQLALCHEMY_DATABASE_SYNC_URI))
+    if not database_exists(str(settings.sqlalchemy_database_sync_uri)):
+        create_database(str(settings.sqlalchemy_database_sync_uri))
 
     schema_name = "farmbase_core"
 
@@ -114,7 +114,7 @@ def init_database(engine):
 
     Base.metadata.create_all(engine, tables=tables)
 
-    version_schema(script_location=config.ALEMBIC_CORE_REVISION_PATH)
+    version_schema(script_location=settings.ALEMBIC_CORE_REVISION_PATH)
     # setup_fulltext_search(engine, tables)
 
     # setup an required database functions
@@ -183,7 +183,7 @@ def init_schema(*, engine, organization: Organization):
     Base.metadata.create_all(schema_engine, tables=tables)
 
     # put schema under version control
-    version_schema(script_location=config.ALEMBIC_TENANT_REVISION_PATH)
+    version_schema(script_location=settings.ALEMBIC_TENANT_REVISION_PATH)
 
     # with engine.connect() as connection:
     #     # we need to map this for full text search as it uses sql literal strings
