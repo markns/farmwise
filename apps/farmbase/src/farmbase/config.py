@@ -92,9 +92,17 @@ class Settings(BaseSettings):
         """
         # .get_secret_value() is used to access the raw string from a SecretStr
         quoted_password = parse.quote(self.DATABASE_PASSWORD.get_secret_value())
+
+        # If the hostname is a path (for a Unix socket), don't include the port.
+        if self.DATABASE_HOSTNAME.startswith('/'):
+            host_and_port = self.DATABASE_HOSTNAME
+        # Otherwise, it's a regular network host, so include the port.
+        else:
+            host_and_port = f"{self.DATABASE_HOSTNAME}:{self.DATABASE_PORT}"
+
         return (
             f"postgresql+asyncpg://{self.DATABASE_USER}:{quoted_password}"
-            f"@{self.DATABASE_HOSTNAME}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
+            f"@{host_and_port}/{self.DATABASE_NAME}"
         )
 
     @computed_field

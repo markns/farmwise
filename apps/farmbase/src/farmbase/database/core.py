@@ -3,9 +3,10 @@ import re
 from typing import Annotated, Any, ClassVar
 
 from fastapi import Depends
+from loguru import logger
 from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect
-from sqlalchemy.engine.url import make_url
+from sqlalchemy.engine.url import make_url, URL
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Session, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
@@ -18,38 +19,64 @@ from farmbase.config import settings
 from farmbase.database.logging import SessionTracker
 
 
-def create_db_engine(connection_string: str, echo=False):
-    """Create a database engine with proper timeout settings.
+def create_db_engine(async_: bool = True, echo: bool = False):
+    """
+    Create a database engine by building the URL manually from settings.
+    Can create either an async or a sync engine.
 
     Args:
-        connection_string: Database connection string
-        echo: Database connection string
+        async_: If True, creates an async engine. If False, creates a sync engine.
+        echo: If True, enables SQLAlchemy engine logging.
     """
-    url = make_url(connection_string)
 
-    # Use existing settingsuration values with fallbacks
+    connect_args = {}
+    host = settings.DATABASE_HOSTNAME
+    port = settings.DATABASE_PORT
+
+    # If using a Unix socket, move the path to connect_args
+    # and clear the host/port for the main URL object.
+    if host.startswith('/'):
+        connect_args["host"] = host
+        host = None
+        port = None
+
+    # Determine the correct drivername based on the async_ flag
+    if async_:
+        drivername = "postgresql+asyncpg"
+    else:
+        # Use the standard synchronous driver. Assumes psycopg2 is installed.
+        drivername = "postgresql+psycopg2"
+
+        # Manually construct the URL object from individual, clean components.
+    url = URL.create(
+        drivername=drivername,
+        username=settings.DATABASE_USER,
+        password=settings.DATABASE_PASSWORD.get_secret_value(),
+        host=host,
+        port=port,
+        database=settings.DATABASE_NAME,
+    )
+
     timeout_kwargs = {
-        # Connection timeout - how long to wait for a connection from the pool
         "pool_timeout": settings.DATABASE_ENGINE_POOL_TIMEOUT,
-        # Recycle connections after this many seconds
         "pool_recycle": settings.DATABASE_ENGINE_POOL_RECYCLE,
-        # Maximum number of connections to keep in the pool
         "pool_size": settings.DATABASE_ENGINE_POOL_SIZE,
-        # Maximum overflow connections allowed beyond pool_size
         "max_overflow": settings.DATABASE_ENGINE_MAX_OVERFLOW,
-        # Connection pre-ping to verify connection is still alive
         "pool_pre_ping": settings.DATABASE_ENGINE_POOL_PING,
     }
 
-    if "async" in url.drivername:
-        return create_async_engine(url, **timeout_kwargs, echo=echo)
+    # Use the appropriate engine creation function
+    if async_:
+        return create_async_engine(url, **timeout_kwargs, echo=echo, connect_args=connect_args)
     else:
-        return create_engine(url, **timeout_kwargs, echo=echo)
+        return create_engine(url, **timeout_kwargs, echo=echo, connect_args=connect_args)
 
+# Create the default asynchronous engine for your application
+engine = create_db_engine(async_=True, echo=False)
 
-# Create the default engine with standard timeout
-engine = create_db_engine(settings.sqlalchemy_database_uri, echo=False)
-engine_sync = create_db_engine(settings.sqlalchemy_database_sync_uri, echo=True)
+# Create a synchronous engine, for example, for a script or a migration tool
+# Note: You will need to have a synchronous driver like 'psycopg2-binary' installed.
+engine_sync = create_db_engine(async_=False, echo=True)
 
 # Enable query timing logging
 #
@@ -240,6 +267,7 @@ async def get_schema_names(_engine: AsyncEngine) -> list[str]:
         inspector = inspect(sync_conn)
         return inspector.get_schema_names()
 
+    logger.info(_engine.url)
     async with _engine.connect() as async_conn:
         return await async_conn.run_sync(_get_schema_names)
 
