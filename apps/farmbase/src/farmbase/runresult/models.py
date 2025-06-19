@@ -239,7 +239,3 @@ class ReasoningItemCreate(RunItemBase):
 
 RunItemCreate = RunItemBase  # fallback for generic use
 
-
-class ChatState(BaseModel):
-    last_agent: AgentRead | None
-    input_list: List[dict[str, Any]] = Field(default_factory=list)

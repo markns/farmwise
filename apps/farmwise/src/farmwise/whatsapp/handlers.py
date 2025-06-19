@@ -174,9 +174,17 @@ async def location_handler(_: WhatsApp, msg: types.Message):
 
     response = await farmwise.invoke(user_input)
     async for event in response:
-        await _send_response(event.response, msg)
+        match event.response:
+            case WhatsAppResponse():
+                await _send_response(event.response, msg)
+            case AudioResponse():
+                await _send_audio_response(event.response, msg)
+            case _:
+                print("Unknown response type")
+
         if event.has_more:
             await msg.indicate_typing()
+
 
 
 async def _send_audio_response(response: AudioResponse, msg):

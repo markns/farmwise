@@ -161,7 +161,8 @@ class FarmwiseService:
         user_input: UserInput,
         chat_state: ChatState,
     ) -> AsyncIterator[ResponseEvent]:
-        input_items = chat_state.input_list or []
+
+        input_items = chat_state.messages or []
 
         content = []
         if user_input.message:

@@ -101,7 +101,7 @@ class FarmBase(FarmbaseBase):
 class FarmContactLink(FarmbaseBase):
     """Model for linking a contact when creating a farm."""
 
-    contact_id: PrimaryKey = PydanticField(description="ID of the contact to link")
+    contact_id: int = PydanticField(description="ID of the contact to link")
     role: FarmContactRole = PydanticField(description="Role of the contact in the farm")
 
 
