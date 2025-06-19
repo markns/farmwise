@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import React from 'react'
 import { useNotificationStore } from '@/stores/notificationStore'
 import { WithAuthInfoProps, withAuthInfo } from '@propelauth/react'
+import { apiBaseUrl } from '@/config/env'
 
 export interface ApiConfig {
   baseURL?: string
@@ -17,7 +18,7 @@ export class ApiClient {
     this.accessToken = config.accessToken || null
 
     this.instance = axios.create({
-      baseURL: config.baseURL || 'http://localhost:8000/api/v1',
+      baseURL: config.baseURL || apiBaseUrl,
       timeout: config.timeout || 10000,
     })
 

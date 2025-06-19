@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:staging": "tsc -b && vite build --mode staging",
+    "build:production": "tsc -b && vite build --mode production",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "type-check": "tsc --noEmit",
-    "deploy": "tsc -b && vite build && firebase deploy --only hosting"
+    "deploy": "npm run build:production && firebase deploy --only hosting",
+    "deploy:staging": "npm run build:staging && firebase deploy --only hosting"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
