@@ -23,13 +23,16 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=find_dotenv(),
         env_file_encoding="utf-8",
-        extra="ignore"
+        extra="ignore",
     )
 
     # --- General ---
     FARMBASE_UI_URL: AnyHttpUrl = Field(default="http://localhost:8080")
     FARMBASE_ENCRYPTION_KEY: SecretStr
     FARMBASE_API_KEY: SecretStr
+
+    # --- Security ---
+    ALLOWED_ORIGINS: list[str] = Field(default=['http://localhost:8080', 'http://127.0.0.1:8080'])
 
     # --- Sentry Middleware ---
     # Use Optional[T] = None for values that might not be set, it's cleaner than default="".

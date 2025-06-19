@@ -16,6 +16,7 @@ from starlette.routing import compile_path
 
 from .api import api_router
 from .common.utils.cli import install_plugin_events, install_plugins
+from .config import settings
 from .database.core import engine, get_schema_names
 from .database.logging import SessionTracker
 from .exceptions.handlers import register_error_handlers
@@ -54,16 +55,9 @@ api = FastAPI(
 )
 api.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# TODO: Remove this later. Allow localhost:8080 to access API
-origins = [
-    "http://localhost:8080",
-    "http://localhost:8082",
-    "http://127.0.0.1:8080",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # or ["*"] to allow all
+    allow_origins=settings.ALLOWED_ORIGINS,  # or ["*"] to allow all
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
