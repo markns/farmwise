@@ -35,6 +35,15 @@ npm run type-check
 npm run lint
 ```
 
+## Deploy
+
+```bash
+npm install -g firebase-tools
+
+TODO:
+
+```
+
 ## Project Structure
 
 ```
