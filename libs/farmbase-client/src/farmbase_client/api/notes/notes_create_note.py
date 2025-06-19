@@ -88,7 +88,7 @@ def _build_response(
 def sync_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: NoteCreate,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, NoteRead]]:
     """Create Note
@@ -122,7 +122,7 @@ def sync_detailed(
 def sync(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: NoteCreate,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, NoteRead]]:
     """Create Note
@@ -151,7 +151,7 @@ def sync(
 async def asyncio_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: NoteCreate,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, NoteRead]]:
     """Create Note
@@ -183,7 +183,7 @@ async def asyncio_detailed(
 async def asyncio(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: NoteCreate,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, NoteRead]]:
     """Create Note

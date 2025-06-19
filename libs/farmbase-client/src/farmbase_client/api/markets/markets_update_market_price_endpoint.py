@@ -88,7 +88,7 @@ def _build_response(
 def sync_detailed(
     market_price_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: MarketPriceUpdate,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
     """Update Market Price Endpoint
@@ -122,7 +122,7 @@ def sync_detailed(
 def sync(
     market_price_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: MarketPriceUpdate,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
     """Update Market Price Endpoint
@@ -151,7 +151,7 @@ def sync(
 async def asyncio_detailed(
     market_price_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: MarketPriceUpdate,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
     """Update Market Price Endpoint
@@ -183,7 +183,7 @@ async def asyncio_detailed(
 async def asyncio(
     market_price_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: MarketPriceUpdate,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
     """Update Market Price Endpoint

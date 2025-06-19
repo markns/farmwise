@@ -84,7 +84,7 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: MarketCreate,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, MarketRead]]:
     """Create Market Endpoint
@@ -115,7 +115,7 @@ def sync_detailed(
 
 def sync(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: MarketCreate,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketRead]]:
     """Create Market Endpoint
@@ -141,7 +141,7 @@ def sync(
 
 async def asyncio_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: MarketCreate,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, MarketRead]]:
     """Create Market Endpoint
@@ -170,7 +170,7 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: MarketCreate,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketRead]]:
     """Create Market Endpoint

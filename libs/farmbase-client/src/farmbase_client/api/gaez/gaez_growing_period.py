@@ -84,7 +84,7 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     latitude: float,
     longitude: float,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, int]]:
@@ -118,7 +118,7 @@ def sync_detailed(
 
 def sync(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     latitude: float,
     longitude: float,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, int]]:
@@ -147,7 +147,7 @@ def sync(
 
 async def asyncio_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     latitude: float,
     longitude: float,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, int]]:
@@ -179,7 +179,7 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     latitude: float,
     longitude: float,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, int]]:

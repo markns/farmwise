@@ -91,7 +91,7 @@ def sync_detailed(
     organization: str,
     farm_contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: FarmContactUpdate,
 ) -> Response[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Update Farm Contact
@@ -128,7 +128,7 @@ def sync(
     organization: str,
     farm_contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: FarmContactUpdate,
 ) -> Optional[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Update Farm Contact
@@ -160,7 +160,7 @@ async def asyncio_detailed(
     organization: str,
     farm_contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: FarmContactUpdate,
 ) -> Response[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Update Farm Contact
@@ -195,7 +195,7 @@ async def asyncio(
     organization: str,
     farm_contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: FarmContactUpdate,
 ) -> Optional[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Update Farm Contact

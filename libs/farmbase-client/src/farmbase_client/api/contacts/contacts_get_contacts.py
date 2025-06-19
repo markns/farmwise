@@ -108,7 +108,7 @@ def _build_response(
 def sync_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     items_per_page: Union[Unset, int] = 100,
     page: Union[Unset, int] = 1,
     ordering: Union[Unset, list[str]] = UNSET,
@@ -151,7 +151,7 @@ def sync_detailed(
 def sync(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     items_per_page: Union[Unset, int] = 100,
     page: Union[Unset, int] = 1,
     ordering: Union[Unset, list[str]] = UNSET,
@@ -189,7 +189,7 @@ def sync(
 async def asyncio_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     items_per_page: Union[Unset, int] = 100,
     page: Union[Unset, int] = 1,
     ordering: Union[Unset, list[str]] = UNSET,
@@ -230,7 +230,7 @@ async def asyncio_detailed(
 async def asyncio(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     items_per_page: Union[Unset, int] = 100,
     page: Union[Unset, int] = 1,
     ordering: Union[Unset, list[str]] = UNSET,

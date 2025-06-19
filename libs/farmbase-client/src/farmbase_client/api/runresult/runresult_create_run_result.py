@@ -86,7 +86,7 @@ def _build_response(
 def sync_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: RunResultCreate,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, str]]:
     """Create a new run_result.
@@ -120,7 +120,7 @@ def sync_detailed(
 def sync(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: RunResultCreate,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, str]]:
     """Create a new run_result.
@@ -149,7 +149,7 @@ def sync(
 async def asyncio_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: RunResultCreate,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, str]]:
     """Create a new run_result.
@@ -181,7 +181,7 @@ async def asyncio_detailed(
 async def asyncio(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: RunResultCreate,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, str]]:
     """Create a new run_result.

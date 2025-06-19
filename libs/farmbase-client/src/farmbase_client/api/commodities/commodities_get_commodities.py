@@ -88,7 +88,7 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     page: Union[Unset, int] = 1,
     items_per_page: Union[Unset, int] = 50,
 ) -> Response[Union[CommodityPagination, ErrorResponse, HTTPValidationError]]:
@@ -122,7 +122,7 @@ def sync_detailed(
 
 def sync(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     page: Union[Unset, int] = 1,
     items_per_page: Union[Unset, int] = 50,
 ) -> Optional[Union[CommodityPagination, ErrorResponse, HTTPValidationError]]:
@@ -151,7 +151,7 @@ def sync(
 
 async def asyncio_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     page: Union[Unset, int] = 1,
     items_per_page: Union[Unset, int] = 50,
 ) -> Response[Union[CommodityPagination, ErrorResponse, HTTPValidationError]]:
@@ -183,7 +183,7 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     page: Union[Unset, int] = 1,
     items_per_page: Union[Unset, int] = 50,
 ) -> Optional[Union[CommodityPagination, ErrorResponse, HTTPValidationError]]:

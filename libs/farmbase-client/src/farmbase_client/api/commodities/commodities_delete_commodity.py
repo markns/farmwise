@@ -76,7 +76,7 @@ def _build_response(
 def sync_detailed(
     commodity_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Commodity
 
@@ -107,7 +107,7 @@ def sync_detailed(
 def sync(
     commodity_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Commodity
 
@@ -133,7 +133,7 @@ def sync(
 async def asyncio_detailed(
     commodity_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Commodity
 
@@ -162,7 +162,7 @@ async def asyncio_detailed(
 async def asyncio(
     commodity_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Commodity
 

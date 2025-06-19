@@ -81,7 +81,7 @@ def sync_detailed(
     organization: str,
     note_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, NoteRead]]:
     """Get Note
 
@@ -115,7 +115,7 @@ def sync(
     organization: str,
     note_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, NoteRead]]:
     """Get Note
 
@@ -144,7 +144,7 @@ async def asyncio_detailed(
     organization: str,
     note_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, NoteRead]]:
     """Get Note
 
@@ -176,7 +176,7 @@ async def asyncio(
     organization: str,
     note_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, NoteRead]]:
     """Get Note
 

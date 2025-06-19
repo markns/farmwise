@@ -79,7 +79,7 @@ def sync_detailed(
     organization: str,
     product_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Product
 
@@ -113,7 +113,7 @@ def sync(
     organization: str,
     product_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Product
 
@@ -142,7 +142,7 @@ async def asyncio_detailed(
     organization: str,
     product_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Product
 
@@ -174,7 +174,7 @@ async def asyncio(
     organization: str,
     product_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Product
 

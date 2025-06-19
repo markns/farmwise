@@ -81,7 +81,7 @@ def sync_detailed(
     organization: str,
     farm_contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Get Farm Contact
 
@@ -115,7 +115,7 @@ def sync(
     organization: str,
     farm_contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Get Farm Contact
 
@@ -144,7 +144,7 @@ async def asyncio_detailed(
     organization: str,
     farm_contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Get Farm Contact
 
@@ -176,7 +176,7 @@ async def asyncio(
     organization: str,
     farm_contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Get Farm Contact
 

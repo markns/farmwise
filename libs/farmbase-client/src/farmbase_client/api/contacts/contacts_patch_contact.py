@@ -91,7 +91,7 @@ def sync_detailed(
     organization: str,
     contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: ContactPatch,
 ) -> Response[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Patch Contact
@@ -128,7 +128,7 @@ def sync(
     organization: str,
     contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: ContactPatch,
 ) -> Optional[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Patch Contact
@@ -160,7 +160,7 @@ async def asyncio_detailed(
     organization: str,
     contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: ContactPatch,
 ) -> Response[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Patch Contact
@@ -195,7 +195,7 @@ async def asyncio(
     organization: str,
     contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: ContactPatch,
 ) -> Optional[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Patch Contact

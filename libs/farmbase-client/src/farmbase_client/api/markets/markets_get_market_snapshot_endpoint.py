@@ -78,7 +78,7 @@ def _build_response(
 def sync_detailed(
     market_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, MarketSnapshotRead]]:
     """Get Market Snapshot Endpoint
 
@@ -109,7 +109,7 @@ def sync_detailed(
 def sync(
     market_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketSnapshotRead]]:
     """Get Market Snapshot Endpoint
 
@@ -135,7 +135,7 @@ def sync(
 async def asyncio_detailed(
     market_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, MarketSnapshotRead]]:
     """Get Market Snapshot Endpoint
 
@@ -164,7 +164,7 @@ async def asyncio_detailed(
 async def asyncio(
     market_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketSnapshotRead]]:
     """Get Market Snapshot Endpoint
 

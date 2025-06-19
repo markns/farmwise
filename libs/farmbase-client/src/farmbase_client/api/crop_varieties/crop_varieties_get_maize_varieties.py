@@ -86,7 +86,7 @@ def _build_response(
 
 def sync_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     altitude: float,
     growing_period: int,
 ) -> Response[Union[CropVarietiesResponse, ErrorResponse, HTTPValidationError]]:
@@ -118,7 +118,7 @@ def sync_detailed(
 
 def sync(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     altitude: float,
     growing_period: int,
 ) -> Optional[Union[CropVarietiesResponse, ErrorResponse, HTTPValidationError]]:
@@ -145,7 +145,7 @@ def sync(
 
 async def asyncio_detailed(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     altitude: float,
     growing_period: int,
 ) -> Response[Union[CropVarietiesResponse, ErrorResponse, HTTPValidationError]]:
@@ -175,7 +175,7 @@ async def asyncio_detailed(
 
 async def asyncio(
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     altitude: float,
     growing_period: int,
 ) -> Optional[Union[CropVarietiesResponse, ErrorResponse, HTTPValidationError]]:

@@ -91,7 +91,7 @@ def sync_detailed(
     organization: str,
     product_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: ProductUpdate,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, ProductRead]]:
     """Update Product
@@ -128,7 +128,7 @@ def sync(
     organization: str,
     product_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: ProductUpdate,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, ProductRead]]:
     """Update Product
@@ -160,7 +160,7 @@ async def asyncio_detailed(
     organization: str,
     product_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: ProductUpdate,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, ProductRead]]:
     """Update Product
@@ -195,7 +195,7 @@ async def asyncio(
     organization: str,
     product_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: ProductUpdate,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, ProductRead]]:
     """Update Product

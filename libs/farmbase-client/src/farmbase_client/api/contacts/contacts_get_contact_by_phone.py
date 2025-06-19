@@ -87,7 +87,7 @@ def _build_response(
 def sync_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     phone: str,
 ) -> Response[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Get a single contact by phone number.
@@ -119,7 +119,7 @@ def sync_detailed(
 def sync(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     phone: str,
 ) -> Optional[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Get a single contact by phone number.
@@ -146,7 +146,7 @@ def sync(
 async def asyncio_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     phone: str,
 ) -> Response[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Get a single contact by phone number.
@@ -176,7 +176,7 @@ async def asyncio_detailed(
 async def asyncio(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     phone: str,
 ) -> Optional[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Get a single contact by phone number.

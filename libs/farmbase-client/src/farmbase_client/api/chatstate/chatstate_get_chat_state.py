@@ -87,7 +87,7 @@ def _build_response(
 def sync_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     contact_id: int,
 ) -> Response[Union[ChatState, ErrorResponse, HTTPValidationError]]:
     """Get the latest chat state
@@ -119,7 +119,7 @@ def sync_detailed(
 def sync(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     contact_id: int,
 ) -> Optional[Union[ChatState, ErrorResponse, HTTPValidationError]]:
     """Get the latest chat state
@@ -146,7 +146,7 @@ def sync(
 async def asyncio_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     contact_id: int,
 ) -> Response[Union[ChatState, ErrorResponse, HTTPValidationError]]:
     """Get the latest chat state
@@ -176,7 +176,7 @@ async def asyncio_detailed(
 async def asyncio(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     contact_id: int,
 ) -> Optional[Union[ChatState, ErrorResponse, HTTPValidationError]]:
     """Get the latest chat state

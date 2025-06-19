@@ -79,7 +79,7 @@ def sync_detailed(
     organization: str,
     note_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Note
 
@@ -113,7 +113,7 @@ def sync(
     organization: str,
     note_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Note
 
@@ -142,7 +142,7 @@ async def asyncio_detailed(
     organization: str,
     note_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Note
 
@@ -174,7 +174,7 @@ async def asyncio(
     organization: str,
     note_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
     """Delete Note
 

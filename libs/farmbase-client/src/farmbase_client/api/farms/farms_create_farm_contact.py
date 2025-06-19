@@ -88,7 +88,7 @@ def _build_response(
 def sync_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: FarmContactCreate,
 ) -> Response[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Create Farm Contact
@@ -122,7 +122,7 @@ def sync_detailed(
 def sync(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: FarmContactCreate,
 ) -> Optional[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Create Farm Contact
@@ -151,7 +151,7 @@ def sync(
 async def asyncio_detailed(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: FarmContactCreate,
 ) -> Response[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Create Farm Contact
@@ -183,7 +183,7 @@ async def asyncio_detailed(
 async def asyncio(
     organization: str,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
     body: FarmContactCreate,
 ) -> Optional[Union[ErrorResponse, FarmContactRead, HTTPValidationError]]:
     """Create Farm Contact

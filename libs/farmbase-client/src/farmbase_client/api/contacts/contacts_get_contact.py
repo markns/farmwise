@@ -81,7 +81,7 @@ def sync_detailed(
     organization: str,
     contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Get a contact.
 
@@ -115,7 +115,7 @@ def sync(
     organization: str,
     contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Get a contact.
 
@@ -144,7 +144,7 @@ async def asyncio_detailed(
     organization: str,
     contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Response[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Get a contact.
 
@@ -176,7 +176,7 @@ async def asyncio(
     organization: str,
     contact_id: int,
     *,
-    client: Union[AuthenticatedClient, Client],
+    client: AuthenticatedClient,
 ) -> Optional[Union[ContactRead, ErrorResponse, HTTPValidationError]]:
     """Get a contact.
 
