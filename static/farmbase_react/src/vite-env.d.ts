@@ -5,6 +5,7 @@ interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string
   readonly VITE_APP_ENVIRONMENT: string
   readonly VITE_AUTH_URL: string
+  readonly VITE_MAPBOX_ACCESS_TOKEN: string
   readonly VITE_DISPATCH_SENTRY_ENABLED?: string
   readonly VITE_DISPATCH_SENTRY_DSN?: string
   readonly VITE_DISPATCH_AUTH_REGISTRATION_ENABLED?: string

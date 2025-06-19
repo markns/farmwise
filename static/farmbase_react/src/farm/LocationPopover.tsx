@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Button,
   Card,
@@ -10,10 +10,10 @@ import {
 } from '@mui/material'
 import {
   LocationOn as LocationIcon,
-  Map as MapIcon,
-  OpenInNew as OpenInNewIcon,
   Close as CloseIcon,
 } from '@mui/icons-material'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 interface Location {
   latitude: number
@@ -28,6 +28,8 @@ interface LocationPopoverProps {
 
 const LocationPopover: React.FC<LocationPopoverProps> = ({ location, farmName }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+  const mapContainer = useRef<HTMLDivElement>(null)
+  const map = useRef<mapboxgl.Map | null>(null)
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -35,16 +37,59 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ location, farmName })
 
   const handleClose = () => {
     setAnchorEl(null)
+    if (map.current) {
+      map.current.remove()
+      map.current = null
+    }
   }
 
   const open = Boolean(anchorEl)
 
+  useEffect(() => {
+    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
+  }, [])
+
+  useEffect(() => {
+    if (open && !map.current) {
+      // Use a longer delay and check multiple times for the container
+      const initMap = () => {
+        if (mapContainer.current) {
+          try {
+            map.current = new mapboxgl.Map({
+              container: mapContainer.current,
+              style: 'mapbox://styles/mapbox/satellite-v9',
+              center: [location.longitude, location.latitude],
+              zoom: 15
+            })
+
+            // Add a marker at the location
+            new mapboxgl.Marker()
+              .setLngLat([location.longitude, location.latitude])
+              .addTo(map.current)
+
+            // Add navigation controls
+            map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
+            
+            // Ensure map resizes properly
+            map.current.on('load', () => {
+              map.current?.resize()
+            })
+          } catch (error) {
+            console.error('Error initializing map:', error)
+          }
+        } else {
+          // If container is not ready, try again after a short delay
+          setTimeout(initMap, 50)
+        }
+      }
+
+      // Start initialization after popover is fully rendered
+      setTimeout(initMap, 200)
+    }
+  }, [open, location.latitude, location.longitude])
+
   const formatLocation = (loc: Location): string => {
     return `${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}`
-  }
-
-  const getGoogleMapsLink = (): string => {
-    return `https://www.google.com/maps?q=${location.latitude},${location.longitude}`
   }
 
   return (
@@ -106,43 +151,29 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ location, farmName })
               </Box>
             )}
 
-            {/* Map placeholder */}
+            {/* Mapbox GL Map */}
             <Box
+              ref={mapContainer}
               sx={{
-                height: 150,
+                height: 200,
+                width: '100%',
+                minHeight: 200,
                 border: '1px solid',
                 borderColor: 'divider',
                 borderRadius: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%)',
-                color: 'text.secondary',
                 mb: 2,
+                position: 'relative',
+                overflow: 'hidden',
+                '& .mapboxgl-canvas': {
+                  borderRadius: 1,
+                },
+                '& .mapboxgl-ctrl-top-right': {
+                  top: '10px',
+                  right: '10px',
+                },
               }}
-            >
-              <MapIcon sx={{ fontSize: 64 }} />
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Map View
-              </Typography>
-              <Typography variant="caption">
-                {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
-              </Typography>
-            </Box>
+            />
 
-            <Button
-              href={getGoogleMapsLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="outlined"
-              color="primary"
-              size="small"
-              fullWidth
-              startIcon={<OpenInNewIcon />}
-            >
-              View in Google Maps
-            </Button>
           </CardContent>
         </Card>
       </Popover>
