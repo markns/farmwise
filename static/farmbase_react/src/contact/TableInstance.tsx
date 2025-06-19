@@ -292,10 +292,12 @@ const TableInstance: React.FC = () => {
     {
       field: 'gender',
       headerName: 'Gender',
-      width: 100,
+      width: 80,
+      align: 'center',
+      headerAlign: 'center',
       renderCell: (params) => (
         <Typography variant="body2">
-          {params.value || 'Not specified'}
+          {params.value ? params.value.charAt(0).toUpperCase() : ''}
         </Typography>
       ),
     },
@@ -517,6 +519,9 @@ const TableInstance: React.FC = () => {
             paginationMode="server"
             sortingMode="server"
             rowCount={instanceTable.rows.total || 0}
+            columnVisibilityModel={{
+              date_of_birth: false, // Hide date of birth by default
+            }}
             paginationModel={{
               page: instanceTable.options.page - 1, // DataGrid uses 0-based indexing
               pageSize: instanceTable.options.itemsPerPage,

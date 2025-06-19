@@ -77,6 +77,7 @@ const ContactCreateEditDialog: React.FC = () => {
     selected,
     closeCreateEdit,
     save,
+    setSelected,
   } = useContactStore()
 
   const isEdit = Boolean(selected?.id)
@@ -190,13 +191,13 @@ const ContactCreateEditDialog: React.FC = () => {
         
         // Temporarily update selected to match form data
         const originalSelected = selected
-        useContactStore.setState({ selected: contactData })
+        setSelected(contactData)
         
         try {
           await save()
         } catch (error) {
           // Restore original state on error
-          useContactStore.setState({ selected: originalSelected })
+          setSelected(originalSelected)
           throw error
         }
       }

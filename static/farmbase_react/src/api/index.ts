@@ -2,7 +2,7 @@
 export { ApiClient, createApiClient, withApiClient } from './client'
 
 // Export API modules selectively to avoid conflicts
-export { farmApi } from './farm'
+export { createFarmApi } from './farm'
 export { organizationApi } from './organization'
 export * from './contact'
 
