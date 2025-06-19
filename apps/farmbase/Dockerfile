@@ -67,7 +67,8 @@ COPY . /workspace
 # Stage 2: Install the local project package itself.
 # This step is very fast because all third-party dependencies are already installed.
 RUN uv sync --frozen --package=farmbase
+EXPOSE 8000
 
 # --- Application Entrypoint ---
-# Run the FastAPI application using 4 workers.
-CMD ["fastapi", "run", "--workers", "4", "apps/farmbase/src/farmbase/main.py"]
+# Run the FastAPI application using 2 workers.
+CMD ["fastapi", "run", "--workers", "2", "apps/farmbase/src/farmbase/main.py"]

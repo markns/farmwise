@@ -29,5 +29,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY . /workspace
 RUN uv sync --frozen --package=farmwise
+EXPOSE 8000
 
-CMD ["fastapi", "run", "--workers", "4", "apps/farmwise/src/farmwise/app.py"]
+CMD ["fastapi", "run", "--workers", "2", "apps/farmwise/src/farmwise/app.py"]
