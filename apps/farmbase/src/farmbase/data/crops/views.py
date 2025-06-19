@@ -1,11 +1,14 @@
+from functools import lru_cache
 from typing import Any
 
 import pandas as pd
 from fastapi import APIRouter
+from loguru import logger
 
 from farmbase.data.crops.models import CropVarietiesResponse, CropVarietyResponse
 
 router = APIRouter()
+
 
 # Load the region lookup GeoDataFrame
 # region_gdf = pd.read_pickle("farmbase/data/kalro/regions.pkl")
@@ -14,7 +17,16 @@ router = APIRouter()
 # crops_df = pd.read_csv("farmbase/data/kalro/crops.csv")
 # suitability_df = pd.read_pickle("farmbase/data/kalro/suitability.pkl")
 
-maize_df = pd.read_csv("gs://farmbase_data/maize/maize_varieties.csv")
+
+@lru_cache(maxsize=None)
+def get_maize_data():
+    """
+    Loads the growing period raster from GCS.
+    This function is cached, so it only runs once.
+    """
+    logger.info(f"Loading and caching maize variety data")
+    maize_df = pd.read_csv("gs://farmbase_data/maize/maize_varieties.csv")
+    return maize_df
 
 
 def maize_maturity_category(growing_season_days: float | int | None) -> str | None:
@@ -61,19 +73,19 @@ def maize_maturity_category(growing_season_days: float | int | None) -> str | No
 
 @router.get("/maize", response_model=CropVarietiesResponse)
 def get_maize_varieties(altitude: float, growing_period: int) -> Any:
+    maize_df = get_maize_data()
     maturity_category = maize_maturity_category(growing_period)
 
     suitable = maize_df[
         (maize_df["min_altitude_masl"] <= altitude)
         & (maize_df["max_altitude_masl"] >= altitude)
         & (maize_df["maturity_category"] >= maturity_category)
-    ]
+        ]
     varieties = [
         CropVarietyResponse(variety=row["variety"], description=row["description"], max_yield=row["yield_tons_ha"])
         for _, row in suitable.iterrows()
     ]
     return CropVarietiesResponse(crop="maize", varieties=varieties)
-
 
 #
 #
