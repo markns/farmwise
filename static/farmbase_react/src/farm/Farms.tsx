@@ -184,13 +184,19 @@ const FarmsContent: React.FC = () => {
     }
 
     return (
-        <Box sx={{ p: 3, backgroundColor: '#f8f9fa', minHeight: '100%' }}>
+        <Box sx={{ 
+            p: 3, 
+            backgroundColor: '#f8f9fa', 
+            minHeight: '100%',
+            width: '100%',
+            maxWidth: 'none',
+        }}>
             <NotesDrawer/>
             <FarmCreateEditDialog/>
             <FarmDeleteDialog/>
 
             {/* Header */}
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: 3, width: '100%' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography 
                         variant="h4" 
@@ -245,6 +251,7 @@ const FarmsContent: React.FC = () => {
                     borderRadius: '8px',
                     boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
                     overflow: 'hidden',
+                    width: '100%',
                 }}
             >
                 <DataGrid
@@ -293,6 +300,8 @@ const FarmsContent: React.FC = () => {
                                 borderBottom: '1px solid #f0f0f0',
                                 fontSize: '14px',
                                 color: '#3c4043',
+                                display: 'flex',
+                                alignItems: 'center',
                                 '&:focus': {
                                     outline: 'none',
                                 },

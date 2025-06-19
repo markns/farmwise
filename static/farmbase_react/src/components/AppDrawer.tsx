@@ -9,6 +9,7 @@ import {
   Typography,
   Box,
   Collapse,
+  Tooltip,
 } from '@mui/material'
 import {
   Dashboard as DashboardIcon,
@@ -23,6 +24,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { useAppStore } from '../stores/appStore'
 
 const drawerWidth = 256
+const collapsedDrawerWidth = 72
 
 interface MenuItem {
   title: string
@@ -37,10 +39,15 @@ const AppDrawer: React.FC = () => {
   const location = useLocation()
   const { organization = 'default' } = useParams()
   const toggleDrawer = useAppStore(state => state.toggleDrawer)
+  const drawerHovered = useAppStore(state => state.drawerHovered)
+  const setDrawerHovered = useAppStore(state => state.setDrawerHovered)
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({
     management: true,
     data: true,
   })
+  
+  // When drawer is collapsed, only expand on hover
+  const isExpanded = toggleDrawer || drawerHovered
 
   const menuItems: MenuItem[] = [
     {
@@ -107,7 +114,36 @@ const AppDrawer: React.FC = () => {
 
   const renderMenuItem = (item: MenuItem, level: number = 0) => {
     if (item.children) {
-      const isExpanded = expandedSections[item.group]
+      const isSectionExpanded = expandedSections[item.group]
+      
+      // In collapsed mode, show only the icon
+      if (!isExpanded) {
+        return (
+          <Tooltip key={item.group} title={item.title} placement="right">
+            <ListItemButton
+              onClick={() => handleSectionToggle(item.group)}
+              sx={{
+                minHeight: 48,
+                justifyContent: 'center',
+                px: 2.5,
+                '&:hover': {
+                  backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                },
+              }}
+            >
+              <ListItemIcon sx={{ 
+                minWidth: 0, 
+                mr: 0,
+                justifyContent: 'center',
+                color: '#5f6368' 
+              }}>
+                {item.icon}
+              </ListItemIcon>
+            </ListItemButton>
+          </Tooltip>
+        )
+      }
+      
       return (
         <React.Fragment key={item.group}>
           <ListItemButton
@@ -131,14 +167,46 @@ const AppDrawer: React.FC = () => {
                 color: '#3c4043',
               }}
             />
-            {isExpanded ? <ExpandLess /> : <ExpandMore />}
+            {isSectionExpanded ? <ExpandLess /> : <ExpandMore />}
           </ListItemButton>
-          <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+          <Collapse in={isSectionExpanded} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {item.children.map((child) => renderMenuItem(child, level + 1))}
             </List>
           </Collapse>
         </React.Fragment>
+      )
+    }
+
+    // For leaf items
+    if (!isExpanded) {
+      return (
+        <Tooltip key={item.group} title={item.title} placement="right">
+          <ListItemButton
+            onClick={() => item.path && handleItemClick(item.path)}
+            sx={{
+              minHeight: 48,
+              justifyContent: 'center',
+              px: 2.5,
+              backgroundColor: isActive(item.path) ? 'rgba(25, 118, 210, 0.12)' : 'transparent',
+              borderRight: isActive(item.path) ? '3px solid #1976d2' : 'none',
+              '&:hover': {
+                backgroundColor: isActive(item.path) 
+                  ? 'rgba(25, 118, 210, 0.16)' 
+                  : 'rgba(25, 118, 210, 0.08)',
+              },
+            }}
+          >
+            <ListItemIcon sx={{ 
+              minWidth: 0,
+              mr: 0,
+              justifyContent: 'center',
+              color: isActive(item.path) ? '#1976d2' : '#5f6368' 
+            }}>
+              {item.icon}
+            </ListItemIcon>
+          </ListItemButton>
+        </Tooltip>
       )
     }
 
@@ -180,15 +248,20 @@ const AppDrawer: React.FC = () => {
     <Drawer
       variant="persistent"
       anchor="left"
-      open={toggleDrawer}
+      open={true} // Always open, but width changes
+      onMouseEnter={() => setDrawerHovered(true)}
+      onMouseLeave={() => setDrawerHovered(false)}
       sx={{
-        width: drawerWidth,
+        width: isExpanded ? drawerWidth : collapsedDrawerWidth,
         flexShrink: 0,
+        transition: 'width 0.2s ease-in-out',
         '& .MuiDrawer-paper': {
-          width: drawerWidth,
+          width: isExpanded ? drawerWidth : collapsedDrawerWidth,
           boxSizing: 'border-box',
           backgroundColor: '#fafafa',
           borderRight: '1px solid #e0e0e0',
+          transition: 'width 0.2s ease-in-out',
+          overflowX: 'hidden',
         },
       }}
     >
@@ -197,19 +270,43 @@ const AppDrawer: React.FC = () => {
         backgroundColor: '#ffffff',
         borderBottom: '1px solid #e0e0e0',
       }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-          <Typography 
-            variant="h6" 
-            noWrap 
-            component="div"
-            sx={{
-              fontWeight: 400,
-              fontSize: '22px',
-              color: '#3c4043',
-            }}
-          >
-            FarmBase
-          </Typography>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          width: '100%',
+          justifyContent: isExpanded ? 'flex-start' : 'center',
+        }}>
+          {isExpanded ? (
+            <Typography 
+              variant="h6" 
+              noWrap 
+              component="div"
+              sx={{
+                fontWeight: 400,
+                fontSize: '22px',
+                color: '#3c4043',
+              }}
+            >
+              FarmBase
+            </Typography>
+          ) : (
+            <Tooltip title="FarmBase" placement="right">
+              <Box sx={{
+                width: 32,
+                height: 32,
+                backgroundColor: '#1976d2',
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '14px',
+              }}>
+                FB
+              </Box>
+            </Tooltip>
+          )}
         </Box>
       </Toolbar>
       <List sx={{ pt: 1 }}>

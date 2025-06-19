@@ -1,13 +1,10 @@
 import React, { useEffect } from 'react'
 import {
-  Container,
   Typography,
   Box,
   Button,
   Chip,
   Tooltip,
-  Card,
-  CardContent,
   Avatar,
 } from '@mui/material'
 import {
@@ -23,6 +20,9 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   FilterAlt as FilterIcon,
+  Agriculture as FarmerIcon,
+  School as ExtensionOfficerIcon,
+  Person as PersonIcon,
 } from '@mui/icons-material'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useContactStore, type Contact } from '@/stores/contactStore'
@@ -91,6 +91,34 @@ const TableInstance: React.FC = () => {
       return `${age} years`
     } catch {
       return 'Unknown'
+    }
+  }
+
+  const getRoleIcon = (role?: string) => {
+    if (!role) return <PersonIcon sx={{ color: '#9e9e9e' }} />
+    
+    switch (role.toLowerCase()) {
+      case 'farmer':
+        return <FarmerIcon sx={{ color: '#4caf50' }} />
+      case 'extension_officer':
+      case 'extension officer':
+        return <ExtensionOfficerIcon sx={{ color: '#2196f3' }} />
+      default:
+        return <PersonIcon sx={{ color: '#9e9e9e' }} />
+    }
+  }
+
+  const getRoleTooltip = (role?: string): string => {
+    if (!role) return 'No role specified'
+    
+    switch (role.toLowerCase()) {
+      case 'farmer':
+        return 'Farmer'
+      case 'extension_officer':
+      case 'extension officer':
+        return 'Extension Officer'
+      default:
+        return role.charAt(0).toUpperCase() + role.slice(1)
     }
   }
 
@@ -274,11 +302,20 @@ const TableInstance: React.FC = () => {
     {
       field: 'role',
       headerName: 'Role',
-      width: 150,
+      width: 80,
+      align: 'center',
+      headerAlign: 'center',
       renderCell: (params) => (
-        <Typography variant="body2">
-          {params.value || 'No role'}
-        </Typography>
+        <Tooltip title={getRoleTooltip(params.value)} placement="top">
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            height: '100%',
+          }}>
+            {getRoleIcon(params.value)}
+          </Box>
+        </Tooltip>
       ),
     },
     {
@@ -382,38 +419,96 @@ const TableInstance: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+    <Box sx={{ 
+      p: 3, 
+      backgroundColor: '#f8f9fa', 
+      minHeight: '100%',
+      width: '100%',
+      maxWidth: 'none',
+    }}>
       <ChatDrawer />
       <ContactCreateEditDialog />
       <ContactFilterDialog />
       
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
-          Contacts
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<FilterIcon />}
-            onClick={() => filterShow()}
+      <Box sx={{ mb: 3, width: '100%' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography 
+            variant="h4" 
+            component="h1"
+            sx={{ 
+              fontWeight: 400,
+              fontSize: '28px',
+              color: '#3c4043',
+              fontFamily: '"Google Sans", Roboto, sans-serif',
+            }}
           >
-            Filters
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={() => createEditShow()}
-          >
-            New Contact
-          </Button>
+            Contacts
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="outlined"
+              startIcon={<FilterIcon />}
+              onClick={() => filterShow()}
+              sx={{
+                color: '#1976d2',
+                borderColor: '#1976d2',
+                textTransform: 'none',
+                fontWeight: 500,
+                fontSize: '14px',
+                '&:hover': {
+                  borderColor: '#1565c0',
+                  backgroundColor: 'rgba(25, 118, 210, 0.04)',
+                },
+              }}
+            >
+              FILTERS
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => createEditShow()}
+              sx={{
+                backgroundColor: '#1976d2',
+                boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
+                '&:hover': {
+                  backgroundColor: '#1565c0',
+                  boxShadow: '0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15)',
+                },
+                textTransform: 'none',
+                fontWeight: 500,
+                fontSize: '14px',
+                borderRadius: '4px',
+                px: 3,
+                py: 1,
+              }}
+            >
+              CREATE CONTACT
+            </Button>
+          </Box>
         </Box>
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            color: '#5f6368',
+            fontSize: '14px',
+            mb: 2,
+          }}
+        >
+          Manage your contacts and track relationships with farmers and stakeholders
+        </Typography>
       </Box>
 
       {/* Data Table */}
-      <Card>
-        <CardContent sx={{ p: 0 }}>
+      <Box
+        sx={{
+          backgroundColor: '#ffffff',
+          borderRadius: '8px',
+          boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
+          overflow: 'hidden',
+          width: '100%',
+        }}
+      >
           <DataGrid
             rows={instanceTable.rows.items}
             columns={columns}
@@ -444,29 +539,65 @@ const TableInstance: React.FC = () => {
               updateInstanceTableOptions({ q: quickFilterValue })
             }}
             sx={{
-              '& .MuiDataGrid-cell': {
-                borderBottom: '1px solid rgba(224, 224, 224, 1)',
-                display: 'flex',
-                alignItems: 'center',
+              border: 'none',
+              '& .MuiDataGrid-main': {
+                '& .MuiDataGrid-columnHeaders': {
+                  backgroundColor: '#f8f9fa',
+                  borderBottom: '1px solid #e0e0e0',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: '#3c4043',
+                  '& .MuiDataGrid-columnHeaderTitle': {
+                    fontWeight: 500,
+                  },
+                },
+                '& .MuiDataGrid-cell': {
+                  borderBottom: '1px solid #f0f0f0',
+                  fontSize: '14px',
+                  color: '#3c4043',
+                  display: 'flex',
+                  alignItems: 'center',
+                  '&:focus': {
+                    outline: 'none',
+                  },
+                },
+                '& .MuiDataGrid-row': {
+                  '&:hover': {
+                    backgroundColor: '#f8f9fa',
+                  },
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(25, 118, 210, 0.12)',
+                    },
+                  },
+                },
               },
-              '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              '& .MuiDataGrid-toolbarContainer': {
+                padding: '16px',
+                borderBottom: '1px solid #e0e0e0',
+                '& .MuiButton-root': {
+                  color: '#5f6368',
+                  fontSize: '14px',
+                  textTransform: 'none',
+                },
+                '& .MuiInputBase-root': {
+                  fontSize: '14px',
+                },
               },
-              '& .MuiDataGrid-cell--textLeft': {
-                justifyContent: 'flex-start',
+              '& .MuiDataGrid-footerContainer': {
+                borderTop: '1px solid #e0e0e0',
+                backgroundColor: '#fafafa',
+                '& .MuiTablePagination-root': {
+                  fontSize: '14px',
+                  color: '#5f6368',
+                },
               },
-              '& .MuiDataGrid-cell--textCenter': {
-                justifyContent: 'center',
-              },
-              '& .MuiDataGrid-cell--textRight': {
-                justifyContent: 'flex-end',
-              },
-              minHeight: 400,
+              minHeight: 500,
             }}
           />
-        </CardContent>
-      </Card>
-    </Container>
+      </Box>
+    </Box>
   )
 }
 
