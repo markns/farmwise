@@ -25,14 +25,16 @@ class Settings(BaseSettings):
     )
     MODE: str | None = None
     HOST: str = "0.0.0.0"
-    PORT: int = 8001
-    AUTH_SECRET: SecretStr | None = None
-    OPENAI_API_KEY: SecretStr | None = None
-    FARMBASE_ENDPOINT: str | None = None
-    FARMBASE_API_KEY: SecretStr | None = None
+    PORT: int = 8000
+    OPENAI_API_KEY: SecretStr
+    FARMBASE_ENDPOINT: str
+    FARMBASE_API_KEY: SecretStr
     WHATSAPP_TOKEN: str
     WHATSAPP_PHONE_ID: str
     WHATSAPP_CALLBACK_URL: str
+    WHATSAPP_VERIFY_TOKEN: str
+    WHATSAPP_APP_ID: int
+    WHATSAPP_APP_SECRET: str
     DOWNLOAD_DIR: str
     MEDIA_SERVER: str
 

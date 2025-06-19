@@ -34,13 +34,13 @@ async def lifespan(_):
 app = FastAPI(debug=settings.is_dev(), lifespan=lifespan)
 
 wa = WhatsApp(
-    phone_id=settings.WHATSAPP_PHONE_ID,  # The phone id you got from the API Setup
-    token=settings.WHATSAPP_TOKEN,  # The token you got from the API Setup
+    phone_id=settings.WHATSAPP_PHONE_ID,
+    token=settings.WHATSAPP_TOKEN,
     server=app,
     callback_url=settings.WHATSAPP_CALLBACK_URL,
-    verify_token="xyz123fdsfds",
-    app_id=1392339421934377,
-    app_secret="b8a5543a9bf425a0e87676641569b2b4",
+    verify_token=settings.WHATSAPP_VERIFY_TOKEN,
+    app_id=settings.WHATSAPP_APP_ID,
+    app_secret=settings.WHATSAPP_APP_SECRET,
     handlers_modules=[handlers],
 )
 

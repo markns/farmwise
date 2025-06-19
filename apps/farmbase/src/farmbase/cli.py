@@ -257,7 +257,7 @@ def drop_database():
     """Drops all data in database."""
     from sqlalchemy_utils import database_exists, drop_database
 
-    sqlalchemy_database_uri = str(config.SQLALCHEMY_DATABASE_SYNC_URI)
+    sqlalchemy_database_uri = str(settings.sqlalchemy_database_sync_uri)
 
     if database_exists(str(sqlalchemy_database_uri)):
         if click.confirm(f"Are you sure you want to drop database? {str(sqlalchemy_database_uri)}"):
