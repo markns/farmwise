@@ -16,7 +16,7 @@ sketch
 
 # Environment files
 .env.local
-.env.*.local
+.env.*
 
 # Build output
 dist/
