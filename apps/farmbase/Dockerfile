@@ -59,14 +59,14 @@ ENV GDAL_VERSION=3.6.2
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-workspace --package=farmbase
+    uv sync --compile-bytecode --frozen --no-install-workspace --package=farmbase
 
 # Copy the application source code into the workspace
 COPY . /workspace
 
 # Stage 2: Install the local project package itself.
 # This step is very fast because all third-party dependencies are already installed.
-RUN uv sync --frozen --package=farmbase
+RUN uv sync --compile-bytecode --frozen --package=farmbase
 EXPOSE 8000
 
 # --- Application Entrypoint ---
