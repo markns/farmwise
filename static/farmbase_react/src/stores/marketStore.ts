@@ -177,7 +177,7 @@ const createMarketStore = (apiClient: ApiClient) => {
 }
 
 // Context for the store
-const MarketStoreContext = createContext<MarketStore | null>(null)
+const MarketStoreContext = createContext<ReturnType<typeof createMarketStore> | null>(null)
 
 // Provider component
 interface MarketStoreProviderProps {
@@ -186,7 +186,7 @@ interface MarketStoreProviderProps {
 }
 
 export const MarketStoreProvider: React.FC<MarketStoreProviderProps> = ({ children, apiClient }) => {
-  const storeRef = React.useRef<MarketStore>()
+  const storeRef = React.useRef<ReturnType<typeof createMarketStore>>()
   
   if (!storeRef.current) {
     storeRef.current = createMarketStore(apiClient)
@@ -205,7 +205,7 @@ export const useMarketStore = () => {
   if (!store) {
     throw new Error('useMarketStore must be used within MarketStoreProvider')
   }
-  return store()
+  return store
 }
 
 // Export types

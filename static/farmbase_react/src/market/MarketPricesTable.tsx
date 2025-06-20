@@ -23,6 +23,7 @@ import {
 import { useMarketStore, type MarketPrice } from '@/stores/marketStore'
 
 const MarketPricesTable: React.FC = () => {
+  const store = useMarketStore()
   const {
     markets,
     commodities,
@@ -31,7 +32,7 @@ const MarketPricesTable: React.FC = () => {
     loadMarkets,
     loadCommodities,
     updateInstanceTableOptions,
-  } = useMarketStore()
+  } = store()
 
   const { options } = instanceTable
 
