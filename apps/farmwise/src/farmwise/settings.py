@@ -35,8 +35,8 @@ class Settings(BaseSettings):
     WHATSAPP_VERIFY_TOKEN: str
     WHATSAPP_APP_ID: int
     WHATSAPP_APP_SECRET: str
-    DOWNLOAD_DIR: str
-    MEDIA_SERVER: str
+    GCS_BUCKET: str = "gs://farmwise_media"
+    GCS_SERVICE_ACCOUNT_FILE: str | None = None
 
     def is_dev(self) -> bool:
         return self.MODE == "dev"

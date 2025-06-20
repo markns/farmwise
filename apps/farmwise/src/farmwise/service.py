@@ -1,5 +1,6 @@
 import io
 import json
+import tempfile
 from datetime import UTC, datetime
 from typing import AsyncIterator
 
@@ -139,8 +140,8 @@ class FarmwiseService:
         filename = file_url.split("/")[-1] or "upload.jpg"
 
         # Make sure the filename has a supported extension
-        if not any(filename.lower().endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".gif", ".webp"]):
-            raise ValueError(f"Unsupported file extension in: {filename}")
+        # if not any(filename.lower().endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".gif", ".webp"]):
+        #     raise ValueError(f"Unsupported file extension in: {filename}")
 
         file_like = io.BytesIO(response.content)
         file_like.name = filename  # This is critical — OpenAI expects a `.name` attribute
@@ -168,10 +169,10 @@ class FarmwiseService:
         if user_input.message:
             content.append(ResponseInputTextParam(text=user_input.message, type="input_text"))
         if user_input.image:
-            file_id = self.create_openai_file(user_input.image)
+            # file_id = self.create_openai_file(user_input.image)
             content.extend(
                 [
-                    ResponseInputImageParam(detail="auto", file_id=file_id, type="input_image"),
+                    ResponseInputImageParam(detail="auto", image_url=user_input.image, type="input_image"),
                     ResponseInputTextParam(text=f"image_path={user_input.image}", type="input_text"),
                 ]
             )
@@ -231,20 +232,33 @@ class FarmwiseService:
     async def invoke_voice(self, user_input: UserInput) -> str:
         agent = agents[DEFAULT_AGENT]
 
-        audio_input = load_oga_as_audio_input(user_input.voice)
+        with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as temp_f:
+            temp_file_path = temp_f.name
+            print(f"Created temporary file: {temp_file_path}")
 
-        print(f"loaded audio input {audio_input}")
-        pipeline = VoicePipeline(
-            workflow=SingleAgentVoiceWorkflow(agent),
-            config=VoicePipelineConfig(workflow_name="FarmWise", tts_settings=TTSModelSettings(voice="onyx")),
-        )
+            # Make a request to the URL, streaming the response
+            print(f"Downloading from {user_input.voice}...")
+            with requests.get(user_input.voice, stream=True) as r:
+                # Check if the request was successful
+                r.raise_for_status()
 
-        result = await pipeline.run(audio_input)
+                # Write the content to the temporary file in chunks
+                for chunk in r.iter_content(chunk_size=8192):
+                    temp_f.write(chunk)
 
-        output_path = user_input.voice.replace(".oga", "_response.oga")
-        await write_stream_to_ogg(result.stream(), output_path)
+            audio_input = load_oga_as_audio_input(temp_file_path)
 
-        return output_path
+            pipeline = VoicePipeline(
+                workflow=SingleAgentVoiceWorkflow(agent),
+                config=VoicePipelineConfig(workflow_name="FarmWise", tts_settings=TTSModelSettings(voice="onyx")),
+            )
+
+            result = await pipeline.run(audio_input)
+
+            # output_path = user_input.voice.replace(".oga", "_response.oga")
+            # await write_stream_to_ogg(result.stream(), output_path)
+            #
+            # return output_path
 
 
 farmwise = FarmwiseService()
