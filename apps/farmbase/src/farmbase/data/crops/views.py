@@ -29,6 +29,60 @@ def get_maize_data():
     return maize_df
 
 
+@router.get("/maize", response_model=CropVarietiesResponse)
+def get_maize_varieties(altitude: float = None, growing_period: int = None) -> Any:
+    """
+    Filters and returns maize varieties based on optional altitude and growing period criteria.
+    """
+    maize_df = get_maize_data()
+
+    # Start with the full dataframe, which will be progressively filtered.
+    suitable_df = maize_df.copy()
+
+    # 1. Conditionally filter by altitude if a value is provided.
+    if altitude is not None:
+        suitable_df = suitable_df[
+            (suitable_df["min_altitude_masl"] <= altitude)
+            & (suitable_df["max_altitude_masl"] >= altitude)
+            ]
+
+    # 2. Conditionally filter by growing period if a value is provided.
+    if growing_period is not None:
+        maturity_category = maize_maturity_category(growing_period)
+
+        if maturity_category is not None:
+            # To correctly filter for varieties with a "greater or equal" maturity period,
+            # we define an explicit order for the categories.
+            category_order = [
+                "Extremely early",
+                "Early",
+                "Intermediate",
+                "Late",
+                "Very late"
+            ]
+
+            try:
+                # Find the position of the requested maturity category in the ordered list.
+                user_category_index = category_order.index(maturity_category)
+
+                # Identify all categories that are suitable (the requested one and all that take longer).
+                suitable_categories = category_order[user_category_index:]
+
+                # Filter the dataframe to include only varieties in the suitable categories.
+                suitable_df = suitable_df[suitable_df["maturity_category"].isin(suitable_categories)]
+            except ValueError:
+                # This handles cases where the calculated maturity_category is not in our defined order.
+                # In this scenario, we do not apply a maturity filter.
+                pass
+
+    varieties = [
+        CropVarietyResponse(**row)
+        for _, row in suitable_df.iterrows()
+    ]
+
+    return CropVarietiesResponse(crop="maize", varieties=varieties)
+
+
 def maize_maturity_category(growing_season_days: float | int | None) -> str | None:
     """
     Return the maturity category for a maize variety, given its growing-season
@@ -71,23 +125,6 @@ def maize_maturity_category(growing_season_days: float | int | None) -> str | No
         return None
 
 
-@router.get("/maize", response_model=CropVarietiesResponse)
-def get_maize_varieties(altitude: float, growing_period: int) -> Any:
-    maize_df = get_maize_data()
-    maturity_category = maize_maturity_category(growing_period)
-
-    suitable = maize_df[
-        (maize_df["min_altitude_masl"] <= altitude)
-        & (maize_df["max_altitude_masl"] >= altitude)
-        & (maize_df["maturity_category"] >= maturity_category)
-        ]
-    varieties = [
-        CropVarietyResponse(variety=row["variety"], description=row["description"], max_yield=row["yield_tons_ha"])
-        for _, row in suitable.iterrows()
-    ]
-    return CropVarietiesResponse(crop="maize", varieties=varieties)
-
-#
 #
 # @router.get("/suitability", response_model=CropVarietiesResponse)
 # def get_suitable_crop_varieties(session: SessionDep, crop_type: str, latitude: float, longitude: float) -> Any:

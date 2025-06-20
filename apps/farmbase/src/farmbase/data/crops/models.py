@@ -5,8 +5,14 @@ from pydantic import BaseModel
 
 class CropVarietyResponse(BaseModel):
     variety: str
+    producer: str
+    # website: str
     description: str
-    max_yield: str
+    maturity_months: str
+    yield_tons_ha: str
+    min_altitude_masl: float
+    max_altitude_masl: float
+    maturity_category: str
 
 
 class CropVarietiesResponse(BaseModel):
