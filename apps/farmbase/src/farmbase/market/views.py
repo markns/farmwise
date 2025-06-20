@@ -38,7 +38,7 @@ from .service import (
 )
 
 router = APIRouter()
-
+price_router = APIRouter()
 
 def _to_market_price_read(market_price) -> MarketPriceRead:
     """Convert MarketPrice ORM object to MarketPriceRead schema."""
@@ -202,17 +202,19 @@ async def get_market_snapshot_endpoint(
 
 
 # Market price endpoints
-@router.get("/prices", response_model=MarketPricePagination)
+@price_router.get("", response_model=MarketPricePagination)
 async def get_market_prices(
     db_session: DbSession,
-    page: Annotated[int, Query(ge=1)] = 1,
-    items_per_page: Annotated[int, Query(ge=1, le=100)] = 50,
     market_id: Annotated[int, Query()] = None,
     commodity_id: Annotated[int, Query()] = None,
+    page: Annotated[int, Query(ge=1)] = 1,
+    items_per_page: Annotated[int, Query(ge=1, le=100)] = 50,
 ):
     """Get market prices with optional filtering by market or commodity."""
     offset = (page - 1) * items_per_page
 
+    if not market_id and not commodity_id:
+        raise Exception("One of market_id and commodity_id must be set")
     if market_id:
         market_prices = await get_market_prices_by_market(
             db_session=db_session, market_id=market_id, limit=items_per_page, offset=offset
@@ -221,8 +223,6 @@ async def get_market_prices(
         market_prices = await get_market_prices_by_commodity(
             db_session=db_session, commodity_id=commodity_id, limit=items_per_page, offset=offset
         )
-    else:
-        market_prices = await get_all_market_prices(db_session=db_session, limit=items_per_page, offset=offset)
 
     total = await count_market_prices(db_session=db_session)
 
@@ -233,68 +233,68 @@ async def get_market_prices(
         total=total,
     )
 
-
-@router.post("/prices", response_model=MarketPriceRead)
-async def create_market_price_endpoint(
-    db_session: DbSession,
-    market_price_in: MarketPriceCreate,
-):
-    """Create a new market price."""
-    # Verify market exists
-    market = await get_market(db_session=db_session, market_id=market_price_in.market_id)
-    if not market:
-        raise EntityDoesNotExistError(message="Market not found.")
-
-    # Verify commodity exists
-    from ..commodity.service import get as get_commodity
-
-    commodity = await get_commodity(db_session=db_session, commodity_id=market_price_in.commodity_id)
-    if not commodity:
-        raise EntityDoesNotExistError(message="Commodity not found.")
-
-    market_price = await create_market_price(db_session=db_session, market_price_in=market_price_in)
-    return _to_market_price_read(market_price)
-
-
-@router.get("/prices/{market_price_id}", response_model=MarketPriceRead)
-async def get_market_price_endpoint(
-    db_session: DbSession,
-    market_price_id: PrimaryKey,
-):
-    """Get a market price by ID."""
-    market_price = await get_market_price(db_session=db_session, market_price_id=market_price_id)
-    if not market_price:
-        raise EntityDoesNotExistError(message="Market price not found.")
-
-    return _to_market_price_read(market_price)
+#
+# @router.post("/prices", response_model=MarketPriceRead)
+# async def create_market_price_endpoint(
+#     db_session: DbSession,
+#     market_price_in: MarketPriceCreate,
+# ):
+#     """Create a new market price."""
+#     # Verify market exists
+#     market = await get_market(db_session=db_session, market_id=market_price_in.market_id)
+#     if not market:
+#         raise EntityDoesNotExistError(message="Market not found.")
+#
+#     # Verify commodity exists
+#     from ..commodity.service import get as get_commodity
+#
+#     commodity = await get_commodity(db_session=db_session, commodity_id=market_price_in.commodity_id)
+#     if not commodity:
+#         raise EntityDoesNotExistError(message="Commodity not found.")
+#
+#     market_price = await create_market_price(db_session=db_session, market_price_in=market_price_in)
+#     return _to_market_price_read(market_price)
 
 
-@router.put("/prices/{market_price_id}", response_model=MarketPriceRead)
-async def update_market_price_endpoint(
-    db_session: DbSession,
-    market_price_id: PrimaryKey,
-    market_price_in: MarketPriceUpdate,
-):
-    """Update an existing market price."""
-    market_price = await get_market_price(db_session=db_session, market_price_id=market_price_id)
-    if not market_price:
-        raise EntityDoesNotExistError(message="Market price not found.")
-
-    market_price = await update_market_price(
-        db_session=db_session, market_price=market_price, market_price_in=market_price_in
-    )
-    return _to_market_price_read(market_price)
+# @router.get("/prices/{market_price_id}", response_model=MarketPriceRead)
+# async def get_market_price_endpoint(
+#     db_session: DbSession,
+#     market_price_id: PrimaryKey,
+# ):
+#     """Get a market price by ID."""
+#     market_price = await get_market_price(db_session=db_session, market_price_id=market_price_id)
+#     if not market_price:
+#         raise EntityDoesNotExistError(message="Market price not found.")
+#
+#     return _to_market_price_read(market_price)
 
 
-@router.delete("/prices/{market_price_id}")
-async def delete_market_price_endpoint(
-    db_session: DbSession,
-    market_price_id: PrimaryKey,
-):
-    """Delete a market price."""
-    market_price = await get_market_price(db_session=db_session, market_price_id=market_price_id)
-    if not market_price:
-        raise EntityDoesNotExistError(message="Market price not found.")
-
-    await delete_market_price(db_session=db_session, market_price_id=market_price_id)
-    return {"message": "Market price deleted successfully"}
+# @router.put("/prices/{market_price_id}", response_model=MarketPriceRead)
+# async def update_market_price_endpoint(
+#     db_session: DbSession,
+#     market_price_id: PrimaryKey,
+#     market_price_in: MarketPriceUpdate,
+# ):
+#     """Update an existing market price."""
+#     market_price = await get_market_price(db_session=db_session, market_price_id=market_price_id)
+#     if not market_price:
+#         raise EntityDoesNotExistError(message="Market price not found.")
+#
+#     market_price = await update_market_price(
+#         db_session=db_session, market_price=market_price, market_price_in=market_price_in
+#     )
+#     return _to_market_price_read(market_price)
+#
+#
+# @router.delete("/prices/{market_price_id}")
+# async def delete_market_price_endpoint(
+#     db_session: DbSession,
+#     market_price_id: PrimaryKey,
+# ):
+#     """Delete a market price."""
+#     market_price = await get_market_price(db_session=db_session, market_price_id=market_price_id)
+#     if not market_price:
+#         raise EntityDoesNotExistError(message="Market price not found.")
+#
+#     await delete_market_price(db_session=db_session, market_price_id=market_price_id)
+#     return {"message": "Market price deleted successfully"}

@@ -17,6 +17,7 @@ import {
   People as ContactIcon,
   Storage as DataIcon,
   Settings as SettingsIcon,
+  TrendingUp as MarketIcon,
   ExpandLess,
   ExpandMore,
 } from '@mui/icons-material'
@@ -85,6 +86,12 @@ const AppDrawer: React.FC = () => {
           icon: <DataIcon />,
           path: `/${organization}/data`,
           group: 'data-explorer',
+        },
+        {
+          title: 'Market Prices',
+          icon: <MarketIcon />,
+          path: `/${organization}/data/market-prices`,
+          group: 'market-prices',
         },
       ],
     },

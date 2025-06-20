@@ -53,7 +53,11 @@ export class ApiClient {
 
     // Organization context interceptor
     this.instance.interceptors.request.use((config) => {
-      if (!config.url?.includes('organization')) {
+      // Skip organization prefix for global endpoints
+      const globalEndpoints = ['/markets', '/commodities', '/market_prices']
+      const isGlobalEndpoint = globalEndpoints.some(endpoint => config.url?.includes(endpoint))
+      
+      if (!config.url?.includes('organization') && !isGlobalEndpoint) {
         // Extract organization from current URL path
         const pathParts = window.location.pathname.split('/')
         const currentOrganization = pathParts[1] || 'default'

@@ -17,7 +17,7 @@ from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
 from farmbase.products.views import router as products_router
 from farmbase.runresult.views import router as runresult_router
-
+from farmbase.market.views import price_router
 
 class ErrorMessage(BaseModel):
     msg: str
@@ -66,6 +66,7 @@ authenticated_organization_api_router.include_router(farm_router, prefix="/farms
 authenticated_organization_api_router.include_router(note_router, prefix="/notes", tags=["notes"])
 authenticated_api_router.include_router(commodity_router, prefix="/commodities", tags=["commodities"])
 authenticated_api_router.include_router(market_router, prefix="/markets", tags=["markets"])
+authenticated_api_router.include_router(price_router, prefix="/market_prices", tags=["market_prices"])
 
 
 @api_router.get("/healthcheck", include_in_schema=False)

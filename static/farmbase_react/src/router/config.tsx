@@ -30,6 +30,7 @@ const Farms = React.lazy(() => import('@/farm/Farms'))
 const Contacts = React.lazy(() => import('@/contact/Contacts'))
 const OrganizationMemberTable = React.lazy(() => import('@/organization/OrganizationMemberTable'))
 const ResultList = React.lazy(() => import('@/search/ResultList'))
+const MarketPrices = React.lazy(() => import('@/market/MarketPrices'))
 
 
 export interface RouteConfig {
@@ -134,7 +135,13 @@ export const protectedRoutes: RouteConfig[] = [
       menu: true,
       requiresAuth: true,
     },
-    children: [],
+    children: [
+      {
+        path: 'market-prices',
+        element: withSuspense(MarketPrices),
+        meta: { title: 'Market Prices', subMenu: 'data', group: 'market-prices' },
+      },
+    ],
   },
   {
     path: '/:organization/settings',
