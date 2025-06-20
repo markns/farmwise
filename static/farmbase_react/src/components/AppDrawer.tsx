@@ -18,6 +18,7 @@ import {
   Storage as DataIcon,
   Settings as SettingsIcon,
   TrendingUp as MarketIcon,
+  Grass as SeedIcon,
   ExpandLess,
   ExpandMore,
 } from '@mui/icons-material'
@@ -92,6 +93,12 @@ const AppDrawer: React.FC = () => {
           icon: <MarketIcon />,
           path: `/${organization}/data/market-prices`,
           group: 'market-prices',
+        },
+        {
+          title: 'Seed Varieties',
+          icon: <SeedIcon />,
+          path: `/${organization}/data/seed-varieties`,
+          group: 'seed-varieties',
         },
       ],
     },
