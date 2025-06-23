@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends
+from loguru import logger
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
@@ -25,7 +26,6 @@ class ErrorMessage(BaseModel):
 
 class ErrorResponse(BaseModel):
     detail: Optional[List[ErrorMessage]]
-
 
 # WARNING: Don't use this unless you want unauthenticated routes
 api_router = APIRouter(

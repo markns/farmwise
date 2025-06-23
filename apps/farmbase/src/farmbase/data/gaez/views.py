@@ -1,14 +1,10 @@
 import os
-from pprint import pprint
-from typing import Annotated
 from functools import lru_cache
+from typing import Annotated
 
 import gcsfs
-import xarray as xr
 from fastapi import APIRouter, Query
 from loguru import logger
-
-from rioxarray import rioxarray
 
 from farmbase.data.gaez.models import SuitabilityIndexResponse
 
@@ -59,6 +55,7 @@ def get_aez_raster():
     This function is cached, so it only runs once.
     """
     logger.info(f"Loading and caching AEZ raster from: {AEZ_RASTER_PATH}")
+    from rioxarray import rioxarray
     return rioxarray.open_rasterio(AEZ_RASTER_PATH)
 
 
@@ -69,6 +66,7 @@ def get_growing_period_raster():
     This function is cached, so it only runs once.
     """
     logger.info(f"Loading and caching growing period raster from: {GROWING_PERIOD_RASTER_PATH}")
+    from rioxarray import rioxarray
     return rioxarray.open_rasterio(GROWING_PERIOD_RASTER_PATH)
 
 
@@ -78,6 +76,9 @@ def get_suitability_raster():
     Loads, aligns, and stacks all crop suitability rasters.
     This is a heavy operation and is cached to run only once.
     """
+    from rioxarray import rioxarray
+    import xarray as xr
+
     logger.info(f"Loading and caching all suitability rasters from: {SUITABILITY_RASTER_DIR}")
     # Note: Using fs.glob() to find files is more robust
     raster_paths = fs.glob(os.path.join(SUITABILITY_RASTER_DIR, "suHr0_*.tif"))

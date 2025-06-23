@@ -41,7 +41,6 @@ def custom_generate_unique_id(route: APIRoute) -> str:
         return ""
     return f"{route.tags[0]}-{route.name}"
 
-
 api = FastAPI(
     title="FarmBase",
     description="Welcome to FarmBase's API documentation! Here you will able to discover all of the ways you "

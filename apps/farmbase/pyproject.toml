@@ -46,6 +46,7 @@ dev = [
     "poethepoet>0",
     "pytest>0",
     "ruff>0",
+    "yappi>=1.6.10",
 ]
 
 [project.entry-points."farmbase.plugins"]

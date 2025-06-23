@@ -1,7 +1,9 @@
 import os
 import os.path
-import traceback
+import sys
 from subprocess import check_output
+
+from loguru import logger
 
 from .commodity.models import Commodity
 from .contact.models import Contact
@@ -29,6 +31,27 @@ except Exception:
 import warnings
 
 warnings.filterwarnings("ignore", message="int_from_bytes is deprecated")
+
+if os.environ.get("LOG_MODULE_IMPORTS", False):
+    class CustomMetaPathFinder:
+        def find_spec(self, fullname, path, target=None):
+            logger.info(f"Attempting to find spec for: {fullname}")
+            # Let the default finders handle the actual module location
+            return None
+
+
+    class CustomPathHook:
+        def __init__(self, path):
+            self.path = path
+
+        def find_spec(self, fullname, path, target=None):
+            logger.info(f"Attempting to find spec in path hook for: {fullname} in {self.path}")
+            # Allow default finders to handle the actual module location
+            return None
+
+
+    # Add the custom finder to the meta_path
+    sys.meta_path.insert(0, CustomMetaPathFinder())
 
 
 def _get_git_revision(path):

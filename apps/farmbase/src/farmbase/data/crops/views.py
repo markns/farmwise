@@ -124,7 +124,6 @@ def maize_maturity_category(growing_season_days: float | int | None) -> str | No
         # catches values < 76 or any negative / nonsensical input
         return None
 
-
 #
 # @router.get("/suitability", response_model=CropVarietiesResponse)
 # def get_suitable_crop_varieties(session: SessionDep, crop_type: str, latitude: float, longitude: float) -> Any:
