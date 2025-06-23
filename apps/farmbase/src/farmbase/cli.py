@@ -287,12 +287,7 @@ def upgrade_database(tag, sql, revision, revision_type):
     from .database.manage import init_database
 
     alembic_cfg = AlembicConfig(settings.ALEMBIC_INI_PATH)
-    import farmbase.contact
 
-    # f: Contact = Contact()
-    for _, modname, _ in pkgutil.walk_packages(farmbase.contact.__path__):
-        print(modname)
-        importlib.import_module(f"farmbase.contact.{modname}")
     # importlib.import_module(".contact.models.Contact")
     if not database_exists(str(settings.SQLALCHEMY_DATABASE_SYNC_URI)):
         click.secho("Found no database to upgrade, initializing new database...")

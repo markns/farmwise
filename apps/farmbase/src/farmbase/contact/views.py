@@ -49,7 +49,6 @@ def _to_contact_read(contact: Contact) -> ContactRead:
     # Build a dict of fields for ContactRead from the ORM object, excluding farms
     data: dict = {}
     for field in ContactRead.model_fields:
-        print(field)
         if field == "farms":
             continue
         data[field] = getattr(contact, field)
