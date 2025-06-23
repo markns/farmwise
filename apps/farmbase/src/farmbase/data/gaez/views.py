@@ -3,6 +3,7 @@ from functools import lru_cache
 from typing import Annotated
 
 import gcsfs
+import rasterio
 from fastapi import APIRouter, Query
 from loguru import logger
 
@@ -56,7 +57,8 @@ def get_aez_raster():
     """
     logger.info(f"Loading and caching AEZ raster from: {AEZ_RASTER_PATH}")
     from rioxarray import rioxarray
-    return rioxarray.open_rasterio(AEZ_RASTER_PATH)
+    with rasterio.Env(GS_NO_SIGN_REQUEST='YES'):
+        return rioxarray.open_rasterio(AEZ_RASTER_PATH)
 
 
 @lru_cache(maxsize=None)
@@ -67,7 +69,8 @@ def get_growing_period_raster():
     """
     logger.info(f"Loading and caching growing period raster from: {GROWING_PERIOD_RASTER_PATH}")
     from rioxarray import rioxarray
-    return rioxarray.open_rasterio(GROWING_PERIOD_RASTER_PATH)
+    with rasterio.Env(GS_NO_SIGN_REQUEST='YES'):
+        return rioxarray.open_rasterio(GROWING_PERIOD_RASTER_PATH)
 
 
 @lru_cache(maxsize=None)
@@ -83,23 +86,24 @@ def get_suitability_raster():
     # Note: Using fs.glob() to find files is more robust
     raster_paths = fs.glob(os.path.join(SUITABILITY_RASTER_DIR, "suHr0_*.tif"))
 
-    # Prepend 'gs://' to make them valid URLs for rioxarray
-    full_raster_paths = [f"gs://{path}" for path in raster_paths]
+    with rasterio.Env(GS_NO_SIGN_REQUEST='YES'):
+        # Prepend 'gs://' to make them valid URLs for rioxarray
+        full_raster_paths = [f"gs://{path}" for path in raster_paths]
 
-    rasters = [rioxarray.open_rasterio(path) for path in full_raster_paths]
+        rasters = [rioxarray.open_rasterio(path) for path in full_raster_paths]
 
-    # Align rasters to ensure they have the same spatial resolution and extents
-    aligned_rasters = xr.align(*rasters, join="exact")
+        # Align rasters to ensure they have the same spatial resolution and extents
+        aligned_rasters = xr.align(*rasters, join="exact")
 
-    # Extract crop codes from filenames for coordinates
-    raster_crop_codes = [os.path.basename(p).split('.')[0].split('_')[1] for p in full_raster_paths]
+        # Extract crop codes from filenames for coordinates
+        raster_crop_codes = [os.path.basename(p).split('.')[0].split('_')[1] for p in full_raster_paths]
 
-    # Stack rasters along a new 'crop' dimension
-    stacked_raster = xr.concat(aligned_rasters, dim="crop")
+        # Stack rasters along a new 'crop' dimension
+        stacked_raster = xr.concat(aligned_rasters, dim="crop")
 
-    # Assign meaningful labels to the new dimension
-    stacked_raster = stacked_raster.assign_coords(crop=raster_crop_codes)
-    return stacked_raster
+        # Assign meaningful labels to the new dimension
+        stacked_raster = stacked_raster.assign_coords(crop=raster_crop_codes)
+        return stacked_raster
 
 
 # --- API Endpoints ---
