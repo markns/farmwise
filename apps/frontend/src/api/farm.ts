@@ -31,7 +31,7 @@ export interface FarmListResponse {
 
 export interface Note {
   id: string
-  content: string
+  note_text: string
   farm_id: string
   created_at: string
   updated_at: string

@@ -114,7 +114,7 @@ const NotesDrawer: React.FC = () => {
                             mb: 2,
                           }}
                         >
-                          {note.content}
+                          {note.note_text}
                         </Typography>
 
                         {/* Tags - if the note has tags */}
