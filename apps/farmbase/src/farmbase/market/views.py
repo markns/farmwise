@@ -4,16 +4,12 @@ from fastapi import APIRouter, Query
 
 from farmbase.database.core import DbSession
 from farmbase.models import PrimaryKey
-
-from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
 from .schemas import (
     CommodityPriceSnapshot,
     MarketCreate,
     MarketPagination,
-    MarketPriceCreate,
     MarketPricePagination,
     MarketPriceRead,
-    MarketPriceUpdate,
     MarketRead,
     MarketSnapshotRead,
     MarketUpdate,
@@ -21,21 +17,17 @@ from .schemas import (
 from .service import (
     count_market_prices,
     create_market,
-    create_market_price,
     delete_market,
-    delete_market_price,
-    get_all_market_prices,
     get_all_markets,
     get_market,
     get_market_by_name,
-    get_market_price,
     get_market_prices_by_commodity,
     get_market_prices_by_market,
     get_market_snapshot,
     get_markets_near_location,
     update_market,
-    update_market_price,
 )
+from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
 
 router = APIRouter()
 price_router = APIRouter()
