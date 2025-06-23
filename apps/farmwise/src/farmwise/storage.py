@@ -137,30 +137,3 @@ def upload_bytes_to_gcs(data: bytes, bucket_name: str, blob_name: str, content_t
     except Exception as e:
         logger.error(f"Error uploading data to GCS: {e}")
         return False
-
-if __name__ == "__main__":
-    from farmwise.settings import settings
-    from openai import OpenAI
-    import uuid
-    from service import farmwise
-    # Example usage
-    SERVICE_ACCOUNT_FILE = settings.GCS_SERVICE_ACCOUNT_FILE
-
-    blob_name = f"images/{uuid.uuid4()}.jpg"
-    bucket_name = settings.GCS_BUCKET.replace("gs://", "")
-    upload_file_to_gcs("/Users/markns/Documents/1667486593.jpg", bucket_name, blob_name, service_account_file=settings.GCS_SERVICE_ACCOUNT_FILE)
-
-    make_blob_public(bucket_name, blob_name)
-    # url = generate_signed_url(bucket_name, blob_name, SERVICE_ACCOUNT_FILE)
-
-    # if url:
-    #     print(f"\nGenerated Signed URL: {url}")
-    #     print("\nThis URL will be valid for 1 hour.")
-    #
-    # farmwise.create_openai_file(url)
-    # openai_client = OpenAI(api_key=settings.OPENAI_API_KEY.get_secret_value())
-    # openai_client.files.create(
-    #     file=url,
-    #     purpose="vision",
-    # )
-    # file_id = self.create_openai_file(url)

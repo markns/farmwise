@@ -54,16 +54,6 @@ if os.environ.get("LOG_MODULE_IMPORTS", False):
     sys.meta_path.insert(0, CustomMetaPathFinder())
 
 
-import gcsfs
-
-gcs = gcsfs.GCSFileSystem()
-try:
-    logger.info("Attempting to load gaez data")
-    files = gcs.ls('gs://farmbase_data/gaez/res01/ENSEMBLE/rcp4p5')
-    logger.info(files)
-except Exception as e:
-    print(f"Error listing bucket: {e}")
-
 
 def _get_git_revision(path):
     if not os.path.exists(os.path.join(path, ".git")):

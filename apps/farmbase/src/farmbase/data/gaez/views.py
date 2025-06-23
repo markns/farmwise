@@ -6,6 +6,7 @@ import gcsfs
 import rasterio
 from fastapi import APIRouter, Query
 from loguru import logger
+from rasterio import MemoryFile
 
 from farmbase.data.gaez.models import SuitabilityIndexResponse
 
@@ -49,6 +50,16 @@ def get_class_map():
     return _read_clr(CLASS_MAP_PATH)
 
 
+def open_raster_from_gcs(path):
+    # Although rioxarray can read gs:// paths, it doesn't seem to handle the ambient credentials
+    # when running in Google Cloud Run. Therefore, use GCSFileSystem to memory
+    import rioxarray
+    with fs.open(path, 'rb') as f:
+        with MemoryFile(f.read()) as memfile:
+            with memfile.open() as dataset:
+                return rioxarray.open_rasterio(dataset)
+
+
 @lru_cache(maxsize=None)
 def get_aez_raster():
     """
@@ -56,9 +67,7 @@ def get_aez_raster():
     This function is cached, so it only runs once.
     """
     logger.info(f"Loading and caching AEZ raster from: {AEZ_RASTER_PATH}")
-    from rioxarray import rioxarray
-    with rasterio.Env(GS_NO_SIGN_REQUEST='YES'):
-        return rioxarray.open_rasterio(AEZ_RASTER_PATH)
+    return open_raster_from_gcs(AEZ_RASTER_PATH)
 
 
 @lru_cache(maxsize=None)
@@ -68,9 +77,7 @@ def get_growing_period_raster():
     This function is cached, so it only runs once.
     """
     logger.info(f"Loading and caching growing period raster from: {GROWING_PERIOD_RASTER_PATH}")
-    from rioxarray import rioxarray
-    with rasterio.Env(GS_NO_SIGN_REQUEST='YES'):
-        return rioxarray.open_rasterio(GROWING_PERIOD_RASTER_PATH)
+    return open_raster_from_gcs(GROWING_PERIOD_RASTER_PATH)
 
 
 @lru_cache(maxsize=None)
@@ -79,7 +86,6 @@ def get_suitability_raster():
     Loads, aligns, and stacks all crop suitability rasters.
     This is a heavy operation and is cached to run only once.
     """
-    from rioxarray import rioxarray
     import xarray as xr
 
     logger.info(f"Loading and caching all suitability rasters from: {SUITABILITY_RASTER_DIR}")
@@ -89,8 +95,7 @@ def get_suitability_raster():
     with rasterio.Env(GS_NO_SIGN_REQUEST='YES'):
         # Prepend 'gs://' to make them valid URLs for rioxarray
         full_raster_paths = [f"gs://{path}" for path in raster_paths]
-
-        rasters = [rioxarray.open_rasterio(path) for path in full_raster_paths]
+        rasters = [open_raster_from_gcs(path) for path in full_raster_paths]
 
         # Align rasters to ensure they have the same spatial resolution and extents
         aligned_rasters = xr.align(*rasters, join="exact")
