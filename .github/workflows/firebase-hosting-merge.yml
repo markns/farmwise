@@ -23,3 +23,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_FARMWISE_462814 }}
           channelId: live
           projectId: farmwise-462814
+          entryPoint: apps/frontend

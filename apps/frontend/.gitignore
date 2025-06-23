@@ -21,3 +21,4 @@ sketch
 # Build output
 dist/
 
+.firebase/
