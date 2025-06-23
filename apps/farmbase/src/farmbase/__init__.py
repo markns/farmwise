@@ -58,6 +58,7 @@ import gcsfs
 
 gcs = gcsfs.GCSFileSystem()
 try:
+    logger.info("Attempting to load gaez data")
     files = gcs.ls('gs://farmbase_data/gaez/res01/ENSEMBLE/rcp4p5')
     logger.info(files)
 except Exception as e:
