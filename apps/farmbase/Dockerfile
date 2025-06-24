@@ -22,25 +22,10 @@ ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 
 # --- System Dependency Installation ---
-# FIX 4: Overwrite the default sources.list with a reliable mirror.
-# The GPG signature errors suggest a problem with the default deb.debian.org mirror
-# in the buildx environment. We are replacing it with Debian's CDN mirror, which can
-# be more stable. This is a more direct way to solve the repository validation issue.
-RUN echo "deb http://cdn-fastly.deb.debian.org/debian bookworm main" > /etc/apt/sources.list \
-    && echo "deb http://cdn-fastly.deb.debian.org/debian bookworm-updates main" >> /etc/apt/sources.list \
-    && echo "deb http://security.debian.org/debian-security bookworm-security main" >> /etc/apt/sources.list
-
-# Now, with the new sources, run the update and installation in separate, cached layers.
-# We add --allow-insecure-repositories as a fallback for networks that might interfere with HTTPS.
-RUN apt-get update --allow-insecure-repositories
-
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     gdal-bin \
     libgdal-dev \
-    gcc \
-    g++ \
-    python3-dev \
-    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # --- GDAL Configuration ---
@@ -59,16 +44,16 @@ ENV GDAL_VERSION=3.6.2
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --compile-bytecode --frozen --no-install-workspace --package=farmbase
+    uv sync --no-dev --compile-bytecode --frozen --no-install-workspace --package=farmbase
 
 # Copy the application source code into the workspace
 COPY . /workspace
 
 # Stage 2: Install the local project package itself.
 # This step is very fast because all third-party dependencies are already installed.
-RUN uv sync --compile-bytecode --frozen --package=farmbase
+RUN uv sync --no-dev --compile-bytecode --frozen --package=farmbase
 EXPOSE 8000
 
 # --- Application Entrypoint ---
 # Run the FastAPI application using 2 workers.
-CMD ["fastapi", "run", "--workers", "2", "apps/farmbase/src/farmbase/main.py"]
+CMD ["fastapi", "run", "--workers", "1", "apps/farmbase/src/farmbase/main.py"]

@@ -1,4 +1,5 @@
 import os
+import tempfile
 from functools import lru_cache
 from typing import Annotated
 
@@ -50,17 +51,14 @@ def get_class_map():
 
 def open_raster_from_gcs(path):
     # Although rioxarray can read gs:// paths, it doesn't seem to handle the ambient credentials
-    # when running in Google Cloud Run. Therefore, use GCSFileSystem to memory
+    # when running in Google Cloud Run. Therefore, use GCSFileSystem to a named temp file
     import rioxarray
-    from rasterio import MemoryFile
 
     with fs.open(path, 'rb') as f:
-        logger.debug(f"opened file {f}")
-        with MemoryFile(f.read()) as memfile:
-            logger.debug(f"read file {f} into {memfile}")
-            with memfile.open() as dataset:
-                logger.debug(f"opened memfile {memfile}")
-                return rioxarray.open_rasterio(dataset)
+        with tempfile.NamedTemporaryFile(suffix=".tif", delete=False) as tmp:
+            tmp.write(f.read())
+            tmp.flush()
+            return rioxarray.open_rasterio(tmp.name)
 
 
 @lru_cache(maxsize=None)

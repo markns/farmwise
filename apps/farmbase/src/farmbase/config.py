@@ -34,40 +34,6 @@ class Settings(BaseSettings):
     # --- Security ---
     ALLOWED_ORIGINS: list[str] = Field(default=['http://localhost:8080', 'http://127.0.0.1:8080'])
 
-    # --- Sentry Middleware ---
-    # Use Optional[T] = None for values that might not be set, it's cleaner than default="".
-    # Pydantic will automatically cast "true", "1", "false", "0" to booleans.
-    SENTRY_ENABLED: bool = False
-    SENTRY_DSN: Optional[AnyHttpUrl] = None
-    SENTRY_APP_KEY: Optional[str] = None
-
-    # This field will be parsed by the computed_field below.
-    # The original implementation used CommaSeparatedStrings. Pydantic can parse
-    # comma-separated values into a List[str] directly, but we'll stick to the
-    # original logic of parsing a custom format like "tag:ENV_VAR,tag2:ENV_VAR2".
-    SENTRY_TAGS: Optional[str] = None
-
-    @computed_field
-    @property
-    def sentry_tags_dict(self) -> Dict[str, str]:
-        """
-        Create a dictionary of Sentry tags from the SENTRY_TAGS env var.
-        This replaces the get_env_tags function.
-        Format: "tag_key1:ENV_VAR_1,tag_key2:ENV_VAR_2"
-        """
-        tags = {}
-        if not self.SENTRY_TAGS:
-            return tags
-
-        tag_list = self.SENTRY_TAGS.split(",")
-        for t in tag_list:
-            if ":" not in t:
-                continue
-            tag_key, env_key = t.split(":", 1)
-            env_value = os.environ.get(env_key.strip())
-            if env_value:
-                tags[tag_key.strip()] = env_value
-        return tags
 
     # --- Database ---
     DATABASE_HOSTNAME: str
