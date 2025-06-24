@@ -1,7 +1,8 @@
 from typing import List, Optional, Sequence
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from farmbase.agronomy.models import (
     Crop,
@@ -23,13 +24,13 @@ from farmbase.models import PaginationParams
 # ————————————————————————————————————————
 
 
-def get_crop(session: Session, host_id: str) -> Optional[Crop]:
+async def get_crop(session: AsyncSession, host_id: str) -> Optional[Crop]:
     """Get a crop by host_id."""
-    return session.get(Crop, host_id)
+    return await session.get(Crop, host_id)
 
 
-def get_all_crops(
-    session: Session,
+async def get_all_crops(
+    session: AsyncSession,
     pagination: Optional[PaginationParams] = None,
     cultivation_type: Optional[str] = None,
     labor_level: Optional[str] = None,
@@ -48,21 +49,22 @@ def get_all_crops(
         limit, offset = pagination.limit_offset
         query = query.offset(offset).limit(limit)
 
-    return session.execute(query).scalars().all()
+    result = await session.execute(query)
+    return result.scalars().all()
 
 
-def create_crop(session: Session, crop_data: dict) -> Crop:
+async def create_crop(session: AsyncSession, crop_data: dict) -> Crop:
     """Create a new crop."""
     crop = Crop(**crop_data)
     session.add(crop)
-    session.commit()
-    session.refresh(crop)
+    await session.commit()
+    await session.refresh(crop)
     return crop
 
 
-def update_crop(session: Session, host_id: str, crop_data: dict) -> Optional[Crop]:
+async def update_crop(session: AsyncSession, host_id: str, crop_data: dict) -> Optional[Crop]:
     """Update an existing crop."""
-    crop = session.get(Crop, host_id)
+    crop = await session.get(Crop, host_id)
     if not crop:
         return None
 
@@ -70,19 +72,19 @@ def update_crop(session: Session, host_id: str, crop_data: dict) -> Optional[Cro
         if hasattr(crop, key) and value is not None:
             setattr(crop, key, value)
 
-    session.commit()
-    session.refresh(crop)
+    await session.commit()
+    await session.refresh(crop)
     return crop
 
 
-def delete_crop(session: Session, host_id: str) -> bool:
+async def delete_crop(session: AsyncSession, host_id: str) -> bool:
     """Delete a crop."""
-    crop = session.get(Crop, host_id)
+    crop = await session.get(Crop, host_id)
     if not crop:
         return False
 
-    session.delete(crop)
-    session.commit()
+    await session.delete(crop)
+    await session.commit()
     return True
 
 
@@ -91,15 +93,16 @@ def delete_crop(session: Session, host_id: str) -> bool:
 # ————————————————————————————————————————
 
 
-def get_pathogen(session: Session, pathogen_id: int) -> Optional[Pathogen]:
+async def get_pathogen(session: AsyncSession, pathogen_id: int) -> Optional[Pathogen]:
     """Get a pathogen by ID with images."""
-    return session.execute(
+    result = await session.execute(
         select(Pathogen).options(selectinload(Pathogen.images)).where(Pathogen.id == pathogen_id)
-    ).scalar_one_or_none()
+    )
+    return result.scalar_one_or_none()
 
 
-def get_all_pathogens(
-    session: Session,
+async def get_all_pathogens(
+    session: AsyncSession,
     pagination: Optional[PaginationParams] = None,
     pathogen_class: Optional[PathogenClass] = None,
     severity: Optional[int] = None,
@@ -115,7 +118,7 @@ def get_all_pathogens(
     if severity is not None:
         query = query.where(Pathogen.severity == severity)
     if is_activated:
-        query = query.where(Pathogen.is_activated == True)
+        query = query.where(Pathogen.is_activated)
     if crop_id:
         query = query.join(pathogen_crop_association).where(pathogen_crop_association.c.crop_id == crop_id)
 
@@ -124,11 +127,12 @@ def get_all_pathogens(
         limit, offset = pagination.limit_offset
         query = query.offset(offset).limit(limit)
 
-    return session.execute(query).scalars().all()
+    result = await session.execute(query)
+    return result.scalars().all()
 
 
-def search_pathogens_by_crop(
-    session: Session,
+async def search_pathogens_by_crop(
+    session: AsyncSession,
     crop_id: str,
     pathogen_class: Optional[PathogenClass] = None,
     severity: Optional[int] = None,
@@ -139,7 +143,7 @@ def search_pathogens_by_crop(
         .options(selectinload(Pathogen.images))
         .join(pathogen_crop_association)
         .where(pathogen_crop_association.c.crop_id == crop_id)
-        .where(Pathogen.is_activated == True)
+        .where(Pathogen.is_activated)
     )
 
     if pathogen_class:
@@ -147,21 +151,22 @@ def search_pathogens_by_crop(
     if severity is not None:
         query = query.where(Pathogen.severity == severity)
 
-    return session.execute(query).scalars().all()
+    result = await session.execute(query)
+    return result.scalars().all()
 
 
-def create_pathogen(session: Session, pathogen_data: dict) -> Pathogen:
+async def create_pathogen(session: AsyncSession, pathogen_data: dict) -> Pathogen:
     """Create a new pathogen."""
     pathogen = Pathogen(**pathogen_data)
     session.add(pathogen)
-    session.commit()
-    session.refresh(pathogen)
+    await session.commit()
+    await session.refresh(pathogen)
     return pathogen
 
 
-def update_pathogen(session: Session, pathogen_id: int, pathogen_data: dict) -> Optional[Pathogen]:
+async def update_pathogen(session: AsyncSession, pathogen_id: int, pathogen_data: dict) -> Optional[Pathogen]:
     """Update an existing pathogen."""
-    pathogen = session.get(Pathogen, pathogen_id)
+    pathogen = await session.get(Pathogen, pathogen_id)
     if not pathogen:
         return None
 
@@ -169,19 +174,19 @@ def update_pathogen(session: Session, pathogen_id: int, pathogen_data: dict) -> 
         if hasattr(pathogen, key) and value is not None:
             setattr(pathogen, key, value)
 
-    session.commit()
-    session.refresh(pathogen)
+    await session.commit()
+    await session.refresh(pathogen)
     return pathogen
 
 
-def delete_pathogen(session: Session, pathogen_id: int) -> bool:
+async def delete_pathogen(session: AsyncSession, pathogen_id: int) -> bool:
     """Delete a pathogen."""
-    pathogen = session.get(Pathogen, pathogen_id)
+    pathogen = await session.get(Pathogen, pathogen_id)
     if not pathogen:
         return False
 
-    session.delete(pathogen)
-    session.commit()
+    await session.delete(pathogen)
+    await session.commit()
     return True
 
 
@@ -190,13 +195,13 @@ def delete_pathogen(session: Session, pathogen_id: int) -> bool:
 # ————————————————————————————————————————
 
 
-def get_event(session: Session, event_id: str) -> Optional[Event]:
+async def get_event(session: AsyncSession, event_id: str) -> Optional[Event]:
     """Get an event by ID."""
-    return session.get(Event, event_id)
+    return await session.get(Event, event_id)
 
 
-def get_all_events(
-    session: Session,
+async def get_all_events(
+    session: AsyncSession,
     pagination: Optional[PaginationParams] = None,
     event_category: Optional[EventCategory] = None,
     crop_id: Optional[str] = None,
@@ -218,11 +223,12 @@ def get_all_events(
         limit, offset = pagination.limit_offset
         query = query.offset(offset).limit(limit)
 
-    return session.execute(query).scalars().all()
+    result = await session.execute(query)
+    return result.scalars().all()
 
 
-def get_events_for_crop(
-    session: Session,
+async def get_events_for_crop(
+    session: AsyncSession,
     crop_id: str,
     event_category: Optional[EventCategory] = None,
     start_day: Optional[int] = None,
@@ -243,11 +249,12 @@ def get_events_for_crop(
     # Order by start day for crop planning
     query = query.order_by(Event.start_day.nullslast())
 
-    return session.execute(query).scalars().all()
+    result = await session.execute(query)
+    return result.scalars().all()
 
 
-def get_preventive_events_for_pathogen(
-    session: Session,
+async def get_preventive_events_for_pathogen(
+    session: AsyncSession,
     pathogen_id: int,
     crop_id: Optional[str] = None,
 ) -> Sequence[Event]:
@@ -259,21 +266,22 @@ def get_preventive_events_for_pathogen(
     if crop_id:
         query = query.join(event_crop_association).where(event_crop_association.c.crop_id == crop_id)
 
-    return session.execute(query).scalars().all()
+    result = await session.execute(query)
+    return result.scalars().all()
 
 
-def create_event(session: Session, event_data: dict) -> Event:
+async def create_event(session: AsyncSession, event_data: dict) -> Event:
     """Create a new event."""
     event = Event(**event_data)
     session.add(event)
-    session.commit()
-    session.refresh(event)
+    await session.commit()
+    await session.refresh(event)
     return event
 
 
-def update_event(session: Session, event_id: str, event_data: dict) -> Optional[Event]:
+async def update_event(session: AsyncSession, event_id: str, event_data: dict) -> Optional[Event]:
     """Update an existing event."""
-    event = session.get(Event, event_id)
+    event = await session.get(Event, event_id)
     if not event:
         return None
 
@@ -281,19 +289,19 @@ def update_event(session: Session, event_id: str, event_data: dict) -> Optional[
         if hasattr(event, key) and value is not None:
             setattr(event, key, value)
 
-    session.commit()
-    session.refresh(event)
+    await session.commit()
+    await session.refresh(event)
     return event
 
 
-def delete_event(session: Session, event_id: str) -> bool:
+async def delete_event(session: AsyncSession, event_id: str) -> bool:
     """Delete an event."""
-    event = session.get(Event, event_id)
+    event = await session.get(Event, event_id)
     if not event:
         return False
 
-    session.delete(event)
-    session.commit()
+    await session.delete(event)
+    await session.commit()
     return True
 
 
@@ -302,9 +310,9 @@ def delete_event(session: Session, event_id: str) -> bool:
 # ————————————————————————————————————————
 
 
-def get_crop_cycle(session: Session, cycle_id: int) -> Optional[CropCycle]:
+async def get_crop_cycle(session: AsyncSession, cycle_id: int) -> Optional[CropCycle]:
     """Get a crop cycle by ID with stages and events."""
-    return session.execute(
+    result = await session.execute(
         select(CropCycle)
         .options(
             selectinload(CropCycle.stages),
@@ -312,11 +320,12 @@ def get_crop_cycle(session: Session, cycle_id: int) -> Optional[CropCycle]:
             selectinload(CropCycle.crop),
         )
         .where(CropCycle.id == cycle_id)
-    ).scalar_one_or_none()
+    )
+    return result.scalar_one_or_none()
 
 
-def get_crop_cycles_for_crop(
-    session: Session,
+async def get_crop_cycles_for_crop(
+    session: AsyncSession,
     crop_id: str,
     koppen_classification: Optional[str] = None,
 ) -> Sequence[CropCycle]:
@@ -334,11 +343,12 @@ def get_crop_cycles_for_crop(
     if koppen_classification:
         query = query.where(CropCycle.koppen_climate_classification == koppen_classification)
 
-    return session.execute(query).scalars().all()
+    result = await session.execute(query)
+    return result.scalars().all()
 
 
-def get_all_crop_cycles(
-    session: Session,
+async def get_all_crop_cycles(
+    session: AsyncSession,
     pagination: Optional[PaginationParams] = None,
     crop_id: Optional[str] = None,
     koppen_classification: Optional[str] = None,
@@ -361,11 +371,12 @@ def get_all_crop_cycles(
         limit, offset = pagination.limit_offset
         query = query.offset(offset).limit(limit)
 
-    return session.execute(query).scalars().all()
+    result = await session.execute(query)
+    return result.scalars().all()
 
 
-def create_crop_cycle(
-    session: Session,
+async def create_crop_cycle(
+    session: AsyncSession,
     cycle_data: dict,
     stages_data: Optional[List[dict]] = None,
     events_data: Optional[List[dict]] = None,
@@ -373,7 +384,7 @@ def create_crop_cycle(
     """Create a new crop cycle with stages and events."""
     cycle = CropCycle(**cycle_data)
     session.add(cycle)
-    session.flush()  # Get the ID without committing
+    await session.flush()  # Get the ID without committing
 
     # Add stages
     if stages_data:
@@ -387,20 +398,20 @@ def create_crop_cycle(
             event = CropCycleEvent(crop_cycle_id=cycle.id, **event_data)
             session.add(event)
 
-    session.commit()
-    session.refresh(cycle)
+    await session.commit()
+    await session.refresh(cycle)
     return cycle
 
 
-def update_crop_cycle(
-    session: Session,
+async def update_crop_cycle(
+    session: AsyncSession,
     cycle_id: int,
     cycle_data: dict,
     stages_data: Optional[List[dict]] = None,
     events_data: Optional[List[dict]] = None,
 ) -> Optional[CropCycle]:
     """Update an existing crop cycle."""
-    cycle = session.get(CropCycle, cycle_id)
+    cycle = await session.get(CropCycle, cycle_id)
     if not cycle:
         return None
 
@@ -412,12 +423,11 @@ def update_crop_cycle(
     # Update stages if provided
     if stages_data is not None:
         # Delete existing stages
-        existing_stages = (
-            session.execute(select(CropCycleStage).where(CropCycleStage.cycle_id == cycle_id)).scalars().all()
-        )
+        result = await session.execute(select(CropCycleStage).where(CropCycleStage.cycle_id == cycle_id))
+        existing_stages = result.scalars().all()
 
         for stage in existing_stages:
-            session.delete(stage)
+            await session.delete(stage)
 
         # Add new stages
         for stage_data in stages_data:
@@ -427,31 +437,30 @@ def update_crop_cycle(
     # Update events if provided
     if events_data is not None:
         # Delete existing events
-        existing_events = (
-            session.execute(select(CropCycleEvent).where(CropCycleEvent.crop_cycle_id == cycle_id)).scalars().all()
-        )
+        result = await session.execute(select(CropCycleEvent).where(CropCycleEvent.crop_cycle_id == cycle_id))
+        existing_events = result.scalars().all()
 
         for event in existing_events:
-            session.delete(event)
+            await session.delete(event)
 
         # Add new events
         for event_data in events_data:
             event = CropCycleEvent(crop_cycle_id=cycle.id, **event_data)
             session.add(event)
 
-    session.commit()
-    session.refresh(cycle)
+    await session.commit()
+    await session.refresh(cycle)
     return cycle
 
 
-def delete_crop_cycle(session: Session, cycle_id: int) -> bool:
+async def delete_crop_cycle(session: AsyncSession, cycle_id: int) -> bool:
     """Delete a crop cycle."""
-    cycle = session.get(CropCycle, cycle_id)
+    cycle = await session.get(CropCycle, cycle_id)
     if not cycle:
         return False
 
-    session.delete(cycle)
-    session.commit()
+    await session.delete(cycle)
+    await session.commit()
     return True
 
 
@@ -460,22 +469,19 @@ def delete_crop_cycle(session: Session, cycle_id: int) -> bool:
 # ————————————————————————————————————————
 
 
-def get_crop_cycle_events_for_crop_cycle(session: Session, cycle_id: int) -> Sequence[CropCycleEvent]:
+async def get_crop_cycle_events_for_crop_cycle(session: AsyncSession, cycle_id: int) -> Sequence[CropCycleEvent]:
     """Get all events for a specific crop cycle."""
-    return (
-        session.execute(
-            select(CropCycleEvent)
-            .options(selectinload(CropCycleEvent.event))
-            .where(CropCycleEvent.crop_cycle_id == cycle_id)
-            .order_by(CropCycleEvent.start_day)
-        )
-        .scalars()
-        .all()
+    result = await session.execute(
+        select(CropCycleEvent)
+        .options(selectinload(CropCycleEvent.event))
+        .where(CropCycleEvent.crop_cycle_id == cycle_id)
+        .order_by(CropCycleEvent.start_day)
     )
+    return result.scalars().all()
 
 
-def get_crop_cycle_events_by_time_range(
-    session: Session,
+async def get_crop_cycle_events_by_time_range(
+    session: AsyncSession,
     cycle_id: int,
     start_day: Optional[int] = None,
     end_day: Optional[int] = None,
@@ -492,7 +498,8 @@ def get_crop_cycle_events_by_time_range(
     if end_day is not None:
         query = query.where(CropCycleEvent.start_day <= end_day)
 
-    return session.execute(query.order_by(CropCycleEvent.start_day)).scalars().all()
+    result = await session.execute(query.order_by(CropCycleEvent.start_day))
+    return result.scalars().all()
 
 
 # ————————————————————————————————————————
@@ -500,15 +507,12 @@ def get_crop_cycle_events_by_time_range(
 # ————————————————————————————————————————
 
 
-def get_crop_cycle_stages_for_crop_cycle(session: Session, cycle_id: int) -> Sequence[CropCycleStage]:
+async def get_crop_cycle_stages_for_crop_cycle(session: AsyncSession, cycle_id: int) -> Sequence[CropCycleStage]:
     """Get all stages for a specific crop cycle."""
-    return (
-        session.execute(
-            select(CropCycleStage).where(CropCycleStage.cycle_id == cycle_id).order_by(CropCycleStage.order)
-        )
-        .scalars()
-        .all()
+    result = await session.execute(
+        select(CropCycleStage).where(CropCycleStage.cycle_id == cycle_id).order_by(CropCycleStage.order)
     )
+    return result.scalars().all()
 
 
 # ————————————————————————————————————————
@@ -516,47 +520,52 @@ def get_crop_cycle_stages_for_crop_cycle(session: Session, cycle_id: int) -> Seq
 # ————————————————————————————————————————
 
 
-def count_pathogens_by_class(session: Session) -> dict:
+async def count_pathogens_by_class(session: AsyncSession) -> dict:
     """Get count of pathogens by class."""
-    result = session.execute(
+    result = await session.execute(
         select(Pathogen.pathogen_class, func.count(Pathogen.id))
-        .where(Pathogen.is_activated == True)
+        .where(Pathogen.is_activated)
         .group_by(Pathogen.pathogen_class)
-    ).all()
+    )
+    rows = result.all()
 
-    return {pathogen_class: count for pathogen_class, count in result}
+    return {pathogen_class: count for pathogen_class, count in rows}
 
 
-def count_events_by_category(session: Session) -> dict:
+async def count_events_by_category(session: AsyncSession) -> dict:
     """Get count of events by category."""
-    result = session.execute(select(Event.event_category, func.count(Event.id)).group_by(Event.event_category)).all()
+    result = await session.execute(select(Event.event_category, func.count(Event.id)).group_by(Event.event_category))
+    rows = result.all()
 
-    return {category: count for category, count in result}
+    return {category: count for category, count in rows}
 
 
-def get_crop_summary(session: Session, crop_id: str) -> dict:
+async def get_crop_summary(session: AsyncSession, crop_id: str) -> dict:
     """Get a summary of data related to a crop."""
-    crop = session.get(Crop, crop_id)
+    crop = await session.get(Crop, crop_id)
     if not crop:
         return {}
 
     # Count pathogens
-    pathogen_count = session.execute(
+    pathogen_result = await session.execute(
         select(func.count(Pathogen.id.distinct()))
         .join(pathogen_crop_association)
         .where(pathogen_crop_association.c.crop_id == crop_id)
-        .where(Pathogen.is_activated == True)
-    ).scalar()
+        .where(Pathogen.is_activated)
+    )
+    pathogen_count = pathogen_result.scalar()
 
     # Count events
-    event_count = session.execute(
+    event_result = await session.execute(
         select(func.count(Event.id.distinct()))
         .join(event_crop_association)
         .where(event_crop_association.c.crop_id == crop_id)
-    ).scalar()
+    )
+    event_count = event_result.scalar()
 
     # Count cycles
-    cycle_count = session.execute(select(func.count(CropCycle.id)).where(CropCycle.crop_id == crop_id)).scalar()
+    cycle_result = await session.execute(select(func.count(CropCycle.id)).where(CropCycle.crop_id == crop_id))
+    cycle_count = cycle_result.scalar()
 
     return {
         "crop": crop,
