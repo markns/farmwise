@@ -16,6 +16,7 @@ from farmbase.farm.views import router as farm_router
 from farmbase.market.views import router as market_router
 from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
+from farmbase.agronomy.views import router as agronomy_router
 from farmbase.products.views import router as products_router
 from farmbase.runresult.views import router as runresult_router
 from farmbase.market.views import price_router
@@ -52,6 +53,7 @@ authenticated_organization_api_router = APIRouter(
 
 authenticated_api_router.include_router(gaez_router, prefix="/gaez", tags=["gaez"])
 authenticated_api_router.include_router(crops_router, prefix="/crop-varieties", tags=["crop-varieties"])
+authenticated_api_router.include_router(agronomy_router, prefix="/agronomy", tags=["agronomy"])
 
 # NOTE: All api routes should be authenticated by default
 authenticated_api_router.include_router(organization_router, prefix="/organizations", tags=["organizations"])

@@ -7,7 +7,6 @@ import click
 from farmbase import __version__
 from farmbase.config import settings
 from farmbase.exceptions.exceptions import FarmBaseApiError
-from farmbase.extensions import configure_extensions
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
@@ -16,8 +15,7 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 @click.version_option(version=__version__)
 def farmbase_cli():
     """Command-line interface to Farmbase."""
-
-    configure_extensions()
+    ...
 
 
 @farmbase_cli.group("plugins")
@@ -289,7 +287,7 @@ def upgrade_database(tag, sql, revision, revision_type):
     alembic_cfg = AlembicConfig(settings.ALEMBIC_INI_PATH)
 
     # importlib.import_module(".contact.models.Contact")
-    if not database_exists(str(settings.SQLALCHEMY_DATABASE_SYNC_URI)):
+    if not database_exists(str(settings.sqlalchemy_database_sync_uri)):
         click.secho("Found no database to upgrade, initializing new database...")
         init_database(engine)
     else:
