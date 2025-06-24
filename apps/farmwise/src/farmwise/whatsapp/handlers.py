@@ -1,5 +1,4 @@
 import logging
-import os
 import uuid
 from enum import Enum
 
@@ -14,7 +13,7 @@ from farmwise.schema import Action, AudioResponse, Contact, UserInput, WhatsAppR
 from farmwise.schema import SectionList as FarmwiseSectionList
 from farmwise.service import farmwise
 from farmwise.settings import settings
-from farmwise.storage import generate_signed_url, upload_file_to_gcs, upload_bytes_to_gcs, make_blob_public
+from farmwise.storage import make_blob_public, upload_bytes_to_gcs
 from farmwise.whatsapp.utils import _convert_md_to_whatsapp
 
 # Intercept standard logging and route to loguru
@@ -188,7 +187,6 @@ async def location_handler(_: WhatsApp, msg: types.Message):
             await msg.indicate_typing()
 
 
-
 async def _send_audio_response(response: AudioResponse, msg):
     await msg.reply_audio(audio=response.audio, mime_type="audio/ogg")
 
@@ -271,20 +269,20 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
 @WhatsApp.on_message(filters.image)
 async def image_handler(_: WhatsApp, msg: types.Message):
     await msg.indicate_typing()
-    
+
     image_bytes = await msg.image.download(in_memory=True)
 
     # Generate a unique blob name for GCS
     blob_name = f"images/{uuid.uuid4()}.jpg"
     bucket_name = settings.GCS_BUCKET.replace("gs://", "")
-    
+
     # Upload to GCS
     upload_success = upload_bytes_to_gcs(
         data=image_bytes,
         bucket_name=bucket_name,
         blob_name=blob_name,
     )
-    
+
     if upload_success:
         # TODO: Generate signed URL for the uploaded image
         # signed_url = generate_signed_url( bucket_name=bucket_name, blob_name=blob_name, )
@@ -386,6 +384,7 @@ async def voice_handler(_: WhatsApp, msg: types.Message):
     #     else:
     #         await msg.reply_text("Sorry, there was an error processing the audio response.")
     #
+
 
 @WhatsApp.on_raw_update
 async def raw_update_handler(_: WhatsApp, update: dict):

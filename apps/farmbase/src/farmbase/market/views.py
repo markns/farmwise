@@ -4,6 +4,8 @@ from fastapi import APIRouter, Query
 
 from farmbase.database.core import DbSession
 from farmbase.models import PrimaryKey
+
+from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
 from .schemas import (
     CommodityPriceSnapshot,
     MarketCreate,
@@ -27,10 +29,10 @@ from .service import (
     get_markets_near_location,
     update_market,
 )
-from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
 
 router = APIRouter()
 price_router = APIRouter()
+
 
 def _to_market_price_read(market_price) -> MarketPriceRead:
     """Convert MarketPrice ORM object to MarketPriceRead schema."""
@@ -224,6 +226,7 @@ async def get_market_prices(
         page=page,
         total=total,
     )
+
 
 #
 # @router.post("/prices", response_model=MarketPriceRead)

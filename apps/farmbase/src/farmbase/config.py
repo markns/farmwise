@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Optional, Any
+from typing import Any
 from urllib import parse
 
 from dotenv import find_dotenv
@@ -32,8 +32,7 @@ class Settings(BaseSettings):
     FARMBASE_API_KEY: SecretStr
 
     # --- Security ---
-    ALLOWED_ORIGINS: list[str] = Field(default=['http://localhost:8080', 'http://127.0.0.1:8080'])
-
+    ALLOWED_ORIGINS: list[str] = Field(default=["http://localhost:8080", "http://127.0.0.1:8080"])
 
     # --- Database ---
     DATABASE_HOSTNAME: str
@@ -63,16 +62,13 @@ class Settings(BaseSettings):
         quoted_password = parse.quote(self.DATABASE_PASSWORD.get_secret_value())
 
         # If the hostname is a path (for a Unix socket), don't include the port.
-        if self.DATABASE_HOSTNAME.startswith('/'):
+        if self.DATABASE_HOSTNAME.startswith("/"):
             host_and_port = self.DATABASE_HOSTNAME
         # Otherwise, it's a regular network host, so include the port.
         else:
             host_and_port = f"{self.DATABASE_HOSTNAME}:{self.DATABASE_PORT}"
 
-        return (
-            f"postgresql+asyncpg://{self.DATABASE_USER}:{quoted_password}"
-            f"@{host_and_port}/{self.DATABASE_NAME}"
-        )
+        return f"postgresql+asyncpg://{self.DATABASE_USER}:{quoted_password}@{host_and_port}/{self.DATABASE_NAME}"
 
     @computed_field
     @property

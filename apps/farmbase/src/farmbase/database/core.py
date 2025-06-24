@@ -6,7 +6,7 @@ from fastapi import Depends
 from loguru import logger
 from pydantic import ValidationError
 from sqlalchemy import create_engine, inspect
-from sqlalchemy.engine.url import make_url, URL
+from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Session, object_session, sessionmaker
 from sqlalchemy.sql.expression import true
@@ -35,7 +35,7 @@ def create_db_engine(async_: bool = True, echo: bool = False):
 
     # If using a Unix socket, move the path to connect_args
     # and clear the host/port for the main URL object.
-    if host.startswith('/'):
+    if host.startswith("/"):
         connect_args["host"] = host
         host = None
         port = None
@@ -70,6 +70,7 @@ def create_db_engine(async_: bool = True, echo: bool = False):
         return create_async_engine(url, **timeout_kwargs, echo=echo, connect_args=connect_args)
     else:
         return create_engine(url, **timeout_kwargs, echo=echo, connect_args=connect_args)
+
 
 # Create the default asynchronous engine for your application
 engine = create_db_engine(async_=True, echo=False)

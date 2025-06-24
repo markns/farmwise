@@ -1,10 +1,10 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends
-from loguru import logger
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
+from farmbase.agronomy.views import router as agronomy_router
 from farmbase.auth import authenticate_user_or_machine
 from farmbase.chatstate.views import router as chatstate_router
 from farmbase.commodity.views import router as commodity_router
@@ -13,13 +13,13 @@ from farmbase.data.crops.views import router as crops_router
 from farmbase.data.gaez.views import router as gaez_router
 from farmbase.farm.note.views import router as note_router
 from farmbase.farm.views import router as farm_router
+from farmbase.market.views import price_router
 from farmbase.market.views import router as market_router
 from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
-from farmbase.agronomy.views import router as agronomy_router
 from farmbase.products.views import router as products_router
 from farmbase.runresult.views import router as runresult_router
-from farmbase.market.views import price_router
+
 
 class ErrorMessage(BaseModel):
     msg: str
@@ -27,6 +27,7 @@ class ErrorMessage(BaseModel):
 
 class ErrorResponse(BaseModel):
     detail: Optional[List[ErrorMessage]]
+
 
 # WARNING: Don't use this unless you want unauthenticated routes
 api_router = APIRouter(

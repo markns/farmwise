@@ -6,8 +6,6 @@ from google.cloud import storage
 from loguru import logger
 
 
-
-
 def get_storage_client(service_account_file: Optional[str] = None) -> storage.Client:
     """Get a Google Cloud Storage client, using service account file if provided."""
     if service_account_file and os.path.exists(service_account_file):
@@ -15,7 +13,6 @@ def get_storage_client(service_account_file: Optional[str] = None) -> storage.Cl
     else:
         # Use default credentials (Application Default Credentials)
         return storage.Client()
-
 
 
 def make_blob_public(bucket_name, blob_name):
@@ -35,9 +32,7 @@ def make_blob_public(bucket_name, blob_name):
     try:
         blob.make_public()
 
-        print(
-            f"Success! Object '{blob_name}' in bucket '{bucket_name}' is now publicly readable."
-        )
+        print(f"Success! Object '{blob_name}' in bucket '{bucket_name}' is now publicly readable.")
         print("\nIts public URL is:")
         print(blob.public_url)
         return blob.public_url
@@ -48,8 +43,9 @@ def make_blob_public(bucket_name, blob_name):
         print("You also need the 'Storage Object Admin' role on your account.")
 
 
-
-def generate_signed_url(bucket_name: str, blob_name: str, service_account_file: Optional[str] = None, expiration_hours: int = 1) -> Optional[str]:
+def generate_signed_url(
+    bucket_name: str, blob_name: str, service_account_file: Optional[str] = None, expiration_hours: int = 1
+) -> Optional[str]:
     """Generates a v4 signed URL for downloading a blob.
 
     Args:
@@ -83,7 +79,9 @@ def generate_signed_url(bucket_name: str, blob_name: str, service_account_file: 
         return None
 
 
-def upload_file_to_gcs(file_path: str, bucket_name: str, blob_name: str, service_account_file: Optional[str] = None) -> bool:
+def upload_file_to_gcs(
+    file_path: str, bucket_name: str, blob_name: str, service_account_file: Optional[str] = None
+) -> bool:
     """Upload a file to Google Cloud Storage.
 
     Args:
@@ -109,7 +107,9 @@ def upload_file_to_gcs(file_path: str, bucket_name: str, blob_name: str, service
         return False
 
 
-def upload_bytes_to_gcs(data: bytes, bucket_name: str, blob_name: str, content_type: str = None, service_account_file: Optional[str] = None) -> bool:
+def upload_bytes_to_gcs(
+    data: bytes, bucket_name: str, blob_name: str, content_type: str = None, service_account_file: Optional[str] = None
+) -> bool:
     """Upload bytes data to Google Cloud Storage.
 
     Args:

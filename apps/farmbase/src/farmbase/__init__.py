@@ -7,11 +7,11 @@ from loguru import logger
 
 from .agronomy.models import (
     Crop,
+    CropCycle,
+    CropCycleStage,
+    Event,
     Pathogen,
     PathogenImage,
-    Event,
-    CropCycle,
-    CropStage,
 )
 from .commodity.models import Commodity
 from .contact.models import Contact
@@ -41,12 +41,12 @@ import warnings
 warnings.filterwarnings("ignore", message="int_from_bytes is deprecated")
 
 if os.environ.get("LOG_MODULE_IMPORTS", False):
+
     class CustomMetaPathFinder:
         def find_spec(self, fullname, path, target=None):
             logger.info(f"Attempting to find spec for: {fullname}")
             # Let the default finders handle the actual module location
             return None
-
 
     class CustomPathHook:
         def __init__(self, path):
@@ -56,7 +56,6 @@ if os.environ.get("LOG_MODULE_IMPORTS", False):
             logger.info(f"Attempting to find spec in path hook for: {fullname} in {self.path}")
             # Allow default finders to handle the actual module location
             return None
-
 
     # Add the custom finder to the meta_path
     sys.meta_path.insert(0, CustomMetaPathFinder())
@@ -145,5 +144,5 @@ __all__ = [
     "PathogenImage",
     "Event",
     "CropCycle",
-    "CropStage",
+    "CropCycleStage",
 ]

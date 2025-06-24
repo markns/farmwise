@@ -31,7 +31,7 @@ from openai.types.responses import (
 )
 
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
-from farmwise.audio import load_oga_as_audio_input, write_stream_to_ogg
+from farmwise.audio import load_oga_as_audio_input
 from farmwise.dependencies import UserContext, chat_state, user_context
 from farmwise.farmbase import FarmbaseClient
 from farmwise.hooks import LoggingHooks
@@ -162,7 +162,6 @@ class FarmwiseService:
         user_input: UserInput,
         chat_state: ChatState,
     ) -> AsyncIterator[ResponseEvent]:
-
         input_items = chat_state.messages or []
 
         content = []

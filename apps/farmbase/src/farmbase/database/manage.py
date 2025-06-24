@@ -4,11 +4,10 @@ from sqlalchemy import inspect, text
 from sqlalchemy.schema import CreateSchema
 from sqlalchemy_utils import create_database, database_exists
 
-from farmbase import config
 from farmbase.commodity.models import Commodity
 from farmbase.organization.models import Organization
-from ..config import settings
 
+from ..config import settings
 from ..farm.activity.models import ActivityType
 from ..farm.platform.models import Platform
 from ..plugin.models import Plugin

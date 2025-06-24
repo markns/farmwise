@@ -24,10 +24,11 @@ SUITABILITY_RASTER_DIR = "gs://farmbase_data/gaez/res05/HadGEM2-ES/rcp4p5/2020sH
 
 # --- Helper and Caching Functions ---
 
+
 def _read_clr(gcs_path):
     """Helper function to read a GAEZ .clr file."""
     colormap = {}
-    with fs.open(gcs_path, 'r', encoding='utf-8') as f:
+    with fs.open(gcs_path, "r", encoding="utf-8") as f:
         for line in f:
             if line.strip() and not line.startswith("#"):
                 parts = line.split(maxsplit=5)
@@ -54,7 +55,7 @@ def open_raster_from_gcs(path):
     # when running in Google Cloud Run. Therefore, use GCSFileSystem to a named temp file
     import rioxarray
 
-    with fs.open(path, 'rb') as f:
+    with fs.open(path, "rb") as f:
         with tempfile.NamedTemporaryFile(suffix=".tif", delete=False) as tmp:
             tmp.write(f.read())
             tmp.flush()
@@ -101,7 +102,7 @@ def get_suitability_raster():
     aligned_rasters = xr.align(*rasters, join="exact")
 
     # Extract crop codes from filenames for coordinates
-    raster_crop_codes = [os.path.basename(p).split('.')[0].split('_')[1] for p in full_raster_paths]
+    raster_crop_codes = [os.path.basename(p).split(".")[0].split("_")[1] for p in full_raster_paths]
 
     # Stack rasters along a new 'crop' dimension
     stacked_raster = xr.concat(aligned_rasters, dim="crop")
@@ -113,10 +114,11 @@ def get_suitability_raster():
 
 # --- API Endpoints ---
 
+
 @router.get("/aez_classification", response_model=str)
 def aez_classification(
-        latitude: Annotated[float, Query(description="The latitude coordinate")],
-        longitude: Annotated[float, Query(description="The longitude coordinate")],
+    latitude: Annotated[float, Query(description="The latitude coordinate")],
+    longitude: Annotated[float, Query(description="The longitude coordinate")],
 ):
     """Get the AEZ (Agro-Ecological Zone) classification for a given geographical coordinate."""
     # Call the cached getter functions
@@ -130,34 +132,58 @@ def aez_classification(
 
 @router.get("/growing_period", response_model=int)
 def growing_period(
-        latitude: Annotated[float, Query(description="The latitude coordinate")],
-        longitude: Annotated[float, Query(description="The longitude coordinate")],
+    latitude: Annotated[float, Query(description="The latitude coordinate")],
+    longitude: Annotated[float, Query(description="The longitude coordinate")],
 ):
     """Get the growing period length in days for a given geographical coordinate."""
     # Call the cached getter function
     raster = get_growing_period_raster()
     logger.debug(f"loaded growing period raster shape {raster.shape}")
-    days =  raster.sel(x=longitude, y=latitude, method="nearest").item()
+    days = raster.sel(x=longitude, y=latitude, method="nearest").item()
     logger.debug(f"growing period for lon:{longitude} lat:{latitude} is {days} days")
     return days
 
 
 # This can remain global as it's just a static dictionary
 crop_codes = {
-    "alf": "Alfalfa", "ban": "Banana", "brl": "Barley", "cit": "Citrus", "coc": "Cocoa",
-    "cof": "Coffee", "con": "Coconut", "cot": "Cotton", "csv": "Cassava", "flx": "Flax",
-    "grd": "Groundnut", "jtr": "Jatropha", "mze": "Maize", "mis": "Miscanthus",
-    "nap": "Napier grass", "olp": "Oil palm", "olv": "Olive", "rcg": "Reed canary grass",
-    "rsd": "Rapeseed", "rub": "Rubber", "sfl": "Sunflower", "soy": "Soybean",
-    "spo": "Sweet potato", "sub": "Sugarbeet", "suc": "Sugarcane", "swg": "Switchgrass",
-    "tea": "Tea", "tob": "Tobacco", "whe": "Wheat", "wpo": "White potato", "yam": "Yam",
+    "alf": "Alfalfa",
+    "ban": "Banana",
+    "brl": "Barley",
+    "cit": "Citrus",
+    "coc": "Cocoa",
+    "cof": "Coffee",
+    "con": "Coconut",
+    "cot": "Cotton",
+    "csv": "Cassava",
+    "flx": "Flax",
+    "grd": "Groundnut",
+    "jtr": "Jatropha",
+    "mze": "Maize",
+    "mis": "Miscanthus",
+    "nap": "Napier grass",
+    "olp": "Oil palm",
+    "olv": "Olive",
+    "rcg": "Reed canary grass",
+    "rsd": "Rapeseed",
+    "rub": "Rubber",
+    "sfl": "Sunflower",
+    "soy": "Soybean",
+    "spo": "Sweet potato",
+    "sub": "Sugarbeet",
+    "suc": "Sugarcane",
+    "swg": "Switchgrass",
+    "tea": "Tea",
+    "tob": "Tobacco",
+    "whe": "Wheat",
+    "wpo": "White potato",
+    "yam": "Yam",
 }
 
 
 @router.get("/suitability_index", response_model=SuitabilityIndexResponse)
 def suitability_index(
-        latitude: Annotated[float, Query(description="The latitude coordinate")],
-        longitude: Annotated[float, Query(description="The longitude coordinate")],
+    latitude: Annotated[float, Query(description="The latitude coordinate")],
+    longitude: Annotated[float, Query(description="The longitude coordinate")],
 ):
     """Get the crop suitability index values for a given geographical coordinate."""
     # Call the cached getter function for the combined suitability raster

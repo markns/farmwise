@@ -24,7 +24,7 @@ def get_maize_data():
     Loads the growing period raster from GCS.
     This function is cached, so it only runs once.
     """
-    logger.info(f"Loading and caching maize variety data")
+    logger.info("Loading and caching maize variety data")
     maize_df = pd.read_csv("gs://farmbase_data/maize/maize_varieties.csv")
     return maize_df
 
@@ -42,9 +42,8 @@ def get_maize_varieties(altitude: float = None, growing_period: int = None) -> A
     # 1. Conditionally filter by altitude if a value is provided.
     if altitude is not None:
         suitable_df = suitable_df[
-            (suitable_df["min_altitude_masl"] <= altitude)
-            & (suitable_df["max_altitude_masl"] >= altitude)
-            ]
+            (suitable_df["min_altitude_masl"] <= altitude) & (suitable_df["max_altitude_masl"] >= altitude)
+        ]
 
     # 2. Conditionally filter by growing period if a value is provided.
     if growing_period is not None:
@@ -53,13 +52,7 @@ def get_maize_varieties(altitude: float = None, growing_period: int = None) -> A
         if maturity_category is not None:
             # To correctly filter for varieties with a "greater or equal" maturity period,
             # we define an explicit order for the categories.
-            category_order = [
-                "Extremely early",
-                "Early",
-                "Intermediate",
-                "Late",
-                "Very late"
-            ]
+            category_order = ["Extremely early", "Early", "Intermediate", "Late", "Very late"]
 
             try:
                 # Find the position of the requested maturity category in the ordered list.
@@ -75,10 +68,7 @@ def get_maize_varieties(altitude: float = None, growing_period: int = None) -> A
                 # In this scenario, we do not apply a maturity filter.
                 pass
 
-    varieties = [
-        CropVarietyResponse(**row)
-        for _, row in suitable_df.iterrows()
-    ]
+    varieties = [CropVarietyResponse(**row) for _, row in suitable_df.iterrows()]
 
     return CropVarietiesResponse(crop="maize", varieties=varieties)
 
@@ -123,6 +113,7 @@ def maize_maturity_category(growing_season_days: float | int | None) -> str | No
     else:
         # catches values < 76 or any negative / nonsensical input
         return None
+
 
 #
 # @router.get("/suitability", response_model=CropVarietiesResponse)

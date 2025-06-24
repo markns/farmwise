@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import true
 
 from farmbase.database.core import DbSession, engine
+
 from .models import Organization, OrganizationCreate, OrganizationRead, OrganizationUpdate
 
 
@@ -109,6 +110,7 @@ async def get_all(*, db_session: AsyncSession) -> List[Optional[Organization]]:
 async def create(*, db_session: AsyncSession, organization_in: OrganizationCreate) -> Organization:
     """Creates an organization."""
     from farmbase.database.manage import init_schema
+
     organization = Organization(**organization_in.dict(exclude={"banner_color"}))
     if organization_in.banner_color:
         organization.banner_color = organization_in.banner_color.as_hex()
@@ -132,7 +134,7 @@ async def get_or_create(*, db_session: AsyncSession, organization_in: Organizati
 
 
 async def update(
-        *, db_session: AsyncSession, organization: Organization, organization_in: OrganizationUpdate
+    *, db_session: AsyncSession, organization: Organization, organization_in: OrganizationUpdate
 ) -> Organization:
     """Updates an organization."""
     organization_data = organization.dict()

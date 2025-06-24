@@ -5,10 +5,9 @@ from zoneinfo import ZoneInfo
 from pydantic import BaseModel, field_validator
 from pydantic.fields import Field, computed_field
 from pydantic.types import SecretStr, constr
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, func
-from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, func
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 # pydantic type that limits the range of primary keys
 PrimaryKey = Annotated[int, Field(default=None, gt=0.0, lt=2147483647.0)]

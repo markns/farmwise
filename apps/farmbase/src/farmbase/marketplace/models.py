@@ -1,18 +1,19 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 from geoalchemy2 import Geometry
 from geoalchemy2.elements import WKBElement
 from sqlalchemy import (
+    JSON,
     BigInteger,
     CheckConstraint,
     ForeignKey,
     Integer,
     String,
     Text,
-    UniqueConstraint, JSON,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -24,10 +25,10 @@ from farmbase.database.core import Base
 from farmbase.enums import FarmbaseEnum
 from farmbase.models import TimeStampMixin
 
-
 # ————————————————————————————————————————
 # Enums
 # ————————————————————————————————————————
+
 
 class ListingStatus(FarmbaseEnum):
     ACTIVE = "active"
@@ -39,6 +40,7 @@ class ListingStatus(FarmbaseEnum):
 # ————————————————————————————————————————
 # Category tree
 # ————————————————————————————————————————
+
 
 class Category(Base, TimeStampMixin):
     __tablename__ = "category"
@@ -52,12 +54,8 @@ class Category(Base, TimeStampMixin):
     # LTree path makes subtree queries super fast
     path: Mapped[str] = mapped_column(LtreeType)
 
-    parent: Mapped[Optional["Category"]] = relationship(
-        remote_side=[id], back_populates="children"
-    )
-    children: Mapped[list["Category"]] = relationship(
-        back_populates="parent", cascade="all, delete-orphan"
-    )
+    parent: Mapped[Optional["Category"]] = relationship(remote_side=[id], back_populates="children")
+    children: Mapped[list["Category"]] = relationship(back_populates="parent", cascade="all, delete-orphan")
 
     __table_args__ = (UniqueConstraint("parent_id", "name"),)
 
@@ -68,6 +66,7 @@ class Category(Base, TimeStampMixin):
 # ————————————————————————————————————————
 # Listing & related artefacts
 # ————————————————————————————————————————
+
 
 class Listing(Base, TimeStampMixin):
     __tablename__ = "listing"
@@ -86,13 +85,9 @@ class Listing(Base, TimeStampMixin):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description_md: Mapped[str] = mapped_column(Text, nullable=False)
 
-    price_cents: Mapped[Optional[int]] = mapped_column(
-        Integer, CheckConstraint("price_cents >= 0")
-    )
+    price_cents: Mapped[Optional[int]] = mapped_column(Integer, CheckConstraint("price_cents >= 0"))
     currency_code: Mapped[str] = mapped_column(String(3), default="USD")
-    status: Mapped[ListingStatus] = mapped_column(
-        default=ListingStatus.ACTIVE, nullable=False, index=True
-    )
+    status: Mapped[ListingStatus] = mapped_column(default=ListingStatus.ACTIVE, nullable=False, index=True)
     expires_at: Mapped[Optional[datetime]]
 
     location: Mapped[Optional[WKBElement]] = mapped_column(
@@ -108,26 +103,15 @@ class Listing(Base, TimeStampMixin):
         ),
     )
 
-    __table_args__ = (
-        CheckConstraint("(price_cents IS NOT NULL) OR (status = 'hidden')"),
-    )
+    __table_args__ = (CheckConstraint("(price_cents IS NOT NULL) OR (status = 'hidden')"),)
 
     # relationships inside the core schema
-    images: Mapped[list["ListingImage"]] = relationship(
-        back_populates="listing", cascade="all, delete-orphan"
-    )
-    reports: Mapped[list["Report"]] = relationship(
-        back_populates="listing", cascade="all, delete-orphan"
-    )
-    audits: Mapped[list["AuditListingEdit"]] = relationship(
-        back_populates="listing", cascade="all, delete-orphan"
-    )
+    images: Mapped[list["ListingImage"]] = relationship(back_populates="listing", cascade="all, delete-orphan")
+    reports: Mapped[list["Report"]] = relationship(back_populates="listing", cascade="all, delete-orphan")
+    audits: Mapped[list["AuditListingEdit"]] = relationship(back_populates="listing", cascade="all, delete-orphan")
 
     # ------- helper: fetch the Contact on demand ---------------------------
-    def fetch_contact(
-            self,
-            tenant_session_factory: Callable[[str], "Session"]
-    ) -> "Contact | None":
+    def fetch_contact(self, tenant_session_factory: Callable[[str], "Session"]) -> "Contact | None":
         """
         Convenience method:
             contact = listing.fetch_contact(session_for_tenant)
@@ -140,10 +124,7 @@ class Listing(Base, TimeStampMixin):
 
     # repr
     def __repr__(self) -> str:
-        return (
-            f"<Listing(id={self.id}, tenant='{self.tenant_key}', "
-            f"title='{self.title[:24]}')>"
-        )
+        return f"<Listing(id={self.id}, tenant='{self.tenant_key}', title='{self.title[:24]}')>"
 
 
 class ListingImage(Base):
@@ -151,9 +132,7 @@ class ListingImage(Base):
     __table_args__ = {"schema": "farmbase_core"}
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    listing_id: Mapped[int] = mapped_column(
-        ForeignKey("listing.id", ondelete="CASCADE")
-    )
+    listing_id: Mapped[int] = mapped_column(ForeignKey("listing.id", ondelete="CASCADE"))
     listing: Mapped["Listing"] = relationship(back_populates="images")
 
     image_url: Mapped[str] = mapped_column(String, nullable=False)
@@ -168,6 +147,7 @@ class ListingImage(Base):
 # ————————————————————————————————————————
 # Social interactions
 # ————————————————————————————————————————
+
 
 class Report(Base, TimeStampMixin):
     __tablename__ = "report"
@@ -206,9 +186,7 @@ class AuditListingEdit(Base):
 
     old_data: Mapped[dict] = mapped_column(JSON, nullable=False)
     new_data: Mapped[dict] = mapped_column(JSON, nullable=False)
-    edited_at: Mapped[datetime] = mapped_column(
-        nullable=False, server_default=func.now()
-    )
+    edited_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.now())
 
     listing: Mapped["Listing"] = relationship(
         back_populates="audits",
@@ -230,20 +208,15 @@ try:
 except ImportError:  # pragma: no cover
     pass
 else:
-    Contact.listings = relationship(
-        "Listing", back_populates="contact", cascade="all, delete-orphan"
-    )
-    Contact.favourites = relationship(
-        "Favourite", back_populates="contact", cascade="all, delete-orphan"
-    )
+    Contact.listings = relationship("Listing", back_populates="contact", cascade="all, delete-orphan")
+    Contact.favourites = relationship("Favourite", back_populates="contact", cascade="all, delete-orphan")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # factory that returns a Session bound to the tenant’s schema
     def session_for_tenant(tenant_key: str) -> Session:
         eng = TENANT_ENGINES[tenant_key]  # cache of Engine objects
         return Session(eng)
-
 
     # 1. load from the shared "core" schema
     with Session(CORE_ENGINE) as core_sess:

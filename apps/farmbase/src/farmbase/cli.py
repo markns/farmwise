@@ -1,6 +1,4 @@
-import importlib
 import os
-import pkgutil
 
 import click
 
@@ -111,7 +109,7 @@ def install_plugins(force):
         for plugin_event_in in p.plugin_events:
             click.secho(f"  Registering plugin event... Slug: {plugin_event_in.slug}", fg="blue")
             if plugin_event := plugin_service.get_plugin_event_by_slug(
-                    db_session=db_session, slug=plugin_event_in.slug
+                db_session=db_session, slug=plugin_event_in.slug
             ):
                 plugin_event.name = plugin_event_in.name
                 plugin_event.description = plugin_event_in.description

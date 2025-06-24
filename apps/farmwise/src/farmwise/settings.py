@@ -39,7 +39,6 @@ class Settings(BaseSettings):
     WHATSAPP_APP_SECRET: str
     GCS_BUCKET: str = "gs://farmwise_media"
 
-
     def is_dev(self) -> bool:
         return self.MODE == "dev"
 

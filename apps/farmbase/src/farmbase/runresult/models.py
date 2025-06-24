@@ -238,4 +238,3 @@ class ReasoningItemCreate(RunItemBase):
 
 
 RunItemCreate = RunItemBase  # fallback for generic use
-

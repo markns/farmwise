@@ -86,7 +86,9 @@ class PluginInstance(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     enabled: Mapped[bool] = mapped_column(default=False)
-    _configuration = Column(StringEncryptedType(key=str(settings.FARMBASE_ENCRYPTION_KEY), engine=AesEngine, padding="pkcs5"))
+    _configuration = Column(
+        StringEncryptedType(key=str(settings.FARMBASE_ENCRYPTION_KEY), engine=AesEngine, padding="pkcs5")
+    )
     plugin_id: Mapped[int] = mapped_column(ForeignKey(Plugin.id))
     plugin = relationship(Plugin, backref="instances")
 

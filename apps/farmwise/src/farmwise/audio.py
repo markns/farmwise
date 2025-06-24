@@ -1,16 +1,11 @@
-import numpy as np
-import tempfile
-import uuid
 from typing import Optional
 
+import numpy as np
 from agents.voice import (
     AudioInput,
 )
 from loguru import logger
 from pydub import AudioSegment
-
-from farmwise.settings import settings
-from farmwise.storage import generate_signed_url, upload_file_to_gcs
 
 
 def _download_from_gcs_if_needed(path: str) -> str:
@@ -27,16 +22,16 @@ def _download_from_gcs_if_needed(path: str) -> str:
 
 def load_oga_as_audio_input(input_path: str) -> AudioInput:
     """Load OGA/Opus file as AudioInput.
-    
+
     Args:
         input_path: Path to the audio file or GCS signed URL
-        
+
     Returns:
         AudioInput object with the audio data
     """
     # Handle both local paths and GCS URLs
     processed_path = _download_from_gcs_if_needed(input_path)
-    
+
     try:
         # Load OGA/Opus file with pydub - requires ffmpeg
         audio = AudioSegment.from_file(processed_path, format="ogg")
@@ -53,7 +48,9 @@ def load_oga_as_audio_input(input_path: str) -> AudioInput:
         raise
 
 
-async def write_stream_to_ogg(stream, output_path: Optional[str] = None, sample_rate: int = 24000, upload_to_gcs: bool = True) -> str:
+async def write_stream_to_ogg(
+    stream, output_path: Optional[str] = None, sample_rate: int = 24000, upload_to_gcs: bool = True
+) -> str:
     """
     Write VoiceStreamEvent stream to an .ogg file and optionally upload to GCS.
 
@@ -62,7 +59,7 @@ async def write_stream_to_ogg(stream, output_path: Optional[str] = None, sample_
         output_path: Local path to write the .ogg file. If None, uses a temporary file.
         sample_rate: Sample rate of the audio (defaults to 24kHz).
         upload_to_gcs: Whether to upload the file to GCS and return a signed URL.
-        
+
     Returns:
         str: Path to the local file, or GCS signed URL if upload_to_gcs is True.
     """
