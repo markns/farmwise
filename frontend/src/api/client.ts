@@ -54,7 +54,7 @@ export class ApiClient {
     // Organization context interceptor
     this.instance.interceptors.request.use((config) => {
       // Skip organization prefix for global endpoints
-      const globalEndpoints = ['/markets', '/commodities', '/market_prices', '/crop-varieties']
+      const globalEndpoints = ['/markets', '/commodities', '/market_prices', '/crop-varieties', '/agronomy']
       const isGlobalEndpoint = globalEndpoints.some(endpoint => config.url?.includes(endpoint))
       
       if (!config.url?.includes('organization') && !isGlobalEndpoint) {

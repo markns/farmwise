@@ -1,0 +1,50 @@
+.rbc-calendar {
+  .rbc-event {
+    &.stage-event {
+      background-color: #3174ad;
+      border: 1px solid #2563eb;
+    }
+    
+    &.calendar-event {
+      background-color: #f57c00;
+      border: 1px solid #e65100;
+    }
+  }
+  
+  .rbc-event-content {
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .rbc-toolbar {
+    margin-bottom: 20px;
+    
+    .rbc-btn-group {
+      button {
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        
+        &.rbc-active {
+          background: #3b82f6;
+          color: white;
+        }
+        
+        &:hover {
+          background: #f3f4f6;
+        }
+      }
+    }
+  }
+}
+
+.crop-calendar-summary {
+  .stage-item, .event-item {
+    padding: 4px 0;
+    border-bottom: 1px solid #f0f0f0;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}

@@ -19,6 +19,7 @@ import {
   Settings as SettingsIcon,
   TrendingUp as MarketIcon,
   Grass as SeedIcon,
+  CalendarMonth as CalendarIcon,
   ExpandLess,
   ExpandMore,
 } from '@mui/icons-material'
@@ -99,6 +100,12 @@ const AppDrawer: React.FC = () => {
           icon: <SeedIcon />,
           path: `/${organization}/data/seed-varieties`,
           group: 'seed-varieties',
+        },
+        {
+          title: 'Crop Calendar',
+          icon: <CalendarIcon />,
+          path: `/${organization}/data/crop-calendar`,
+          group: 'crop-calendar',
         },
       ],
     },
