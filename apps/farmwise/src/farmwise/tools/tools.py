@@ -7,7 +7,6 @@ from agents import (
     RunContextWrapper,
     function_tool,
 )
-from cachetools.func import ttl_cache
 
 from farmbase_client.api.crop_varieties import crop_varieties_get_maize_varieties
 from farmbase_client.api.gaez import gaez_aez_classification, gaez_growing_period, gaez_suitability_index
@@ -86,7 +85,6 @@ async def elevation(_: RunContextWrapper[UserContext], latitude: float, longitud
         return r.json()["elevation"][0]
 
 
-@ttl_cache(maxsize=1, ttl=59 * 60)  # cache token for 59 minutes
 async def get_isda_token():
     async with IsdaClient(base_url=ISDA_URL) as client:
         token = await login_login_post.asyncio(client=client,
