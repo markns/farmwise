@@ -11,13 +11,15 @@ from ... import errors
 from ...models import CropVarietiesResponse
 from ...models import ErrorResponse
 from ...models import HTTPValidationError
+from ...types import UNSET, Unset
 from typing import cast
+from typing import Union
 
 
 def _get_kwargs(
     *,
-    altitude: float,
-    growing_period: int,
+    altitude: Union[Unset, float] = UNSET,
+    growing_period: Union[Unset, int] = UNSET,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
 
@@ -87,14 +89,16 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-    altitude: float,
-    growing_period: int,
+    altitude: Union[Unset, float] = UNSET,
+    growing_period: Union[Unset, int] = UNSET,
 ) -> Response[Union[CropVarietiesResponse, ErrorResponse, HTTPValidationError]]:
     """Get Maize Varieties
 
+     Filters and returns maize varieties based on optional altitude and growing period criteria.
+
     Args:
-        altitude (float):
-        growing_period (int):
+        altitude (Union[Unset, float]):
+        growing_period (Union[Unset, int]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -119,14 +123,16 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-    altitude: float,
-    growing_period: int,
+    altitude: Union[Unset, float] = UNSET,
+    growing_period: Union[Unset, int] = UNSET,
 ) -> Optional[Union[CropVarietiesResponse, ErrorResponse, HTTPValidationError]]:
     """Get Maize Varieties
 
+     Filters and returns maize varieties based on optional altitude and growing period criteria.
+
     Args:
-        altitude (float):
-        growing_period (int):
+        altitude (Union[Unset, float]):
+        growing_period (Union[Unset, int]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -146,14 +152,16 @@ def sync(
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-    altitude: float,
-    growing_period: int,
+    altitude: Union[Unset, float] = UNSET,
+    growing_period: Union[Unset, int] = UNSET,
 ) -> Response[Union[CropVarietiesResponse, ErrorResponse, HTTPValidationError]]:
     """Get Maize Varieties
 
+     Filters and returns maize varieties based on optional altitude and growing period criteria.
+
     Args:
-        altitude (float):
-        growing_period (int):
+        altitude (Union[Unset, float]):
+        growing_period (Union[Unset, int]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -176,14 +184,16 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-    altitude: float,
-    growing_period: int,
+    altitude: Union[Unset, float] = UNSET,
+    growing_period: Union[Unset, int] = UNSET,
 ) -> Optional[Union[CropVarietiesResponse, ErrorResponse, HTTPValidationError]]:
     """Get Maize Varieties
 
+     Filters and returns maize varieties based on optional altitude and growing period criteria.
+
     Args:
-        altitude (float):
-        growing_period (int):
+        altitude (Union[Unset, float]):
+        growing_period (Union[Unset, int]):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
