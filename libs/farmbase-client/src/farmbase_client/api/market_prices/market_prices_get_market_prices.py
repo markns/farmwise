@@ -18,26 +18,26 @@ from typing import Union
 
 def _get_kwargs(
     *,
-    page: Union[Unset, int] = 1,
-    items_per_page: Union[Unset, int] = 50,
     market_id: Union[Unset, int] = UNSET,
     commodity_id: Union[Unset, int] = UNSET,
+    page: Union[Unset, int] = 1,
+    items_per_page: Union[Unset, int] = 50,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
-
-    params["page"] = page
-
-    params["items_per_page"] = items_per_page
 
     params["market_id"] = market_id
 
     params["commodity_id"] = commodity_id
 
+    params["page"] = page
+
+    params["items_per_page"] = items_per_page
+
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/markets/prices",
+        "url": "/market_prices",
         "params": params,
     }
 
@@ -95,20 +95,20 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-    page: Union[Unset, int] = 1,
-    items_per_page: Union[Unset, int] = 50,
     market_id: Union[Unset, int] = UNSET,
     commodity_id: Union[Unset, int] = UNSET,
+    page: Union[Unset, int] = 1,
+    items_per_page: Union[Unset, int] = 50,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPricePagination]]:
     """Get Market Prices
 
      Get market prices with optional filtering by market or commodity.
 
     Args:
-        page (Union[Unset, int]):  Default: 1.
-        items_per_page (Union[Unset, int]):  Default: 50.
         market_id (Union[Unset, int]):
         commodity_id (Union[Unset, int]):
+        page (Union[Unset, int]):  Default: 1.
+        items_per_page (Union[Unset, int]):  Default: 50.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -119,10 +119,10 @@ def sync_detailed(
     """
 
     kwargs = _get_kwargs(
-        page=page,
-        items_per_page=items_per_page,
         market_id=market_id,
         commodity_id=commodity_id,
+        page=page,
+        items_per_page=items_per_page,
     )
 
     response = client.get_httpx_client().request(
@@ -135,20 +135,20 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-    page: Union[Unset, int] = 1,
-    items_per_page: Union[Unset, int] = 50,
     market_id: Union[Unset, int] = UNSET,
     commodity_id: Union[Unset, int] = UNSET,
+    page: Union[Unset, int] = 1,
+    items_per_page: Union[Unset, int] = 50,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPricePagination]]:
     """Get Market Prices
 
      Get market prices with optional filtering by market or commodity.
 
     Args:
-        page (Union[Unset, int]):  Default: 1.
-        items_per_page (Union[Unset, int]):  Default: 50.
         market_id (Union[Unset, int]):
         commodity_id (Union[Unset, int]):
+        page (Union[Unset, int]):  Default: 1.
+        items_per_page (Union[Unset, int]):  Default: 50.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -160,30 +160,30 @@ def sync(
 
     return sync_detailed(
         client=client,
-        page=page,
-        items_per_page=items_per_page,
         market_id=market_id,
         commodity_id=commodity_id,
+        page=page,
+        items_per_page=items_per_page,
     ).parsed
 
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-    page: Union[Unset, int] = 1,
-    items_per_page: Union[Unset, int] = 50,
     market_id: Union[Unset, int] = UNSET,
     commodity_id: Union[Unset, int] = UNSET,
+    page: Union[Unset, int] = 1,
+    items_per_page: Union[Unset, int] = 50,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPricePagination]]:
     """Get Market Prices
 
      Get market prices with optional filtering by market or commodity.
 
     Args:
-        page (Union[Unset, int]):  Default: 1.
-        items_per_page (Union[Unset, int]):  Default: 50.
         market_id (Union[Unset, int]):
         commodity_id (Union[Unset, int]):
+        page (Union[Unset, int]):  Default: 1.
+        items_per_page (Union[Unset, int]):  Default: 50.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -194,10 +194,10 @@ async def asyncio_detailed(
     """
 
     kwargs = _get_kwargs(
-        page=page,
-        items_per_page=items_per_page,
         market_id=market_id,
         commodity_id=commodity_id,
+        page=page,
+        items_per_page=items_per_page,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -208,20 +208,20 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-    page: Union[Unset, int] = 1,
-    items_per_page: Union[Unset, int] = 50,
     market_id: Union[Unset, int] = UNSET,
     commodity_id: Union[Unset, int] = UNSET,
+    page: Union[Unset, int] = 1,
+    items_per_page: Union[Unset, int] = 50,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPricePagination]]:
     """Get Market Prices
 
      Get market prices with optional filtering by market or commodity.
 
     Args:
-        page (Union[Unset, int]):  Default: 1.
-        items_per_page (Union[Unset, int]):  Default: 50.
         market_id (Union[Unset, int]):
         commodity_id (Union[Unset, int]):
+        page (Union[Unset, int]):  Default: 1.
+        items_per_page (Union[Unset, int]):  Default: 50.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -234,9 +234,9 @@ async def asyncio(
     return (
         await asyncio_detailed(
             client=client,
-            page=page,
-            items_per_page=items_per_page,
             market_id=market_id,
             commodity_id=commodity_id,
+            page=page,
+            items_per_page=items_per_page,
         )
     ).parsed

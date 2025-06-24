@@ -10,28 +10,38 @@ from ... import errors
 
 from ...models import ErrorResponse
 from ...models import HTTPValidationError
-from ...models import MarketPriceRead
+from ...models import PathogenRead
+from ...models import PathogenUpdate
 from typing import cast
 
 
 def _get_kwargs(
-    market_price_id: int,
+    pathogen_id: int,
+    *,
+    body: PathogenUpdate,
 ) -> dict[str, Any]:
+    headers: dict[str, Any] = {}
+
     _kwargs: dict[str, Any] = {
-        "method": "get",
-        "url": "/markets/prices/{market_price_id}".format(
-            market_price_id=market_price_id,
+        "method": "put",
+        "url": "/agronomy/pathogens/{pathogen_id}".format(
+            pathogen_id=pathogen_id,
         ),
     }
 
+    _kwargs["json"] = body.to_dict()
+
+    headers["Content-Type"] = "application/json"
+
+    _kwargs["headers"] = headers
     return _kwargs
 
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
+) -> Optional[Union[ErrorResponse, HTTPValidationError, PathogenRead]]:
     if response.status_code == 200:
-        response_200 = MarketPriceRead.model_validate(response.json())
+        response_200 = PathogenRead.model_validate(response.json())
 
         return response_200
     if response.status_code == 400:
@@ -66,7 +76,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
+) -> Response[Union[ErrorResponse, HTTPValidationError, PathogenRead]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -76,27 +86,30 @@ def _build_response(
 
 
 def sync_detailed(
-    market_price_id: int,
+    pathogen_id: int,
     *,
     client: AuthenticatedClient,
-) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Get Market Price Endpoint
+    body: PathogenUpdate,
+) -> Response[Union[ErrorResponse, HTTPValidationError, PathogenRead]]:
+    """Update Existing Pathogen
 
-     Get a market price by ID.
+     Update an existing pathogen.
 
     Args:
-        market_price_id (int):
+        pathogen_id (int):
+        body (PathogenUpdate): Model for updating an existing Pathogen.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]
+        Response[Union[ErrorResponse, HTTPValidationError, PathogenRead]]
     """
 
     kwargs = _get_kwargs(
-        market_price_id=market_price_id,
+        pathogen_id=pathogen_id,
+        body=body,
     )
 
     response = client.get_httpx_client().request(
@@ -107,53 +120,59 @@ def sync_detailed(
 
 
 def sync(
-    market_price_id: int,
+    pathogen_id: int,
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Get Market Price Endpoint
+    body: PathogenUpdate,
+) -> Optional[Union[ErrorResponse, HTTPValidationError, PathogenRead]]:
+    """Update Existing Pathogen
 
-     Get a market price by ID.
+     Update an existing pathogen.
 
     Args:
-        market_price_id (int):
+        pathogen_id (int):
+        body (PathogenUpdate): Model for updating an existing Pathogen.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ErrorResponse, HTTPValidationError, MarketPriceRead]
+        Union[ErrorResponse, HTTPValidationError, PathogenRead]
     """
 
     return sync_detailed(
-        market_price_id=market_price_id,
+        pathogen_id=pathogen_id,
         client=client,
+        body=body,
     ).parsed
 
 
 async def asyncio_detailed(
-    market_price_id: int,
+    pathogen_id: int,
     *,
     client: AuthenticatedClient,
-) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Get Market Price Endpoint
+    body: PathogenUpdate,
+) -> Response[Union[ErrorResponse, HTTPValidationError, PathogenRead]]:
+    """Update Existing Pathogen
 
-     Get a market price by ID.
+     Update an existing pathogen.
 
     Args:
-        market_price_id (int):
+        pathogen_id (int):
+        body (PathogenUpdate): Model for updating an existing Pathogen.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]
+        Response[Union[ErrorResponse, HTTPValidationError, PathogenRead]]
     """
 
     kwargs = _get_kwargs(
-        market_price_id=market_price_id,
+        pathogen_id=pathogen_id,
+        body=body,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -162,28 +181,31 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    market_price_id: int,
+    pathogen_id: int,
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Get Market Price Endpoint
+    body: PathogenUpdate,
+) -> Optional[Union[ErrorResponse, HTTPValidationError, PathogenRead]]:
+    """Update Existing Pathogen
 
-     Get a market price by ID.
+     Update an existing pathogen.
 
     Args:
-        market_price_id (int):
+        pathogen_id (int):
+        body (PathogenUpdate): Model for updating an existing Pathogen.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ErrorResponse, HTTPValidationError, MarketPriceRead]
+        Union[ErrorResponse, HTTPValidationError, PathogenRead]
     """
 
     return (
         await asyncio_detailed(
-            market_price_id=market_price_id,
+            pathogen_id=pathogen_id,
             client=client,
+            body=body,
         )
     ).parsed

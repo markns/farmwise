@@ -8,18 +8,19 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
+from ...models import CropCycleRead
 from ...models import ErrorResponse
 from ...models import HTTPValidationError
 from typing import cast
 
 
 def _get_kwargs(
-    market_price_id: int,
+    cycle_id: int,
 ) -> dict[str, Any]:
     _kwargs: dict[str, Any] = {
-        "method": "delete",
-        "url": "/markets/prices/{market_price_id}".format(
-            market_price_id=market_price_id,
+        "method": "get",
+        "url": "/agronomy/crop-cycles/{cycle_id}".format(
+            cycle_id=cycle_id,
         ),
     }
 
@@ -28,9 +29,10 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Optional[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     if response.status_code == 200:
-        response_200 = response.json()
+        response_200 = CropCycleRead.model_validate(response.json())
+
         return response_200
     if response.status_code == 400:
         response_400 = ErrorResponse.model_validate(response.json())
@@ -64,7 +66,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -74,27 +76,27 @@ def _build_response(
 
 
 def sync_detailed(
-    market_price_id: int,
+    cycle_id: int,
     *,
     client: AuthenticatedClient,
-) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
-    """Delete Market Price Endpoint
+) -> Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
+    """Get Crop Cycle Detail
 
-     Delete a market price.
+     Get detailed information about a specific crop cycle.
 
     Args:
-        market_price_id (int):
+        cycle_id (int):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, ErrorResponse, HTTPValidationError]]
+        Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]
     """
 
     kwargs = _get_kwargs(
-        market_price_id=market_price_id,
+        cycle_id=cycle_id,
     )
 
     response = client.get_httpx_client().request(
@@ -105,53 +107,53 @@ def sync_detailed(
 
 
 def sync(
-    market_price_id: int,
+    cycle_id: int,
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
-    """Delete Market Price Endpoint
+) -> Optional[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
+    """Get Crop Cycle Detail
 
-     Delete a market price.
+     Get detailed information about a specific crop cycle.
 
     Args:
-        market_price_id (int):
+        cycle_id (int):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, ErrorResponse, HTTPValidationError]
+        Union[CropCycleRead, ErrorResponse, HTTPValidationError]
     """
 
     return sync_detailed(
-        market_price_id=market_price_id,
+        cycle_id=cycle_id,
         client=client,
     ).parsed
 
 
 async def asyncio_detailed(
-    market_price_id: int,
+    cycle_id: int,
     *,
     client: AuthenticatedClient,
-) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
-    """Delete Market Price Endpoint
+) -> Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
+    """Get Crop Cycle Detail
 
-     Delete a market price.
+     Get detailed information about a specific crop cycle.
 
     Args:
-        market_price_id (int):
+        cycle_id (int):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, ErrorResponse, HTTPValidationError]]
+        Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]
     """
 
     kwargs = _get_kwargs(
-        market_price_id=market_price_id,
+        cycle_id=cycle_id,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -160,28 +162,28 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    market_price_id: int,
+    cycle_id: int,
     *,
     client: AuthenticatedClient,
-) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
-    """Delete Market Price Endpoint
+) -> Optional[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
+    """Get Crop Cycle Detail
 
-     Delete a market price.
+     Get detailed information about a specific crop cycle.
 
     Args:
-        market_price_id (int):
+        cycle_id (int):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, ErrorResponse, HTTPValidationError]
+        Union[CropCycleRead, ErrorResponse, HTTPValidationError]
     """
 
     return (
         await asyncio_detailed(
-            market_price_id=market_price_id,
+            cycle_id=cycle_id,
             client=client,
         )
     ).parsed

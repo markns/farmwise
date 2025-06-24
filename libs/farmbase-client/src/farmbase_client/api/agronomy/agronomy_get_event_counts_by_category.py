@@ -8,37 +8,27 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
+from ...models import AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory
 from ...models import ErrorResponse
-from ...models import HTTPValidationError
-from ...models import MarketPriceCreate
-from ...models import MarketPriceRead
 from typing import cast
 
 
-def _get_kwargs(
-    *,
-    body: MarketPriceCreate,
-) -> dict[str, Any]:
-    headers: dict[str, Any] = {}
-
+def _get_kwargs() -> dict[str, Any]:
     _kwargs: dict[str, Any] = {
-        "method": "post",
-        "url": "/markets/prices",
+        "method": "get",
+        "url": "/agronomy/analytics/events/by-category",
     }
 
-    _kwargs["json"] = body.to_dict()
-
-    headers["Content-Type"] = "application/json"
-
-    _kwargs["headers"] = headers
     return _kwargs
 
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
+) -> Optional[Union[AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory, ErrorResponse]]:
     if response.status_code == 200:
-        response_200 = MarketPriceRead.model_validate(response.json())
+        response_200 = AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory.model_validate(
+            response.json()
+        )
 
         return response_200
     if response.status_code == 400:
@@ -61,10 +51,6 @@ def _parse_response(
         response_500 = ErrorResponse.model_validate(response.json())
 
         return response_500
-    if response.status_code == 422:
-        response_422 = HTTPValidationError.model_validate(response.json())
-
-        return response_422
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -73,7 +59,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
+) -> Response[Union[AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory, ErrorResponse]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -85,26 +71,20 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-    body: MarketPriceCreate,
-) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Create Market Price Endpoint
+) -> Response[Union[AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory, ErrorResponse]]:
+    """Get Event Counts By Category
 
-     Create a new market price.
-
-    Args:
-        body (MarketPriceCreate): Model for creating a new market price.
+     Get count of events by category.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]
+        Response[Union[AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory, ErrorResponse]]
     """
 
-    kwargs = _get_kwargs(
-        body=body,
-    )
+    kwargs = _get_kwargs()
 
     response = client.get_httpx_client().request(
         **kwargs,
@@ -116,52 +96,41 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-    body: MarketPriceCreate,
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Create Market Price Endpoint
+) -> Optional[Union[AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory, ErrorResponse]]:
+    """Get Event Counts By Category
 
-     Create a new market price.
-
-    Args:
-        body (MarketPriceCreate): Model for creating a new market price.
+     Get count of events by category.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ErrorResponse, HTTPValidationError, MarketPriceRead]
+        Union[AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory, ErrorResponse]
     """
 
     return sync_detailed(
         client=client,
-        body=body,
     ).parsed
 
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-    body: MarketPriceCreate,
-) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Create Market Price Endpoint
+) -> Response[Union[AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory, ErrorResponse]]:
+    """Get Event Counts By Category
 
-     Create a new market price.
-
-    Args:
-        body (MarketPriceCreate): Model for creating a new market price.
+     Get count of events by category.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]
+        Response[Union[AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory, ErrorResponse]]
     """
 
-    kwargs = _get_kwargs(
-        body=body,
-    )
+    kwargs = _get_kwargs()
 
     response = await client.get_async_httpx_client().request(**kwargs)
 
@@ -171,26 +140,21 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-    body: MarketPriceCreate,
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Create Market Price Endpoint
+) -> Optional[Union[AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory, ErrorResponse]]:
+    """Get Event Counts By Category
 
-     Create a new market price.
-
-    Args:
-        body (MarketPriceCreate): Model for creating a new market price.
+     Get count of events by category.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ErrorResponse, HTTPValidationError, MarketPriceRead]
+        Union[AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory, ErrorResponse]
     """
 
     return (
         await asyncio_detailed(
             client=client,
-            body=body,
         )
     ).parsed

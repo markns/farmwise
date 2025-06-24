@@ -9,24 +9,21 @@ from ...types import Response, UNSET
 from ... import errors
 
 from ...models import ErrorResponse
+from ...models import EventCreate
+from ...models import EventRead
 from ...models import HTTPValidationError
-from ...models import MarketPriceRead
-from ...models import MarketPriceUpdate
 from typing import cast
 
 
 def _get_kwargs(
-    market_price_id: int,
     *,
-    body: MarketPriceUpdate,
+    body: EventCreate,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
 
     _kwargs: dict[str, Any] = {
-        "method": "put",
-        "url": "/markets/prices/{market_price_id}".format(
-            market_price_id=market_price_id,
-        ),
+        "method": "post",
+        "url": "/agronomy/events",
     }
 
     _kwargs["json"] = body.to_dict()
@@ -39,11 +36,11 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    if response.status_code == 200:
-        response_200 = MarketPriceRead.model_validate(response.json())
+) -> Optional[Union[ErrorResponse, EventRead, HTTPValidationError]]:
+    if response.status_code == 201:
+        response_201 = EventRead.model_validate(response.json())
 
-        return response_200
+        return response_201
     if response.status_code == 400:
         response_400 = ErrorResponse.model_validate(response.json())
 
@@ -76,7 +73,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
+) -> Response[Union[ErrorResponse, EventRead, HTTPValidationError]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -86,29 +83,26 @@ def _build_response(
 
 
 def sync_detailed(
-    market_price_id: int,
     *,
     client: AuthenticatedClient,
-    body: MarketPriceUpdate,
-) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Update Market Price Endpoint
+    body: EventCreate,
+) -> Response[Union[ErrorResponse, EventRead, HTTPValidationError]]:
+    """Create New Event
 
-     Update an existing market price.
+     Create a new event.
 
     Args:
-        market_price_id (int):
-        body (MarketPriceUpdate): Model for updating an existing market price.
+        body (EventCreate): Model for creating a new Event.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]
+        Response[Union[ErrorResponse, EventRead, HTTPValidationError]]
     """
 
     kwargs = _get_kwargs(
-        market_price_id=market_price_id,
         body=body,
     )
 
@@ -120,58 +114,52 @@ def sync_detailed(
 
 
 def sync(
-    market_price_id: int,
     *,
     client: AuthenticatedClient,
-    body: MarketPriceUpdate,
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Update Market Price Endpoint
+    body: EventCreate,
+) -> Optional[Union[ErrorResponse, EventRead, HTTPValidationError]]:
+    """Create New Event
 
-     Update an existing market price.
+     Create a new event.
 
     Args:
-        market_price_id (int):
-        body (MarketPriceUpdate): Model for updating an existing market price.
+        body (EventCreate): Model for creating a new Event.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ErrorResponse, HTTPValidationError, MarketPriceRead]
+        Union[ErrorResponse, EventRead, HTTPValidationError]
     """
 
     return sync_detailed(
-        market_price_id=market_price_id,
         client=client,
         body=body,
     ).parsed
 
 
 async def asyncio_detailed(
-    market_price_id: int,
     *,
     client: AuthenticatedClient,
-    body: MarketPriceUpdate,
-) -> Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Update Market Price Endpoint
+    body: EventCreate,
+) -> Response[Union[ErrorResponse, EventRead, HTTPValidationError]]:
+    """Create New Event
 
-     Update an existing market price.
+     Create a new event.
 
     Args:
-        market_price_id (int):
-        body (MarketPriceUpdate): Model for updating an existing market price.
+        body (EventCreate): Model for creating a new Event.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]
+        Response[Union[ErrorResponse, EventRead, HTTPValidationError]]
     """
 
     kwargs = _get_kwargs(
-        market_price_id=market_price_id,
         body=body,
     )
 
@@ -181,30 +169,27 @@ async def asyncio_detailed(
 
 
 async def asyncio(
-    market_price_id: int,
     *,
     client: AuthenticatedClient,
-    body: MarketPriceUpdate,
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MarketPriceRead]]:
-    """Update Market Price Endpoint
+    body: EventCreate,
+) -> Optional[Union[ErrorResponse, EventRead, HTTPValidationError]]:
+    """Create New Event
 
-     Update an existing market price.
+     Create a new event.
 
     Args:
-        market_price_id (int):
-        body (MarketPriceUpdate): Model for updating an existing market price.
+        body (EventCreate): Model for creating a new Event.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ErrorResponse, HTTPValidationError, MarketPriceRead]
+        Union[ErrorResponse, EventRead, HTTPValidationError]
     """
 
     return (
         await asyncio_detailed(
-            market_price_id=market_price_id,
             client=client,
             body=body,
         )
