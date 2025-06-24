@@ -5,7 +5,6 @@ from typing import Annotated
 import gcsfs
 from fastapi import APIRouter, Query
 from loguru import logger
-from rasterio import MemoryFile
 
 from farmbase.data.gaez.models import SuitabilityIndexResponse
 
@@ -53,9 +52,14 @@ def open_raster_from_gcs(path):
     # Although rioxarray can read gs:// paths, it doesn't seem to handle the ambient credentials
     # when running in Google Cloud Run. Therefore, use GCSFileSystem to memory
     import rioxarray
+    from rasterio import MemoryFile
+
     with fs.open(path, 'rb') as f:
+        logger.debug(f"opened file {f}")
         with MemoryFile(f.read()) as memfile:
+            logger.debug(f"read file {f} into {memfile}")
             with memfile.open() as dataset:
+                logger.debug(f"opened memfile {memfile}")
                 return rioxarray.open_rasterio(dataset)
 
 
@@ -134,6 +138,7 @@ def growing_period(
     """Get the growing period length in days for a given geographical coordinate."""
     # Call the cached getter function
     raster = get_growing_period_raster()
+    logger.debug(f"loaded growing period raster shape {raster.shape}")
     days =  raster.sel(x=longitude, y=latitude, method="nearest").item()
     logger.debug(f"growing period for lon:{longitude} lat:{latitude} is {days} days")
     return days
