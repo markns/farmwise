@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = "<=3.13"
 dependencies = [
     "farmbase-client",
+    "isdasoil-api-client",
     "google-cloud-storage>=3.1.1",
     "google-cloud-texttospeech>=2.27.0",
     "loguru-logging-intercept>=0.1.5",
@@ -25,6 +26,7 @@ dev = [
 
 [tool.uv.sources]
 farmbase-client = { workspace = true }
+isdasoil-api-client = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

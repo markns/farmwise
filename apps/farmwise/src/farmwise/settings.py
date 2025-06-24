@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: SecretStr
     FARMBASE_ENDPOINT: str
     FARMBASE_API_KEY: SecretStr
+    ISDA_USERNAME: str
+    ISDA_PASSWORD: SecretStr
     WHATSAPP_TOKEN: str
     WHATSAPP_PHONE_ID: str
     WHATSAPP_CALLBACK_URL: str

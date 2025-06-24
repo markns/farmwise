@@ -1,0 +1,15 @@
+[project]
+name = "isdasoil-api-client"
+version = "2.0.0"
+description = "A client library for accessing iSDAsoil API"
+readme = "README.md"
+
+
+[dependencies]
+httpx = ">=0.23.0,<0.29.0"
+attrs = ">=22.2.0"
+python-dateutil = "^2.8.0"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
