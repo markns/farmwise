@@ -5,6 +5,14 @@ from subprocess import check_output
 
 from loguru import logger
 
+from .agronomy.models import (
+    Crop,
+    Pathogen,
+    PathogenImage,
+    Event,
+    CropCycle,
+    CropStage,
+)
 from .commodity.models import Commodity
 from .contact.models import Contact
 from .farm.activity.models import ActivityProduct, ActivityType, FarmActivity
@@ -52,7 +60,6 @@ if os.environ.get("LOG_MODULE_IMPORTS", False):
 
     # Add the custom finder to the meta_path
     sys.meta_path.insert(0, CustomMetaPathFinder())
-
 
 
 def _get_git_revision(path):
@@ -133,4 +140,10 @@ __all__ = [
     "Subregion",
     "Market",
     "MarketPrice",
+    "Crop",
+    "Pathogen",
+    "PathogenImage",
+    "Event",
+    "CropCycle",
+    "CropStage",
 ]
