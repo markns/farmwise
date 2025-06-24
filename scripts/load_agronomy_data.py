@@ -33,7 +33,8 @@ from farmbase.agronomy.models import (
     PathogenImage,
     Event,
     CropCycle,
-    CropStage,
+    CropCycleStage,
+    CropCycleEvent,
     event_crop_association,
     event_pathogen_association,
     pathogen_crop_association,
@@ -260,8 +261,20 @@ def load_events_data(session, events_data: List[Dict[str, Any]], verbose: bool =
     return count
 
 
-def load_crop_cycle_data(session, cycle_data: Dict[str, Any], crop_id: str, verbose: bool = False) -> int:
-    """Load a single crop cycle with stages."""
+def load_crop_cycle_data(session, cycle_data: Dict[str, Any], crop_id: str, koppen_classification: str, verbose: bool = True) -> int:
+    """
+    Load a single crop cycle with stages and events.
+    
+    Args:
+        session: Database session
+        cycle_data: JSON data containing 'stages' and 'events' arrays
+        crop_id: Crop identifier (e.g., 'MAIZE') extracted from filename
+        koppen_classification: Köppen climate classification (e.g., 'As', 'Cfb') extracted from filename
+        verbose: Whether to print detailed progress
+        
+    Returns:
+        1 if successful, 0 if skipped or failed
+    """
     try:
         # Check if crop exists
         crop = session.get(Crop, crop_id)
@@ -269,13 +282,24 @@ def load_crop_cycle_data(session, cycle_data: Dict[str, Any], crop_id: str, verb
             print(f"  Warning: Crop {crop_id} not found, skipping cycle")
             return 0
         
+        # Check if crop cycle already exists for this crop and climate classification
+        from sqlalchemy import select
+        existing_cycle = session.execute(
+            select(CropCycle).where(
+                CropCycle.crop_id == crop_id,
+                CropCycle.koppen_climate_classification == koppen_classification
+            )
+        ).scalar_one_or_none()
+
+        if existing_cycle:
+            if verbose:
+                print(f"  Crop cycle for {crop_id} with {koppen_classification} already exists, skipping...")
+            return 0
+        
         # Create crop cycle
         cycle = CropCycle(
             crop_id=crop_id,
-            name=f"{crop_id}_cycle",
-            description=f"Crop cycle for {crop_id}",
-            total_duration_days=sum(stage['duration'] for stage in cycle_data.get('stages', [])),
-            cultivation_method="direct_seeding",  # Default from the filename pattern
+            koppen_climate_classification=koppen_classification,
         )
         
         session.add(cycle)
@@ -283,26 +307,74 @@ def load_crop_cycle_data(session, cycle_data: Dict[str, Any], crop_id: str, verb
         
         # Add stages
         stages_data = cycle_data.get('stages', [])
-        for i, stage_data in enumerate(stages_data):
-            stage = CropStage(
+        for stage_data in stages_data:
+            stage = CropCycleStage(
                 cycle_id=cycle.id,
-                stage_id=stage_data['id'],
+                order=stage_data['id'],  # Use the original stage ID as order
                 name=stage_data['name'],
-                duration_days=stage_data['duration'],
-                sequence_order=i + 1,
-                description=f"Stage {stage_data['name']} for {crop_id}",
+                duration=stage_data['duration'],
             )
             session.add(stage)
         
+        # Add events (track processed events to avoid duplicates)
+        events_data = cycle_data.get('events', [])
+        processed_events = set()
+        
+        for event_data in events_data:
+            event_identifier = event_data['identifier']
+            
+            # Skip if we've already processed this event for this cycle
+            if event_identifier in processed_events:
+                if verbose:
+                    print(f"    Skipping duplicate event: {event_identifier}")
+                continue
+            
+            # Check if the event exists in the Event table
+            event = session.execute(
+                select(Event).where(Event.identifier == event_identifier)
+            ).scalar_one_or_none()
+            
+            if not event:
+                if verbose:
+                    print(f"    Warning: Event {event_identifier} not found, skipping event")
+                continue
+            
+            # Check if this event is already associated with this crop cycle
+            existing_cycle_event = session.execute(
+                select(CropCycleEvent).where(
+                    CropCycleEvent.crop_cycle_id == cycle.id,
+                    CropCycleEvent.event_identifier == event_identifier
+                )
+            ).scalar_one_or_none()
+            
+            if existing_cycle_event:
+                if verbose:
+                    print(f"    Event {event_identifier} already associated with this crop cycle, skipping...")
+                processed_events.add(event_identifier)
+                continue
+            
+            # Create crop cycle event
+            cycle_event = CropCycleEvent(
+                crop_cycle_id=cycle.id,
+                event_identifier=event_identifier,
+                start_day=event_data['start_day'],
+                end_day=event_data['end_day'],
+                original_event_id=event_data.get('id'),  # Store original ID from JSON
+            )
+            session.add(cycle_event)
+            processed_events.add(event_identifier)
+        
         session.commit()
         
+        unique_events_count = len(processed_events)
+        stages_count = len(stages_data)
         if verbose:
-            print(f"  Added crop cycle for {crop_id} with {len(stages_data)} stages")
+            print(f"  Added crop cycle for {crop_id} ({koppen_classification}) with {stages_count} stages and {unique_events_count} unique events")
         
         return 1
         
     except Exception as e:
-        print(f"  Error loading crop cycle for {crop_id}: {e}")
+        print(f"  Error loading crop cycle for {crop_id} ({koppen_classification}): {e}")
         session.rollback()
         return 0
 
@@ -370,15 +442,23 @@ def main():
             print(f"Found {len(cycle_files)} crop cycle files")
 
             for cycle_file in cycle_files:
-                # Extract crop ID from filename (e.g., "As_maize_direct_seeding.json" -> "MAIZE")
-                crop_id = cycle_file.stem.split('_')[1].upper() if '_' in cycle_file.stem else cycle_file.stem.upper()
+                # Extract Köppen classification and crop ID from filename 
+                # e.g., "As_maize_direct_seeding.json" -> koppen="As", crop_id="maize"
+                filename_parts = cycle_file.stem.split('_')
+                if len(filename_parts) >= 2:
+                    koppen_classification = filename_parts[0]
+                    crop_id = filename_parts[1].upper()  # Convert to uppercase to match existing crop host_ids
+                else:
+                    print(f"  Warning: Invalid filename format: {cycle_file.name}, skipping...")
+                    continue
 
                 cycle_data = load_json_file(cycle_file)
                 if not args.dry_run:
-                    total_loaded += load_crop_cycle_data(session, cycle_data, crop_id, args.verbose)
+                    total_loaded += load_crop_cycle_data(session, cycle_data, crop_id, koppen_classification, args.verbose)
                 else:
                     stages_count = len(cycle_data.get('stages', []))
-                    print(f"[DRY RUN] Would load crop cycle for {crop_id} with {stages_count} stages")
+                    events_count = len(cycle_data.get('events', []))
+                    print(f"[DRY RUN] Would load crop cycle for {crop_id} ({koppen_classification}) with {stages_count} stages and {events_count} events")
 
         if args.dry_run:
             print("[DRY RUN] No changes made to database")

@@ -1,62 +1,74 @@
-from typing import List, Optional, Annotated
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from farmbase.database.core import DbSession
-from farmbase.models import PaginationParams, PrimaryKey
-from farmbase.agronomy.models import EventCategory, PathogenClass, GrowthStage
+from farmbase.agronomy.models import EventCategory, PathogenClass
 from farmbase.agronomy.schemas import (
-    CropRead,
     CropCreate,
-    CropUpdate,
-    CropPagination,
-    PathogenRead,
-    PathogenCreate,
-    PathogenUpdate,
-    PathogenPagination,
-    EventRead,
-    EventCreate,
-    EventUpdate,
-    EventPagination,
-    CropCycleRead,
     CropCycleCreate,
+    CropCycleEventCreate,
+    CropCycleEventRead,
     CropCyclePagination,
-    PathogenSearchResponse,
+    CropCycleRead,
+    CropCycleStageCreate,
+    CropCycleStageRead,
+    CropCycleUpdate,
+    CropPagination,
+    CropRead,
+    CropUpdate,
+    EventCreate,
+    EventPagination,
+    EventRead,
     EventSearchResponse,
+    EventUpdate,
+    PathogenCreate,
+    PathogenPagination,
+    PathogenRead,
+    PathogenSearchResponse,
+    PathogenUpdate,
     SearchFilters,
 )
 from farmbase.agronomy.service import (
-    # Crop services
-    get_crop,
-    get_all_crops,
-    create_crop,
-    update_crop,
-    delete_crop,
-    # Pathogen services
-    get_pathogen,
-    get_all_pathogens,
-    search_pathogens_by_crop,
-    create_pathogen,
-    update_pathogen,
-    delete_pathogen,
-    # Event services
-    get_event,
-    get_all_events,
-    get_events_for_crop,
-    get_preventive_events_for_pathogen,
-    create_event,
-    update_event,
-    delete_event,
-    # Crop cycle services
-    get_crop_cycle,
-    get_crop_cycles_for_crop,
-    create_crop_cycle,
-    update_crop_cycle,
-    delete_crop_cycle,
+    count_events_by_category,
     # Utility services
     count_pathogens_by_class,
-    count_events_by_category,
+    create_crop,
+    create_crop_cycle,
+    create_event,
+    create_pathogen,
+    delete_crop,
+    delete_crop_cycle,
+    delete_event,
+    delete_pathogen,
+    get_all_crop_cycles,
+    get_all_crops,
+    get_all_events,
+    get_all_pathogens,
+    # Crop services
+    get_crop,
+    # Crop cycle services
+    get_crop_cycle,
+    get_crop_cycle_events_by_time_range,
+    # Crop cycle event services
+    get_crop_cycle_events_for_crop_cycle,
+    # Crop cycle stage services
+    get_crop_cycle_stages_for_crop_cycle,
+    get_crop_cycles_for_crop,
     get_crop_summary,
+    # Event services
+    get_event,
+    get_events_for_crop,
+    # Pathogen services
+    get_pathogen,
+    get_preventive_events_for_pathogen,
+    search_pathogens_by_crop,
+    update_crop,
+    update_crop_cycle,
+    update_event,
+    update_pathogen,
 )
+from farmbase.database.core import DbSession
+from farmbase.models import PaginationParams
 
 router = APIRouter()
 
@@ -64,6 +76,7 @@ router = APIRouter()
 # ————————————————————————————————————————
 # Crop Endpoints
 # ————————————————————————————————————————
+
 
 @router.get("/crops", response_model=CropPagination)
 def list_crops(
@@ -79,7 +92,7 @@ def list_crops(
         cultivation_type=cultivation_type,
         labor_level=labor_level,
     )
-    
+
     return CropPagination(
         items=[CropRead.model_validate(crop) for crop in crops],
         page=pagination.page,
@@ -93,10 +106,7 @@ def get_crop_detail(session: DbSession, crop_id: str) -> CropRead:
     """Get detailed information about a specific crop."""
     crop = get_crop(session, crop_id)
     if not crop:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Crop with ID '{crop_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Crop with ID '{crop_id}' not found")
     return CropRead.model_validate(crop)
 
 
@@ -108,18 +118,11 @@ def create_new_crop(session: DbSession, crop_data: CropCreate) -> CropRead:
 
 
 @router.put("/crops/{crop_id}", response_model=CropRead)
-def update_existing_crop(
-    session: DbSession, 
-    crop_id: str, 
-    crop_data: CropUpdate
-) -> CropRead:
+def update_existing_crop(session: DbSession, crop_id: str, crop_data: CropUpdate) -> CropRead:
     """Update an existing crop."""
     crop = update_crop(session, crop_id, crop_data.model_dump(exclude_unset=True))
     if not crop:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Crop with ID '{crop_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Crop with ID '{crop_id}' not found")
     return CropRead.model_validate(crop)
 
 
@@ -128,10 +131,7 @@ def delete_existing_crop(session: DbSession, crop_id: str) -> None:
     """Delete a crop."""
     success = delete_crop(session, crop_id)
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Crop with ID '{crop_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Crop with ID '{crop_id}' not found")
 
 
 @router.get("/crops/{crop_id}/summary")
@@ -139,16 +139,14 @@ def get_crop_summary_info(session: DbSession, crop_id: str) -> dict:
     """Get a summary of all data related to a crop."""
     summary = get_crop_summary(session, crop_id)
     if not summary:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Crop with ID '{crop_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Crop with ID '{crop_id}' not found")
     return summary
 
 
 # ————————————————————————————————————————
 # Pathogen Endpoints
 # ————————————————————————————————————————
+
 
 @router.get("/pathogens", response_model=PathogenPagination)
 def list_pathogens(
@@ -168,7 +166,7 @@ def list_pathogens(
         crop_id=crop_id,
         is_activated=is_activated,
     )
-    
+
     return PathogenPagination(
         items=[PathogenRead.model_validate(pathogen) for pathogen in pathogens],
         page=pagination.page,
@@ -182,10 +180,7 @@ def get_pathogen_detail(session: DbSession, pathogen_id: int) -> PathogenRead:
     """Get detailed information about a specific pathogen."""
     pathogen = get_pathogen(session, pathogen_id)
     if not pathogen:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Pathogen with ID '{pathogen_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Pathogen with ID '{pathogen_id}' not found")
     return PathogenRead.model_validate(pathogen)
 
 
@@ -203,7 +198,7 @@ def search_pathogens_for_crop(
         pathogen_class=pathogen_class,
         severity=severity,
     )
-    
+
     return PathogenSearchResponse(
         pathogens=[PathogenRead.model_validate(p) for p in pathogens],
         total_count=len(pathogens),
@@ -231,10 +226,7 @@ def update_existing_pathogen(
     """Update an existing pathogen."""
     pathogen = update_pathogen(session, pathogen_id, pathogen_data.model_dump(exclude_unset=True))
     if not pathogen:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Pathogen with ID '{pathogen_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Pathogen with ID '{pathogen_id}' not found")
     return PathogenRead.model_validate(pathogen)
 
 
@@ -243,15 +235,13 @@ def delete_existing_pathogen(session: DbSession, pathogen_id: int) -> None:
     """Delete a pathogen."""
     success = delete_pathogen(session, pathogen_id)
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Pathogen with ID '{pathogen_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Pathogen with ID '{pathogen_id}' not found")
 
 
 # ————————————————————————————————————————
 # Event Endpoints
 # ————————————————————————————————————————
+
 
 @router.get("/events", response_model=EventPagination)
 def list_events(
@@ -269,7 +259,7 @@ def list_events(
         crop_id=crop_id,
         importance=importance,
     )
-    
+
     return EventPagination(
         items=[EventRead.model_validate(event) for event in events],
         page=pagination.page,
@@ -283,10 +273,7 @@ def get_event_detail(session: DbSession, event_id: str) -> EventRead:
     """Get detailed information about a specific event."""
     event = get_event(session, event_id)
     if not event:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Event with ID '{event_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Event with ID '{event_id}' not found")
     return EventRead.model_validate(event)
 
 
@@ -306,7 +293,7 @@ def get_events_for_crop_endpoint(
         start_day=start_day,
         end_day=end_day,
     )
-    
+
     return EventSearchResponse(
         events=[EventRead.model_validate(event) for event in events],
         total_count=len(events),
@@ -329,7 +316,7 @@ def get_preventive_events_for_pathogen_endpoint(
         pathogen_id=pathogen_id,
         crop_id=crop_id,
     )
-    
+
     return [EventRead.model_validate(event) for event in events]
 
 
@@ -349,10 +336,7 @@ def update_existing_event(
     """Update an existing event."""
     event = update_event(session, event_id, event_data.model_dump(exclude_unset=True))
     if not event:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Event with ID '{event_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Event with ID '{event_id}' not found")
     return EventRead.model_validate(event)
 
 
@@ -361,32 +345,54 @@ def delete_existing_event(session: DbSession, event_id: str) -> None:
     """Delete an event."""
     success = delete_event(session, event_id)
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Event with ID '{event_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Event with ID '{event_id}' not found")
 
 
 # ————————————————————————————————————————
 # Crop Cycle Endpoints
 # ————————————————————————————————————————
 
+
+@router.get("/crop-cycles", response_model=CropCyclePagination)
+def list_crop_cycles(
+    session: DbSession,
+    pagination: PaginationParams = Depends(),
+    crop_id: Optional[str] = Query(None, description="Filter by crop ID"),
+    koppen_classification: Optional[str] = Query(None, description="Filter by Köppen climate classification"),
+) -> CropCyclePagination:
+    """Get all crop cycles with optional filtering and pagination."""
+    cycles = get_all_crop_cycles(
+        session=session,
+        pagination=pagination,
+        crop_id=crop_id,
+        koppen_classification=koppen_classification,
+    )
+
+    return CropCyclePagination(
+        items=[CropCycleRead.model_validate(cycle) for cycle in cycles],
+        page=pagination.page,
+        items_per_page=pagination.items_per_page,
+        total=len(cycles),  # TODO: Implement proper count
+    )
+
+
 @router.get("/crop-cycles/{cycle_id}", response_model=CropCycleRead)
 def get_crop_cycle_detail(session: DbSession, cycle_id: int) -> CropCycleRead:
     """Get detailed information about a specific crop cycle."""
     cycle = get_crop_cycle(session, cycle_id)
     if not cycle:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Crop cycle with ID '{cycle_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Crop cycle with ID '{cycle_id}' not found")
     return CropCycleRead.model_validate(cycle)
 
 
 @router.get("/crop-cycles/crop/{crop_id}", response_model=List[CropCycleRead])
-def get_crop_cycles_for_crop_endpoint(session: DbSession, crop_id: str) -> List[CropCycleRead]:
+def get_crop_cycles_for_crop_endpoint(
+    session: DbSession,
+    crop_id: str,
+    koppen_classification: Optional[str] = Query(None, description="Filter by Köppen climate classification"),
+) -> List[CropCycleRead]:
     """Get all crop cycles for a specific crop."""
-    cycles = get_crop_cycles_for_crop(session, crop_id)
+    cycles = get_crop_cycles_for_crop(session, crop_id, koppen_classification)
     return [CropCycleRead.model_validate(cycle) for cycle in cycles]
 
 
@@ -394,10 +400,32 @@ def get_crop_cycles_for_crop_endpoint(session: DbSession, crop_id: str) -> List[
 def create_new_crop_cycle(
     session: DbSession,
     cycle_data: CropCycleCreate,
-    stages_data: List[dict] = [],
+    stages_data: Optional[List[CropCycleStageCreate]] = [],
+    events_data: Optional[List[CropCycleEventCreate]] = [],
 ) -> CropCycleRead:
-    """Create a new crop cycle with stages."""
-    cycle = create_crop_cycle(session, cycle_data.model_dump(), stages_data)
+    """Create a new crop cycle with stages and events."""
+    stages_dict = [stage.model_dump() for stage in stages_data] if stages_data else []
+    events_dict = [event.model_dump() for event in events_data] if events_data else []
+
+    cycle = create_crop_cycle(session, cycle_data.model_dump(), stages_dict, events_dict)
+    return CropCycleRead.model_validate(cycle)
+
+
+@router.put("/crop-cycles/{cycle_id}", response_model=CropCycleRead)
+def update_existing_crop_cycle(
+    session: DbSession,
+    cycle_id: int,
+    cycle_data: CropCycleUpdate,
+    stages_data: Optional[List[CropCycleStageCreate]] = None,
+    events_data: Optional[List[CropCycleEventCreate]] = None,
+) -> CropCycleRead:
+    """Update an existing crop cycle."""
+    stages_dict = [stage.model_dump() for stage in stages_data] if stages_data else None
+    events_dict = [event.model_dump() for event in events_data] if events_data else None
+
+    cycle = update_crop_cycle(session, cycle_id, cycle_data.model_dump(exclude_unset=True), stages_dict, events_dict)
+    if not cycle:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Crop cycle with ID '{cycle_id}' not found")
     return CropCycleRead.model_validate(cycle)
 
 
@@ -406,15 +434,49 @@ def delete_existing_crop_cycle(session: DbSession, cycle_id: int) -> None:
     """Delete a crop cycle."""
     success = delete_crop_cycle(session, cycle_id)
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Crop cycle with ID '{cycle_id}' not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Crop cycle with ID '{cycle_id}' not found")
+
+
+# ————————————————————————————————————————
+# Crop Cycle Events Endpoints
+# ————————————————————————————————————————
+
+
+@router.get("/crop-cycles/{cycle_id}/events", response_model=List[CropCycleEventRead])
+def get_crop_cycle_events(session: DbSession, cycle_id: int) -> List[CropCycleEventRead]:
+    """Get all events for a specific crop cycle."""
+    events = get_crop_cycle_events_for_crop_cycle(session, cycle_id)
+    return [CropCycleEventRead.model_validate(event) for event in events]
+
+
+@router.get("/crop-cycles/{cycle_id}/events/time-range", response_model=List[CropCycleEventRead])
+def get_crop_cycle_events_by_time(
+    session: DbSession,
+    cycle_id: int,
+    start_day: Optional[int] = Query(None, ge=0, description="Start day filter"),
+    end_day: Optional[int] = Query(None, ge=0, description="End day filter"),
+) -> List[CropCycleEventRead]:
+    """Get crop cycle events within a specific time range."""
+    events = get_crop_cycle_events_by_time_range(session, cycle_id, start_day, end_day)
+    return [CropCycleEventRead.model_validate(event) for event in events]
+
+
+# ————————————————————————————————————————
+# Crop Cycle Stages Endpoints
+# ————————————————————————————————————————
+
+
+@router.get("/crop-cycles/{cycle_id}/stages", response_model=List[CropCycleStageRead])
+def get_crop_cycle_stages(session: DbSession, cycle_id: int) -> List[CropCycleStageRead]:
+    """Get all stages for a specific crop cycle."""
+    stages = get_crop_cycle_stages_for_crop_cycle(session, cycle_id)
+    return [CropCycleStageRead.model_validate(stage) for stage in stages]
 
 
 # ————————————————————————————————————————
 # Analytics Endpoints
 # ————————————————————————————————————————
+
 
 @router.get("/analytics/pathogens/by-class")
 def get_pathogen_counts_by_class(session: DbSession) -> dict:

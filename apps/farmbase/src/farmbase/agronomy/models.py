@@ -1,16 +1,14 @@
 from __future__ import annotations
 
-from datetime import datetime
-from enum import Enum
 from typing import List, Optional
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     Column,
     Float,
     ForeignKey,
     Integer,
-    JSON,
     String,
     Table,
     Text,
@@ -22,13 +20,14 @@ from farmbase.database.core import Base
 from farmbase.enums import FarmbaseEnum
 from farmbase.models import TimeStampMixin
 
-
 # ————————————————————————————————————————
 # Enums
 # ————————————————————————————————————————
 
+
 class EventCategory(FarmbaseEnum):
     """Agricultural event categories"""
+
     FERTILIZATION_CONVENTIONAL = "fertilization_conventional"
     FERTILIZATION_ORGANIC = "fertilization_organic"
     FIELD_PREPARATION = "field_preparation"
@@ -50,12 +49,15 @@ class EventCategory(FarmbaseEnum):
 
 class EventType(FarmbaseEnum):
     """Agricultural event types"""
+
     ADVICE = "advice"
     HINT = "hint"
-    PROCEDURE = 'procedure'
+    PROCEDURE = "procedure"
+
 
 class PathogenClass(FarmbaseEnum):
     """Pathogen classification types"""
+
     FUNGI = "fungi"
     BACTERIA = "bacteria"
     VIRUS = "virus"
@@ -69,6 +71,7 @@ class PathogenClass(FarmbaseEnum):
 
 class SpreadRisk(FarmbaseEnum):
     """Pathogen spread risk levels"""
+
     LOW = "Low"
     INTERMEDIATE = "Intermediate"
     HIGH = "High"
@@ -76,6 +79,7 @@ class SpreadRisk(FarmbaseEnum):
 
 class GrowthStage(FarmbaseEnum):
     """Crop growth stages"""
+
     SEEDLING = "seedling"
     VEGETATIVE = "vegetative"
     FLOWERING = "flowering"
@@ -85,12 +89,14 @@ class GrowthStage(FarmbaseEnum):
 
 class CultivationType(FarmbaseEnum):
     """Crop cultivation types"""
+
     DIRECT_SEEDING = "direct_seeding"
     TRANSPLANTED = "transplanted"
 
 
 class LaborLevel(FarmbaseEnum):
     """Labor requirement levels"""
+
     LOW = "low"
     INTERMEDIATE = "intermediate"
     HIGH = "high"
@@ -98,6 +104,7 @@ class LaborLevel(FarmbaseEnum):
 
 class WateringLevel(FarmbaseEnum):
     """Watering requirement levels"""
+
     LOW = "low"
     INTERMEDIATE = "intermediate"
     HIGH = "high"
@@ -148,8 +155,10 @@ pathogen_stage_association = Table(
 # Main Models
 # ————————————————————————————————————————
 
+
 class Crop(Base, TimeStampMixin):
-    """Crop cultivation parameters from """
+    """Crop cultivation parameters from"""
+
     __tablename__ = "crop"
     __table_args__ = {"schema": "farmbase_core"}
 
@@ -160,30 +169,24 @@ class Crop(Base, TimeStampMixin):
     description: Mapped[Optional[str]] = mapped_column(Text)
     labor: Mapped[LaborLevel] = mapped_column(nullable=False)
     watering: Mapped[WateringLevel] = mapped_column(nullable=False)
-    
+
     # Nutrient requirements (kg/ha)
     n_opt: Mapped[int] = mapped_column(Integer, nullable=False, comment="Nitrogen kg/ha")
     p_opt: Mapped[int] = mapped_column(Integer, nullable=False, comment="Phosphorus kg/ha")
     k_opt: Mapped[int] = mapped_column(Integer, nullable=False, comment="Potassium kg/ha")
-    
+
     # Soil requirements
     ph_from: Mapped[float] = mapped_column(Float, nullable=False)
     ph_to: Mapped[float] = mapped_column(Float, nullable=False)
     soil_description: Mapped[Optional[str]] = mapped_column(Text)
-    
+
     # Temperature requirements (Celsius)
     temp_day_growth_from: Mapped[int] = mapped_column(Integer, nullable=False)
     temp_day_growth_to: Mapped[int] = mapped_column(Integer, nullable=False)
 
     # Relationships
-    events: Mapped[List["Event"]] = relationship(
-        secondary=event_crop_association,
-        back_populates="crops"
-    )
-    pathogens: Mapped[List["Pathogen"]] = relationship(
-        secondary=pathogen_crop_association,
-        back_populates="crops"
-    )
+    events: Mapped[List["Event"]] = relationship(secondary=event_crop_association, back_populates="crops")
+    pathogens: Mapped[List["Pathogen"]] = relationship(secondary=pathogen_crop_association, back_populates="crops")
     cycles: Mapped[List["CropCycle"]] = relationship(back_populates="crop")
 
     def __repr__(self) -> str:
@@ -191,7 +194,8 @@ class Crop(Base, TimeStampMixin):
 
 
 class Pathogen(Base, TimeStampMixin):
-    """Plant pathogen information from """
+    """Plant pathogen information from"""
+
     __tablename__ = "pathogen"
     __table_args__ = {"schema": "farmbase_core"}
 
@@ -200,10 +204,10 @@ class Pathogen(Base, TimeStampMixin):
     name_en: Mapped[Optional[str]] = mapped_column(String(255))
     scientific_name: Mapped[Optional[str]] = mapped_column(String(255))
     pathogen_class: Mapped[PathogenClass] = mapped_column(nullable=False)
-    
+
     severity: Mapped[int] = mapped_column(Integer, nullable=False, comment="0-2 severity scale")
     spread_risk: Mapped[SpreadRisk] = mapped_column(nullable=False)
-    
+
     # Content fields
     symptoms: Mapped[Optional[str]] = mapped_column(Text)
     trigger: Mapped[Optional[str]] = mapped_column(Text)
@@ -211,7 +215,7 @@ class Pathogen(Base, TimeStampMixin):
     alternative_treatment: Mapped[Optional[str]] = mapped_column(Text)
     preventive_measures: Mapped[Optional[List[str]]] = mapped_column(JSON)
     bullet_points: Mapped[Optional[List[str]]] = mapped_column(JSON)
-    
+
     # Metadata
     default_image: Mapped[Optional[str]] = mapped_column(String(255))
     eppo: Mapped[Optional[str]] = mapped_column(String(50), comment="EPPO code")
@@ -220,18 +224,11 @@ class Pathogen(Base, TimeStampMixin):
     version_number: Mapped[Optional[int]] = mapped_column(Integer)
 
     # Relationships
-    crops: Mapped[List["Crop"]] = relationship(
-        secondary=pathogen_crop_association,
-        back_populates="pathogens"
-    )
+    crops: Mapped[List["Crop"]] = relationship(secondary=pathogen_crop_association, back_populates="pathogens")
     events: Mapped[List["Event"]] = relationship(
-        secondary=event_pathogen_association,
-        back_populates="prevent_pathogens"
+        secondary=event_pathogen_association, back_populates="prevent_pathogens"
     )
-    images: Mapped[List["PathogenImage"]] = relationship(
-        back_populates="pathogen",
-        cascade="all, delete-orphan"
-    )
+    images: Mapped[List["PathogenImage"]] = relationship(back_populates="pathogen", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<Pathogen(id={self.id}, name='{self.name}', class='{self.pathogen_class}')>"
@@ -239,6 +236,7 @@ class Pathogen(Base, TimeStampMixin):
 
 class PathogenImage(Base, TimeStampMixin):
     """Pathogen image metadata"""
+
     __tablename__ = "pathogen_image"
     __table_args__ = {"schema": "farmbase_core"}
 
@@ -246,7 +244,7 @@ class PathogenImage(Base, TimeStampMixin):
     pathogen_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("farmbase_core.pathogen.id", ondelete="CASCADE"), nullable=False
     )
-    
+
     file_name: Mapped[str] = mapped_column(String(255), nullable=False)
     url: Mapped[Optional[str]] = mapped_column(String(500))
     caption: Mapped[Optional[str]] = mapped_column(Text)
@@ -260,7 +258,8 @@ class PathogenImage(Base, TimeStampMixin):
 
 
 class Event(Base, TimeStampMixin):
-    """Agricultural events and advice from """
+    """Agricultural events and advice from"""
+
     __tablename__ = "event"
     __table_args__ = {"schema": "farmbase_core"}
 
@@ -269,19 +268,19 @@ class Event(Base, TimeStampMixin):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
     nutshell: Mapped[Optional[str]] = mapped_column(Text)
-    
+
     event_category: Mapped[EventCategory] = mapped_column(nullable=False)
     event_type: Mapped[EventType] = mapped_column(nullable=False)
     importance: Mapped[Optional[int]] = mapped_column(Integer, comment="1-4 importance scale")
-    
+
     # Timing information (for crop cycle events)
     start_day: Mapped[Optional[int]] = mapped_column(Integer, comment="Days from planting")
     end_day: Mapped[Optional[int]] = mapped_column(Integer, comment="Days from planting")
-    
+
     # Metadata
     video_url: Mapped[Optional[str]] = mapped_column(String(500))
     translated: Mapped[bool] = mapped_column(Boolean, default=False)
-    
+
     # JSON fields for complex data
     image_list: Mapped[Optional[dict]] = mapped_column(JSON)
     params: Mapped[Optional[List[dict]]] = mapped_column(JSON)
@@ -293,13 +292,9 @@ class Event(Base, TimeStampMixin):
     weather_limitations: Mapped[Optional[List[str]]] = mapped_column(JSON)
 
     # Relationships
-    crops: Mapped[List["Crop"]] = relationship(
-        secondary=event_crop_association,
-        back_populates="events"
-    )
+    crops: Mapped[List["Crop"]] = relationship(secondary=event_crop_association, back_populates="events")
     prevent_pathogens: Mapped[List["Pathogen"]] = relationship(
-        secondary=event_pathogen_association,
-        back_populates="events"
+        secondary=event_pathogen_association, back_populates="events"
     )
 
     def __repr__(self) -> str:
@@ -307,7 +302,8 @@ class Event(Base, TimeStampMixin):
 
 
 class CropCycle(Base, TimeStampMixin):
-    """Crop cycle definitions with stages"""
+    """Crop cycle definition with stages"""
+
     __tablename__ = "crop_cycle"
     __table_args__ = {"schema": "farmbase_core"}
 
@@ -315,54 +311,58 @@ class CropCycle(Base, TimeStampMixin):
     crop_id: Mapped[str] = mapped_column(
         String(50), ForeignKey("farmbase_core.crop.host_id", ondelete="CASCADE"), nullable=False
     )
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(Text)
-    
-    # Cycle metadata
-    total_duration_days: Mapped[Optional[int]] = mapped_column(Integer)
-    cultivation_method: Mapped[Optional[str]] = mapped_column(String(100))
+    koppen_climate_classification: Mapped[str] = mapped_column(String(10), nullable=False)
 
     # Relationships
     crop: Mapped["Crop"] = relationship(back_populates="cycles")
-    stages: Mapped[List["CropStage"]] = relationship(
-        back_populates="cycle",
-        cascade="all, delete-orphan",
-        order_by="CropStage.sequence_order"
-    )
-
-    __table_args__ = (
-        UniqueConstraint("crop_id", "name"),
-        {"schema": "farmbase_core"}
-    )
+    stages: Mapped[List["CropCycleStage"]] = relationship(back_populates="cycle", cascade="all, delete-orphan")
+    events: Mapped[List["CropCycleEvent"]] = relationship(back_populates="crop_cycle", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
-        return f"<CropCycle(id={self.id}, crop='{self.crop_id}', name='{self.name}')>"
+        return f"<CropCycle(id={self.id}, crop_id='{self.crop_id}', koppen='{self.koppen_climate_classification}')>"
 
 
-class CropStage(Base, TimeStampMixin):
+class CropCycleStage(Base, TimeStampMixin):
     """Individual stages within a crop cycle"""
-    __tablename__ = "crop_stage"
+
+    __tablename__ = "crop_cycle_stage"
     __table_args__ = {"schema": "farmbase_core"}
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     cycle_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("farmbase_core.crop_cycle.id", ondelete="CASCADE"), nullable=False
     )
-    
-    stage_id: Mapped[Optional[int]] = mapped_column(Integer, comment="Original stage ID from JSON")
+    order: Mapped[int] = mapped_column(Integer, nullable=False, comment="Crop cycle stage order")
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    duration_days: Mapped[int] = mapped_column(Integer, nullable=False)
-    sequence_order: Mapped[int] = mapped_column(Integer, nullable=False)
-    
-    description: Mapped[Optional[str]] = mapped_column(Text)
+    duration: Mapped[int] = mapped_column(Integer, nullable=False, comment="Duration in days")
 
     # Relationships
     cycle: Mapped["CropCycle"] = relationship(back_populates="stages")
 
-    __table_args__ = (
-        UniqueConstraint("cycle_id", "sequence_order"),
-        {"schema": "farmbase_core"}
+    def __repr__(self) -> str:
+        return f"<CropCycleStage(id={self.id}, name='{self.name}', duration={self.duration})>"
+
+
+class CropCycleEvent(Base, TimeStampMixin):
+    """Events associated with crop cycles"""
+
+    __tablename__ = "crop_cycle_event"
+    __table_args__ = (UniqueConstraint("crop_cycle_id", "event_identifier"), {"schema": "farmbase_core"})
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    crop_cycle_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("farmbase_core.crop_cycle.id", ondelete="CASCADE"), nullable=False
     )
+    event_identifier: Mapped[str] = mapped_column(
+        String(255), ForeignKey("farmbase_core.event.identifier", ondelete="CASCADE"), nullable=False
+    )
+    start_day: Mapped[int] = mapped_column(Integer, nullable=False, comment="Days from planting")
+    end_day: Mapped[int] = mapped_column(Integer, nullable=False, comment="Days from planting")
+    original_event_id: Mapped[Optional[int]] = mapped_column(Integer, comment="Original ID from crop cycle JSON")
+
+    # Relationships
+    crop_cycle: Mapped["CropCycle"] = relationship(back_populates="events")
+    event: Mapped["Event"] = relationship()
 
     def __repr__(self) -> str:
-        return f"<CropStage(id={self.id}, name='{self.name}', duration={self.duration_days})>"
+        return f"<CropCycleEvent(id={self.id}, event_identifier='{self.event_identifier}')>"
