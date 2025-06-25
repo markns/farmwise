@@ -5,8 +5,8 @@ import AppDrawer from '../AppDrawer'
 import AppToolbar from '../AppToolbar'
 import NotificationSnackbarsWrapper from '../NotificationSnackbarsWrapper'
 import OrganizationBanner from '../../organization/OrganizationBanner'
-import { useAppStore } from '../../stores/appStore'
-import { useHeaderHeight } from '../../hooks/useHeaderHeight'
+import { useAppStore } from '@/stores/appStore'
+import { useHeaderHeight } from '@/hooks/useHeaderHeight'
 
 const DashboardLayout: React.FC = () => {
   const toggleDrawer = useAppStore(state => state.toggleDrawer)

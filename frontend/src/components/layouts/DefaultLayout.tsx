@@ -6,8 +6,8 @@ import AppToolbar from '../AppToolbar'
 import Refresh from '../Refresh'
 import NotificationSnackbarsWrapper from '../NotificationSnackbarsWrapper'
 import OrganizationBanner from '../../organization/OrganizationBanner'
-import { useAppStore } from '../../stores/appStore'
-import { useHeaderHeight } from '../../hooks/useHeaderHeight'
+import { useAppStore } from '@/stores/appStore'
+import { useHeaderHeight } from '@/hooks/useHeaderHeight'
 
 const DefaultLayout: React.FC = () => {
   const toggleDrawer = useAppStore(state => state.toggleDrawer)
