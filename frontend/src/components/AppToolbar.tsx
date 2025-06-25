@@ -3,7 +3,7 @@ import {AppBar,  Box, IconButton, Menu, MenuItem, Toolbar, Typography, InputBase
 import {AccountCircle, ExitToApp, Menu as MenuIcon, Search as SearchIcon, Notifications, Help} from '@mui/icons-material'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import {useAppStore} from '../stores/appStore'
-import {useLogoutFunction, withAuthInfo, WithAuthInfoProps} from "@propelauth/react";
+import {useLogoutFunction, withAuthInfo, WithAuthInfoProps} from "@propelauth/react"
 
 
 // This version expects WithAuthInfoProps from PropelAuth

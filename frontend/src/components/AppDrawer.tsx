@@ -5,9 +5,6 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Toolbar,
-  Typography,
-  Box,
   Collapse,
   Tooltip,
 } from '@mui/material'
@@ -283,54 +280,13 @@ const AppDrawer: React.FC = () => {
           borderRight: '1px solid #e0e0e0',
           transition: 'width 0.2s ease-in-out',
           overflowX: 'hidden',
+          position: 'static',
+          height: '100%',
+          overflow: 'auto',
         },
       }}
     >
-      <Toolbar sx={{ 
-        minHeight: '64px !important',
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid #e0e0e0',
-      }}>
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          width: '100%',
-          justifyContent: isExpanded ? 'flex-start' : 'center',
-        }}>
-          {isExpanded ? (
-            <Typography 
-              variant="h6" 
-              noWrap 
-              component="div"
-              sx={{
-                fontWeight: 400,
-                fontSize: '22px',
-                color: '#3c4043',
-              }}
-            >
-              FarmBase
-            </Typography>
-          ) : (
-            <Tooltip title="FarmBase" placement="right">
-              <Box sx={{
-                width: 32,
-                height: 32,
-                backgroundColor: '#1976d2',
-                borderRadius: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: '14px',
-              }}>
-                FB
-              </Box>
-            </Tooltip>
-          )}
-        </Box>
-      </Toolbar>
-      <List sx={{ pt: 1 }}>
+      <List sx={{ pt: 2 }}>
         {menuItems.map((item) => renderMenuItem(item))}
       </List>
     </Drawer>
