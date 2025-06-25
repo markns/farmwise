@@ -16,6 +16,9 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v4
+      - name: Set up .env.production
+        run: |
+          echo "${{ secrets.ENV_PRODUCTION_FILE }}" > .env.production
       - run: npm ci && npm run build:production
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
