@@ -409,32 +409,32 @@ def main():
         total_loaded = 0
         
         # Load crops
-        # crops_file = _dir / "crops.json"
-        # if crops_file.exists():
-        #     crops_data = load_json_file(crops_file)
-        #     if not args.dry_run:
-        #         total_loaded += load_crops_data(session, crops_data, args.verbose)
-        #     else:
-        #         print(f"[DRY RUN] Would load {len(crops_data)} crops")
-        #
+        crops_file = _dir / "crops.json"
+        if crops_file.exists():
+            crops_data = load_json_file(crops_file)
+            if not args.dry_run:
+                total_loaded += load_crops_data(session, crops_data, args.verbose)
+            else:
+                print(f"[DRY RUN] Would load {len(crops_data)} crops")
+
         # # Load pathogens
-        # pathogens_file = _dir / "pathogens.json"
-        # if pathogens_file.exists():
-        #     pathogens_data = load_json_file(pathogens_file)
-        #     if not args.dry_run:
-        #         total_loaded += load_pathogens_data(session, pathogens_data, args.verbose)
-        #     else:
-        #         print(f"[DRY RUN] Would load {len(pathogens_data)} pathogens")
-        #
+        pathogens_file = _dir / "pathogens.json"
+        if pathogens_file.exists():
+            pathogens_data = load_json_file(pathogens_file)
+            if not args.dry_run:
+                total_loaded += load_pathogens_data(session, pathogens_data, args.verbose)
+            else:
+                print(f"[DRY RUN] Would load {len(pathogens_data)} pathogens")
+
         # # # Load events
-        # events_file = _dir / "events.json"
-        # if events_file.exists():
-        #     events_data = load_json_file(events_file)
-        #     if not args.dry_run:
-        #         total_loaded += load_events_data(session, events_data, args.verbose)
-        #     else:
-        #         print(f"[DRY RUN] Would load {len(events_data)} events")
-        #
+        events_file = _dir / "events.json"
+        if events_file.exists():
+            events_data = load_json_file(events_file)
+            if not args.dry_run:
+                total_loaded += load_events_data(session, events_data, args.verbose)
+            else:
+                print(f"[DRY RUN] Would load {len(events_data)} events")
+
         # Load crop cycles
         crop_cycle_dir = _dir / "crop-cycle"
         if crop_cycle_dir.exists():
