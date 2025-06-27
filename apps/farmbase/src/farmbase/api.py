@@ -6,8 +6,9 @@ from starlette.responses import JSONResponse
 
 from farmbase.agronomy.views import router as agronomy_router
 from farmbase.auth import authenticate_user_or_machine
-from farmbase.chatstate.views import router as chatstate_router
 from farmbase.commodity.views import router as commodity_router
+from farmbase.contact.chatstate.views import router as chatstate_router
+from farmbase.contact.runresult.views import router as runresult_router
 from farmbase.contact.views import router as contact_router
 from farmbase.data.crops.views import router as crops_router
 from farmbase.data.gaez.views import router as gaez_router
@@ -18,7 +19,6 @@ from farmbase.market.views import router as market_router
 from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
 from farmbase.products.views import router as products_router
-from farmbase.runresult.views import router as runresult_router
 
 
 class ErrorMessage(BaseModel):
@@ -50,7 +50,6 @@ def get_organization_path(organization: OrganizationSlug): ...
 authenticated_organization_api_router = APIRouter(
     prefix="/{organization}", dependencies=[Depends(get_organization_path), Depends(authenticate_user_or_machine)]
 )
-
 
 authenticated_api_router.include_router(gaez_router, prefix="/gaez", tags=["gaez"])
 authenticated_api_router.include_router(crops_router, prefix="/crop-varieties", tags=["crop-varieties"])

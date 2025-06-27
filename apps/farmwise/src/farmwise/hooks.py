@@ -1,14 +1,9 @@
-from datetime import datetime, UTC
 from typing import Any
 
 from agents import Agent, RunContextWrapper, RunHooks, Tool, Usage
 from loguru import logger
 
-from farmbase.runresult.models import AgentCreate
-from farmbase_client.api.runresult import runresult_create_run_result
-from farmbase_client.models import RunResultCreate, AgentCreate
 from farmwise.context import UserContext
-from farmwise.farmbase import FarmbaseClient
 
 
 class AgentHooks(RunHooks):

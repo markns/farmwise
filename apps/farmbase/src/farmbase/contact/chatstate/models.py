@@ -4,7 +4,7 @@ from typing import Any, List
 
 from pydantic import BaseModel, Field
 
-from farmbase.runresult.models import AgentRead
+from farmbase.contact.runresult.models import AgentRead
 
 
 class ChatState(BaseModel):

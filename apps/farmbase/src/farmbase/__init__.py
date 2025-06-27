@@ -24,11 +24,11 @@ from .farm.planting.models import Planting
 from .farm.platform.models import Platform
 from .geospatial.models import Region, Subregion
 from .market.models import Market, MarketPrice
-from .message.models import Message
+from farmbase.contact.message import Message
 from .organization.models import Organization
 from .plugin.models import Plugin, PluginEvent, PluginInstance
 from .products.models import Manufacturer, Product
-from .runresult.models import RunResult
+from farmbase.contact.runresult import RunResult
 
 try:
     VERSION = __import__("pkg_resources").get_distribution("farmbase").version

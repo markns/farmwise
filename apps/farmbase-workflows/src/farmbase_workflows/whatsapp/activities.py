@@ -61,7 +61,7 @@ class WhatsAppActivities:
         from farmbase.auth.models import FarmbaseUserOrganization
         from farmbase.database.core import engine
         from farmbase.farm.models import FarmContact
-        from farmbase.message.models import Message
+        from farmbase.contact.message.models import Message
 
         # TODO: fake import
         FarmbaseUserOrganization.organization
