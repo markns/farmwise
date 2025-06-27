@@ -40,9 +40,9 @@ router = APIRouter()
 def get_user_id(organization: str, contact_id: int):
     return f"{organization}:{contact_id}"
 
-
+# TODO: Could use api_router
 @alru_cache(maxsize=None)
-async def memory_instance():
+async def memory_instance() -> AsyncMemory:
     return await AsyncMemory.from_config(DEFAULT_CONFIG)
 
 
@@ -77,9 +77,12 @@ async def get_all_memories(
     """Retrieve stored memories."""
     try:
         memory = await memory_instance()
-        return memory.get_all(
+        mem = await memory.get_all(
             user_id=get_user_id(organization, contact_id),
         )
+        # TODO: Bug in AsyncMemory.get_all method!
+        mem['results'] = await mem['results']
+        return mem
     except Exception as e:
         logging.exception("Error in get_all_memories:")
         raise HTTPException(status_code=500, detail=str(e))
