@@ -1,3 +1,4 @@
+import os
 from typing import Any
 
 from agents import set_default_openai_key

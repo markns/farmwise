@@ -16,8 +16,22 @@ class MemoryCreate(BaseModel):
     # run_id: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
 
+
 class MemoryResults(BaseModel):
     results: List[MemoryItem] = Field(..., description="List of stored memories")
+
+
+class MemoryUpdate(BaseModel):
+    id: str
+    memory: str
+    event: str
+    actor_id: str | None = None
+    role: str | None = None
+
+
+class MemoryAddResults(BaseModel):
+    results: List[MemoryUpdate]
+
 
 class SearchRequest(BaseModel):
     query: str = Field(..., description="Search query.")

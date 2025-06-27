@@ -25,11 +25,11 @@ from openai.types.responses import (
     ResponseTextDeltaEvent, )
 
 from farmbase_client.api.contacts import contacts_create_run_result
-from farmbase_client.models import RunResultCreate, AgentCreate
+from farmbase_client.models import RunResultCreate, AgentCreate, Message
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input
 from farmwise.context import user_context
-from farmwise.memory.memory import retrieve_memories
+from farmwise.memory.memory import retrieve_memories, add_memory
 from farmwise.memory.session import get_session_state, set_session_state
 from farmwise.farmbase import FarmbaseClient
 from farmwise.hooks import AgentHooks
@@ -171,6 +171,11 @@ class FarmwiseService:
         await set_session_state(context, SessionState(last_agent=result.last_agent.name,
                                                       previous_response_id=result.last_response_id))
 
+        if user_input.message:
+            text_response: TextResponse = result.final_output_as(TextResponse)
+            await add_memory(context.contact, messages=[Message(role="user", content=user_input.message),
+                                                        Message(role="assistant", content=text_response.content)])
+
         usage = result.context_wrapper.usage
         async with FarmbaseClient() as client:
             await contacts_create_run_result.asyncio(
@@ -192,7 +197,6 @@ class FarmwiseService:
                     total_tokens=usage.total_tokens,
                 ),
             )
-
 
     async def invoke_voice(self, user_input: UserInput) -> str:
         agent = agents[DEFAULT_AGENT]

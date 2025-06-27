@@ -7,8 +7,8 @@ X-Farmbase-Key: {{farmbaseKey}}
   "messages": [
     {
       "role": "user",
-      "content": "I grow the best mangoes in Kenya"
+      "content": "actually I grow the best kumquats in Kenya"
     }
   ]
-
 }
+

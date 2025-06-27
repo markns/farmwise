@@ -8,7 +8,7 @@ from mem0 import AsyncMemory
 from mem0.configs.base import MemoryItem
 
 from farmbase.config import settings
-from farmbase.contact.memory.models import MemoryCreate, SearchRequest, MemoryResults
+from farmbase.contact.memory.models import MemoryCreate, SearchRequest, MemoryResults, MemoryAddResults
 
 DEFAULT_CONFIG = {
     "version": "v1.1",
@@ -56,7 +56,7 @@ async def memory_instance() -> AsyncMemory:
 #     return {"message": "Configuration set successfully"}
 
 
-@router.post("/", summary="Create memories", response_model=MemoryItem)
+@router.post("/", summary="Create memories", response_model=MemoryAddResults)
 async def add_memory(organization: str,
                      contact_id: int,
                      memory_create: MemoryCreate):
@@ -65,7 +65,7 @@ async def add_memory(organization: str,
         memory = await memory_instance()
         response = await memory.add(messages=[m.model_dump() for m in memory_create.messages],
                                     user_id=get_user_id(organization, contact_id))
-        return JSONResponse(content=response)
+        return response
     except Exception as e:
         logging.exception("Error in add_memory:")  # This will log the full traceback
         raise HTTPException(status_code=500, detail=str(e))
