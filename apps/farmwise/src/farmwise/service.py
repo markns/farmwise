@@ -28,11 +28,12 @@ from farmbase_client.api.runresult import runresult_create_run_result
 from farmbase_client.models import RunResultCreate, AgentCreate
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input
-from farmwise.dependencies import get_session_state, user_context
+from farmwise.context import user_context
+from farmwise.memory.session import get_session_state, set_session_state
 from farmwise.farmbase import FarmbaseClient
 from farmwise.hooks import AgentHooks
 from farmwise.openai.enums import RunItemStreamEventName
-from farmwise.schema import AudioResponse, ResponseEvent, UserInput, TextResponse
+from farmwise.schema import AudioResponse, ResponseEvent, UserInput, TextResponse, SessionState
 
 
 async def text_to_speech(text) -> SynthesizeSpeechResponse:
@@ -133,7 +134,7 @@ class FarmwiseService:
         if context.new_user:
             agent = agents[ONBOARDING_AGENT]
         elif session_state:
-            agent = agents[session_state.last_agent]
+            agent = agents.get(session_state.last_agent, DEFAULT_AGENT)
         else:
             agent = agents[DEFAULT_AGENT]
 
@@ -165,6 +166,9 @@ class FarmwiseService:
 
             async for event in _batch_stream_events(result.stream_events()):
                 yield event
+
+        await set_session_state(context, SessionState(last_agent=result.last_agent.name,
+                                                      previous_response_id=result.last_response_id))
 
         usage = result.context_wrapper.usage
         async with FarmbaseClient() as client:

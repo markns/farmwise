@@ -1043,6 +1043,7 @@ dependencies = [
     { name = "openai-agents", extra = ["voice"] },
     { name = "pydub" },
     { name = "pywa", extra = ["cryptography", "fastapi"] },
+    { name = "upstash-redis" },
 ]
 
 [package.dev-dependencies]
@@ -1063,6 +1064,7 @@ requires-dist = [
     { name = "openai-agents", extras = ["voice"], specifier = ">=0.0.19" },
     { name = "pydub", specifier = ">=0.25.1" },
     { name = "pywa", extras = ["cryptography", "fastapi"], specifier = ">=2.10.0" },
+    { name = "upstash-redis", specifier = ">=1.4.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -4562,6 +4564,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/43/0f/fa4723f22942480be4ca9527bbde8d43f6c3f2fe8412f00e7f5f6746bc8b/tzdata-2025.1.tar.gz", hash = "sha256:24894909e88cdb28bd1636c6887801df64cb485bd593f2fd83ef29075a81d694", size = 194950 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0f/dd/84f10e23edd882c6f968c21c2434fe67bd4a528967067515feca9e611e5e/tzdata-2025.1-py2.py3-none-any.whl", hash = "sha256:7e127113816800496f027041c570f50bcd464a020098a3b6b199517772303639", size = 346762 },
+]
+
+[[package]]
+name = "upstash-redis"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/73/4c/308af54f76b54c2245f60a8f294ec710738402d44291e8605aeac8d82532/upstash_redis-1.4.0.tar.gz", hash = "sha256:e3b77205cb99695b8000042695f8054e27c12fbc2eebe5ccdd428d986b11de87", size = 34976 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/39/1d/faadd7437cbb7496ca8971e18e0ccaf57b373a87ed470562e1f12a67a63e/upstash_redis-1.4.0-py3-none-any.whl", hash = "sha256:88e41c4e95be3ea1e97b5e7818dcecd1bcbea5a3f074cc2c41951bd07fe0db1c", size = 37305 },
 ]
 
 [[package]]

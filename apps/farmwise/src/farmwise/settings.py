@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     WHATSAPP_APP_SECRET: str
     GCS_BUCKET: str = "gs://farmwise_media"
 
+    UPSTASH_REDIS_REST_URL: str
+    UPSTASH_REDIS_REST_TOKEN: str
+    SESSION_TTL_SECS: int = 7200  # default 2 hour session
+
     def is_dev(self) -> bool:
         return self.MODE == "dev"
 
