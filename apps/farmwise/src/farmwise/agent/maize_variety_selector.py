@@ -2,7 +2,7 @@ from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 from farmwise.dependencies import UserContext
-from farmwise.schema import Section, SectionList, SectionRow, WhatsAppResponse
+from farmwise.schema import Section, SectionList, SectionRow, TextResponse
 from farmwise.tools.farmbase import update_contact
 from farmwise.tools.tools import aez_classification, elevation, growing_period, maize_varieties, soil_properties
 
@@ -77,6 +77,6 @@ maize_variety_selector: Agent[UserContext] = Agent(
     handoff_description="An agent that can recommend suitable varieties of Maize",
     instructions=maize_variety_selector_instructions,
     tools=[elevation, soil_properties, aez_classification, growing_period, maize_varieties, update_contact],
-    output_type=WhatsAppResponse,
+    output_type=TextResponse,
     model="gpt-4.1",
 )

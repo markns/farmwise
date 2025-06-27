@@ -2,7 +2,7 @@ from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 from farmwise.dependencies import UserContext
-from farmwise.schema import WhatsAppResponse
+from farmwise.schema import TextResponse
 from farmwise.tools.tools import soil_properties
 
 
@@ -83,6 +83,6 @@ soil_advisor_agent: Agent[UserContext] = Agent(
     handoff_description="An agent that can advises on soil management for farmers",
     instructions=soil_advisory_instructions,
     tools=[soil_properties],
-    output_type=WhatsAppResponse,
+    output_type=TextResponse,
     model="gpt-4.1",
 )

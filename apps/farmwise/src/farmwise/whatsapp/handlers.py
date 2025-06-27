@@ -9,7 +9,7 @@ from pywa_async import WhatsApp, filters, types
 from pywa_async.types.base_update import BaseUserUpdateAsync
 from pywa_async.types.others import Contact as PywaContact
 
-from farmwise.schema import Action, AudioResponse, Contact, UserInput, WhatsAppResponse
+from farmwise.schema import Action, AudioResponse, Contact, UserInput, TextResponse
 from farmwise.schema import SectionList as FarmwiseSectionList
 from farmwise.service import farmwise
 from farmwise.settings import settings
@@ -27,7 +27,7 @@ class Commands(Enum):
     SHOW_SUITABLE_CROPS = Command(name="Show suitable crops", description="Show suitable crops for a location")
 
 
-async def _send_response(response: WhatsAppResponse, msg: BaseUserUpdateAsync):
+async def _send_text_response(response: TextResponse, msg: BaseUserUpdateAsync):
     """Send a WhatsApp response using the appropriate message type based on response content."""
 
     # Priority 1: Location request (highest priority)
@@ -47,41 +47,41 @@ async def _send_response(response: WhatsAppResponse, msg: BaseUserUpdateAsync):
         buttons = [Button(b.title[:20], b.callback_data) for b in response.buttons[:3]]
 
     # Priority 2: Media messages (can include buttons/section_lists)
-    if response.image_url:
-        await msg.reply_image(
-            image=response.image_url,
-            caption=response.content,
-            buttons=section_list or buttons,
-        )
-        return
-
-    # Priority 3: Contact sharing
-    if response.contact:
-        contact = _convert_to_pywa_contact(response.contact)
-        await msg.reply_contact(contact=contact)
-        # If there are buttons/section_lists, send them in a follow-up text message
-        if section_list or buttons:
-            await msg.reply_text(
-                text=_convert_md_to_whatsapp(response.content) if response.content else "Choose an option:",
-                buttons=section_list or buttons,
-            )
-        return
-
-    # Priority 4: Product sharing
-    if response.product:
-        await msg.reply_product(
-            catalog_id=response.product.catalog_id,
-            sku=response.product.sku,
-            body=response.product.body,
-            footer=response.product.footer,
-        )
-        # If there are buttons/section_lists, send them in a follow-up text message
-        if section_list or buttons:
-            await msg.reply_text(
-                text=_convert_md_to_whatsapp(response.content) if response.content else "Choose an option:",
-                buttons=section_list or buttons,
-            )
-        return
+    # if response.image_url:
+    #     await msg.reply_image(
+    #         image=response.image_url,
+    #         caption=response.content,
+    #         buttons=section_list or buttons,
+    #     )
+    #     return
+    #
+    # # Priority 3: Contact sharing
+    # if response.contact:
+    #     contact = _convert_to_pywa_contact(response.contact)
+    #     await msg.reply_contact(contact=contact)
+    #     # If there are buttons/section_lists, send them in a follow-up text message
+    #     if section_list or buttons:
+    #         await msg.reply_text(
+    #             text=_convert_md_to_whatsapp(response.content) if response.content else "Choose an option:",
+    #             buttons=section_list or buttons,
+    #         )
+    #     return
+    #
+    # # Priority 4: Product sharing
+    # if response.product:
+    #     await msg.reply_product(
+    #         catalog_id=response.product.catalog_id,
+    #         sku=response.product.sku,
+    #         body=response.product.body,
+    #         footer=response.product.footer,
+    #     )
+    #     # If there are buttons/section_lists, send them in a follow-up text message
+    #     if section_list or buttons:
+    #         await msg.reply_text(
+    #             text=_convert_md_to_whatsapp(response.content) if response.content else "Choose an option:",
+    #             buttons=section_list or buttons,
+    #         )
+    #     return
 
     # Priority 5: Interactive text messages with section lists or buttons
     if section_list or buttons:
@@ -176,8 +176,8 @@ async def location_handler(_: WhatsApp, msg: types.Message):
     response = await farmwise.invoke(user_input)
     async for event in response:
         match event.response:
-            case WhatsAppResponse():
-                await _send_response(event.response, msg)
+            case TextResponse():
+                await _send_text_response(event.response, msg)
             case AudioResponse():
                 await _send_audio_response(event.response, msg)
             case _:
@@ -202,11 +202,11 @@ async def message_handler(_: WhatsApp, msg: types.Message):
         user_name=msg.from_user.name,
     )
 
-    response_events = await farmwise.invoke(user_input)
+    response_events = farmwise.invoke(user_input)
     async for event in response_events:
         match event.response:
-            case WhatsAppResponse():
-                await _send_response(event.response, msg)
+            case TextResponse():
+                await _send_text_response(event.response, msg)
             case AudioResponse():
                 await _send_audio_response(event.response, msg)
             case _:
@@ -227,11 +227,11 @@ async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
         user_name=sel.from_user.name,
     )
 
-    response_events = await farmwise.invoke(user_input)
+    response_events = farmwise.invoke(user_input)
     async for event in response_events:
         match event.response:
-            case WhatsAppResponse():
-                await _send_response(event.response, sel)
+            case TextResponse():
+                await _send_text_response(event.response, sel)
             case AudioResponse():
                 await _send_audio_response(event.response, sel)
             case _:
@@ -252,11 +252,11 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
         user_name=btn.from_user.name,
     )
 
-    response_events = await farmwise.invoke(user_input)
+    response_events = farmwise.invoke(user_input)
     async for event in response_events:
         match event.response:
-            case WhatsAppResponse():
-                await _send_response(event.response, btn)
+            case TextResponse():
+                await _send_text_response(event.response, btn)
             case AudioResponse():
                 await _send_audio_response(event.response, btn)
             case _:
@@ -300,11 +300,11 @@ async def image_handler(_: WhatsApp, msg: types.Message):
         user_name=msg.from_user.name,
     )
 
-    response_events = await farmwise.invoke(user_input)
+    response_events = farmwise.invoke(user_input)
     async for event in response_events:
         match event.response:
-            case WhatsAppResponse():
-                await _send_response(event.response, msg)
+            case TextResponse():
+                await _send_text_response(event.response, msg)
             case AudioResponse():
                 await _send_audio_response(event.response, msg)
             case _:

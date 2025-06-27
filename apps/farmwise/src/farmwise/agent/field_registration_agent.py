@@ -2,7 +2,7 @@ from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 from farmwise.dependencies import UserContext
-from farmwise.schema import WhatsAppResponse
+from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import update_contact
 
 
@@ -34,6 +34,6 @@ farm_registration_agent: Agent[UserContext] = Agent(
     handoff_description="This agent is used for registering a field in the system",
     instructions=farm_registration_agent_instructions,
     tools=[update_contact],
-    output_type=WhatsAppResponse,
+    output_type=TextResponse,
     model="gpt-4.1",
 )

@@ -140,7 +140,7 @@ class Product(BaseModel):
     footer: str | None = Field(default=None, description="Footer text for the product message")
 
 
-class WhatsAppResponse(BaseModel):
+class TextResponse(BaseModel):
     content: str | None = Field(description="Content of the response.")
     actions: list[Action] = Field(
         default=[],
@@ -148,9 +148,9 @@ class WhatsAppResponse(BaseModel):
     )
     # TODO: use a oneOf here to make sure not everything is set -
     #  https://docs.pydantic.dev/latest/concepts/fields/#discriminator
-    image_url: str | None = Field(default=None, description="An image url that should be sent to the user.")
-    contact: Contact | None = Field(default=None, description="Contact information to share with the user.")
-    product: Product | None = Field(default=None, description="Product information to share with the user.")
+    # image_url: str | None = Field(default=None, description="An image url that should be sent to the user.")
+    # contact: Contact | None = Field(default=None, description="Contact information to share with the user.")
+    # product: Product | None = Field(default=None, description="Product information to share with the user.")
     buttons: list[Button] = Field(
         default=[],
         description="Buttons that can be added to the response. Should be left empty unless specified.",
@@ -169,7 +169,7 @@ class AudioResponse(BaseModel):
 
 
 class ResponseEvent(BaseModel):
-    response: WhatsAppResponse | AudioResponse
+    response: TextResponse | AudioResponse
     has_more: bool = True
 
 

@@ -2,7 +2,7 @@ from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 from farmwise.dependencies import UserContext
-from farmwise.schema import WhatsAppResponse
+from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import create_note
 
 
@@ -67,7 +67,7 @@ crop_pathogen_diagnosis_agent: Agent[UserContext] = Agent(
     name="Crop pathogen diagnosis agent",
     handoff_description="An agent that can identify crop pests and diseases from an image",
     instructions=crop_pathogen_diagnosis_agent_instructions,
-    output_type=WhatsAppResponse,
+    output_type=TextResponse,
     tools=[create_note],
     model="gpt-4.1",
 )

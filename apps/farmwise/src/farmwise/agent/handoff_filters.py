@@ -6,7 +6,7 @@ from agents import (
 )
 from loguru import logger
 
-from farmwise.schema import WhatsAppResponse
+from farmwise.schema import TextResponse
 
 
 def remove_whatsapp_interactivity(handoff_input_data: HandoffInputData) -> HandoffInputData:
@@ -32,7 +32,7 @@ def _whatsapp_interactivity_from_input(
             # noinspection PyBroadException
             try:
                 original = item["content"][0]["text"]
-                response = WhatsAppResponse.model_validate(json.loads(original))
+                response = TextResponse.model_validate(json.loads(original))
                 item["content"][0]["text"] = response.content
                 logger.debug(f"removed whatsapp interactivity from {original} -> {item}")
             except Exception:

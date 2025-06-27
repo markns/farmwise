@@ -2,7 +2,7 @@ from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 from farmwise.dependencies import UserContext
-from farmwise.schema import WhatsAppResponse
+from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import create_farm, update_contact
 
 
@@ -95,6 +95,6 @@ onboarding_agent: Agent[UserContext] = Agent(
     handoff_description="This agent is used for onboarding new users into the system",
     instructions=onboarding_agent_instructions,
     tools=[update_contact, create_farm],
-    output_type=WhatsAppResponse,
+    output_type=TextResponse,
     model="gpt-4.1",
 )

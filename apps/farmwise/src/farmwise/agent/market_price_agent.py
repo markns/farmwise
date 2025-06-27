@@ -2,7 +2,7 @@ from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 from farmwise.dependencies import UserContext
-from farmwise.schema import Section, SectionList, SectionRow, WhatsAppResponse
+from farmwise.schema import Section, SectionList, SectionRow, TextResponse
 from farmwise.tools.farmbase import get_market_price_snapshot, get_markets
 
 
@@ -53,6 +53,6 @@ market_price_agent: Agent[UserContext] = Agent(
     handoff_description="Provides current market prices based on farm location and product interests.",
     instructions=market_price_agent_instructions,
     tools=[get_markets, get_market_price_snapshot],
-    output_type=WhatsAppResponse,
+    output_type=TextResponse,
     model="gpt-4.1",
 )
