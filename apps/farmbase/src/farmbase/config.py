@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     FARMBASE_UI_URL: AnyHttpUrl = Field(default="http://localhost:8080")
     FARMBASE_ENCRYPTION_KEY: SecretStr
     FARMBASE_API_KEY: SecretStr
+    OPENAI_API_KEY: SecretStr
 
     # --- Security ---
     ALLOWED_ORIGINS: list[str] = Field(default=["http://localhost:8080", "http://127.0.0.1:8080"])

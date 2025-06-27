@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 from farmbase.database.core import DbSession
 from farmbase.models import PrimaryKey
 from .chatstate.views import router as chatstate_router
+from .memory.views import router as memory_router
 from .filterset import ContactFilterSet, ContactQueryParams
 from .flows import contact_init_flow
 from .models import (
@@ -25,8 +26,9 @@ from ..organization.service import CurrentOrganization
 router = APIRouter()
 
 # Include nested routers
-router.include_router(runresult_router, prefix="/{contact_id}/runresults", tags=["runresult"])
+router.include_router(runresult_router, prefix="/{contact_id}/runresults", tags=["runresults"])
 router.include_router(chatstate_router, prefix="/{contact_id}/messages", tags=["messages"])
+router.include_router(memory_router, prefix="/{contact_id}/memories", tags=["memories"])
 
 
 @router.get("", response_model=ContactPagination)
