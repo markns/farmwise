@@ -8,39 +8,33 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
+from ...models import ChatState
 from ...models import ErrorResponse
 from ...models import HTTPValidationError
-from ...models import RunResultCreate
 from typing import cast
 
 
 def _get_kwargs(
     organization: str,
-    *,
-    body: RunResultCreate,
+    contact_id: int,
 ) -> dict[str, Any]:
-    headers: dict[str, Any] = {}
-
     _kwargs: dict[str, Any] = {
-        "method": "post",
-        "url": "/{organization}/runresult".format(
+        "method": "get",
+        "url": "/{organization}/contacts/{contact_id}/messages".format(
             organization=organization,
+            contact_id=contact_id,
         ),
     }
 
-    _kwargs["json"] = body.to_dict()
-
-    headers["Content-Type"] = "application/json"
-
-    _kwargs["headers"] = headers
     return _kwargs
 
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[ErrorResponse, HTTPValidationError, str]]:
+) -> Optional[Union[ChatState, ErrorResponse, HTTPValidationError]]:
     if response.status_code == 200:
-        response_200 = cast(str, response.json())
+        response_200 = ChatState.model_validate(response.json())
+
         return response_200
     if response.status_code == 400:
         response_400 = ErrorResponse.model_validate(response.json())
@@ -74,7 +68,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[ErrorResponse, HTTPValidationError, str]]:
+) -> Response[Union[ChatState, ErrorResponse, HTTPValidationError]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -85,29 +79,27 @@ def _build_response(
 
 def sync_detailed(
     organization: str,
+    contact_id: int,
     *,
     client: AuthenticatedClient,
-    body: RunResultCreate,
-) -> Response[Union[ErrorResponse, HTTPValidationError, str]]:
-    """Create a new run_result.
-
-     Create a new run_result.
+) -> Response[Union[ChatState, ErrorResponse, HTTPValidationError]]:
+    """Get the latest chat state for a contact
 
     Args:
         organization (str):
-        body (RunResultCreate):
+        contact_id (int):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ErrorResponse, HTTPValidationError, str]]
+        Response[Union[ChatState, ErrorResponse, HTTPValidationError]]
     """
 
     kwargs = _get_kwargs(
         organization=organization,
-        body=body,
+        contact_id=contact_id,
     )
 
     response = client.get_httpx_client().request(
@@ -119,58 +111,54 @@ def sync_detailed(
 
 def sync(
     organization: str,
+    contact_id: int,
     *,
     client: AuthenticatedClient,
-    body: RunResultCreate,
-) -> Optional[Union[ErrorResponse, HTTPValidationError, str]]:
-    """Create a new run_result.
-
-     Create a new run_result.
+) -> Optional[Union[ChatState, ErrorResponse, HTTPValidationError]]:
+    """Get the latest chat state for a contact
 
     Args:
         organization (str):
-        body (RunResultCreate):
+        contact_id (int):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ErrorResponse, HTTPValidationError, str]
+        Union[ChatState, ErrorResponse, HTTPValidationError]
     """
 
     return sync_detailed(
         organization=organization,
+        contact_id=contact_id,
         client=client,
-        body=body,
     ).parsed
 
 
 async def asyncio_detailed(
     organization: str,
+    contact_id: int,
     *,
     client: AuthenticatedClient,
-    body: RunResultCreate,
-) -> Response[Union[ErrorResponse, HTTPValidationError, str]]:
-    """Create a new run_result.
-
-     Create a new run_result.
+) -> Response[Union[ChatState, ErrorResponse, HTTPValidationError]]:
+    """Get the latest chat state for a contact
 
     Args:
         organization (str):
-        body (RunResultCreate):
+        contact_id (int):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ErrorResponse, HTTPValidationError, str]]
+        Response[Union[ChatState, ErrorResponse, HTTPValidationError]]
     """
 
     kwargs = _get_kwargs(
         organization=organization,
-        body=body,
+        contact_id=contact_id,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -180,30 +168,28 @@ async def asyncio_detailed(
 
 async def asyncio(
     organization: str,
+    contact_id: int,
     *,
     client: AuthenticatedClient,
-    body: RunResultCreate,
-) -> Optional[Union[ErrorResponse, HTTPValidationError, str]]:
-    """Create a new run_result.
-
-     Create a new run_result.
+) -> Optional[Union[ChatState, ErrorResponse, HTTPValidationError]]:
+    """Get the latest chat state for a contact
 
     Args:
         organization (str):
-        body (RunResultCreate):
+        contact_id (int):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ErrorResponse, HTTPValidationError, str]
+        Union[ChatState, ErrorResponse, HTTPValidationError]
     """
 
     return (
         await asyncio_detailed(
             organization=organization,
+            contact_id=contact_id,
             client=client,
-            body=body,
         )
     ).parsed

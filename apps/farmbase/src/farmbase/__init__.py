@@ -14,7 +14,9 @@ from .agronomy.models import (
     PathogenImage,
 )
 from .commodity.models import Commodity
+from .contact.message.models import Message
 from .contact.models import Contact
+from .contact.runresult.models import Agent, RunResult
 from .farm.activity.models import ActivityProduct, ActivityType, FarmActivity
 from .farm.field.models import BoundaryDefinitionActivity, Field, FieldGroup, FieldGroupMember
 from .farm.harvest.models import HarvestLoad, StorageLocation
@@ -24,11 +26,9 @@ from .farm.planting.models import Planting
 from .farm.platform.models import Platform
 from .geospatial.models import Region, Subregion
 from .market.models import Market, MarketPrice
-from farmbase.contact.message import Message
 from .organization.models import Organization
 from .plugin.models import Plugin, PluginEvent, PluginInstance
 from .products.models import Manufacturer, Product
-from farmbase.contact.runresult import RunResult
 
 try:
     VERSION = __import__("pkg_resources").get_distribution("farmbase").version
@@ -142,4 +142,5 @@ __all__ = [
     "Event",
     "CropCycle",
     "CropCycleStage",
+    "RunResult",
 ]

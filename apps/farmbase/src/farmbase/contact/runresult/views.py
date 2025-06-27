@@ -11,10 +11,11 @@ router = APIRouter()
 @router.post(
     "",
     response_model=str,
-    summary="Create a new run_result.",
+    summary="Create a new run_result for a contact.",
     # dependencies=[Depends(PermissionsDependency([ContactCreatePermission]))],
 )
 async def create_run_result(
+    contact_id: int,
     db_session: DbSession,
     run_result_in: RunResultCreate,
 ):

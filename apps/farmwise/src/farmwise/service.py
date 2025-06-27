@@ -24,7 +24,7 @@ from openai.types.responses import (
     ResponseInputTextParam,
     ResponseTextDeltaEvent, )
 
-from farmbase_client.api.runresult import runresult_create_run_result
+from farmbase_client.api.contacts import contacts_create_run_result
 from farmbase_client.models import RunResultCreate, AgentCreate
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input
@@ -172,9 +172,10 @@ class FarmwiseService:
 
         usage = result.context_wrapper.usage
         async with FarmbaseClient() as client:
-            await runresult_create_run_result.asyncio(
+            await contacts_create_run_result.asyncio(
                 client=client.raw,
                 organization=context.contact.organization.slug,
+                contact_id=context.contact.id,
                 body=RunResultCreate(
                     created_at=datetime.now(UTC),
                     contact_id=context.contact.id,
