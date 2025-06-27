@@ -1,12 +1,10 @@
-import io
 import json
 import tempfile
-from datetime import UTC, datetime
+from datetime import datetime, UTC
 from typing import AsyncIterator
 
 import requests
 from agents import (
-    Agent,
     AgentUpdatedStreamEvent,
     ItemHelpers,
     RawResponsesStreamEvent,
@@ -17,26 +15,24 @@ from agents import (
     trace,
 )
 from agents.voice import SingleAgentVoiceWorkflow, TTSModelSettings, VoicePipeline, VoicePipelineConfig
-from farmbase_client.api.runresult import runresult_create_run_result as create_run_result
-from farmbase_client.models import AgentBase, ChatState, RunResultCreate
 from google.cloud import texttospeech
 from google.cloud.texttospeech_v1 import SynthesizeSpeechResponse
 from loguru import logger
-from openai import OpenAI
 from openai.types.responses import (
     EasyInputMessageParam,
     ResponseInputImageParam,
     ResponseInputTextParam,
-    ResponseTextDeltaEvent,
-)
+    ResponseTextDeltaEvent, )
 
+from farmbase_client.api.runresult import runresult_create_run_result
+from farmbase_client.models import RunResultCreate, AgentCreate
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input
-from farmwise.dependencies import UserContext, chat_state, user_context
+from farmwise.dependencies import get_session_state, user_context
 from farmwise.farmbase import FarmbaseClient
-from farmwise.hooks import LoggingHooks
-from farmwise.schema import AudioResponse, ResponseEvent, UserInput, WhatsAppResponse
-from farmwise.settings import settings
+from farmwise.hooks import AgentHooks
+from farmwise.openai.enums import RunItemStreamEventName
+from farmwise.schema import AudioResponse, ResponseEvent, UserInput, TextResponse
 
 
 async def text_to_speech(text) -> SynthesizeSpeechResponse:
@@ -78,7 +74,7 @@ async def text_to_speech(text) -> SynthesizeSpeechResponse:
 
 
 async def _batch_stream_events(
-    event_stream: AsyncIterator[RawResponsesStreamEvent | RunItemStreamEvent | AgentUpdatedStreamEvent],
+        event_stream: AsyncIterator[RawResponsesStreamEvent | RunItemStreamEvent | AgentUpdatedStreamEvent],
 ) -> AsyncIterator[ResponseEvent]:
     accumulated = ""
     ready = ""
@@ -88,6 +84,7 @@ async def _batch_stream_events(
     in_content = False
 
     async for event in event_stream:
+        # logger.debug(event)
         if event.type == RawResponsesStreamEvent.type and isinstance(event.data, ResponseTextDeltaEvent):
             delta = event.data.delta
             accumulated += delta
@@ -100,16 +97,16 @@ async def _batch_stream_events(
                 if message_ready_token in accumulated:
                     ready, accumulated = accumulated.split(message_ready_token)
                     # use json.loads to unescape newlines etc.
-                    yield ResponseEvent(response=WhatsAppResponse(content=json.loads(f'"{ready}"')))
+                    yield ResponseEvent(response=TextResponse(content=json.loads(f'"{ready}"')))
 
             if end_token in accumulated:
                 ready, accumulated = accumulated.split(end_token)
                 in_content = False
 
-        elif event.type == RunItemStreamEvent.type and event.name == "message_output_created":
+        elif event.type == RunItemStreamEvent.type and event.name == RunItemStreamEventName.MESSAGE_OUTPUT_CREATED:
             content = ItemHelpers.extract_last_content(event.item.raw_item)
             # TODO: content might be a ResponseOutputRefusal
-            response = WhatsAppResponse.model_validate(json.loads(content))
+            response = TextResponse.model_validate(json.loads(content))
 
             full_content = response.content
             response.content = ready
@@ -125,18 +122,20 @@ async def _batch_stream_events(
             )
 
 
-class FarmwiseService:
-    def __init__(self):
-        self.openai_client = OpenAI(api_key=settings.OPENAI_API_KEY.get_secret_value())
 
-    async def run_agent(
-        self,
-        agent: Agent[UserContext],
-        context: UserContext,
-        user_input: UserInput,
-        chat_state: ChatState,
-    ) -> AsyncIterator[ResponseEvent]:
-        input_items = chat_state.messages or []
+class FarmwiseService:
+
+    @classmethod
+    async def invoke(cls, user_input: UserInput) -> AsyncIterator[ResponseEvent]:
+        context = await user_context(user_input)
+        session_state = await get_session_state(context)
+
+        if context.new_user:
+            agent = agents[ONBOARDING_AGENT]
+        elif session_state:
+            agent = agents[session_state.last_agent]
+        else:
+            agent = agents[DEFAULT_AGENT]
 
         content = []
         if user_input.message:
@@ -149,57 +148,45 @@ class FarmwiseService:
                 ]
             )
 
-        input_items.append(
+        input_items = [
             EasyInputMessageParam(
                 content=content,
                 role="user",
             )
-        )
+        ]
 
+        previous_response_id = session_state.previous_response_id if session_state else None
+        hooks = AgentHooks()
         trace_id = gen_trace_id()
-        hooks = LoggingHooks()
+
         with trace("FarmWise", trace_id=trace_id, group_id=user_input.user_id):
-            result: RunResultStreaming = Runner.run_streamed(agent, input=input_items, context=context, hooks=hooks)
+            result: RunResultStreaming = Runner.run_streamed(agent, input=input_items, context=context, hooks=hooks,
+                                                             previous_response_id=previous_response_id)
+
             async for event in _batch_stream_events(result.stream_events()):
                 yield event
 
+        usage = result.context_wrapper.usage
         async with FarmbaseClient() as client:
-            await create_run_result.asyncio(
+            await runresult_create_run_result.asyncio(
                 client=client.raw,
                 organization=context.contact.organization.slug,
                 body=RunResultCreate(
-                    contact_id=context.contact.id,
                     created_at=datetime.now(UTC),
-                    input=result.input,
+                    contact_id=context.contact.id,
+                    input=user_input.message,
                     final_output=result.final_output,
-                    input_guardrails=None,
-                    output_guardrails=None,
-                    last_agent=AgentBase(name=result.last_agent.name),
-                    new_items=[],  # TODO: do we want to persist new_items and raw_responses?
-                    raw_responses=[],
-                    input_list=result.to_input_list(),
+                    last_agent=AgentCreate(name=result.last_agent.name),
                     trace_id=trace_id,
-                    # todo:
-                    #  add tokens
+                    requests=usage.requests,
+                    input_tokens=usage.input_tokens,
+                    input_tokens_cached=usage.input_tokens_details.cached_tokens,
+                    output_tokens=usage.output_tokens,
+                    output_tokens_reasoning=usage.output_tokens_details.reasoning_tokens,
+                    total_tokens=usage.total_tokens,
                 ),
             )
 
-        logger.info(f"ASSISTANT: {result.final_output}")
-
-    async def invoke(self, user_input: UserInput) -> AsyncIterator[ResponseEvent]:
-        context = await user_context(user_input)
-        chat_state_obj = await chat_state(context)
-
-        if context.new_user:
-            logger.info(f"NEW USER: {user_input.user_id}")
-            agent = agents[ONBOARDING_AGENT]
-        elif chat_state_obj.last_agent:
-            agent = agents[chat_state_obj.last_agent.name]
-        else:
-            agent = agents[DEFAULT_AGENT]
-
-        logger.info(f"USER: {user_input.message} AGENT: {agent.name} CONTEXT: {context}")
-        return self.run_agent(agent, context, user_input, chat_state_obj)
 
     async def invoke_voice(self, user_input: UserInput) -> str:
         agent = agents[DEFAULT_AGENT]
