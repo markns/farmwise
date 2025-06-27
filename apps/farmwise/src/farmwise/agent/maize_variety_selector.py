@@ -1,7 +1,7 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
-from farmwise.dependencies import UserContext
+from farmwise.context import UserContext
 from farmwise.schema import Section, SectionList, SectionRow, TextResponse
 from farmwise.tools.farmbase import update_contact
 from farmwise.tools.tools import aez_classification, elevation, growing_period, maize_varieties, soil_properties

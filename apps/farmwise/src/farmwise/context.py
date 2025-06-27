@@ -1,13 +1,9 @@
-from typing import Annotated
-
-from farmbase_client.api.chatstate import chatstate_get_chat_state as get_chat_state
-from farmbase_client.api.contacts import contacts_create_contact as create_contact
-from farmbase_client.api.contacts import contacts_get_contact_by_phone as get_contact_by_phone
-from farmbase_client.models import ChatState, ContactCreate, ContactRead
-from fastapi import Depends
 from loguru import logger
 from pydantic import BaseModel, ValidationError
 
+from farmbase_client.api.contacts import contacts_create_contact as create_contact
+from farmbase_client.api.contacts import contacts_get_contact_by_phone as get_contact_by_phone
+from farmbase_client.models import ContactCreate, ContactRead
 from farmwise.farmbase import FarmbaseClient
 from farmwise.schema import UserInput
 
@@ -17,7 +13,8 @@ class UserContext(BaseModel):
     new_user: bool = False
 
 
-# TODO: how does organization get set?
+# TODO: how does organization get set -
+#  maybe an endpoint that searches all schemas?
 async def user_context(user_input: UserInput, organization="default"):
     async with FarmbaseClient() as client:
         # TODO: Handle errors better, more consistently in farmbase.
@@ -47,17 +44,3 @@ async def user_context(user_input: UserInput, organization="default"):
         return context
 
 
-UserContextDep = Annotated[UserContext, Depends(user_context)]
-
-
-# TODO: Dependency caching can be used to get all state
-async def chat_state(context: UserContextDep) -> ChatState:
-    async with FarmbaseClient() as client:
-        return await get_chat_state.asyncio(
-            organization=context.contact.organization.slug,
-            client=client.raw,
-            contact_id=context.contact.id,
-        )
-
-
-ChatStateDep = Annotated[ChatState, Depends(chat_state)]

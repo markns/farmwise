@@ -1,7 +1,7 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
-from farmwise.dependencies import UserContext
+from farmwise.context import UserContext
 from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import create_farm, update_contact
 

@@ -7,7 +7,7 @@ from loguru import logger
 from farmbase.runresult.models import AgentCreate
 from farmbase_client.api.runresult import runresult_create_run_result
 from farmbase_client.models import RunResultCreate, AgentCreate
-from farmwise.dependencies import UserContext
+from farmwise.context import UserContext
 from farmwise.farmbase import FarmbaseClient
 
 

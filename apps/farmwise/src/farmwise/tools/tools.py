@@ -22,7 +22,7 @@ from isdasoil_api_client.models.get_soil_data_isdasoil_v2_soilproperty_get_prope
     GetSoilDataIsdasoilV2SoilpropertyGetPropertyType0 as PropertyType,
 )
 
-from farmwise.dependencies import UserContext
+from farmwise.context import UserContext
 from farmwise.farmbase import FarmbaseClient
 from farmwise.settings import settings
 from farmwise.utils import copy_doc

@@ -14,7 +14,7 @@ from farmbase_client.models import (
     NoteRead,
 )
 
-from farmwise.dependencies import UserContext
+from farmwise.context import UserContext
 from farmwise.farmbase import FarmbaseClient
 from farmwise.utils import join_with
 
