@@ -895,6 +895,7 @@ name = "farmbase"
 version = "0.1.0"
 source = { editable = "apps/farmbase" }
 dependencies = [
+    { name = "async-lru" },
     { name = "asyncpg" },
     { name = "babel" },
     { name = "email-validator" },
@@ -937,6 +938,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "async-lru", specifier = ">=2.0.4" },
     { name = "asyncpg", specifier = ">=0.30.0" },
     { name = "babel", specifier = ">=2.17.0" },
     { name = "email-validator", specifier = ">=2.2.0" },
