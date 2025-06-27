@@ -1,52 +1,51 @@
-import random
+from datetime import datetime, UTC
 from typing import Any
 
 from agents import Agent, RunContextWrapper, RunHooks, Tool, Usage
 from loguru import logger
 
+from farmbase.runresult.models import AgentCreate
+from farmbase_client.api.runresult import runresult_create_run_result
+from farmbase_client.models import RunResultCreate, AgentCreate
 from farmwise.dependencies import UserContext
+from farmwise.farmbase import FarmbaseClient
 
 
-async def on_seat_booking_handoff(context: RunContextWrapper[UserContext]) -> None:
-    flight_number = f"FLT-{random.randint(100, 999)}"
-    context.context.flight_number = flight_number
-
-
-class LoggingHooks(RunHooks):
+class AgentHooks(RunHooks):
     def __init__(self):
         self.event_counter = 0
 
     def _usage_to_str(self, usage: Usage) -> str:
         return f"{usage.requests} requests, {usage.input_tokens} input tokens, {usage.output_tokens} output tokens, {usage.total_tokens} total tokens"
 
-    async def on_agent_start(self, context: RunContextWrapper, agent: Agent) -> None:
+    async def on_agent_start(self, context: RunContextWrapper[UserContext], agent: Agent) -> None:
         self.event_counter += 1
         logger.info(f"### {self.event_counter}: Agent {agent.name} started. Usage: {self._usage_to_str(context.usage)}")
 
-    async def on_agent_end(self, context: RunContextWrapper, agent: Agent, output: Any) -> None:
+    async def on_agent_end(self, context: RunContextWrapper[UserContext], agent: Agent, output: Any) -> None:
         self.event_counter += 1
         logger.info(
             f"### {self.event_counter}: Agent {agent.name} ended with output {output}. Usage: {self._usage_to_str(context.usage)}"
         )
 
-    async def on_tool_start(self, context: RunContextWrapper, agent: Agent, tool: Tool) -> None:
+    async def on_tool_start(self, context: RunContextWrapper[UserContext], agent: Agent, tool: Tool) -> None:
         self.event_counter += 1
         logger.info(f"### {self.event_counter}: Tool {tool.name} started. Usage: {self._usage_to_str(context.usage)}")
 
-    async def on_tool_end(self, context: RunContextWrapper, agent: Agent, tool: Tool, result: str) -> None:
+    async def on_tool_end(self, context: RunContextWrapper[UserContext], agent: Agent, tool: Tool, result: str) -> None:
         self.event_counter += 1
         logger.info(
             f"### {self.event_counter}: Tool {tool.name} ended with result {result}. Usage: {self._usage_to_str(context.usage)}"
         )
 
-    async def on_handoff(self, context: RunContextWrapper, from_agent: Agent, to_agent: Agent) -> None:
+    async def on_handoff(self, context: RunContextWrapper[UserContext], from_agent: Agent, to_agent: Agent) -> None:
         self.event_counter += 1
         logger.info(
             f"### {self.event_counter}: Handoff from {from_agent.name} to {to_agent.name}. Usage: {self._usage_to_str(context.usage)}"
         )
 
 
-hooks = LoggingHooks()
+hooks = AgentHooks()
 
 # await Runner.run(
 #     start_agent,
