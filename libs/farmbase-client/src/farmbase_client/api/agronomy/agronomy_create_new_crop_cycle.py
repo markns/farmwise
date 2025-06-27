@@ -89,7 +89,7 @@ def sync_detailed(
 ) -> Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     """Create New Crop Cycle
 
-     Create a new crop cycle with stages.
+     Create a new crop cycle with stages and events.
 
     Args:
         body (BodyAgronomyCreateNewCropCycle):
@@ -120,7 +120,7 @@ def sync(
 ) -> Optional[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     """Create New Crop Cycle
 
-     Create a new crop cycle with stages.
+     Create a new crop cycle with stages and events.
 
     Args:
         body (BodyAgronomyCreateNewCropCycle):
@@ -146,7 +146,7 @@ async def asyncio_detailed(
 ) -> Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     """Create New Crop Cycle
 
-     Create a new crop cycle with stages.
+     Create a new crop cycle with stages and events.
 
     Args:
         body (BodyAgronomyCreateNewCropCycle):
@@ -175,7 +175,7 @@ async def asyncio(
 ) -> Optional[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     """Create New Crop Cycle
 
-     Create a new crop cycle with stages.
+     Create a new crop cycle with stages and events.
 
     Args:
         body (BodyAgronomyCreateNewCropCycle):

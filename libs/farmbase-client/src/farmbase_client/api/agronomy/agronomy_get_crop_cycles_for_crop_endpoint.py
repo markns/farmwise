@@ -11,17 +11,34 @@ from ... import errors
 from ...models import CropCycleRead
 from ...models import ErrorResponse
 from ...models import HTTPValidationError
+from ...types import UNSET, Unset
 from typing import cast
+from typing import cast, Union
+from typing import Union
 
 
 def _get_kwargs(
     crop_id: str,
+    *,
+    koppen_classification: Union[None, Unset, str] = UNSET,
 ) -> dict[str, Any]:
+    params: dict[str, Any] = {}
+
+    json_koppen_classification: Union[None, Unset, str]
+    if isinstance(koppen_classification, Unset):
+        json_koppen_classification = UNSET
+    else:
+        json_koppen_classification = koppen_classification
+    params["koppen_classification"] = json_koppen_classification
+
+    params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
     _kwargs: dict[str, Any] = {
         "method": "get",
         "url": "/agronomy/crop-cycles/crop/{crop_id}".format(
             crop_id=crop_id,
         ),
+        "params": params,
     }
 
     return _kwargs
@@ -84,6 +101,7 @@ def sync_detailed(
     crop_id: str,
     *,
     client: AuthenticatedClient,
+    koppen_classification: Union[None, Unset, str] = UNSET,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, list["CropCycleRead"]]]:
     """Get Crop Cycles For Crop Endpoint
 
@@ -91,6 +109,7 @@ def sync_detailed(
 
     Args:
         crop_id (str):
+        koppen_classification (Union[None, Unset, str]): Filter by Köppen climate classification
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -102,6 +121,7 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         crop_id=crop_id,
+        koppen_classification=koppen_classification,
     )
 
     response = client.get_httpx_client().request(
@@ -115,6 +135,7 @@ def sync(
     crop_id: str,
     *,
     client: AuthenticatedClient,
+    koppen_classification: Union[None, Unset, str] = UNSET,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, list["CropCycleRead"]]]:
     """Get Crop Cycles For Crop Endpoint
 
@@ -122,6 +143,7 @@ def sync(
 
     Args:
         crop_id (str):
+        koppen_classification (Union[None, Unset, str]): Filter by Köppen climate classification
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -134,6 +156,7 @@ def sync(
     return sync_detailed(
         crop_id=crop_id,
         client=client,
+        koppen_classification=koppen_classification,
     ).parsed
 
 
@@ -141,6 +164,7 @@ async def asyncio_detailed(
     crop_id: str,
     *,
     client: AuthenticatedClient,
+    koppen_classification: Union[None, Unset, str] = UNSET,
 ) -> Response[Union[ErrorResponse, HTTPValidationError, list["CropCycleRead"]]]:
     """Get Crop Cycles For Crop Endpoint
 
@@ -148,6 +172,7 @@ async def asyncio_detailed(
 
     Args:
         crop_id (str):
+        koppen_classification (Union[None, Unset, str]): Filter by Köppen climate classification
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -159,6 +184,7 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         crop_id=crop_id,
+        koppen_classification=koppen_classification,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -170,6 +196,7 @@ async def asyncio(
     crop_id: str,
     *,
     client: AuthenticatedClient,
+    koppen_classification: Union[None, Unset, str] = UNSET,
 ) -> Optional[Union[ErrorResponse, HTTPValidationError, list["CropCycleRead"]]]:
     """Get Crop Cycles For Crop Endpoint
 
@@ -177,6 +204,7 @@ async def asyncio(
 
     Args:
         crop_id (str):
+        koppen_classification (Union[None, Unset, str]): Filter by Köppen climate classification
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -190,5 +218,6 @@ async def asyncio(
         await asyncio_detailed(
             crop_id=crop_id,
             client=client,
+            koppen_classification=koppen_classification,
         )
     ).parsed
