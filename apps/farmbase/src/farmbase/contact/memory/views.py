@@ -5,9 +5,10 @@ from async_lru import alru_cache
 from fastapi import HTTPException, APIRouter
 from fastapi.responses import JSONResponse
 from mem0 import AsyncMemory
+from mem0.configs.base import MemoryItem
 
 from farmbase.config import settings
-from farmbase.contact.memory.models import MemoryCreate, SearchRequest
+from farmbase.contact.memory.models import MemoryCreate, SearchRequest, MemoryResults
 
 DEFAULT_CONFIG = {
     "version": "v1.1",
@@ -40,6 +41,7 @@ router = APIRouter()
 def get_user_id(organization: str, contact_id: int):
     return f"{organization}:{contact_id}"
 
+
 # TODO: Could use api_router
 @alru_cache(maxsize=None)
 async def memory_instance() -> AsyncMemory:
@@ -54,7 +56,7 @@ async def memory_instance() -> AsyncMemory:
 #     return {"message": "Configuration set successfully"}
 
 
-@router.post("/", summary="Create memories")
+@router.post("/", summary="Create memories", response_model=MemoryItem)
 async def add_memory(organization: str,
                      contact_id: int,
                      memory_create: MemoryCreate):
@@ -62,14 +64,14 @@ async def add_memory(organization: str,
     try:
         memory = await memory_instance()
         response = await memory.add(messages=[m.model_dump() for m in memory_create.messages],
-                                             user_id=get_user_id(organization, contact_id))
+                                    user_id=get_user_id(organization, contact_id))
         return JSONResponse(content=response)
     except Exception as e:
         logging.exception("Error in add_memory:")  # This will log the full traceback
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/", summary="Get memories")
+@router.get("/", summary="Get memories", response_model=MemoryResults)
 async def get_all_memories(
         organization: str,
         contact_id: int,
@@ -88,7 +90,7 @@ async def get_all_memories(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/{memory_id}", summary="Get a memory")
+@router.get("/{memory_id}", summary="Get a memory", response_model=MemoryItem)
 async def get_memory(memory_id: str):
     """Retrieve a specific memory by ID."""
     try:
@@ -99,21 +101,21 @@ async def get_memory(memory_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/search", summary="Search memories")
+@router.post("/search", summary="Search memories", response_model=MemoryResults)
 async def search_memories(organization: str,
-                    contact_id: int,
-                    search_req: SearchRequest):
+                          contact_id: int,
+                          search_req: SearchRequest):
     """Search for memories based on a query."""
     try:
         memory = await memory_instance()
         return await memory.search(query=search_req.query,
-                                      user_id=get_user_id(organization, contact_id))
+                                   user_id=get_user_id(organization, contact_id))
     except Exception as e:
         logging.exception("Error in search_memories:")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/{memory_id}", summary="Update a memory")
+@router.put("/{memory_id}", summary="Update a memory", response_model=MemoryItem)
 async def update_memory(memory_id: str, updated_memory: Dict[str, Any]):
     """Update an existing memory."""
     try:

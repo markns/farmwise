@@ -10,6 +10,7 @@ from ... import errors
 
 from ...models import ErrorResponse
 from ...models import HTTPValidationError
+from ...models import MemoryResults
 from ...models import SearchRequest
 from typing import cast
 
@@ -40,9 +41,10 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Optional[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
     if response.status_code == 200:
-        response_200 = response.json()
+        response_200 = MemoryResults.model_validate(response.json())
+
         return response_200
     if response.status_code == 400:
         response_400 = ErrorResponse.model_validate(response.json())
@@ -76,7 +78,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Response[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -91,7 +93,7 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: SearchRequest,
-) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Response[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
     """Search memories
 
      Search for memories based on a query.
@@ -106,7 +108,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, ErrorResponse, HTTPValidationError]]
+        Response[Union[ErrorResponse, HTTPValidationError, MemoryResults]]
     """
 
     kwargs = _get_kwargs(
@@ -128,7 +130,7 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: SearchRequest,
-) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Optional[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
     """Search memories
 
      Search for memories based on a query.
@@ -143,7 +145,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, ErrorResponse, HTTPValidationError]
+        Union[ErrorResponse, HTTPValidationError, MemoryResults]
     """
 
     return sync_detailed(
@@ -160,7 +162,7 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: SearchRequest,
-) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Response[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
     """Search memories
 
      Search for memories based on a query.
@@ -175,7 +177,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, ErrorResponse, HTTPValidationError]]
+        Response[Union[ErrorResponse, HTTPValidationError, MemoryResults]]
     """
 
     kwargs = _get_kwargs(
@@ -195,7 +197,7 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: SearchRequest,
-) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Optional[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
     """Search memories
 
      Search for memories based on a query.
@@ -210,7 +212,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, ErrorResponse, HTTPValidationError]
+        Union[ErrorResponse, HTTPValidationError, MemoryResults]
     """
 
     return (

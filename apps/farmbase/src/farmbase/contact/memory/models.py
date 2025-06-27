@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Optional
 
+from mem0.configs.base import MemoryItem
 from pydantic import BaseModel, Field
 
 
@@ -15,6 +16,8 @@ class MemoryCreate(BaseModel):
     # run_id: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
 
+class MemoryResults(BaseModel):
+    results: List[MemoryItem] = Field(..., description="List of stored memories")
 
 class SearchRequest(BaseModel):
     query: str = Field(..., description="Search query.")

@@ -29,6 +29,7 @@ from farmbase_client.models import RunResultCreate, AgentCreate
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input
 from farmwise.context import user_context
+from farmwise.memory.memory import retrieve_memories
 from farmwise.memory.session import get_session_state, set_session_state
 from farmwise.farmbase import FarmbaseClient
 from farmwise.hooks import AgentHooks

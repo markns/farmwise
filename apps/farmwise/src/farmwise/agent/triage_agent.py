@@ -1,6 +1,7 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
+from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import Section, SectionList, SectionRow, TextResponse
 from farmwise.tools.farmbase import update_contact
@@ -58,7 +59,7 @@ Core Capabilities:
 You can add the following section list to the WhatsAppResponse to offer the user a list of activities:
 {activities}
 
-These are the details of the current user: {ctx.context}
+{get_profile_and_memories(ctx.context)}
 """
 
 

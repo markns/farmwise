@@ -1,6 +1,7 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
+from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import create_farm, update_contact
@@ -85,6 +86,7 @@ After gathering the location, use the create_farm tool to record the information
 The name of the farm should simply be the farmer's name with Farm. For example if the user's name is Hudson Ndege, the 
 name of the farm should be Hudson Ndege's Farm. 
 
+{get_profile_and_memories(ctx.context)}
 """
 
 

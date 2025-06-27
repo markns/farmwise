@@ -11,6 +11,7 @@ from ... import errors
 from ...models import ErrorResponse
 from ...models import HTTPValidationError
 from ...models import MemoryCreate
+from ...models import MemoryItem
 from typing import cast
 
 
@@ -40,9 +41,10 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Optional[Union[ErrorResponse, HTTPValidationError, MemoryItem]]:
     if response.status_code == 200:
-        response_200 = response.json()
+        response_200 = MemoryItem.model_validate(response.json())
+
         return response_200
     if response.status_code == 400:
         response_400 = ErrorResponse.model_validate(response.json())
@@ -76,7 +78,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Response[Union[ErrorResponse, HTTPValidationError, MemoryItem]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -91,7 +93,7 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: MemoryCreate,
-) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Response[Union[ErrorResponse, HTTPValidationError, MemoryItem]]:
     """Create memories
 
      Store new memories.
@@ -106,7 +108,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, ErrorResponse, HTTPValidationError]]
+        Response[Union[ErrorResponse, HTTPValidationError, MemoryItem]]
     """
 
     kwargs = _get_kwargs(
@@ -128,7 +130,7 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: MemoryCreate,
-) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Optional[Union[ErrorResponse, HTTPValidationError, MemoryItem]]:
     """Create memories
 
      Store new memories.
@@ -143,7 +145,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, ErrorResponse, HTTPValidationError]
+        Union[ErrorResponse, HTTPValidationError, MemoryItem]
     """
 
     return sync_detailed(
@@ -160,7 +162,7 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: MemoryCreate,
-) -> Response[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Response[Union[ErrorResponse, HTTPValidationError, MemoryItem]]:
     """Create memories
 
      Store new memories.
@@ -175,7 +177,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[Any, ErrorResponse, HTTPValidationError]]
+        Response[Union[ErrorResponse, HTTPValidationError, MemoryItem]]
     """
 
     kwargs = _get_kwargs(
@@ -195,7 +197,7 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: MemoryCreate,
-) -> Optional[Union[Any, ErrorResponse, HTTPValidationError]]:
+) -> Optional[Union[ErrorResponse, HTTPValidationError, MemoryItem]]:
     """Create memories
 
      Store new memories.
@@ -210,7 +212,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[Any, ErrorResponse, HTTPValidationError]
+        Union[ErrorResponse, HTTPValidationError, MemoryItem]
     """
 
     return (

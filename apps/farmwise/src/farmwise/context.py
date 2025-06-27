@@ -1,9 +1,9 @@
 from loguru import logger
 from pydantic import BaseModel, ValidationError
 
-from farmbase_client.api.contacts import contacts_create_contact as create_contact
+from farmbase_client.api.contacts import contacts_create_contact as create_contact, contacts_get_all_memories
 from farmbase_client.api.contacts import contacts_get_contact_by_phone as get_contact_by_phone
-from farmbase_client.models import ContactCreate, ContactRead
+from farmbase_client.models import ContactCreate, ContactRead, MemoryItem
 from farmwise.farmbase import FarmbaseClient
 from farmwise.schema import UserInput
 
@@ -11,6 +11,7 @@ from farmwise.schema import UserInput
 class UserContext(BaseModel):
     contact: ContactRead
     new_user: bool = False
+    memories: list[MemoryItem] = []
 
 
 # TODO: how does organization get set -
@@ -24,9 +25,16 @@ async def user_context(user_input: UserInput, organization="default"):
                 organization=organization,
                 phone=user_input.user_id,
             )
+            memories = await contacts_get_all_memories.asyncio(
+                organization=contact.organization.slug,
+                contact_id=contact.id,
+                client=client.raw
+            )
 
+            print(memories)
             context = UserContext(
                 contact=contact,
+                memories=memories.results
             )
         except ValidationError as e:
             logger.warning(f"User not found: {e}")
@@ -39,8 +47,7 @@ async def user_context(user_input: UserInput, organization="default"):
                     phone_number=user_input.user_id,
                 ),
             )
+
             context = UserContext(contact=contact, new_user=True)
 
         return context
-
-

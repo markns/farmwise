@@ -1,6 +1,7 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
+from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import update_contact
@@ -22,7 +23,7 @@ location
 If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the
  triage agent.
 
-These are the details of the current user: {ctx.context}
+{get_profile_and_memories(ctx.context)}
 """
 
 
