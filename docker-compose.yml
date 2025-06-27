@@ -1,8 +1,8 @@
 services:
 
   db:
-    # postgis/postgis isn't build for arm processors
-    image: ghcr.io/baosystems/postgis:17
+    # see dockerfile in dev/pg_image
+    image: postgres-postgis-pgvector
     restart: "no"
     ports:
       - "5432:5432"
