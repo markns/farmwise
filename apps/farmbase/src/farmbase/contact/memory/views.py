@@ -2,13 +2,12 @@ import logging
 from typing import Any, Dict
 
 from async_lru import alru_cache
-from fastapi import HTTPException, APIRouter
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, HTTPException
 from mem0 import AsyncMemory
 from mem0.configs.base import MemoryItem
 
 from farmbase.config import settings
-from farmbase.contact.memory.models import MemoryCreate, SearchRequest, MemoryResults, MemoryAddResults
+from farmbase.contact.memory.models import MemoryAddResults, MemoryCreate, MemoryResults, SearchRequest
 
 DEFAULT_CONFIG = {
     "version": "v1.1",

@@ -6,10 +6,14 @@ from sqlalchemy.orm import selectinload
 
 from farmbase.database.core import DbSession
 from farmbase.models import PrimaryKey
+
+from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
+from ..farm.models import FarmContact, FarmSummary
+from ..organization.service import CurrentOrganization
 from .chatstate.views import router as chatstate_router
-from .memory.views import router as memory_router
 from .filterset import ContactFilterSet, ContactQueryParams
 from .flows import contact_init_flow
+from .memory.views import router as memory_router
 from .models import (
     Contact,
     ContactCreate,
@@ -19,9 +23,6 @@ from .models import (
 )
 from .runresult.views import router as runresult_router
 from .service import create, delete, get, get_by_phone_number, patch
-from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
-from ..farm.models import FarmContact, FarmSummary
-from ..organization.service import CurrentOrganization
 
 router = APIRouter()
 

@@ -1,9 +1,10 @@
+from farmbase_client.api.contacts import contacts_create_contact as create_contact
+from farmbase_client.api.contacts import contacts_get_all_memories
+from farmbase_client.api.contacts import contacts_get_contact_by_phone as get_contact_by_phone
+from farmbase_client.models import ContactCreate, ContactRead, MemoryItem
 from loguru import logger
 from pydantic import BaseModel, ValidationError
 
-from farmbase_client.api.contacts import contacts_create_contact as create_contact, contacts_get_all_memories
-from farmbase_client.api.contacts import contacts_get_contact_by_phone as get_contact_by_phone
-from farmbase_client.models import ContactCreate, ContactRead, MemoryItem
 from farmwise.farmbase import FarmbaseClient
 from farmwise.schema import UserInput
 

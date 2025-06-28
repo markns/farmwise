@@ -2,11 +2,11 @@ from typing import Sequence
 
 from fastapi import APIRouter
 
-from farmbase.database.core import DbSession
 from farmbase.contact.message import service as message_service
 from farmbase.contact.message.models import Message
 from farmbase.contact.runresult import service as run_result_service
 from farmbase.contact.runresult.models import AgentRead
+from farmbase.database.core import DbSession
 
 from .models import ChatState
 

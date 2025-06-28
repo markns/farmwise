@@ -1,6 +1,6 @@
 import json
 import tempfile
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import AsyncIterator
 
 import requests
@@ -15,6 +15,8 @@ from agents import (
     trace,
 )
 from agents.voice import SingleAgentVoiceWorkflow, TTSModelSettings, VoicePipeline, VoicePipelineConfig
+from farmbase_client.api.contacts import contacts_create_run_result
+from farmbase_client.models import AgentCreate, Message, RunResultCreate
 from google.cloud import texttospeech
 from google.cloud.texttospeech_v1 import SynthesizeSpeechResponse
 from loguru import logger
@@ -22,19 +24,18 @@ from openai.types.responses import (
     EasyInputMessageParam,
     ResponseInputImageParam,
     ResponseInputTextParam,
-    ResponseTextDeltaEvent, )
+    ResponseTextDeltaEvent,
+)
 
-from farmbase_client.api.contacts import contacts_create_run_result
-from farmbase_client.models import RunResultCreate, AgentCreate, Message
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input
 from farmwise.context import user_context
-from farmwise.memory.memory import retrieve_memories, add_memory
-from farmwise.memory.session import get_session_state, set_session_state
 from farmwise.farmbase import FarmbaseClient
 from farmwise.hooks import AgentHooks
+from farmwise.memory.memory import add_memory
+from farmwise.memory.session import get_session_state, set_session_state
 from farmwise.openai.enums import RunItemStreamEventName
-from farmwise.schema import AudioResponse, ResponseEvent, UserInput, TextResponse, SessionState
+from farmwise.schema import AudioResponse, ResponseEvent, SessionState, TextResponse, UserInput
 
 
 async def text_to_speech(text) -> SynthesizeSpeechResponse:

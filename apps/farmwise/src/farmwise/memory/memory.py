@@ -1,5 +1,6 @@
-from farmbase_client.api.contacts import contacts_get_all_memories, contacts_add_memory
+from farmbase_client.api.contacts import contacts_add_memory, contacts_get_all_memories
 from farmbase_client.models import ContactRead, MemoryCreate, Message
+
 from farmwise.farmbase import FarmbaseClient
 
 

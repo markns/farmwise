@@ -9,7 +9,7 @@ from pywa_async import WhatsApp, filters, types
 from pywa_async.types.base_update import BaseUserUpdateAsync
 from pywa_async.types.others import Contact as PywaContact
 
-from farmwise.schema import Action, AudioResponse, Contact, UserInput, TextResponse
+from farmwise.schema import Action, AudioResponse, Contact, TextResponse, UserInput
 from farmwise.schema import SectionList as FarmwiseSectionList
 from farmwise.service import farmwise
 from farmwise.settings import settings

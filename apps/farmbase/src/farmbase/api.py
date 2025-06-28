@@ -18,6 +18,7 @@ from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
 from farmbase.products.views import router as products_router
 
+
 class ErrorMessage(BaseModel):
     msg: str
 
