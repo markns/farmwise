@@ -10,10 +10,10 @@ from farmbase.models import PrimaryKey
 from ..exceptions.exceptions import EntityAlreadyExistsError, EntityDoesNotExistError
 from ..farm.models import FarmContact, FarmSummary
 from ..organization.service import CurrentOrganization
-from .chatstate.views import router as chatstate_router
 from .filterset import ContactFilterSet, ContactQueryParams
 from .flows import contact_init_flow
 from .memory.views import router as memory_router
+from .message.views import router as message_router
 from .models import (
     Contact,
     ContactCreate,
@@ -28,8 +28,8 @@ router = APIRouter()
 
 # Include nested routers
 router.include_router(runresult_router, prefix="/{contact_id}/runresults", tags=["runresults"])
-router.include_router(chatstate_router, prefix="/{contact_id}/messages", tags=["messages"])
 router.include_router(memory_router, prefix="/{contact_id}/memories", tags=["memories"])
+router.include_router(message_router, prefix="/{contact_id}/messages", tags=["messages"])
 
 
 @router.get("", response_model=ContactPagination)
