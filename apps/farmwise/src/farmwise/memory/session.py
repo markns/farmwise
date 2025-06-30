@@ -10,6 +10,7 @@ redis = Redis(url=settings.UPSTASH_REDIS_REST_URL, token=settings.UPSTASH_REDIS_
 def get_state_key(context: UserContext):
     return f"session:{context.contact.organization.slug}:{context.contact.phone_number}"
 
+
 async def get_session_state(context: UserContext) -> SessionState | None:
     key = get_state_key(context)
     raw = await redis.get(key)
@@ -17,6 +18,7 @@ async def get_session_state(context: UserContext) -> SessionState | None:
     if raw is not None:
         return SessionState.model_validate_json(raw)
     return None
+
 
 async def set_session_state(context: UserContext, session_state: SessionState):
     key = get_state_key(context)

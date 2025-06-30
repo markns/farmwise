@@ -92,6 +92,6 @@ class RunResultBase(BaseModel):
 class RunResultCreate(RunResultBase):
     last_agent: Optional[AgentCreate] = None
 
+
 class RunResultRead(RunResultBase):
     id: int
-

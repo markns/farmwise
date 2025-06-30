@@ -26,12 +26,14 @@ DEFAULT_CONFIG = {
     #     "provider": "neo4j",
     #     "config": {"url": NEO4J_URI, "username": NEO4J_USERNAME, "password": NEO4J_PASSWORD},
     # },
-    "llm": {"provider": "openai",
-            "config": {"api_key": settings.OPENAI_API_KEY.get_secret_value(),
-                       "temperature": 0.1, "model": "gpt-4o-mini"}},
-    "embedder": {"provider": "openai",
-                 "config": {"api_key": settings.OPENAI_API_KEY.get_secret_value(),
-                            "model": "text-embedding-3-small"}},
+    "llm": {
+        "provider": "openai",
+        "config": {"api_key": settings.OPENAI_API_KEY.get_secret_value(), "temperature": 0.1, "model": "gpt-4o-mini"},
+    },
+    "embedder": {
+        "provider": "openai",
+        "config": {"api_key": settings.OPENAI_API_KEY.get_secret_value(), "model": "text-embedding-3-small"},
+    },
 }
 
 router = APIRouter()
@@ -56,14 +58,13 @@ async def memory_instance() -> AsyncMemory:
 
 
 @router.post("/", summary="Create memories", response_model=MemoryAddResults)
-async def add_memory(organization: str,
-                     contact_id: int,
-                     memory_create: MemoryCreate):
+async def add_memory(organization: str, contact_id: int, memory_create: MemoryCreate):
     """Store new memories."""
     try:
         memory = await memory_instance()
-        response = await memory.add(messages=[m.model_dump() for m in memory_create.messages],
-                                    user_id=get_user_id(organization, contact_id))
+        response = await memory.add(
+            messages=[m.model_dump() for m in memory_create.messages], user_id=get_user_id(organization, contact_id)
+        )
         return response
     except Exception as e:
         logging.exception("Error in add_memory:")  # This will log the full traceback
@@ -72,8 +73,8 @@ async def add_memory(organization: str,
 
 @router.get("/", summary="Get memories", response_model=MemoryResults)
 async def get_all_memories(
-        organization: str,
-        contact_id: int,
+    organization: str,
+    contact_id: int,
 ):
     """Retrieve stored memories."""
     try:
@@ -82,7 +83,7 @@ async def get_all_memories(
             user_id=get_user_id(organization, contact_id),
         )
         # TODO: Bug in AsyncMemory.get_all method!
-        mem['results'] = await mem['results']
+        mem["results"] = await mem["results"]
         return mem
     except Exception as e:
         logging.exception("Error in get_all_memories:")
@@ -101,14 +102,11 @@ async def get_memory(memory_id: str):
 
 
 @router.post("/search", summary="Search memories", response_model=MemoryResults)
-async def search_memories(organization: str,
-                          contact_id: int,
-                          search_req: SearchRequest):
+async def search_memories(organization: str, contact_id: int, search_req: SearchRequest):
     """Search for memories based on a query."""
     try:
         memory = await memory_instance()
-        return await memory.search(query=search_req.query,
-                                   user_id=get_user_id(organization, contact_id))
+        return await memory.search(query=search_req.query, user_id=get_user_id(organization, contact_id))
     except Exception as e:
         logging.exception("Error in search_memories:")
         raise HTTPException(status_code=500, detail=str(e))
@@ -149,10 +147,7 @@ async def delete_memory(memory_id: str):
 
 
 @router.delete("/", summary="Delete all memories")
-async def delete_all_memories(
-        organization: str,
-        contact_id: int
-):
+async def delete_all_memories(organization: str, contact_id: int):
     """Delete all memories for a given identifier."""
     try:
         memory = await memory_instance()

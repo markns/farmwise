@@ -28,15 +28,10 @@ async def user_context(wa_id: str, name: str, organization="default") -> UserCon
                 phone=wa_id,
             )
             memories = await contacts_get_all_memories.asyncio(
-                organization=contact.organization.slug,
-                contact_id=contact.id,
-                client=client.raw
+                organization=contact.organization.slug, contact_id=contact.id, client=client.raw
             )
 
-            return UserContext(
-                contact=contact,
-                memories=memories.results
-            )
+            return UserContext(contact=contact, memories=memories.results)
         except Exception as e:
             logger.warning(f"User not found: {e}")
 

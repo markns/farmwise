@@ -34,8 +34,8 @@ router.include_router(message_router, prefix="/{contact_id}/messages", tags=["me
 
 @router.get("", response_model=ContactPagination)
 async def get_contacts(
-        db_session: DbSession,
-        query_params: Annotated[ContactQueryParams, Query()],
+    db_session: DbSession,
+    query_params: Annotated[ContactQueryParams, Query()],
 ):
     """Get all contacts."""
     stmt = select(Contact).options(
@@ -80,9 +80,9 @@ def _to_contact_read(contact: Contact) -> ContactRead:
     # dependencies=[Depends(PermissionsDependency([ContactCreatePermission]))],
 )
 async def create_contact(
-        db_session: DbSession,
-        organization: CurrentOrganization,
-        contact_in: ContactCreate,
+    db_session: DbSession,
+    organization: CurrentOrganization,
+    contact_in: ContactCreate,
 ):
     """Create a new contact."""
     contact = await get_by_phone_number(db_session=db_session, phone_number=contact_in.phone_number)
@@ -114,8 +114,8 @@ async def create_contact(
     summary="Get a single contact by phone number.",
 )
 async def get_contact_by_phone(
-        db_session: DbSession,
-        phone: Annotated[str, Query(description="Phone number in E.164 format")],
+    db_session: DbSession,
+    phone: Annotated[str, Query(description="Phone number in E.164 format")],
 ):
     contact = await get_by_phone_number(db_session=db_session, phone_number=phone)
     if not contact:
@@ -143,9 +143,9 @@ async def get_contact(db_session: DbSession, contact_id: PrimaryKey):
     # dependencies=[Depends(PermissionsDependency([ContactUpdatePermission]))],
 )
 async def patch_contact(
-        db_session: DbSession,
-        contact_id: PrimaryKey,
-        contact_in: ContactPatch,
+    db_session: DbSession,
+    contact_id: PrimaryKey,
+    contact_in: ContactPatch,
 ):
     """Update an existing contact with partial data."""
     contact = await get(db_session=db_session, contact_id=contact_id)

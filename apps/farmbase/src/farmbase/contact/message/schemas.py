@@ -1,31 +1,30 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional, Any
+from typing import Any, Optional
 
 from pydantic import Field
 
 from farmbase.models import FarmbaseBase, PrimaryKey
 
-from .models import MessageType, MessageDirection
+from .models import MessageDirection, MessageType
 
 
 class MessageBase(FarmbaseBase):
-
     contact_id: int = Field(description="ID of the contact")
     direction: MessageDirection = Field(description="Is the message inbound or outbound")
     whatsapp_message_id: str = Field(description="WhatsApp message ID")
     timestamp: datetime = Field(description="When the message was sent")
     type: MessageType = Field(description="Message type")
-    
+
     # Message flags
     forwarded: bool = Field(default=False, description="Whether the message was forwarded")
     forwarded_many_times: bool = Field(default=False, description="Whether forwarded many times")
-    
+
     # Content fields
     text: Optional[str] = Field(None, description="Text content")
     caption: Optional[str] = Field(None, description="Media caption")
-    
+
     # Media and other data as JSON
     image: Optional[dict] = Field(None, description="Image data")
     video: Optional[dict] = Field(None, description="Video data")
@@ -57,9 +56,21 @@ class MessageCreate(MessageBase):
     # Field(alias="metadata_") tells Pydantic: this field maps to metadata_ in the SQLAlchemy model.
     metadata_: Optional[dict[str, Any]] = Field(None, alias="metadata")
 
-class MessageRead(MessageBase):
 
+class MessageRead(MessageBase):
     id: PrimaryKey = Field(description="Message ID")
     created_at: datetime = Field(description="Creation timestamp")
     updated_at: datetime = Field(description="Last update timestamp")
     metadata: Optional[dict[str, Any]] = Field(None, alias="metadata_")
+
+
+class MessageSummary(FarmbaseBase):
+    """Simplified message summary for chat display"""
+
+    id: PrimaryKey = Field(description="Message ID")
+    timestamp: datetime = Field(description="When the message was sent")
+    direction: MessageDirection = Field(description="Is the message inbound or outbound")
+    type: MessageType = Field(description="Message type")
+    text: Optional[str] = Field(None, description="Text content")
+    caption: Optional[str] = Field(None, description="Media caption")
+    storage_url: Optional[str] = Field(None, description="URL of downloaded media file")

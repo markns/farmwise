@@ -7,11 +7,13 @@ class ServiceError(error.ServerProblem):
 
     pass
 
+
 # fastapi_problem.error.NotFoundProblem provides status 404 errors
 class EntityDoesNotExistError(error.NotFoundProblem):
     """database returns nothing"""
 
     pass
+
 
 # fastapi_problem.error.ConflictProblem provides status 409 errors
 class EntityAlreadyExistsError(error.ConflictProblem):
@@ -27,8 +29,6 @@ class EntityAlreadyExistsError(error.ConflictProblem):
 #     "UnprocessableProblem",
 
 
-
-
 class AuthenticationFailed(error.UnauthorisedProblem):
     """invalid authentication credentials"""
 
@@ -39,4 +39,3 @@ class InvalidTokenError(error.UnauthorisedProblem):
     """invalid token"""
 
     pass
-

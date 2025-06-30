@@ -12,9 +12,8 @@ from farmwise.schema import AudioResponse, TextResponse, UserInput
 from farmwise.service import farmwise
 from farmwise.settings import settings
 from farmwise.storage import make_blob_public, upload_bytes_to_gcs
-from farmwise.whatsapp.responses import _send_text_response, _send_audio_response
-from farmwise.whatsapp.store import record_inbound_message, record_callback_selection, \
-    record_callback_button
+from farmwise.whatsapp.responses import _send_audio_response, _send_text_response
+from farmwise.whatsapp.store import record_callback_button, record_callback_selection, record_inbound_message
 
 # Intercept standard logging and route to loguru
 logging.basicConfig(handlers=[InterceptHandler()], level=logging.INFO, force=True)
@@ -156,7 +155,6 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
 
 @WhatsApp.on_message(filters.image)
 async def image_handler(_: WhatsApp, msg: types.Message):
-
     await msg.mark_as_read()
     context = await user_context(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
     contact = context.contact
@@ -185,8 +183,7 @@ async def image_handler(_: WhatsApp, msg: types.Message):
         await msg.reply_text("Sorry, there was an error processing your image.")
         return
 
-    await record_inbound_message(contact, msg,
-                                 storage={"blob": blob_name, "url": url})
+    await record_inbound_message(contact, msg, storage={"blob": blob_name, "url": url})
 
     await msg.indicate_typing()
     user_input = UserInput(message=msg.caption, image=url)

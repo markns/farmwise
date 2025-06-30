@@ -16,7 +16,7 @@ def _convert_md_to_whatsapp(response: str) -> str:
 
 
 import copy
-from dataclasses import is_dataclass, fields
+from dataclasses import fields, is_dataclass
 
 
 def asdict_with_exclusions(obj, excluded: set):
@@ -47,14 +47,21 @@ def asdict_with_exclusions(obj, excluded: set):
         elif isinstance(value, (list, tuple)):
             result.append((f.name, type(value)(asdict_with_exclusions(v, excluded) for v in value)))
         elif isinstance(value, dict):
-            result.append((f.name, type(value)(
-                (asdict_with_exclusions(k, excluded), asdict_with_exclusions(v, excluded)) for k, v in
-                value.items())))
+            result.append(
+                (
+                    f.name,
+                    type(value)(
+                        (asdict_with_exclusions(k, excluded), asdict_with_exclusions(v, excluded))
+                        for k, v in value.items()
+                    ),
+                )
+            )
         else:
             # For simple types, just append them. deepcopy for safety.
             result.append((f.name, copy.deepcopy(value)))
 
     return dict(result)
+
 
 def _convert_to_pywa_contact(contact: Contact) -> PywaContact:
     """Convert our Contact model to pywa Contact type."""

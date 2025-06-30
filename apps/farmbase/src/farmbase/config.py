@@ -103,7 +103,8 @@ class Settings(BaseSettings):
             # set in the environment before the app starts (e.g., in Docker).
             logger.debug("GAC path not defined in .env or settings. Relying on pre-existing environment.")
 
-        os.environ['MEM0_TELEMETRY'] = "disable"
+        os.environ["MEM0_TELEMETRY"] = "disable"
+
 
 # Create a single instance of the settings to be imported by other modules
 settings = Settings()

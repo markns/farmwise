@@ -111,6 +111,5 @@ agents = AgentDict(
 )
 
 
-
 def get_all_agent_info() -> list[AgentInfo]:
     return [AgentInfo(key=agent_id, description=agent.handoff_description) for agent_id, agent in agents.items()]

@@ -8,9 +8,8 @@ from farmwise.farmbase import FarmbaseClient
 async def retrieve_memories(contact: ContactRead):
     async with FarmbaseClient() as client:
         memories = await contacts_get_all_memories.asyncio(
-            organization=contact.organization.slug,
-            contact_id=contact.id,
-            client=client.raw)
+            organization=contact.organization.slug, contact_id=contact.id, client=client.raw
+        )
         return memories.results
 
 
@@ -20,5 +19,6 @@ async def add_memory(contact: ContactRead, messages: list[Message]):
             organization=contact.organization.slug,
             contact_id=contact.id,
             client=client.raw,
-            body=MemoryCreate(messages=messages, metadata=None))
+            body=MemoryCreate(messages=messages, metadata=None),
+        )
         return memories.results

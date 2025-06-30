@@ -20,7 +20,6 @@ class AgentInfo(BaseModel):
     )
 
 
-
 class SessionState(BaseModel):
     last_agent: str
     previous_response_id: str

@@ -1,9 +1,10 @@
+from farmbase_client.models import ContactRead
 from loguru import logger
-from pywa.types import Button, SectionList, Section, SectionRow
+from pywa.types import Button, Section, SectionList, SectionRow
 from pywa_async.types.base_update import BaseUserUpdateAsync
 
-from farmbase_client.models import ContactRead
-from farmwise.schema import TextResponse, AudioResponse, SectionList as FarmwiseSectionList, Action
+from farmwise.schema import Action, AudioResponse, TextResponse
+from farmwise.schema import SectionList as FarmwiseSectionList
 from farmwise.whatsapp.store import record_outbound_message
 from farmwise.whatsapp.utils import _convert_md_to_whatsapp
 
@@ -51,8 +52,6 @@ def _convert_to_pywa_section_list(section_list: FarmwiseSectionList) -> SectionL
             for section in section_list.sections[:10]
         ],
     )
-
-
 
     # Priority 2: Media messages (can include buttons/section_lists)
     # if response.image_url:
