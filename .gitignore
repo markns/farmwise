@@ -178,3 +178,4 @@ plantix/
 scripts/kamis/data
 dbdump/
 farmwise-*.json
+*.private.env.json
