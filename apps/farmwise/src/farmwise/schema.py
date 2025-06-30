@@ -1,5 +1,4 @@
 import pathlib
-from datetime import UTC, datetime
 from enum import Enum
 from typing import Annotated, Any, Literal, NotRequired
 
@@ -43,25 +42,25 @@ class UserInput(BaseModel):
         description="Voice path to send to the agent.",
         default=None,
     )
-    user_id: str = Field(
-        description="User ID to persist and continue a multi-turn conversation.",
-        examples=["+254748256530", "847c6285-8fc9-4560-a83f-4e6285809254"],
-    )
-    timestamp: datetime = Field(
-        description="Timestamp of the user input.",
-        default_factory=lambda: datetime.now(UTC),
-        examples=[datetime.now(UTC).isoformat()],
-    )
-    user_name: str | None = Field(
-        description="User ID to persist and continue a multi-turn conversation.",
-        default=None,
-        examples=["Mark Nuttall-Smith"],
-    )
-    agent_config: dict[str, Any] = Field(
-        description="Additional configuration to pass through to the agent",
-        default={},
-        examples=[{"spicy_level": 0.8}],
-    )
+    # user_id: str = Field(
+    #     description="User ID to persist and continue a multi-turn conversation.",
+    #     examples=["+254748256530", "847c6285-8fc9-4560-a83f-4e6285809254"],
+    # )
+    # timestamp: datetime = Field(
+    #     description="Timestamp of the user input.",
+    #     default_factory=lambda: datetime.now(UTC),
+    #     examples=[datetime.now(UTC).isoformat()],
+    # )
+    # user_name: str | None = Field(
+    #     description="User ID to persist and continue a multi-turn conversation.",
+    #     default=None,
+    #     examples=["Mark Nuttall-Smith"],
+    # )
+    # agent_config: dict[str, Any] = Field(
+    #     description="Additional configuration to pass through to the agent",
+    #     default={},
+    #     examples=[{"spicy_level": 0.8}],
+    # )
 
 
 class StreamInput(UserInput):

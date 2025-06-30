@@ -15,8 +15,6 @@ from agents import (
     trace,
 )
 from agents.voice import SingleAgentVoiceWorkflow, TTSModelSettings, VoicePipeline, VoicePipelineConfig
-from farmbase_client.api.contacts import contacts_create_run_result
-from farmbase_client.models import AgentCreate, Message, RunResultCreate
 from google.cloud import texttospeech
 from google.cloud.texttospeech_v1 import SynthesizeSpeechResponse
 from loguru import logger
@@ -27,9 +25,11 @@ from openai.types.responses import (
     ResponseTextDeltaEvent,
 )
 
+from farmbase_client.api.contacts import contacts_create_run_result
+from farmbase_client.models import AgentCreate, Message, RunResultCreate
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input
-from farmwise.context import user_context
+from farmwise.context import UserContext
 from farmwise.farmbase import FarmbaseClient
 from farmwise.hooks import AgentHooks
 from farmwise.memory.memory import add_memory
@@ -125,12 +125,11 @@ async def _batch_stream_events(
             )
 
 
-
 class FarmwiseService:
 
     @classmethod
-    async def invoke(cls, user_input: UserInput) -> AsyncIterator[ResponseEvent]:
-        context = await user_context(user_input)
+    async def invoke(cls, context: UserContext, user_input: UserInput) -> AsyncIterator[ResponseEvent]:
+
         session_state = await get_session_state(context)
 
         if context.new_user:
@@ -161,8 +160,11 @@ class FarmwiseService:
         previous_response_id = session_state.previous_response_id if session_state else None
         hooks = AgentHooks()
         trace_id = gen_trace_id()
+        contact = context.contact
 
-        with trace("FarmWise", trace_id=trace_id, group_id=user_input.user_id):
+        with trace("FarmWise", trace_id=trace_id, group_id=contact.phone_number,
+                   metadata={"username": contact.name, "organization": contact.organization.slug}):
+
             result: RunResultStreaming = Runner.run_streamed(agent, input=input_items, context=context, hooks=hooks,
                                                              previous_response_id=previous_response_id)
 
@@ -174,18 +176,18 @@ class FarmwiseService:
 
         if user_input.message:
             text_response: TextResponse = result.final_output_as(TextResponse)
-            await add_memory(context.contact, messages=[Message(role="user", content=user_input.message),
+            await add_memory(contact, messages=[Message(role="user", content=user_input.message),
                                                         Message(role="assistant", content=text_response.content)])
 
         usage = result.context_wrapper.usage
         async with FarmbaseClient() as client:
             await contacts_create_run_result.asyncio(
                 client=client.raw,
-                organization=context.contact.organization.slug,
-                contact_id=context.contact.id,
+                organization=contact.organization.slug,
+                contact_id=contact.id,
                 body=RunResultCreate(
                     created_at=datetime.now(UTC),
-                    contact_id=context.contact.id,
+                    contact_id=contact.id,
                     input=user_input.message,
                     final_output=result.final_output,
                     last_agent=AgentCreate(name=result.last_agent.name),
