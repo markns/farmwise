@@ -15,6 +15,7 @@ class FarmbaseClient:
             token=settings.FARMBASE_API_KEY.get_secret_value(),
             prefix="",
             auth_header_name="X-Farmbase-Key",
+            raise_on_unexpected_status=True
         )
         self.client = await self._client_cm.__aenter__()  # NOTE: important
         return self

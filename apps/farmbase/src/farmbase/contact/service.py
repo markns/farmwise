@@ -16,10 +16,11 @@ async def get(*, db_session: AsyncSession, contact_id: int) -> Contact | None:
         select(Contact)
         .options(
             selectinload(Contact.farm_associations).selectinload(FarmContact.farm),
+            selectinload(Contact.organization),
         )
         .where(Contact.id == contact_id)
     )
-    return result.scalar_one()
+    return result.scalar_one_or_none()
 
 
 async def get_by_name(*, db_session: AsyncSession, name: str) -> Optional[Contact]:
@@ -34,7 +35,6 @@ async def get_by_phone_number(*, db_session: AsyncSession, phone_number: str) ->
         select(Contact)
         .options(
             selectinload(Contact.farm_associations).selectinload(FarmContact.farm),
-            # TODO: don't know why this selectinload is required, whereas for get it's not.
             selectinload(Contact.organization),
         )
         .where(Contact.phone_number == phone_number)

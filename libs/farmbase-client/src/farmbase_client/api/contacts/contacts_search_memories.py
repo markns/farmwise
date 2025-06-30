@@ -8,9 +8,8 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
-from ...models import ErrorResponse
-from ...models import HTTPValidationError
 from ...models import MemoryResults
+from fastapi.exceptions import RequestValidationError
 from ...models import SearchRequest
 from typing import cast
 
@@ -41,33 +40,13 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
+) -> Optional[Union[MemoryResults, RequestValidationError]]:
     if response.status_code == 200:
         response_200 = MemoryResults.model_validate(response.json())
 
         return response_200
-    if response.status_code == 400:
-        response_400 = ErrorResponse.model_validate(response.json())
-
-        return response_400
-    if response.status_code == 401:
-        response_401 = ErrorResponse.model_validate(response.json())
-
-        return response_401
-    if response.status_code == 403:
-        response_403 = ErrorResponse.model_validate(response.json())
-
-        return response_403
-    if response.status_code == 404:
-        response_404 = ErrorResponse.model_validate(response.json())
-
-        return response_404
-    if response.status_code == 500:
-        response_500 = ErrorResponse.model_validate(response.json())
-
-        return response_500
     if response.status_code == 422:
-        response_422 = HTTPValidationError.model_validate(response.json())
+        response_422 = RequestValidationError.model_validate(response.json())
 
         return response_422
     if client.raise_on_unexpected_status:
@@ -78,7 +57,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
+) -> Response[Union[MemoryResults, RequestValidationError]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -93,7 +72,7 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: SearchRequest,
-) -> Response[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
+) -> Response[Union[MemoryResults, RequestValidationError]]:
     """Search memories
 
      Search for memories based on a query.
@@ -108,7 +87,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ErrorResponse, HTTPValidationError, MemoryResults]]
+        Response[Union[MemoryResults, RequestValidationError]]
     """
 
     kwargs = _get_kwargs(
@@ -130,7 +109,7 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: SearchRequest,
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
+) -> Optional[Union[MemoryResults, RequestValidationError]]:
     """Search memories
 
      Search for memories based on a query.
@@ -145,7 +124,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ErrorResponse, HTTPValidationError, MemoryResults]
+        Union[MemoryResults, RequestValidationError]
     """
 
     return sync_detailed(
@@ -162,7 +141,7 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: SearchRequest,
-) -> Response[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
+) -> Response[Union[MemoryResults, RequestValidationError]]:
     """Search memories
 
      Search for memories based on a query.
@@ -177,7 +156,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[ErrorResponse, HTTPValidationError, MemoryResults]]
+        Response[Union[MemoryResults, RequestValidationError]]
     """
 
     kwargs = _get_kwargs(
@@ -197,7 +176,7 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: SearchRequest,
-) -> Optional[Union[ErrorResponse, HTTPValidationError, MemoryResults]]:
+) -> Optional[Union[MemoryResults, RequestValidationError]]:
     """Search memories
 
      Search for memories based on a query.
@@ -212,7 +191,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[ErrorResponse, HTTPValidationError, MemoryResults]
+        Union[MemoryResults, RequestValidationError]
     """
 
     return (

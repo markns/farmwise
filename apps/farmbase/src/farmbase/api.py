@@ -1,8 +1,4 @@
-from typing import List, Optional
-
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
-from starlette.responses import JSONResponse
 
 from farmbase.agronomy.views import router as agronomy_router
 from farmbase.auth import authenticate_user_or_machine
@@ -18,26 +14,7 @@ from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
 from farmbase.products.views import router as products_router
 
-
-class ErrorMessage(BaseModel):
-    msg: str
-
-
-class ErrorResponse(BaseModel):
-    detail: Optional[List[ErrorMessage]]
-
-
-# WARNING: Don't use this unless you want unauthenticated routes
-api_router = APIRouter(
-    default_response_class=JSONResponse,
-    responses={
-        400: {"model": ErrorResponse},
-        401: {"model": ErrorResponse},
-        403: {"model": ErrorResponse},
-        404: {"model": ErrorResponse},
-        500: {"model": ErrorResponse},
-    },
-)
+api_router = APIRouter()
 
 authenticated_api_router = APIRouter(dependencies=[Depends(authenticate_user_or_machine)])
 
@@ -55,7 +32,6 @@ authenticated_api_router.include_router(agronomy_router, prefix="/agronomy", tag
 
 # NOTE: All api routes should be authenticated by default
 authenticated_api_router.include_router(organization_router, prefix="/organizations", tags=["organizations"])
-
 
 authenticated_organization_api_router.include_router(contact_router, prefix="/contacts", tags=["contacts"])
 

@@ -33,6 +33,7 @@ dependencies = [
     "shapely>=2.1.1",
     "mem0ai>=0.1.111",
     "async-lru>=2.0.4",
+    "fastapi-problem>=0.11.4",
 ]
 
 [dependency-groups]

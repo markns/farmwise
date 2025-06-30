@@ -1,6 +1,6 @@
 from loguru import logger
 
-from farmbase.exceptions.exceptions import InvalidConfigurationError
+# from farmbase.exceptions.exceptions import InvalidConfigurationError
 
 
 # inspired by https://github.com/getsentry/sentry
@@ -53,8 +53,8 @@ class InstanceManager(object):
                 else:
                     results.append(cls)
 
-            except InvalidConfigurationError as e:
-                logger.warning(f"Plugin '{class_name}' may not work correctly. {e}")
+            # except InvalidConfigurationError as e:
+            #     logger.warning(f"Plugin '{class_name}' may not work correctly. {e}")
 
             except Exception as e:
                 logger.exception(f"Unable to import {cls_path}. Reason: {e}")

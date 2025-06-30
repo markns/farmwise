@@ -87,7 +87,7 @@ async def create_contact(
     """Create a new contact."""
     contact = await get_by_phone_number(db_session=db_session, phone_number=contact_in.phone_number)
     if contact:
-        raise EntityAlreadyExistsError(message="A contact with this phone number already exists.")
+        raise EntityAlreadyExistsError("A contact with this phone number already exists.")
 
     # TODO: how to handle sqlalchemy.exc.IntegrityError: (sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) <class 'asyncpg.exceptions.UniqueViolationError'>: duplicate key value violates unique constraint "contact_pkey"
     #  DETAIL:  Key (id)=(1) already exists.
@@ -119,7 +119,7 @@ async def get_contact_by_phone(
 ):
     contact = await get_by_phone_number(db_session=db_session, phone_number=phone)
     if not contact:
-        raise EntityDoesNotExistError(message="Contact not found")
+        raise EntityDoesNotExistError("Contact not found")
 
     return _to_contact_read(contact)
 
@@ -133,7 +133,7 @@ async def get_contact(db_session: DbSession, contact_id: PrimaryKey):
     """Get a contact."""
     contact = await get(db_session=db_session, contact_id=contact_id)
     if not contact:
-        raise EntityDoesNotExistError(message="A contact with this id does not exist.")
+        raise EntityDoesNotExistError("A contact with this id does not exist.")
     return _to_contact_read(contact)
 
 
@@ -150,7 +150,7 @@ async def patch_contact(
     """Update an existing contact with partial data."""
     contact = await get(db_session=db_session, contact_id=contact_id)
     if not contact:
-        raise EntityDoesNotExistError(message="A contact with this id does not exist.")
+        raise EntityDoesNotExistError("A contact with this id does not exist.")
     contact = await patch(db_session=db_session, contact=contact, contact_in=contact_in)
     return _to_contact_read(contact)
 
@@ -164,5 +164,5 @@ async def delete_contact(db_session: DbSession, contact_id: PrimaryKey):
     """Delete a contact."""
     contact = await get(db_session=db_session, contact_id=contact_id)
     if not contact:
-        raise EntityDoesNotExistError(message="A contact with this id does not exist.")
+        raise EntityDoesNotExistError("A contact with this id does not exist.")
     await delete(db_session=db_session, contact_id=contact_id)
