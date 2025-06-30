@@ -112,6 +112,16 @@ export interface ContactMemoryListResponse {
   results: ContactMemory[]
 }
 
+export interface MessageSummary {
+  id: string
+  timestamp: string
+  direction: 'inbound' | 'outbound'
+  type: 'text' | 'image' | 'video' | 'audio' | 'document' | 'sticker' | 'reaction' | 'location' | 'contacts' | 'order' | 'system' | 'unknown' | 'unsupported' | 'interactive' | 'button' | 'request_welcome'
+  text?: string
+  caption?: string
+  storage_url?: string
+}
+
 // Factory function to create contact API with authenticated client
 export const createContactApi = (client: ApiClient) => ({
   // Main contact operations
@@ -229,6 +239,16 @@ export const createContactApi = (client: ApiClient) => ({
   // Contact memories
   async getMemories(contactId: string): Promise<ContactMemoryListResponse> {
     const response = await client.get(`/contacts/${contactId}/memories/`)
+    return response.data
+  },
+
+  // Messages
+  async getMessages(contactId: string, options: { limit?: number; offset?: number } = {}): Promise<MessageSummary[]> {
+    const params = new URLSearchParams()
+    if (options.limit) params.append('limit', options.limit.toString())
+    if (options.offset) params.append('offset', options.offset.toString())
+    
+    const response = await client.get(`/contacts/${contactId}/messages?${params.toString()}`)
     return response.data
   },
 

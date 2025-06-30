@@ -10,7 +10,8 @@ import {
   type ContactFilter,
   type ChatState,
   type ContactInstance,
-  type ContactMemory
+  type ContactMemory,
+  type MessageSummary
 } from '@/api/contact'
 import { type ApiClient } from '@/api/client'
 import { useNotificationStore } from './notificationStore'
@@ -60,6 +61,7 @@ interface ContactState {
   chatState: ChatState | null
   availableFilters: Record<string, string[]>
   memories: ContactMemory[]
+  messages: MessageSummary[]
   
   // Actions
   getAll: () => void
@@ -100,6 +102,9 @@ interface ContactState {
   
   // Memory actions
   loadMemories: (contactId: string) => Promise<void>
+  
+  // Message actions
+  loadMessages: (contactId: string) => Promise<void>
 }
 
 // Factory function to create contact store with authenticated API client
@@ -151,6 +156,7 @@ export const createContactStore = (apiClient: ApiClient) => {
   chatState: null,
   availableFilters: {},
   memories: [],
+  messages: [],
 
   // Debounced getAll function
   getAll: debounce(async () => {
@@ -403,13 +409,14 @@ export const createContactStore = (apiClient: ApiClient) => {
       selected: contact,
       dialogs: { ...get().dialogs, showChat: true }
     })
-    get().loadChatState(contact.id)
+    get().loadMessages(contact.id)
   },
 
   closeChat: () => {
     set({ 
       selected: null,
       chatState: null,
+      messages: [],
       dialogs: { ...get().dialogs, showChat: false }
     })
   },
@@ -563,6 +570,19 @@ export const createContactStore = (apiClient: ApiClient) => {
       })
     }
   },
+
+  loadMessages: async (contactId: string) => {
+    try {
+      const messages = await contactApi.getMessages(contactId, { limit: 100 })
+      set({ messages })
+    } catch (error) {
+      const { addNotification } = useNotificationStore.getState()
+      addNotification({
+        text: 'Failed to load contact messages',
+        type: 'error',
+      })
+    }
+  },
   }))
 }
 
@@ -615,5 +635,5 @@ export const useContactStore = () => {
 //   // ... component logic
 // }
 
-export type { Contact, ContactListOptions, ContactEngagement, ContactFilter, ChatState, ContactInstance, ContactMemory }
+export type { Contact, ContactListOptions, ContactEngagement, ContactFilter, ChatState, ContactInstance, ContactMemory, MessageSummary }
 export default createContactStore

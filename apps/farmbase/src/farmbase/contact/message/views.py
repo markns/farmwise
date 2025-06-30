@@ -1,4 +1,3 @@
-from pprint import pprint
 from typing import Annotated, List, Optional
 
 from fastapi import APIRouter, HTTPException, Path, Query
@@ -8,12 +7,12 @@ from farmbase.database.core import DbSession
 
 from . import service
 from .models import MessageType
-from .schemas import MessageCreate, MessageRead
+from .schemas import MessageCreate, MessageRead, MessageSummary
 
 router = APIRouter()
 
 
-@router.get("", response_model=List[MessageRead])
+@router.get("", response_model=List[MessageSummary])
 async def list_messages(
     db_session: DbSession,
     contact_id: Annotated[int, Path(description="Contact ID")],
@@ -21,7 +20,7 @@ async def list_messages(
     limit: Annotated[int, Query(description="Number of messages to return", ge=1, le=1000)] = 100,
     offset: Annotated[int, Query(description="Number of messages to skip", ge=0)] = 0,
 ):
-    """List messages for a contact."""
+    """List message summaries for a contact."""
     messages = await service.list_messages(
         db_session=db_session,
         contact_id=contact_id,
@@ -29,7 +28,26 @@ async def list_messages(
         limit=limit,
         offset=offset,
     )
-    return [MessageRead.model_validate(message) for message in messages]
+
+    summaries = []
+    for message in messages:
+        # Extract storage URL if available
+        storage_url = None
+        if message.storage and isinstance(message.storage, dict):
+            storage_url = message.storage.get("url")
+
+        summary = MessageSummary(
+            id=message.id,
+            timestamp=message.timestamp,
+            direction=message.direction,
+            type=message.type,
+            text=message.text,
+            caption=message.caption,
+            storage_url=storage_url,
+        )
+        summaries.append(summary)
+
+    return summaries
 
 
 @router.get("/{message_id}", response_model=MessageRead)
@@ -41,10 +59,7 @@ async def get_message(
     """Get a specific message."""
     message = await service.get_by_id(db_session=db_session, message_id=message_id)
     if not message or message.contact_id != contact_id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Message not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Message not found")
     return MessageRead.model_validate(message)
 
 
@@ -94,11 +109,8 @@ async def delete_message(
     """Delete a message."""
     message = await service.get_by_id(db_session=db_session, message_id=message_id)
     if not message or message.contact_id != contact_id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Message not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Message not found")
+
     await service.delete(db_session=db_session, message=message)
 
 
@@ -114,8 +126,5 @@ async def get_message_by_whatsapp_id(
         whatsapp_message_id=whatsapp_message_id,
     )
     if not message or message.contact_id != contact_id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Message not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Message not found")
     return MessageRead.model_validate(message)
