@@ -5,7 +5,7 @@ import TableInstance from './TableInstance'
 import ChatDrawer from './ChatDrawer'
 import ContactCreateEditDialog from './ContactCreateEditDialog'
 import ContactFilterDialog from './ContactFilterDialog'
-import ContactMemoriesPopover from './ContactMemoriesPopover'
+import MemoriesDrawer from './MemoriesDrawer'
 
 interface ContactsProps {
     apiClient: ApiClient
@@ -19,7 +19,7 @@ const ContactsContent: React.FC = () => {
             <ChatDrawer />
             <ContactCreateEditDialog />
             <ContactFilterDialog />
-            <ContactMemoriesPopover />
+            <MemoriesDrawer />
         </React.Fragment>
     )
 }
