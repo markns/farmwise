@@ -1,48 +1,65 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 
 from pydantic import Field
 
 from farmbase.models import FarmbaseBase, PrimaryKey
 
-from .models import MessageType, RecipientType
+from .models import MessageType, MessageDirection
 
 
 class MessageBase(FarmbaseBase):
-    messaging_product: str = Field(default="whatsapp", description="Messaging product (always 'whatsapp')")
-    recipient_type: RecipientType = Field(default=RecipientType.INDIVIDUAL, description="Recipient type")
-    to: str = Field(description="Recipient's phone number")
-    type: MessageType = Field(default=MessageType.TEXT, description="Message type")
-    status: Optional[str] = Field(None, description="Message status")
-    biz_opaque_callback_data: Optional[str] = Field(None, max_length=512, description="Business callback data")
+
+    contact_id: int = Field(description="ID of the contact")
+    direction: MessageDirection = Field(description="Is the message inbound or outbound")
+    whatsapp_message_id: str = Field(description="WhatsApp message ID")
+    timestamp: datetime = Field(description="When the message was sent")
+    type: MessageType = Field(description="Message type")
     
-    audio: Optional[dict] = Field(None, description="Audio message data")
-    contacts: Optional[dict] = Field(None, description="Contact message data")
-    context: Optional[dict] = Field(None, description="Context for message replies")
-    document: Optional[dict] = Field(None, description="Document message data")
-    image: Optional[dict] = Field(None, description="Image message data")
-    interactive: Optional[dict] = Field(None, description="Interactive message data")
-    location: Optional[dict] = Field(None, description="Location message data")
-    sticker: Optional[dict] = Field(None, description="Sticker message data")
-    template: Optional[dict] = Field(None, description="Template message data")
-    text: Optional[dict] = Field(None, description="Text message data")
-    reaction: Optional[dict] = Field(None, description="Reaction message data")
+    # Message flags
+    forwarded: bool = Field(default=False, description="Whether the message was forwarded")
+    forwarded_many_times: bool = Field(default=False, description="Whether forwarded many times")
+    
+    # Content fields
+    text: Optional[str] = Field(None, description="Text content")
+    caption: Optional[str] = Field(None, description="Media caption")
+    
+    # Media and other data as JSON
+    image: Optional[dict] = Field(None, description="Image data")
+    video: Optional[dict] = Field(None, description="Video data")
+    sticker: Optional[dict] = Field(None, description="Sticker data")
+    document: Optional[dict] = Field(None, description="Document data")
+    audio: Optional[dict] = Field(None, description="Audio data")
+    # location of downloaded media
+    storage: Optional[dict] = Field(None, description="Location of downloaded media")
+
+    reaction: Optional[dict] = Field(None, description="Reaction data")
+    location: Optional[dict] = Field(None, description="Location data")
+    contacts: Optional[dict] = Field(None, description="Contacts data")
+    order: Optional[dict] = Field(None, description="Order data")
+    system: Optional[dict] = Field(None, description="System update data")
+
+    from_user: Optional[dict] = Field(None, description="User who sent the message")
+    reply_to_message: Optional[dict] = Field(None, description="Message being replied to")
+
+    # Callback handler info
+    data: Optional[str] = Field(None)
+    title: Optional[str] = Field(None)
+    description: Optional[str] = Field(None)
+
+    # Error handling
+    error: Optional[dict] = Field(None, description="Error data if any")
 
 
 class MessageCreate(MessageBase):
-    contact_id: int = Field(description="ID of the contact to send message to")
-
-
-class MessageUpdate(FarmbaseBase):
-    status: Optional[str] = Field(None, description="Message status")
-    whatsapp_message_id: Optional[str] = Field(None, description="WhatsApp message ID")
-
+    # Field(alias="metadata_") tells Pydantic: this field maps to metadata_ in the SQLAlchemy model.
+    metadata_: Optional[dict[str, Any]] = Field(None, alias="metadata")
 
 class MessageRead(MessageBase):
+
     id: PrimaryKey = Field(description="Message ID")
-    whatsapp_message_id: Optional[str] = Field(None, description="WhatsApp message ID")
-    contact_id: int = Field(description="Contact ID")
     created_at: datetime = Field(description="Creation timestamp")
     updated_at: datetime = Field(description="Last update timestamp")
+    metadata: Optional[dict[str, Any]] = Field(None, alias="metadata_")

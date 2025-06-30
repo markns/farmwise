@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing import Annotated, List, Optional
 
 from fastapi import APIRouter, HTTPException, Path, Query
@@ -7,7 +8,7 @@ from farmbase.database.core import DbSession
 
 from . import service
 from .models import MessageType
-from .schemas import MessageCreate, MessageRead, MessageUpdate
+from .schemas import MessageCreate, MessageRead
 
 router = APIRouter()
 
@@ -56,32 +57,32 @@ async def create_message(
     """Create a new message."""
     # Ensure the contact_id in the path matches the one in the payload
     message_in.contact_id = contact_id
-    
+
     message = await service.create(db_session=db_session, message_in=message_in)
     return MessageRead.model_validate(message)
 
 
-@router.patch("/{message_id}", response_model=MessageRead)
-async def update_message(
-    db_session: DbSession,
-    contact_id: Annotated[int, Path(description="Contact ID")],
-    message_id: Annotated[int, Path(description="Message ID")],
-    message_update: MessageUpdate,
-):
-    """Update a message."""
-    message = await service.get_by_id(db_session=db_session, message_id=message_id)
-    if not message or message.contact_id != contact_id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Message not found"
-        )
-    
-    updated_message = await service.update(
-        db_session=db_session,
-        message=message,
-        message_update=message_update,
-    )
-    return MessageRead.model_validate(updated_message)
+# @router.patch("/{message_id}", response_model=MessageRead)
+# async def update_message(
+#     db_session: DbSession,
+#     contact_id: Annotated[int, Path(description="Contact ID")],
+#     message_id: Annotated[int, Path(description="Message ID")],
+#     message_update: MessageUpdate,
+# ):
+#     """Update a message."""
+#     message = await service.get_by_id(db_session=db_session, message_id=message_id)
+#     if not message or message.contact_id != contact_id:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Message not found"
+#         )
+#
+#     updated_message = await service.update(
+#         db_session=db_session,
+#         message=message,
+#         message_update=message_update,
+#     )
+#     return MessageRead.model_validate(updated_message)
 
 
 @router.delete("/{message_id}", status_code=status.HTTP_204_NO_CONTENT)

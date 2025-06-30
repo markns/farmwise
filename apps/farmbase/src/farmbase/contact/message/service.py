@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from .models import Message
-from .schemas import MessageCreate, MessageUpdate
+from .schemas import MessageCreate
 
 
 async def get(*, db_session: AsyncSession, contact_id: int, since: datetime = datetime.min) -> Sequence[Message]:
@@ -49,15 +49,15 @@ async def create(*, db_session: AsyncSession, message_in: MessageCreate) -> Mess
     return message
 
 
-async def update(*, db_session: AsyncSession, message: Message, message_update: MessageUpdate) -> Message:
-    """Updates an existing message."""
-    update_data = message_update.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(message, field, value)
-    
-    await db_session.commit()
-    await db_session.refresh(message)
-    return message
+# async def update(*, db_session: AsyncSession, message: Message, message_update: MessageUpdate) -> Message:
+#     """Updates an existing message."""
+#     update_data = message_update.model_dump(exclude_unset=True)
+#     for field, value in update_data.items():
+#         setattr(message, field, value)
+#
+#     await db_session.commit()
+#     await db_session.refresh(message)
+#     return message
 
 
 async def list_messages(

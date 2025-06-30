@@ -42,7 +42,10 @@ uvx --from git+https://github.com/koxudaxi/datamodel-code-generator[http] \
 #  '  $MODELS > /tmp/models_123 && mv /tmp/models_123 $MODELS
 #done
 #
-#sed -i '' '/model_rebuild/d' $MODELS
+
+find $OUTPUT/api -type f -name "*.py" \
+  -exec sed -i '' \
+  's|from .*models import RequestValidationError|from fastapi.exceptions import RequestValidationError|g' {} +
 
 # Monkey patch the BaseModel to return model_dump() when calling to_dict()
 # as this is used by the generated client

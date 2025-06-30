@@ -1,7 +1,6 @@
 from fastapi_problem import error
 
 
-
 # fastapi_problem.error.ServerProblem provides status 500 errors
 class ServiceError(error.ServerProblem):
     """failures in external services or APIs, like a database or a third-party service"""
