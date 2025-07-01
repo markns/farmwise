@@ -7,8 +7,8 @@ from sqlalchemy.orm import selectinload
 
 from ..farm.models import Farm, FarmContact
 from ..organization.models import Organization
-from .models import Contact
-from .schemas import ContactCreate, ContactPatch, ContactRead
+from .models import Contact, ContactConsent
+from .schemas import ContactConsentCreate, ContactCreate, ContactPatch, ContactRead
 
 
 async def get(*, db_session: AsyncSession, contact_id: int) -> Contact | None:
@@ -120,3 +120,19 @@ async def delete(*, db_session: AsyncSession, contact_id: int) -> None:
     if contact:
         await db_session.delete(contact)
         await db_session.commit()
+
+
+async def create_consent(
+    *, db_session: AsyncSession, contact_id: int, consent_in: ContactConsentCreate
+) -> ContactConsent:
+    """Creates a consent record for a contact."""
+    consent = ContactConsent(
+        contact_id=contact_id,
+        **consent_in.model_dump()
+    )
+    
+    db_session.add(consent)
+    await db_session.commit()
+    await db_session.refresh(consent)
+    
+    return consent

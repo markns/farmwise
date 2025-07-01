@@ -5,8 +5,8 @@ from typing import List, Optional
 
 from pydantic import Field, field_validator
 
-from farmbase.enums import Gender, ContactRole
-from farmbase.models import FarmbaseBase, PrimaryKey, Pagination
+from farmbase.enums import ContactRole, Gender
+from farmbase.models import FarmbaseBase, Pagination, PrimaryKey
 from farmbase.organization.models import OrganizationRead
 from farmbase.validators import must_not_be_blank
 
@@ -72,3 +72,23 @@ class ContactPagination(Pagination):
     """Model for paginated list of contacts."""
 
     items: List[ContactRead] = Field(default_factory=list, description="List of contacts in the current page")
+
+
+class ContactConsentBase(FarmbaseBase):
+    """Base model for ContactConsent data."""
+
+    consent_type: str = Field(description="Type of consent (e.g., 'data_processing', 'marketing', 'communication')")
+    consent_given: bool = Field(description="Whether consent was given or not")
+    consent_version: str = Field(description="Version of the consent terms")
+
+
+class ContactConsentCreate(ContactConsentBase):
+    """Model for creating new ContactConsent."""
+    pass
+
+
+class ContactConsentRead(ContactConsentBase):
+    """Model for reading ContactConsent data."""
+
+    id: PrimaryKey = Field(description="Unique identifier of the consent record")
+    contact_id: int = Field(description="ID of the contact this consent belongs to")

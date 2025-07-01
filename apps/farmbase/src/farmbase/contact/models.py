@@ -4,10 +4,11 @@ from datetime import date
 
 from sqlalchemy import (
     JSON,
+    Boolean,
     Date,
     ForeignKey,
     Integer,
-    String, Boolean,
+    String,
 )
 from sqlalchemy import Enum as SqlEnum
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -17,7 +18,6 @@ from farmbase.database.core import Base
 from farmbase.enums import ContactRole, Gender
 from farmbase.models import TimeStampMixin
 from farmbase.organization.models import Organization
-
 
 # TODO: use this pattern to add other contact types. eg. farmers
 # https://docs.sqlalchemy.org/en/20/orm/queryguide/_inheritance_setup.html
@@ -63,7 +63,7 @@ class ContactConsent(Base, TimeStampMixin):
     __tablename__ = "contact_consents"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    contact_id: Mapped[int] = mapped_column(ForeignKey("contacts.id", ondelete="CASCADE"), nullable=False)
+    contact_id: Mapped[int] = mapped_column(ForeignKey("contact.id", ondelete="CASCADE"), nullable=False)
 
     consent_type: Mapped[str] = mapped_column(String(length=100), nullable=False)
     consent_given: Mapped[bool] = mapped_column(Boolean, nullable=False)

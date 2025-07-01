@@ -17,9 +17,16 @@ from .message.views import router as message_router
 from .models import (
     Contact,
 )
-from .schemas import ContactCreate, ContactPatch, ContactRead, ContactPagination
 from .runresult.views import router as runresult_router
-from .service import create, delete, get, get_by_phone_number, patch
+from .schemas import (
+    ContactConsentCreate,
+    ContactConsentRead,
+    ContactCreate,
+    ContactPagination,
+    ContactPatch,
+    ContactRead,
+)
+from .service import create, create_consent, delete, get, get_by_phone_number, patch
 
 router = APIRouter()
 
@@ -163,3 +170,29 @@ async def delete_contact(db_session: DbSession, contact_id: PrimaryKey):
     if not contact:
         raise EntityDoesNotExistError("A contact with this id does not exist.")
     await delete(db_session=db_session, contact_id=contact_id)
+
+
+@router.post(
+    "/{contact_id}/consent",
+    response_model=ContactConsentRead,
+    summary="Create a consent record for a contact.",
+)
+async def create_contact_consent(
+    db_session: DbSession,
+    contact_id: PrimaryKey,
+    consent_in: ContactConsentCreate,
+):
+    """Create a consent record for a contact."""
+    # Verify the contact exists
+    contact = await get(db_session=db_session, contact_id=contact_id)
+    if not contact:
+        raise EntityDoesNotExistError("A contact with this id does not exist.")
+    
+    consent = await create_consent(db_session=db_session, contact_id=contact_id, consent_in=consent_in)
+    return ContactConsentRead(
+        id=consent.id,
+        contact_id=consent.contact_id,
+        consent_type=consent.consent_type,
+        consent_given=consent.consent_given,
+        consent_version=consent.consent_version,
+    )
