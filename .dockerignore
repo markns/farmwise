@@ -19,8 +19,7 @@ checkpoints.db*
 data
 dbdump
 docs
-media
-notebooks
+dev
 plantix
 scripts
 static

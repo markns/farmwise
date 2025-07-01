@@ -175,7 +175,7 @@ cython_debug/
 
 .claude/
 plantix/
-scripts/kamis/data
+dev/scripts/kamis/data
 dbdump/
 farmwise-*.json
 *.private.env.json
