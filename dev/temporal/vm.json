@@ -1,0 +1,142 @@
+{
+  "canIpForward": false,
+  "confidentialInstanceConfig": {
+    "enableConfidentialCompute": false
+  },
+  "cpuPlatform": "Intel Broadwell",
+  "creationTimestamp": "2025-06-30T07:03:20.884-07:00",
+  "deletionProtection": false,
+  "description": "",
+  "disks": [
+    {
+      "architecture": "X86_64",
+      "guestOsFeatures": [
+        {
+          "type": "UEFI_COMPATIBLE"
+        },
+        {
+          "type": "VIRTIO_SCSI_MULTIQUEUE"
+        },
+        {
+          "type": "GVNIC"
+        },
+        {
+          "type": "SEV_CAPABLE"
+        },
+        {
+          "type": "SEV_LIVE_MIGRATABLE_V2"
+        }
+      ],
+      "type": "PERSISTENT",
+      "licenses": [
+        "projects/debian-cloud/global/licenses/debian-12-bookworm"
+      ],
+      "deviceName": "instance-20250630-135937",
+      "autoDelete": true,
+      "source": "projects/farmwise-462814/zones/europe-west4-b/disks/instance-20250630-135937",
+      "index": 0,
+      "boot": true,
+      "kind": "compute#attachedDisk",
+      "mode": "READ_WRITE",
+      "interface": "SCSI",
+      "diskSizeGb": "10"
+    }
+  ],
+  "displayDevice": {
+    "enableDisplay": false
+  },
+  "fingerprint": "ilp_DHufs5M=",
+  "id": "6043906595070355402",
+  "keyRevocationActionType": "NONE",
+  "kind": "compute#instance",
+  "labelFingerprint": "pzBpbdzjubE=",
+  "labels": {
+    "goog-ops-agent-policy": "v2-x86-template-1-4-0"
+  },
+  "lastStartTimestamp": "2025-06-30T07:03:34.261-07:00",
+  "machineType": "projects/farmwise-462814/zones/europe-west4-b/machineTypes/e2-small",
+  "metadata": {
+    "fingerprint": "iWNfLMWDE9k=",
+    "kind": "compute#metadata",
+    "items": [
+      {
+        "value": "TRUE",
+        "key": "enable-osconfig"
+      }
+    ]
+  },
+  "name": "instance-20250630-135937",
+  "networkInterfaces": [
+    {
+      "stackType": "IPV4_ONLY",
+      "name": "nic0",
+      "network": "projects/farmwise-462814/global/networks/default",
+      "accessConfigs": [
+        {
+          "name": "External NAT",
+          "type": "ONE_TO_ONE_NAT",
+          "natIP": "35.234.167.154",
+          "kind": "compute#accessConfig",
+          "networkTier": "PREMIUM"
+        }
+      ],
+      "subnetwork": "projects/farmwise-462814/regions/europe-west4/subnetworks/default",
+      "networkIP": "10.164.0.2",
+      "fingerprint": "AlwxLT19CgU=",
+      "kind": "compute#networkInterface"
+    }
+  ],
+  "reservationAffinity": {
+    "consumeReservationType": "ANY_RESERVATION"
+  },
+  "resourceStatus": {
+    "scheduling": {}
+  },
+  "satisfiesPzi": true,
+  "scheduling": {
+    "onHostMaintenance": "MIGRATE",
+    "provisioningModel": "STANDARD",
+    "automaticRestart": true,
+    "preemptible": false
+  },
+  "selfLink": "projects/farmwise-462814/zones/europe-west4-b/instances/instance-20250630-135937",
+  "serviceAccounts": [
+    {
+      "email": "519829651234-compute@developer.gserviceaccount.com",
+      "scopes": [
+        "https://www.googleapis.com/auth/devstorage.read_only",
+        "https://www.googleapis.com/auth/logging.write",
+        "https://www.googleapis.com/auth/monitoring.write",
+        "https://www.googleapis.com/auth/service.management.readonly",
+        "https://www.googleapis.com/auth/servicecontrol",
+        "https://www.googleapis.com/auth/trace.append"
+      ]
+    }
+  ],
+  "shieldedInstanceConfig": {
+    "enableSecureBoot": false,
+    "enableVtpm": true,
+    "enableIntegrityMonitoring": true
+  },
+  "shieldedInstanceIntegrityPolicy": {
+    "updateAutoLearnPolicy": true
+  },
+  "shieldedVmConfig": {
+    "enableSecureBoot": false,
+    "enableVtpm": true,
+    "enableIntegrityMonitoring": true
+  },
+  "shieldedVmIntegrityPolicy": {
+    "updateAutoLearnPolicy": true
+  },
+  "startRestricted": false,
+  "status": "RUNNING",
+  "tags": {
+    "items": [
+      "https-server",
+      "temporal-server"
+    ],
+    "fingerprint": "d-kSoxulVv0="
+  },
+  "zone": "projects/farmwise-462814/zones/europe-west4-b"
+}
