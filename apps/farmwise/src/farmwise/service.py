@@ -30,7 +30,7 @@ from openai.types.responses import (
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input
 from farmwise.context import UserContext
-from farmwise.farmbase import FarmbaseClient
+from farmwise.farmbase import farmbase_api_client
 from farmwise.hooks import AgentHooks
 from farmwise.memory.memory import add_memory
 from farmwise.memory.session import get_session_state, set_session_state
@@ -188,26 +188,25 @@ class FarmwiseService:
             )
 
         usage = result.context_wrapper.usage
-        async with FarmbaseClient() as client:
-            await contacts_create_run_result.asyncio(
-                client=client.raw,
-                organization=contact.organization.slug,
+        await contacts_create_run_result.asyncio(
+            client=farmbase_api_client,
+            organization=contact.organization.slug,
+            contact_id=contact.id,
+            body=RunResultCreate(
+                created_at=datetime.now(UTC),
                 contact_id=contact.id,
-                body=RunResultCreate(
-                    created_at=datetime.now(UTC),
-                    contact_id=contact.id,
-                    input=user_input.message,
-                    final_output=result.final_output,
-                    last_agent=AgentCreate(name=result.last_agent.name),
-                    trace_id=trace_id,
-                    requests=usage.requests,
-                    input_tokens=usage.input_tokens,
-                    input_tokens_cached=usage.input_tokens_details.cached_tokens,
-                    output_tokens=usage.output_tokens,
-                    output_tokens_reasoning=usage.output_tokens_details.reasoning_tokens,
-                    total_tokens=usage.total_tokens,
-                ),
-            )
+                input=user_input.message,
+                final_output=result.final_output,
+                last_agent=AgentCreate(name=result.last_agent.name),
+                trace_id=trace_id,
+                requests=usage.requests,
+                input_tokens=usage.input_tokens,
+                input_tokens_cached=usage.input_tokens_details.cached_tokens,
+                output_tokens=usage.output_tokens,
+                output_tokens_reasoning=usage.output_tokens_details.reasoning_tokens,
+                total_tokens=usage.total_tokens,
+            ),
+        )
 
     async def invoke_voice(self, user_input: UserInput) -> str:
         agent = agents[DEFAULT_AGENT]

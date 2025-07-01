@@ -23,7 +23,7 @@ from isdasoil_api_client.models.get_soil_data_isdasoil_v2_soilproperty_get_prope
 )
 
 from farmwise.context import UserContext
-from farmwise.farmbase import FarmbaseClient
+from farmwise.farmbase import farmbase_api_client
 from farmwise.settings import settings
 from farmwise.utils import copy_doc
 
@@ -35,15 +35,13 @@ ISDA_URL = "https://api.isda-africa.com"
 async def suitability_index(
     _: RunContextWrapper[UserContext], latitude: float, longitude: float
 ) -> SuitabilityIndexResponse:
-    async with FarmbaseClient() as client:
-        return await gaez_suitability_index.asyncio(client=client.raw, latitude=latitude, longitude=longitude)
+    return await gaez_suitability_index.asyncio(client=farmbase_api_client, latitude=latitude, longitude=longitude)
 
 
 @function_tool
 @copy_doc(gaez_aez_classification.asyncio)
 async def aez_classification(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> str:
-    async with FarmbaseClient() as client:
-        return await gaez_aez_classification.asyncio(client=client.raw, latitude=latitude, longitude=longitude)
+    return await gaez_aez_classification.asyncio(client=farmbase_api_client, latitude=latitude, longitude=longitude)
 
 
 # Refining the Spatial Scale for Maize Crop Agro-Climatological Suitability Conditions in a Region
@@ -60,8 +58,7 @@ async def aez_classification(_: RunContextWrapper[UserContext], latitude: float,
 @function_tool
 @copy_doc(gaez_growing_period.asyncio)
 async def growing_period(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> int:
-    async with FarmbaseClient() as client:
-        return await gaez_growing_period.asyncio(client=client.raw, latitude=latitude, longitude=longitude)
+    return await gaez_growing_period.asyncio(client=farmbase_api_client, latitude=latitude, longitude=longitude)
 
 
 @function_tool
@@ -69,10 +66,9 @@ async def growing_period(_: RunContextWrapper[UserContext], latitude: float, lon
 async def maize_varieties(
     _: RunContextWrapper[UserContext], altitude: float, growing_period_days: int
 ) -> CropVarietiesResponse:
-    async with FarmbaseClient() as client:
-        return await crop_varieties_get_maize_varieties.asyncio(
-            client=client.raw, altitude=altitude, growing_period=growing_period_days
-        )
+    return await crop_varieties_get_maize_varieties.asyncio(
+        client=farmbase_api_client, altitude=altitude, growing_period=growing_period_days
+    )
 
 
 @function_tool
