@@ -7,7 +7,8 @@ from sqlalchemy.orm import selectinload
 
 from ..farm.models import Farm, FarmContact
 from ..organization.models import Organization
-from .models import Contact, ContactCreate, ContactPatch, ContactRead
+from .models import Contact
+from .schemas import ContactCreate, ContactPatch, ContactRead
 
 
 async def get(*, db_session: AsyncSession, contact_id: int) -> Contact | None:

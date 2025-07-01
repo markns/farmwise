@@ -16,11 +16,8 @@ from .memory.views import router as memory_router
 from .message.views import router as message_router
 from .models import (
     Contact,
-    ContactCreate,
-    ContactPagination,
-    ContactPatch,
-    ContactRead,
 )
+from .schemas import ContactCreate, ContactPatch, ContactRead, ContactPagination
 from .runresult.views import router as runresult_router
 from .service import create, delete, get, get_by_phone_number, patch
 

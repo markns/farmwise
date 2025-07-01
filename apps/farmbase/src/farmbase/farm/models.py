@@ -16,7 +16,8 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase import validators
-from farmbase.contact.models import Contact, ContactRead
+from farmbase.contact.models import Contact
+from farmbase.contact.schemas import ContactRead
 from farmbase.database.core import Base
 from farmbase.enums import FarmContactRole
 from farmbase.farm.field.models import Field, FieldGroup
