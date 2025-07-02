@@ -1,9 +1,0 @@
-0 255 255 255 255 0
-1 81 0 0 255 S1: Dominantly very steep terrain
-2 0 202 202 255 S2: Dominantly hydromorphic soils
-3 122 157 0 255 S3: No or few soil/terrain limitations
-4 255 255 53 255 S4: Moderate soil/terrain limitations
-5 240 163 0 255 S5: Severe soil/terrain limitations
-7 28 28 255 255 L1: Water
-8 230 0 0 255 L2: Built-up/Artificial
-6 0 138 204 255 L3: Irrigated soils
