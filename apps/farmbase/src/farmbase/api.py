@@ -13,6 +13,8 @@ from farmbase.market.views import router as market_router
 from farmbase.models import OrganizationSlug
 from farmbase.organization.views import router as organization_router
 from farmbase.products.views import router as products_router
+from farmbase.topic.views import router as topic_router
+from farmbase.topic.views import subscription_router
 
 api_router = APIRouter()
 
@@ -41,6 +43,8 @@ authenticated_organization_api_router.include_router(note_router, prefix="/notes
 authenticated_api_router.include_router(commodity_router, prefix="/commodities", tags=["commodities"])
 authenticated_api_router.include_router(market_router, prefix="/markets", tags=["markets"])
 authenticated_api_router.include_router(price_router, prefix="/market_prices", tags=["market_prices"])
+authenticated_api_router.include_router(topic_router, prefix="/topics", tags=["topics"])
+authenticated_api_router.include_router(subscription_router, prefix="/subscriptions", tags=["subscriptions"])
 
 
 @api_router.get("/healthcheck", include_in_schema=False)

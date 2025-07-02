@@ -29,6 +29,7 @@ from .market.models import Market, MarketPrice
 from .organization.models import Organization
 from .plugin.models import Plugin, PluginEvent, PluginInstance
 from .products.models import Manufacturer, Product
+from .topic.models import Subscription, Topic
 
 try:
     VERSION = __import__("pkg_resources").get_distribution("farmbase").version
@@ -143,4 +144,6 @@ __all__ = [
     "CropCycle",
     "CropCycleStage",
     "RunResult",
+    "Topic",
+    "Subscription",
 ]
