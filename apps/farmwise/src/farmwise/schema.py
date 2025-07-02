@@ -28,7 +28,7 @@ class SessionState(BaseModel):
 class UserInput(BaseModel):
     """Basic user input for the agent."""
 
-    message: str | None = Field(
+    text: str | None = Field(
         description="User input to the agent.",
         default=None,
         examples=["What is the weather in Tokyo?"],

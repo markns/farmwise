@@ -55,7 +55,7 @@ async def location_handler(_: WhatsApp, msg: types.Message):
     await msg.indicate_typing()
 
     user_input = UserInput(
-        message=f"My location is {msg.location}",
+        text=f"My location is {msg.location}",
     )
 
     response = await farmwise.invoke(user_input)
@@ -87,7 +87,7 @@ async def message_handler(_: WhatsApp, msg: types.Message):
     await record_inbound_message(contact, msg)
     await msg.indicate_typing()
 
-    user_input = UserInput(message=msg.text)
+    user_input = UserInput(text=msg.text)
 
     response_events = farmwise.invoke(context, user_input)
     async for event in response_events:
@@ -112,7 +112,7 @@ async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
     await record_callback_selection(contact, sel)
     await sel.indicate_typing()
 
-    user_input = UserInput(message=sel.data)
+    user_input = UserInput(text=sel.data)
 
     response_events = farmwise.invoke(context, user_input)
     async for event in response_events:
@@ -137,7 +137,7 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
     await record_callback_button(contact, btn)
     await btn.indicate_typing()
 
-    user_input = UserInput(message=btn.data)
+    user_input = UserInput(text=btn.data)
 
     response_events = farmwise.invoke(context, user_input)
     async for event in response_events:
@@ -186,7 +186,7 @@ async def image_handler(_: WhatsApp, msg: types.Message):
     await record_inbound_message(contact, msg, storage={"blob": blob_name, "url": url})
 
     await msg.indicate_typing()
-    user_input = UserInput(message=msg.caption, image=url)
+    user_input = UserInput(text=msg.caption, image=url)
 
     response_events = farmwise.invoke(context, user_input)
     async for event in response_events:

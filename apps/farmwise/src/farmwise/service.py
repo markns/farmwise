@@ -138,12 +138,13 @@ class FarmwiseService:
             agent = agents[DEFAULT_AGENT]
 
         content = []
-        if user_input.message:
-            content.append(ResponseInputTextParam(text=user_input.message, type="input_text"))
+        if user_input.text:
+            content.append(ResponseInputTextParam(text=user_input.text, type="input_text"))
         if user_input.image:
             content.extend(
                 [
                     ResponseInputImageParam(detail="auto", image_url=user_input.image, type="input_image"),
+                    # TODO: is this still necessary?
                     ResponseInputTextParam(text=f"image_path={user_input.image}", type="input_text"),
                 ]
             )
@@ -177,12 +178,12 @@ class FarmwiseService:
             context, SessionState(last_agent=result.last_agent.name, previous_response_id=result.last_response_id)
         )
 
-        if user_input.message:
+        if user_input.text:
             text_response: TextResponse = result.final_output_as(TextResponse)
             await add_memory(
                 contact,
                 messages=[
-                    Message(role="user", content=user_input.message),
+                    Message(role="user", content=user_input.text),
                     Message(role="assistant", content=text_response.content),
                 ],
             )
@@ -195,7 +196,7 @@ class FarmwiseService:
             body=RunResultCreate(
                 created_at=datetime.now(UTC),
                 contact_id=contact.id,
-                input=user_input.message,
+                input=user_input.text,
                 final_output=result.final_output,
                 last_agent=AgentCreate(name=result.last_agent.name),
                 trace_id=trace_id,
