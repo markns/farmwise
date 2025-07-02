@@ -50,9 +50,13 @@ class Contact(Base):
     harvest_loads_involved: Mapped[list["HarvestLoad"]] = relationship(back_populates="person_involved_contact")
 
     farms = association_proxy("farm_associations", "farm")
-    consents: Mapped[list["ContactConsent"]] = relationship(
-        back_populates="contact", cascade="all, delete-orphan"
-    )
+    consents: Mapped[list["ContactConsent"]] = relationship(back_populates="contact", cascade="all, delete-orphan")
+
+    # This relationship uses the Subscription association object
+    subscriptions: Mapped[list["Subscription"]] = relationship(back_populates="contact", cascade="all, delete-orphan")
+
+    # This proxy provides convenient, direct access to the Topic objects
+    subscribed_topics = association_proxy("subscriptions", "topic")
 
     def __repr__(self):
         return f"<Contact(id={self.id}, name='{self.name}')>"
@@ -69,5 +73,3 @@ class ContactConsent(Base):
     consent_version: Mapped[str] = mapped_column(String(length=50), nullable=False)
 
     contact: Mapped["Contact"] = relationship(back_populates="consents")
-
-
