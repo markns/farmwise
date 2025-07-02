@@ -5,11 +5,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
 from farmbase.enums import ProductCategory
-from farmbase.models import FarmbaseBase, Pagination, PrimaryKey, TimeStampMixin
+from farmbase.models import FarmbaseBase, Pagination, PrimaryKey
 
 
 # TODO: add
-class Manufacturer(Base, TimeStampMixin):
+class Manufacturer(Base):
     """Manufacturer of agricultural products."""
 
     __tablename__ = "manufacturer"
@@ -17,7 +17,7 @@ class Manufacturer(Base, TimeStampMixin):
     name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
 
 
-class Product(Base, TimeStampMixin):
+class Product(Base):
     """An agricultural product, e.g., fungicide, insecticide, herbicide."""
 
     __tablename__ = "product"

@@ -13,7 +13,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.contact.models import Contact
 from farmbase.database.core import Base
-from farmbase.models import TimeStampMixin
 
 
 # --------------------------------------------------------------------------- #
@@ -44,7 +43,7 @@ class AgentRead(AgentBase):
     id: int
 
 
-class RunResult(Base, TimeStampMixin):
+class RunResult(Base):
     __tablename__ = "run_result"
     id: Mapped[int] = mapped_column(primary_key=True)
     contact_id: Mapped[int] = mapped_column(ForeignKey("contact.id"))

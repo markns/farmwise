@@ -18,7 +18,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
 from farmbase.enums import FarmbaseEnum
-from farmbase.models import TimeStampMixin
 
 # ————————————————————————————————————————
 # Enums
@@ -156,7 +155,7 @@ pathogen_stage_association = Table(
 # ————————————————————————————————————————
 
 
-class Crop(Base, TimeStampMixin):
+class Crop(Base):
     """Crop cultivation parameters from"""
 
     __tablename__ = "crop"
@@ -193,7 +192,7 @@ class Crop(Base, TimeStampMixin):
         return f"<Crop(host_id='{self.host_id}', cultivation_type='{self.cultivation_type}')>"
 
 
-class Pathogen(Base, TimeStampMixin):
+class Pathogen(Base):
     """Plant pathogen information from"""
 
     __tablename__ = "pathogen"
@@ -234,7 +233,7 @@ class Pathogen(Base, TimeStampMixin):
         return f"<Pathogen(id={self.id}, name='{self.name}', class='{self.pathogen_class}')>"
 
 
-class PathogenImage(Base, TimeStampMixin):
+class PathogenImage(Base):
     """Pathogen image metadata"""
 
     __tablename__ = "pathogen_image"
@@ -257,7 +256,7 @@ class PathogenImage(Base, TimeStampMixin):
         return f"<PathogenImage(id={self.id}, file_name='{self.file_name}')>"
 
 
-class Event(Base, TimeStampMixin):
+class Event(Base):
     """Agricultural events and advice from"""
 
     __tablename__ = "event"
@@ -301,7 +300,7 @@ class Event(Base, TimeStampMixin):
         return f"<Event(id='{self.id}', title='{self.title[:30]}...')>"
 
 
-class CropCycle(Base, TimeStampMixin):
+class CropCycle(Base):
     """Crop cycle definition with stages"""
 
     __tablename__ = "crop_cycle"
@@ -322,7 +321,7 @@ class CropCycle(Base, TimeStampMixin):
         return f"<CropCycle(id={self.id}, crop_id='{self.crop_id}', koppen='{self.koppen_climate_classification}')>"
 
 
-class CropCycleStage(Base, TimeStampMixin):
+class CropCycleStage(Base):
     """Individual stages within a crop cycle"""
 
     __tablename__ = "crop_cycle_stage"
@@ -343,7 +342,7 @@ class CropCycleStage(Base, TimeStampMixin):
         return f"<CropCycleStage(id={self.id}, name='{self.name}', duration={self.duration})>"
 
 
-class CropCycleEvent(Base, TimeStampMixin):
+class CropCycleEvent(Base):
     """Events associated with crop cycles"""
 
     __tablename__ = "crop_cycle_event"

@@ -23,10 +23,10 @@ from farmbase.enums import FarmContactRole
 from farmbase.farm.field.models import Field, FieldGroup
 from farmbase.farm.harvest.models import StorageLocation
 from farmbase.farm.note.models import Note
-from farmbase.models import FarmbaseBase, Location, Pagination, PrimaryKey, TimeStampMixin
+from farmbase.models import FarmbaseBase, Location, Pagination, PrimaryKey
 
 
-class Farm(Base, TimeStampMixin):
+class Farm(Base):
     __tablename__ = "farm"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     farm_name: Mapped[str] = mapped_column(String(255), nullable=False)

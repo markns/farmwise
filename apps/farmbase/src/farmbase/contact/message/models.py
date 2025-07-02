@@ -11,7 +11,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from farmbase.contact.models import Contact
 from farmbase.database.core import Base
 from farmbase.enums import FarmbaseEnum
-from farmbase.models import TimeStampMixin
 
 
 class MessageDirection(FarmbaseEnum):
@@ -40,7 +39,7 @@ class MessageType(str, Enum):
     REQUEST_WELCOME = "request_welcome"
 
 
-class Message(Base, TimeStampMixin):
+class Message(Base):
     __tablename__ = "message"
 
     id: Mapped[int] = mapped_column(primary_key=True)

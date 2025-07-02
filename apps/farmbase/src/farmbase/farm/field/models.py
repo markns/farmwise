@@ -46,10 +46,6 @@ class Field(Base):
     )
     total_physical_acres: Mapped[Optional[float]] = mapped_column(DECIMAL(10, 2), nullable=True)
     added_on_platform_id: Mapped[int] = mapped_column(ForeignKey(Platform.id), nullable=False)
-    date_created: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
-    last_modified: Mapped[datetime.datetime] = mapped_column(
-        DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
-    )
 
     # Relationships
     farm: Mapped["Farm"] = relationship(back_populates="fields")

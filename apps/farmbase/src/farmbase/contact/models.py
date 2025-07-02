@@ -16,14 +16,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from farmbase.database.core import Base
 from farmbase.enums import ContactRole, Gender
-from farmbase.models import TimeStampMixin
 from farmbase.organization.models import Organization
 
 # TODO: use this pattern to add other contact types. eg. farmers
 # https://docs.sqlalchemy.org/en/20/orm/queryguide/_inheritance_setup.html
 
 
-class Contact(Base, TimeStampMixin):
+class Contact(Base):
     __tablename__ = "contact"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -59,7 +58,7 @@ class Contact(Base, TimeStampMixin):
         return f"<Contact(id={self.id}, name='{self.name}')>"
 
 
-class ContactConsent(Base, TimeStampMixin):
+class ContactConsent(Base):
     __tablename__ = "contact_consents"
 
     id: Mapped[int] = mapped_column(primary_key=True)

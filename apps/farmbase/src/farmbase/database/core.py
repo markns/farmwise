@@ -17,6 +17,7 @@ from starlette.requests import Request
 
 from farmbase.config import settings
 from farmbase.database.logging import SessionTracker
+from farmbase.models import TimeStampMixin
 
 
 def create_db_engine(async_: bool = True, echo: bool = False):
@@ -166,8 +167,8 @@ class ReprMixin:
         return f"<{self.__class__.__name__} {id_str}{attrs}>"
 
 
-class Base(ReprMixin, DeclarativeBase):
-    """Project-wide declarative base (inherits mixin behaviour)."""
+class Base(ReprMixin, DeclarativeBase, TimeStampMixin):
+    """Project-wide declarative base with universal audit timestamps."""
 
 
 def get_db(request: Request) -> AsyncSession:

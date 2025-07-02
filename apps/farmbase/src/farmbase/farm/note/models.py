@@ -19,13 +19,13 @@ from farmbase.contact.models import Contact
 from farmbase.database.core import Base
 from farmbase.farm.field.models import Field
 from farmbase.farm.planting.models import Planting
-from farmbase.models import FarmbaseBase, Location, Pagination, PrimaryKey, TimeStampMixin
+from farmbase.models import FarmbaseBase, Location, Pagination, PrimaryKey
 
 if TYPE_CHECKING:
     from farmbase.farm.models import Farm
 
 
-class Note(Base, TimeStampMixin):
+class Note(Base):
     __tablename__ = "note"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     farm_id: Mapped[int] = mapped_column(ForeignKey("farm.id"), nullable=False)
