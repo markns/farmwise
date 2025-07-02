@@ -14,7 +14,7 @@ with workflow.unsafe.imports_passed_through():
 
 
 @workflow.defn
-class FarmAlertWorkflow:
+class PestAlertWorkflow:
     @workflow.run
     async def run(self) -> str:
         """

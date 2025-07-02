@@ -1,7 +1,5 @@
 from temporalio import workflow
 
-# MONEY_TRANSFER_TASK_QUEUE_NAME = "TRANSFER_MONEY_TASK_QUEUE"
-DEFAULT_TASK_QUEUE = "DEFAULT_TASK_QUEUE"
 
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use

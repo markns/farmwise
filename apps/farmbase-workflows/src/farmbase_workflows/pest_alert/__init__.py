@@ -1,0 +1,1 @@
+TASK_QUEUE = "pest-alert-task-queue"

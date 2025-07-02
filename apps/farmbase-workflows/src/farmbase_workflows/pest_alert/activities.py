@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 from temporalio import activity
 
 from ..whatsapp.shared import SimpleContact
-from .shared import AlertDetails, AlertMessage, FarmWithContacts
+from .schema import AlertDetails, AlertMessage, FarmWithContacts
 
 
 class AlertActivities:

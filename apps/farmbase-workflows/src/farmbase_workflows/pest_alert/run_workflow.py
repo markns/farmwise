@@ -3,9 +3,10 @@ import traceback
 
 from temporalio import workflow
 from temporalio.client import Client, WorkflowFailureError
+from temporalio.service import TLSConfig
 
-from farmbase_workflows.alert.workflows import FarmAlertWorkflow
-from farmbase_workflows.weather.shared import DEFAULT_TASK_QUEUE
+from farmbase_workflows.pest_alert.workflows import PestAlertWorkflow
+from farmbase_workflows.pest_alert import TASK_QUEUE
 
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use
@@ -15,12 +16,14 @@ with workflow.unsafe.imports_passed_through():
 
 async def main() -> None:
     # Create client connected to server at the given address
-    client: Client = await Client.connect("localhost:7233", data_converter=pydantic_data_converter)
+    client: Client = await Client.connect(
+        "temporal.farmwise.app:7233", tls=TLSConfig(), data_converter=pydantic_data_converter
+    )
     try:
         result = await client.execute_workflow(
-            FarmAlertWorkflow.run,
+            PestAlertWorkflow.run,
             id="farm-alert-workflow-id",
-            task_queue=DEFAULT_TASK_QUEUE,
+            task_queue=TASK_QUEUE,
         )
 
         print(f"Result: {result}")

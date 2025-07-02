@@ -1,7 +1,5 @@
 from temporalio import workflow
 
-CROP_CYCLE_TASK_QUEUE = "CROP_CYCLE_TASK_QUEUE"
-
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use
 with workflow.unsafe.imports_passed_through():

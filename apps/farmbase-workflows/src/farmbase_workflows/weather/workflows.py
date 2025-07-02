@@ -6,16 +6,11 @@ from temporalio.common import RetryPolicy
 from farmbase_workflows.weather.activities import WeatherActivities
 from farmbase_workflows.whatsapp.activities import WhatsAppActivities
 
-# Always pass through external modules to the sandbox that you know are safe for
-# workflow use
-with workflow.unsafe.imports_passed_through():
-    pass
-
 
 @workflow.defn
 class SendWeatherWorkflow:
     @workflow.run
-    async def run(self) -> str:
+    async def run(self):
         retry_policy = RetryPolicy(
             maximum_attempts=1,
             maximum_interval=timedelta(seconds=2),

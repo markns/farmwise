@@ -3,8 +3,9 @@ from python_weather.forecast import Forecast
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from temporalio import activity
 
+
 from ..whatsapp.shared import SimpleContact
-from .shared import ForecastDetails, ForecastSummary
+from .schema import ForecastDetails, ForecastSummary
 
 
 class WeatherActivities:
@@ -39,8 +40,9 @@ class WeatherActivities:
     @activity.defn
     async def summarize_forecast(self, forecast: ForecastDetails) -> ForecastSummary:
         from openai import OpenAI
+        from ..settings import settings
 
-        client = OpenAI()
+        client = OpenAI(api_key=settings.OPENAI_API_KEY.get_secret_value())
 
         input_ = f"""
     Summarise the weather forecast for the next 3 days using the details below.

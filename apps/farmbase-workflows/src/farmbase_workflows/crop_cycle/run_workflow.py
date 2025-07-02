@@ -8,8 +8,9 @@ from dotenv import find_dotenv, load_dotenv
 from temporalio import workflow
 from temporalio.client import Client
 
-from farmbase_workflows.cropcycle.shared import CROP_CYCLE_TASK_QUEUE, CropCycleEvent
-from farmbase_workflows.cropcycle.workflows import CropCycleWorkflow
+from farmbase_workflows import crop_cycle
+from farmbase_workflows.crop_cycle.schema import CropCycleEvent
+from farmbase_workflows.crop_cycle.workflows import CropCycleWorkflow
 from farmbase_workflows.whatsapp.shared import SimpleContact
 
 # Always pass through external modules to the sandbox that you know are safe for
@@ -38,7 +39,7 @@ async def run_crop_cycle_workflow(
         CropCycleWorkflow.run,
         args=[contact, planting_date, events, demo],
         id=workflow_id,
-        task_queue=CROP_CYCLE_TASK_QUEUE,
+        task_queue=crop_cycle.TASK_QUEUE,
     )
 
     return result
