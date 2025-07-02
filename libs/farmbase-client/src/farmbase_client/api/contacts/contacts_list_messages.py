@@ -8,7 +8,7 @@ from ...client import AuthenticatedClient, Client
 from ...types import Response, UNSET
 from ... import errors
 
-from ...models import MessageRead
+from ...models import MessageSummary
 from ...models import MessageType
 from fastapi.exceptions import RequestValidationError
 from ...types import UNSET, Unset
@@ -56,12 +56,12 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[RequestValidationError, list["MessageRead"]]]:
+) -> Optional[Union[RequestValidationError, list["MessageSummary"]]]:
     if response.status_code == 200:
         response_200 = []
         _response_200 = response.json()
         for response_200_item_data in _response_200:
-            response_200_item = MessageRead.model_validate(response_200_item_data)
+            response_200_item = MessageSummary.model_validate(response_200_item_data)
 
             response_200.append(response_200_item)
 
@@ -78,7 +78,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[RequestValidationError, list["MessageRead"]]]:
+) -> Response[Union[RequestValidationError, list["MessageSummary"]]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -95,10 +95,10 @@ def sync_detailed(
     message_type: Union[MessageType, None, Unset] = UNSET,
     limit: Union[Unset, int] = 100,
     offset: Union[Unset, int] = 0,
-) -> Response[Union[RequestValidationError, list["MessageRead"]]]:
+) -> Response[Union[RequestValidationError, list["MessageSummary"]]]:
     """List Messages
 
-     List messages for a contact.
+     List message summaries for a contact.
 
     Args:
         organization (str):
@@ -112,7 +112,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[RequestValidationError, list['MessageRead']]]
+        Response[Union[RequestValidationError, list['MessageSummary']]]
     """
 
     kwargs = _get_kwargs(
@@ -138,10 +138,10 @@ def sync(
     message_type: Union[MessageType, None, Unset] = UNSET,
     limit: Union[Unset, int] = 100,
     offset: Union[Unset, int] = 0,
-) -> Optional[Union[RequestValidationError, list["MessageRead"]]]:
+) -> Optional[Union[RequestValidationError, list["MessageSummary"]]]:
     """List Messages
 
-     List messages for a contact.
+     List message summaries for a contact.
 
     Args:
         organization (str):
@@ -155,7 +155,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[RequestValidationError, list['MessageRead']]
+        Union[RequestValidationError, list['MessageSummary']]
     """
 
     return sync_detailed(
@@ -176,10 +176,10 @@ async def asyncio_detailed(
     message_type: Union[MessageType, None, Unset] = UNSET,
     limit: Union[Unset, int] = 100,
     offset: Union[Unset, int] = 0,
-) -> Response[Union[RequestValidationError, list["MessageRead"]]]:
+) -> Response[Union[RequestValidationError, list["MessageSummary"]]]:
     """List Messages
 
-     List messages for a contact.
+     List message summaries for a contact.
 
     Args:
         organization (str):
@@ -193,7 +193,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[RequestValidationError, list['MessageRead']]]
+        Response[Union[RequestValidationError, list['MessageSummary']]]
     """
 
     kwargs = _get_kwargs(
@@ -217,10 +217,10 @@ async def asyncio(
     message_type: Union[MessageType, None, Unset] = UNSET,
     limit: Union[Unset, int] = 100,
     offset: Union[Unset, int] = 0,
-) -> Optional[Union[RequestValidationError, list["MessageRead"]]]:
+) -> Optional[Union[RequestValidationError, list["MessageSummary"]]]:
     """List Messages
 
-     List messages for a contact.
+     List message summaries for a contact.
 
     Args:
         organization (str):
@@ -234,7 +234,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[RequestValidationError, list['MessageRead']]
+        Union[RequestValidationError, list['MessageSummary']]
     """
 
     return (
