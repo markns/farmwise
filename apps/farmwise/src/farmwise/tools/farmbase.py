@@ -1,5 +1,9 @@
+from typing import Any, Coroutine
+
 from agents import RunContextWrapper, function_tool
-from farmbase_client.api.contacts import contacts_patch_contact
+from fastapi.exceptions import RequestValidationError
+
+from farmbase_client.api.contacts import contacts_patch_contact, contacts_create_contact_consent
 from farmbase_client.api.farms import farms_create_farm
 from farmbase_client.api.markets import markets_get_market_snapshot_endpoint, markets_get_markets
 from farmbase_client.api.notes import notes_create_note
@@ -11,7 +15,7 @@ from farmbase_client.models import (
     MarketPagination,
     MarketSnapshotRead,
     NoteCreate,
-    NoteRead,
+    NoteRead, ContactConsentCreate, ContactConsentRead,
 )
 
 from farmwise.context import UserContext
@@ -27,15 +31,31 @@ if the user mentions them in a message.
 """
 )
 async def update_contact(wrapper: RunContextWrapper[UserContext], contact_in: ContactPatch) -> ContactRead:
-    context = wrapper.context
+    contact = wrapper.context.contact
     result = await contacts_patch_contact.asyncio(
         client=farmbase_api_client,
-        organization=context.contact.organization.slug,
-        contact_id=context.contact.id,
+        organization=contact.organization.slug,
+        contact_id=contact.id,
         body=contact_in,
     )
     return result
 
+@function_tool
+async def data_collection_consent(wrapper: RunContextWrapper[UserContext]) -> ContactConsentRead:
+    """
+    Record the contact's consent for collecting data
+    """
+    contact = wrapper.context.contact
+    return await contacts_create_contact_consent.asyncio(
+        client=farmbase_api_client,
+        organization=contact.organization.slug,
+        contact_id=contact.id,
+        body= ContactConsentCreate(
+            consent_type="data_collection",
+            consent_given=True,
+            consent_version="v1"
+        )
+    )
 
 @function_tool(
     description_override="""

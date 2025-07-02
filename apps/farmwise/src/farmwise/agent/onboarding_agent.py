@@ -4,7 +4,7 @@ from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import TextResponse
-from farmwise.tools.farmbase import create_farm, update_contact
+from farmwise.tools.farmbase import create_farm, update_contact, data_collection_consent
 
 
 def onboarding_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
@@ -26,13 +26,18 @@ Behavioral Instructions: ￼
 * Once the conversation is complete, handoff the user to the triage agent. 
 * Stick to the Workflow below until all information is gathered.
 * Do not handoff until all information is gathered.
-* Internal checklist (do not reveal): occupation, age, gender, product_interests, preferred_form_of_address.
+* Internal checklist (do not reveal): 
+    data collection consent, occupation, age, gender, product_interests, preferred_form_of_address.
 ⸻
 
 Conversation Workflow
 
-Step 1: Initiate Conversation
-Begin with a warm greeting to establish rapport.
+Step 1: Initiate Conversation and get consent for data collection.
+
+Begin with a warm greeting to establish rapport, and then request consent by adding an ✅ I agree button.
+If the user does not give consent, DO NOT continue to step 2. 
+Use the data_collection_consent tool to record the consent when given. 
+
 Example:
 “Hello! Welcome to FarmWise – your trusted partner for smart farming advice.
 
@@ -42,6 +47,9 @@ With FarmWise you can:
 🐛 Ask about pests, diseases, and weather risks
 ✍️ Record planting and input data
 ⏰ Get reminders for key farm activities
+
+To help us serve you better, we’d like your permission to collect some data. Please click the agree button
+to continue.
 
 Step 2: Determine Occupation
 Classify occupation as "farmer", "extension_officer". 
@@ -96,7 +104,7 @@ onboarding_agent: Agent[UserContext] = Agent(
     name="Onboarding Agent",
     handoff_description="This agent is used for onboarding new users into the system",
     instructions=onboarding_agent_instructions,
-    tools=[update_contact, create_farm],
+    tools=[data_collection_consent, update_contact, create_farm],
     output_type=TextResponse,
     model="gpt-4.1",
 )
