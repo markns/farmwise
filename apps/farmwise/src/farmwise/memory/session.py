@@ -8,7 +8,7 @@ redis = Redis(url=settings.UPSTASH_REDIS_REST_URL, token=settings.UPSTASH_REDIS_
 
 
 def get_state_key(context: UserContext):
-    return f"session:{context.contact.organization.slug}:{context.contact.phone_number}"
+    return f"{settings.ENV}:session:{context.contact.organization.slug}:{context.contact.phone_number}"
 
 
 async def get_session_state(context: UserContext) -> SessionState | None:

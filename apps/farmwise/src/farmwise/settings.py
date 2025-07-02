@@ -23,6 +23,7 @@ class Settings(BaseSettings):
         extra="ignore",
         validate_default=False,
     )
+    ENV: str = "DEV"
     MODE: str | None = None
     HOST: str = "0.0.0.0"
     PORT: int = 8000
