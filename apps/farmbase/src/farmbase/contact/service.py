@@ -7,7 +7,8 @@ from sqlalchemy.orm import selectinload
 
 from ..farm.models import Farm, FarmContact
 from ..organization.models import Organization
-from .models import Contact, ContactCreate, ContactPatch, ContactRead
+from .models import Contact, ContactConsent
+from .schemas import ContactConsentCreate, ContactCreate, ContactPatch, ContactRead
 
 
 async def get(*, db_session: AsyncSession, contact_id: int) -> Contact | None:
@@ -16,10 +17,11 @@ async def get(*, db_session: AsyncSession, contact_id: int) -> Contact | None:
         select(Contact)
         .options(
             selectinload(Contact.farm_associations).selectinload(FarmContact.farm),
+            selectinload(Contact.organization),
         )
         .where(Contact.id == contact_id)
     )
-    return result.scalar_one()
+    return result.scalar_one_or_none()
 
 
 async def get_by_name(*, db_session: AsyncSession, name: str) -> Optional[Contact]:
@@ -34,7 +36,6 @@ async def get_by_phone_number(*, db_session: AsyncSession, phone_number: str) ->
         select(Contact)
         .options(
             selectinload(Contact.farm_associations).selectinload(FarmContact.farm),
-            # TODO: don't know why this selectinload is required, whereas for get it's not.
             selectinload(Contact.organization),
         )
         .where(Contact.phone_number == phone_number)
@@ -119,3 +120,16 @@ async def delete(*, db_session: AsyncSession, contact_id: int) -> None:
     if contact:
         await db_session.delete(contact)
         await db_session.commit()
+
+
+async def create_consent(
+    *, db_session: AsyncSession, contact_id: int, consent_in: ContactConsentCreate
+) -> ContactConsent:
+    """Creates a consent record for a contact."""
+    consent = ContactConsent(contact_id=contact_id, **consent_in.model_dump())
+
+    db_session.add(consent)
+    await db_session.commit()
+    await db_session.refresh(consent)
+
+    return consent

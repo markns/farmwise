@@ -23,7 +23,6 @@ from sqlalchemy_utils.types.ltree import LtreeType
 
 from farmbase.database.core import Base
 from farmbase.enums import FarmbaseEnum
-from farmbase.models import TimeStampMixin
 
 # ————————————————————————————————————————
 # Enums
@@ -42,7 +41,7 @@ class ListingStatus(FarmbaseEnum):
 # ————————————————————————————————————————
 
 
-class Category(Base, TimeStampMixin):
+class Category(Base):
     __tablename__ = "category"
     __table_args__ = {"schema": "farmbase_core"}
 
@@ -68,7 +67,7 @@ class Category(Base, TimeStampMixin):
 # ————————————————————————————————————————
 
 
-class Listing(Base, TimeStampMixin):
+class Listing(Base):
     __tablename__ = "listing"
     __table_args__ = {"schema": "farmbase_core"}
 
@@ -149,7 +148,7 @@ class ListingImage(Base):
 # ————————————————————————————————————————
 
 
-class Report(Base, TimeStampMixin):
+class Report(Base):
     __tablename__ = "report"
     __table_args__ = {"schema": "farmbase_core"}
 

@@ -1,8 +1,9 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
-from farmwise.dependencies import UserContext
-from farmwise.schema import WhatsAppResponse
+from farmwise.agent.prompt_utils import get_profile_and_memories
+from farmwise.context import UserContext
+from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import update_contact
 
 
@@ -23,9 +24,7 @@ When all required details for a field are confirmed, call the tool create_field 
 below, then ask whether the user has another field.
 After the last field is stored, send the single line ##FARM_REGISTRATION_COMPLETE## and stop replying.
 
-These are the details of the current user: {ctx.context}
-
-
+{get_profile_and_memories(ctx.context)}
 """
 
 
@@ -34,6 +33,6 @@ farm_registration_agent: Agent[UserContext] = Agent(
     handoff_description="This agent is used for registering a field in the system",
     instructions=farm_registration_agent_instructions,
     tools=[update_contact],
-    output_type=WhatsAppResponse,
+    output_type=TextResponse,
     model="gpt-4.1",
 )

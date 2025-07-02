@@ -23,6 +23,7 @@ import {
   Agriculture as FarmerIcon,
   School as ExtensionOfficerIcon,
   Person as PersonIcon,
+  Psychology as MemoryIcon,
 } from '@mui/icons-material'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useContactStore, type Contact } from '@/stores/contactStore'
@@ -42,6 +43,7 @@ const TableInstance: React.FC = () => {
     chatShow,
     removeShow,
     filterShow,
+    memoriesShow,
     updateInstanceTableOptions,
   } = useContactStore()
 
@@ -132,6 +134,10 @@ const TableInstance: React.FC = () => {
 
   const handleDelete = (contact: Contact) => {
     removeShow(contact)
+  }
+
+  const handleMemories = (contact: Contact) => {
+    memoriesShow(contact)
   }
 
   const renderContactCell = (params: GridRenderCellParams) => {
@@ -365,7 +371,7 @@ const TableInstance: React.FC = () => {
       field: 'actions',
       type: 'actions',
       headerName: '',
-      width: 120,
+      width: 150,
       getActions: (params) => [
         <GridActionsCellItem
           key="edit"
@@ -387,6 +393,17 @@ const TableInstance: React.FC = () => {
           }
           label="View Chat"
           onClick={() => handleChat(params.row)}
+          color="primary"
+        />,
+        <GridActionsCellItem
+          key="memories"
+          icon={
+            <Tooltip title="View Memories">
+              <MemoryIcon />
+            </Tooltip>
+          }
+          label="View Memories"
+          onClick={() => handleMemories(params.row)}
           color="primary"
         />,
         <GridActionsCellItem

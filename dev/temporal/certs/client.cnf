@@ -1,0 +1,20 @@
+[req]
+default_bits       = 2048
+prompt             = no
+default_md         = sha256
+req_extensions     = req_ext
+distinguished_name = dn
+
+[dn]
+C  = KE
+ST = Kenya
+L  = Nairobi
+O  = Farmwise
+OU = IT
+CN = farmwise-client
+
+[req_ext]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = farmwise-client

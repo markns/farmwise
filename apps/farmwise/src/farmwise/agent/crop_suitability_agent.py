@@ -1,8 +1,9 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
-from farmwise.dependencies import UserContext
-from farmwise.schema import WhatsAppResponse
+from farmwise.agent.prompt_utils import get_profile_and_memories
+from farmwise.context import UserContext
+from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import update_contact
 from farmwise.tools.tools import suitability_index
 
@@ -22,7 +23,7 @@ location
 If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the
  triage agent.
 
-These are the details of the current user: {ctx.context}
+{get_profile_and_memories(ctx.context)}
 """
 
 
@@ -31,6 +32,6 @@ crop_suitability_agent: Agent[UserContext] = Agent(
     handoff_description="A helpful agent that can answer questions about crop suitability.",
     instructions=crop_suitability_agent_instructions,
     tools=[suitability_index, update_contact],
-    output_type=WhatsAppResponse,
+    output_type=TextResponse,
     model="gpt-4.1",
 )

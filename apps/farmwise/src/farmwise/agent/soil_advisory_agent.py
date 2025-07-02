@@ -1,8 +1,9 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
-from farmwise.dependencies import UserContext
-from farmwise.schema import WhatsAppResponse
+from farmwise.agent.prompt_utils import get_profile_and_memories
+from farmwise.context import UserContext
+from farmwise.schema import TextResponse
 from farmwise.tools.tools import soil_properties
 
 
@@ -74,7 +75,7 @@ The advisory session is complete when the farmer:
 Finish with: “Happy farming! 🌱 Feel free to ask any time.” 
 and give an option to return to the main menu which should handoff to the triage agent 
 
-These are the details of the current user: {ctx.context}
+{get_profile_and_memories(ctx.context)}
 """
 
 
@@ -83,6 +84,6 @@ soil_advisor_agent: Agent[UserContext] = Agent(
     handoff_description="An agent that can advises on soil management for farmers",
     instructions=soil_advisory_instructions,
     tools=[soil_properties],
-    output_type=WhatsAppResponse,
+    output_type=TextResponse,
     model="gpt-4.1",
 )

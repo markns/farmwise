@@ -5,9 +5,8 @@ from uuid import uuid1
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
+from fastapi_problem.handler import add_exception_handler, new_exception_handler
 from loguru import logger
-from slowapi import _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
 from sqlalchemy.ext.asyncio import async_scoped_session, async_sessionmaker
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
@@ -19,20 +18,11 @@ from .common.utils.cli import install_plugin_events, install_plugins
 from .config import settings
 from .database.core import engine, get_schema_names
 from .database.logging import SessionTracker
-from .exceptions.handlers import register_error_handlers
-from .rate_limiter import limiter
-
-
-async def not_found(request, exc):
-    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": [{"msg": "Not Found."}]})
-
-
-exception_handlers = {404: not_found}
 
 # we create the ASGI for the app
-app = FastAPI(exception_handlers=exception_handlers, openapi_url="")
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app = FastAPI(openapi_url="")
+# app.state.limiter = limiter
+# app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
@@ -53,6 +43,9 @@ api = FastAPI(
     generate_unique_id_function=custom_generate_unique_id,
     separate_input_output_schemas=False,
 )
+
+
+add_exception_handler(api, new_exception_handler(), logger=logger)
 api.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.add_middleware(
@@ -175,32 +168,6 @@ async def add_security_headers(request: Request, call_next):
     response.headers["Strict-Transport-Security"] = "max-age=31536000 ; includeSubDomains"
     return response
 
-
-# class ExceptionMiddleware(BaseHTTPMiddleware):
-#     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> StreamingResponse:
-#         try:
-#             response = await call_next(request)
-#         except ValidationError as e:
-#             logger.exception(e)
-#             response = JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content={"detail": e.errors()})
-#         except ValueError as e:
-#             logger.exception(e)
-#             response = JSONResponse(
-#                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-#                 content={"detail": [{"msg": "Unknown", "loc": ["Unknown"], "type": "Unknown"}]},
-#             )
-#         except Exception as e:
-#             logger.exception(e)
-#             response = JSONResponse(
-#                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#                 content={"detail": [{"msg": "Unknown", "loc": ["Unknown"], "type": "Unknown"}]},
-#             )
-#
-#         return response
-#
-#
-# api.add_middleware(ExceptionMiddleware)
-register_error_handlers(app=api)
 
 # we install all the plugins
 install_plugins()

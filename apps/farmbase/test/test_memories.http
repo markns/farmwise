@@ -1,0 +1,14 @@
+###
+POST http://localhost:8000/api/v1/default/contacts/1/memories/
+Content-Type: application/json
+X-Farmbase-Key: {{farmbaseKey}}
+
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "actually I grow the best kumquats in Kenya"
+    }
+  ]
+}
+

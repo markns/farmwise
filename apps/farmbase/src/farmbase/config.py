@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     FARMBASE_UI_URL: AnyHttpUrl = Field(default="http://localhost:8080")
     FARMBASE_ENCRYPTION_KEY: SecretStr
     FARMBASE_API_KEY: SecretStr
+    OPENAI_API_KEY: SecretStr
 
     # --- Security ---
     ALLOWED_ORIGINS: list[str] = Field(default=["http://localhost:8080", "http://127.0.0.1:8080"])
@@ -101,6 +102,8 @@ class Settings(BaseSettings):
             # This allows the app to still work if the variable is already
             # set in the environment before the app starts (e.g., in Docker).
             logger.debug("GAC path not defined in .env or settings. Relying on pre-existing environment.")
+
+        os.environ["MEM0_TELEMETRY"] = "disable"
 
 
 # Create a single instance of the settings to be imported by other modules

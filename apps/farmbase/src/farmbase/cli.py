@@ -4,7 +4,6 @@ import click
 
 from farmbase import __version__
 from farmbase.config import settings
-from farmbase.exceptions.exceptions import FarmBaseApiError
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
@@ -541,7 +540,7 @@ def entrypoint():
 
     try:
         farmbase_cli()
-    except FarmBaseApiError as e:
+    except Exception as e:
         click.secho(f"ERROR: {e}", bold=True, fg="red")
 
 

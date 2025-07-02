@@ -9,7 +9,9 @@ import {
   type ContactEngagement,
   type ContactFilter,
   type ChatState,
-  type ContactInstance
+  type ContactInstance,
+  type ContactMemory,
+  type MessageSummary
 } from '@/api/contact'
 import { type ApiClient } from '@/api/client'
 import { useNotificationStore } from './notificationStore'
@@ -42,6 +44,7 @@ interface ContactState {
     showHistory: boolean
     showChat: boolean
     showFilter: boolean
+    showMemories: boolean
   }
   table: {
     rows: TableRows
@@ -57,6 +60,8 @@ interface ContactState {
   filters: ContactFilter[]
   chatState: ChatState | null
   availableFilters: Record<string, string[]>
+  memories: ContactMemory[]
+  messages: MessageSummary[]
   
   // Actions
   getAll: () => void
@@ -76,6 +81,8 @@ interface ContactState {
   closeChat: () => void
   filterShow: () => void
   closeFilter: () => void
+  memoriesShow: (contact: Contact) => void
+  closeMemories: () => void
   
   // Table actions
   updateTableOptions: (options: Partial<TableOptions>) => void
@@ -92,6 +99,12 @@ interface ContactState {
   
   // Chat actions
   loadChatState: (contactId: string) => Promise<void>
+  
+  // Memory actions
+  loadMemories: (contactId: string) => Promise<void>
+  
+  // Message actions
+  loadMessages: (contactId: string) => Promise<void>
 }
 
 // Factory function to create contact store with authenticated API client
@@ -106,6 +119,7 @@ export const createContactStore = (apiClient: ApiClient) => {
     showHistory: false,
     showChat: false,
     showFilter: false,
+    showMemories: false,
   },
   table: {
     rows: {
@@ -141,6 +155,8 @@ export const createContactStore = (apiClient: ApiClient) => {
   filters: [],
   chatState: null,
   availableFilters: {},
+  memories: [],
+  messages: [],
 
   // Debounced getAll function
   getAll: debounce(async () => {
@@ -393,13 +409,14 @@ export const createContactStore = (apiClient: ApiClient) => {
       selected: contact,
       dialogs: { ...get().dialogs, showChat: true }
     })
-    get().loadChatState(contact.id)
+    get().loadMessages(contact.id)
   },
 
   closeChat: () => {
     set({ 
       selected: null,
       chatState: null,
+      messages: [],
       dialogs: { ...get().dialogs, showChat: false }
     })
   },
@@ -413,6 +430,22 @@ export const createContactStore = (apiClient: ApiClient) => {
   closeFilter: () => {
     set({ 
       dialogs: { ...get().dialogs, showFilter: false }
+    })
+  },
+
+  memoriesShow: (contact: Contact) => {
+    set({ 
+      selected: contact,
+      dialogs: { ...get().dialogs, showMemories: true }
+    })
+    get().loadMemories(contact.id)
+  },
+
+  closeMemories: () => {
+    set({ 
+      selected: null,
+      memories: [],
+      dialogs: { ...get().dialogs, showMemories: false }
     })
   },
 
@@ -524,6 +557,32 @@ export const createContactStore = (apiClient: ApiClient) => {
       })
     }
   },
+
+  loadMemories: async (contactId: string) => {
+    try {
+      const response = await contactApi.getMemories(contactId)
+      set({ memories: response.results })
+    } catch (error) {
+      const { addNotification } = useNotificationStore.getState()
+      addNotification({
+        text: 'Failed to load contact memories',
+        type: 'error',
+      })
+    }
+  },
+
+  loadMessages: async (contactId: string) => {
+    try {
+      const messages = await contactApi.getMessages(contactId, { limit: 100 })
+      set({ messages })
+    } catch (error) {
+      const { addNotification } = useNotificationStore.getState()
+      addNotification({
+        text: 'Failed to load contact messages',
+        type: 'error',
+      })
+    }
+  },
   }))
 }
 
@@ -576,5 +635,5 @@ export const useContactStore = () => {
 //   // ... component logic
 // }
 
-export type { Contact, ContactListOptions, ContactEngagement, ContactFilter, ChatState, ContactInstance }
+export type { Contact, ContactListOptions, ContactEngagement, ContactFilter, ChatState, ContactInstance, ContactMemory, MessageSummary }
 export default createContactStore

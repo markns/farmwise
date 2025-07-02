@@ -98,6 +98,30 @@ export interface ContactInstance {
   updated_at: string
 }
 
+export interface ContactMemory {
+  id: string
+  memory: string
+  hash: string
+  metadata: Record<string, any> | null
+  score: number | null
+  created_at: string
+  updated_at: string | null
+}
+
+export interface ContactMemoryListResponse {
+  results: ContactMemory[]
+}
+
+export interface MessageSummary {
+  id: string
+  timestamp: string
+  direction: 'inbound' | 'outbound'
+  type: 'text' | 'image' | 'video' | 'audio' | 'document' | 'sticker' | 'reaction' | 'location' | 'contacts' | 'order' | 'system' | 'unknown' | 'unsupported' | 'interactive' | 'button' | 'request_welcome'
+  text?: string
+  caption?: string
+  storage_url?: string
+}
+
 // Factory function to create contact API with authenticated client
 export const createContactApi = (client: ApiClient) => ({
   // Main contact operations
@@ -209,6 +233,22 @@ export const createContactApi = (client: ApiClient) => ({
   // Chat functionality
   async getChatState(contactId: string): Promise<ChatState> {
     const response = await client.get(`/chatstate?contact_id=${contactId}`)
+    return response.data
+  },
+
+  // Contact memories
+  async getMemories(contactId: string): Promise<ContactMemoryListResponse> {
+    const response = await client.get(`/contacts/${contactId}/memories/`)
+    return response.data
+  },
+
+  // Messages
+  async getMessages(contactId: string, options: { limit?: number; offset?: number } = {}): Promise<MessageSummary[]> {
+    const params = new URLSearchParams()
+    if (options.limit) params.append('limit', options.limit.toString())
+    if (options.offset) params.append('offset', options.offset.toString())
+    
+    const response = await client.get(`/contacts/${contactId}/messages?${params.toString()}`)
     return response.data
   },
 

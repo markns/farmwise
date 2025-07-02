@@ -1,92 +1,41 @@
-class FarmBaseApiError(Exception):
-    """base exception class"""
-
-    def __init__(self, message: str, name: str = "FarmBase"):
-        self.message = message
-        self.name = name
-        super().__init__(self.message, self.name)
+from fastapi_problem import error
 
 
-class FarmbasePluginError(FarmBaseApiError):
-    pass
-
-
-class ServiceError(FarmBaseApiError):
+# fastapi_problem.error.ServerProblem provides status 500 errors
+class ServiceError(error.ServerProblem):
     """failures in external services or APIs, like a database or a third-party service"""
 
     pass
 
 
-class EntityDoesNotExistError(FarmBaseApiError):
+# fastapi_problem.error.NotFoundProblem provides status 404 errors
+class EntityDoesNotExistError(error.NotFoundProblem):
     """database returns nothing"""
 
     pass
 
 
-class EntityAlreadyExistsError(FarmBaseApiError):
+# fastapi_problem.error.ConflictProblem provides status 409 errors
+class EntityAlreadyExistsError(error.ConflictProblem):
     """conflict detected, like trying to create a resource that already exists"""
 
     pass
 
 
-class InvalidOperationError(FarmBaseApiError):
-    """invalid operations like trying to delete a non-existing entity, etc."""
+#     "BadRequestProblem",
+#     "ForbiddenProblem", TODO:
+#     "RedirectProblem",
+#     "UnauthorisedProblem",
+#     "UnprocessableProblem",
 
-    pass
 
-
-class AuthenticationFailed(FarmBaseApiError):
+class AuthenticationFailed(error.UnauthorisedProblem):
     """invalid authentication credentials"""
 
     pass
 
 
-class InvalidTokenError(FarmBaseApiError):
+class InvalidTokenError(error.UnauthorisedProblem):
     """invalid token"""
 
     pass
-
-
-class InvalidInputError(Exception):
-    error_code = "INVALID_INPUT"
-    error_message = "Invalid input error"
-
-
-class NotFoundError(ValueError):
-    code = "not_found"
-    msg_template = "{msg}"
-
-
-class FieldNotFoundError(ValueError):
-    code = "not_found.field"
-    msg_template = "{msg}"
-
-
-class ModelNotFoundError(ValueError):
-    code = "not_found.model"
-    msg_template = "{msg}"
-
-
-class ExistsError(ValueError):
-    code = "exists"
-    msg_template = "{msg}"
-
-
-class InvalidConfigurationError(ValueError):
-    code = "invalid.configuration"
-    msg_template = "{msg}"
-
-
-class InvalidFilterError(ValueError):
-    code = "invalid.filter"
-    msg_template = "{msg}"
-
-
-class InvalidUsernameError(ValueError):
-    code = "invalid.username"
-    msg_template = "{msg}"
-
-
-class InvalidPasswordError(ValueError):
-    code = "invalid.password"
-    msg_template = "{msg}"

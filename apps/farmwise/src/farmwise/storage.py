@@ -31,16 +31,10 @@ def make_blob_public(bucket_name, blob_name):
     # It internally grants the "Storage Object Viewer" role to "allUsers".
     try:
         blob.make_public()
-
-        print(f"Success! Object '{blob_name}' in bucket '{bucket_name}' is now publicly readable.")
-        print("\nIts public URL is:")
-        print(blob.public_url)
         return blob.public_url
 
     except Exception as e:
-        print(f"An error occurred: {e}")
-        print("\nPlease ensure your bucket does not have Public Access Prevention enabled.")
-        print("You also need the 'Storage Object Admin' role on your account.")
+        logger.error(f"An error occurred: {e}")
 
 
 def generate_signed_url(

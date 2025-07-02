@@ -1,8 +1,9 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
-from farmwise.dependencies import UserContext
-from farmwise.schema import WhatsAppResponse
+from farmwise.agent.prompt_utils import get_profile_and_memories
+from farmwise.context import UserContext
+from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import create_note
 
 
@@ -59,7 +60,7 @@ Routine for Crop Pest and Disease Diagnosis Agent
     Summarise the diagnosis and advice and record for future reference using the create_note tool.
 11. Give an option to return to the main menu after logging the diagnosis, which transfers the user to the triage agent
 
-These are the details of the current user: {ctx.context}
+{get_profile_and_memories(ctx.context)}
 """
 
 
@@ -67,7 +68,7 @@ crop_pathogen_diagnosis_agent: Agent[UserContext] = Agent(
     name="Crop pathogen diagnosis agent",
     handoff_description="An agent that can identify crop pests and diseases from an image",
     instructions=crop_pathogen_diagnosis_agent_instructions,
-    output_type=WhatsAppResponse,
+    output_type=TextResponse,
     tools=[create_note],
     model="gpt-4.1",
 )

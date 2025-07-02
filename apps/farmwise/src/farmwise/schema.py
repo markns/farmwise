@@ -1,5 +1,4 @@
 import pathlib
-from datetime import UTC, datetime
 from enum import Enum
 from typing import Annotated, Any, Literal, NotRequired
 
@@ -21,29 +20,15 @@ class AgentInfo(BaseModel):
     )
 
 
-class ServiceMetadata(BaseModel):
-    """Metadata about the service including available agents and models."""
-
-    ...
-    agents: list[AgentInfo] = Field(
-        description="List of available agents.",
-    )
-    # models: list[AllModelEnum] = Field(
-    #     description="List of available LLMs.",
-    # )
-    default_agent: str = Field(
-        description="Default agent used when none is specified.",
-        examples=["research-assistant"],
-    )
-    # default_model: AllModelEnum = Field(
-    #     description="Default model used when none is specified.",
-    # )
+class SessionState(BaseModel):
+    last_agent: str
+    previous_response_id: str
 
 
 class UserInput(BaseModel):
     """Basic user input for the agent."""
 
-    message: str | None = Field(
+    text: str | None = Field(
         description="User input to the agent.",
         default=None,
         examples=["What is the weather in Tokyo?"],
@@ -56,25 +41,25 @@ class UserInput(BaseModel):
         description="Voice path to send to the agent.",
         default=None,
     )
-    user_id: str = Field(
-        description="User ID to persist and continue a multi-turn conversation.",
-        examples=["+254748256530", "847c6285-8fc9-4560-a83f-4e6285809254"],
-    )
-    timestamp: datetime = Field(
-        description="Timestamp of the user input.",
-        default_factory=lambda: datetime.now(UTC),
-        examples=[datetime.now(UTC).isoformat()],
-    )
-    user_name: str | None = Field(
-        description="User ID to persist and continue a multi-turn conversation.",
-        default=None,
-        examples=["Mark Nuttall-Smith"],
-    )
-    agent_config: dict[str, Any] = Field(
-        description="Additional configuration to pass through to the agent",
-        default={},
-        examples=[{"spicy_level": 0.8}],
-    )
+    # user_id: str = Field(
+    #     description="User ID to persist and continue a multi-turn conversation.",
+    #     examples=["+254748256530", "847c6285-8fc9-4560-a83f-4e6285809254"],
+    # )
+    # timestamp: datetime = Field(
+    #     description="Timestamp of the user input.",
+    #     default_factory=lambda: datetime.now(UTC),
+    #     examples=[datetime.now(UTC).isoformat()],
+    # )
+    # user_name: str | None = Field(
+    #     description="User ID to persist and continue a multi-turn conversation.",
+    #     default=None,
+    #     examples=["Mark Nuttall-Smith"],
+    # )
+    # agent_config: dict[str, Any] = Field(
+    #     description="Additional configuration to pass through to the agent",
+    #     default={},
+    #     examples=[{"spicy_level": 0.8}],
+    # )
 
 
 class StreamInput(UserInput):
@@ -140,7 +125,7 @@ class Product(BaseModel):
     footer: str | None = Field(default=None, description="Footer text for the product message")
 
 
-class WhatsAppResponse(BaseModel):
+class TextResponse(BaseModel):
     content: str | None = Field(description="Content of the response.")
     actions: list[Action] = Field(
         default=[],
@@ -148,9 +133,9 @@ class WhatsAppResponse(BaseModel):
     )
     # TODO: use a oneOf here to make sure not everything is set -
     #  https://docs.pydantic.dev/latest/concepts/fields/#discriminator
-    image_url: str | None = Field(default=None, description="An image url that should be sent to the user.")
-    contact: Contact | None = Field(default=None, description="Contact information to share with the user.")
-    product: Product | None = Field(default=None, description="Product information to share with the user.")
+    # image_url: str | None = Field(default=None, description="An image url that should be sent to the user.")
+    # contact: Contact | None = Field(default=None, description="Contact information to share with the user.")
+    # product: Product | None = Field(default=None, description="Product information to share with the user.")
     buttons: list[Button] = Field(
         default=[],
         description="Buttons that can be added to the response. Should be left empty unless specified.",
@@ -169,7 +154,7 @@ class AudioResponse(BaseModel):
 
 
 class ResponseEvent(BaseModel):
-    response: WhatsAppResponse | AudioResponse
+    response: TextResponse | AudioResponse
     has_more: bool = True
 
 

@@ -1,8 +1,9 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
-from farmwise.dependencies import UserContext
-from farmwise.schema import Section, SectionList, SectionRow, WhatsAppResponse
+from farmwise.agent.prompt_utils import get_profile_and_memories
+from farmwise.context import UserContext
+from farmwise.schema import Section, SectionList, SectionRow, TextResponse
 from farmwise.tools.farmbase import get_market_price_snapshot, get_markets
 
 
@@ -44,7 +45,7 @@ Workflow:
 8. After completing this workflow ask if the user would like prices for other products or from other markets, and offer
    to return to the main menu which should handoff to the triage agent 
 
-These are the details of the current user: {ctx.context}
+{get_profile_and_memories(ctx.context)}
 """
 
 
@@ -53,6 +54,6 @@ market_price_agent: Agent[UserContext] = Agent(
     handoff_description="Provides current market prices based on farm location and product interests.",
     instructions=market_price_agent_instructions,
     tools=[get_markets, get_market_price_snapshot],
-    output_type=WhatsAppResponse,
+    output_type=TextResponse,
     model="gpt-4.1",
 )
