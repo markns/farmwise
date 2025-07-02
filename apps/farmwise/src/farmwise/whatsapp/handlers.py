@@ -52,17 +52,20 @@ Reply with "menu" to see all services.
 @WhatsApp.on_message(filters.location)
 async def location_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"{msg}")
+
+    await msg.mark_as_read()
+    context = await user_context(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
+    contact = context.contact
+    await record_inbound_message(contact, msg)
     await msg.indicate_typing()
 
-    user_input = UserInput(
-        text=f"My location is {msg.location}",
-    )
+    user_input = UserInput(text=f"My location is {msg.location}")
 
-    response = await farmwise.invoke(user_input)
-    async for event in response:
+    response_events = farmwise.invoke(context, user_input)
+    async for event in response_events:
         match event.response:
             case TextResponse():
-                await _send_text_response(event.response, msg)
+                await _send_text_response(contact, event.response, msg)
             case AudioResponse():
                 await _send_audio_response(event.response, msg)
             case _:
