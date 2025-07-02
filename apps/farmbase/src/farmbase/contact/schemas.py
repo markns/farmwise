@@ -84,6 +84,7 @@ class ContactConsentBase(FarmbaseBase):
 
 class ContactConsentCreate(ContactConsentBase):
     """Model for creating new ContactConsent."""
+
     pass
 
 

@@ -187,7 +187,7 @@ async def create_contact_consent(
     contact = await get(db_session=db_session, contact_id=contact_id)
     if not contact:
         raise EntityDoesNotExistError("A contact with this id does not exist.")
-    
+
     consent = await create_consent(db_session=db_session, contact_id=contact_id, consent_in=consent_in)
     return ContactConsentRead(
         id=consent.id,

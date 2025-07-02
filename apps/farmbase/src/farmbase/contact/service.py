@@ -126,13 +126,10 @@ async def create_consent(
     *, db_session: AsyncSession, contact_id: int, consent_in: ContactConsentCreate
 ) -> ContactConsent:
     """Creates a consent record for a contact."""
-    consent = ContactConsent(
-        contact_id=contact_id,
-        **consent_in.model_dump()
-    )
-    
+    consent = ContactConsent(contact_id=contact_id, **consent_in.model_dump())
+
     db_session.add(consent)
     await db_session.commit()
     await db_session.refresh(consent)
-    
+
     return consent
