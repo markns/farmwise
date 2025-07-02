@@ -10,7 +10,8 @@ from ... import errors
 
 from ...models import BodyAgronomyUpdateExistingCropCycle
 from ...models import CropCycleRead
-from fastapi.exceptions import RequestValidationError
+from ...models import ErrorResponse
+from ...models import HTTPValidationError
 from typing import cast
 
 
@@ -38,13 +39,33 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Optional[Union[CropCycleRead, RequestValidationError]]:
+) -> Optional[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     if response.status_code == 200:
         response_200 = CropCycleRead.model_validate(response.json())
 
         return response_200
+    if response.status_code == 400:
+        response_400 = ErrorResponse.model_validate(response.json())
+
+        return response_400
+    if response.status_code == 401:
+        response_401 = ErrorResponse.model_validate(response.json())
+
+        return response_401
+    if response.status_code == 403:
+        response_403 = ErrorResponse.model_validate(response.json())
+
+        return response_403
+    if response.status_code == 404:
+        response_404 = ErrorResponse.model_validate(response.json())
+
+        return response_404
+    if response.status_code == 500:
+        response_500 = ErrorResponse.model_validate(response.json())
+
+        return response_500
     if response.status_code == 422:
-        response_422 = RequestValidationError.model_validate(response.json())
+        response_422 = HTTPValidationError.model_validate(response.json())
 
         return response_422
     if client.raise_on_unexpected_status:
@@ -55,7 +76,7 @@ def _parse_response(
 
 def _build_response(
     *, client: Union[AuthenticatedClient, Client], response: httpx.Response
-) -> Response[Union[CropCycleRead, RequestValidationError]]:
+) -> Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -69,7 +90,7 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: BodyAgronomyUpdateExistingCropCycle,
-) -> Response[Union[CropCycleRead, RequestValidationError]]:
+) -> Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     """Update Existing Crop Cycle
 
      Update an existing crop cycle.
@@ -83,7 +104,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[CropCycleRead, RequestValidationError]]
+        Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]
     """
 
     kwargs = _get_kwargs(
@@ -103,7 +124,7 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: BodyAgronomyUpdateExistingCropCycle,
-) -> Optional[Union[CropCycleRead, RequestValidationError]]:
+) -> Optional[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     """Update Existing Crop Cycle
 
      Update an existing crop cycle.
@@ -117,7 +138,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[CropCycleRead, RequestValidationError]
+        Union[CropCycleRead, ErrorResponse, HTTPValidationError]
     """
 
     return sync_detailed(
@@ -132,7 +153,7 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: BodyAgronomyUpdateExistingCropCycle,
-) -> Response[Union[CropCycleRead, RequestValidationError]]:
+) -> Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     """Update Existing Crop Cycle
 
      Update an existing crop cycle.
@@ -146,7 +167,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Union[CropCycleRead, RequestValidationError]]
+        Response[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]
     """
 
     kwargs = _get_kwargs(
@@ -164,7 +185,7 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: BodyAgronomyUpdateExistingCropCycle,
-) -> Optional[Union[CropCycleRead, RequestValidationError]]:
+) -> Optional[Union[CropCycleRead, ErrorResponse, HTTPValidationError]]:
     """Update Existing Crop Cycle
 
      Update an existing crop cycle.
@@ -178,7 +199,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Union[CropCycleRead, RequestValidationError]
+        Union[CropCycleRead, ErrorResponse, HTTPValidationError]
     """
 
     return (
