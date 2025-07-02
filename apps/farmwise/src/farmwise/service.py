@@ -15,8 +15,6 @@ from agents import (
     trace,
 )
 from agents.voice import SingleAgentVoiceWorkflow, TTSModelSettings, VoicePipeline, VoicePipelineConfig
-from farmbase_client.api.contacts import contacts_create_run_result
-from farmbase_client.models import AgentCreate, Message, RunResultCreate
 from google.cloud import texttospeech
 from google.cloud.texttospeech_v1 import SynthesizeSpeechResponse
 from loguru import logger
@@ -27,6 +25,8 @@ from openai.types.responses import (
     ResponseTextDeltaEvent,
 )
 
+from farmbase_client.api.contacts import contacts_create_run_result
+from farmbase_client.models import AgentCreate, Message, RunResultCreate
 from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input
 from farmwise.context import UserContext
@@ -76,9 +76,10 @@ async def text_to_speech(text) -> SynthesizeSpeechResponse:
     return response
 
 
-async def _batch_stream_events(
-    event_stream: AsyncIterator[RawResponsesStreamEvent | RunItemStreamEvent | AgentUpdatedStreamEvent],
-) -> AsyncIterator[ResponseEvent]:
+async def _batch_stream_events(event_stream: AsyncIterator[
+                                   RawResponsesStreamEvent | RunItemStreamEvent | AgentUpdatedStreamEvent],
+                               tts: bool
+                               ) -> AsyncIterator[ResponseEvent]:
     accumulated = ""
     ready = ""
     start_token = '"content":"'
@@ -113,16 +114,17 @@ async def _batch_stream_events(
 
             full_content = response.content
             response.content = ready
-            yield ResponseEvent(response=response, has_more=True)
+            yield ResponseEvent(response=response, has_more=tts)
 
-            logger.debug(f"Running text to speech for content: {full_content}")
-            speech = await text_to_speech(full_content)
-            yield ResponseEvent(
-                response=AudioResponse(
-                    audio=speech.audio_content,
-                ),
-                has_more=False,
-            )
+            if tts:
+                logger.debug(f"Running text to speech for content: {full_content}")
+                speech = await text_to_speech(full_content)
+                yield ResponseEvent(
+                    response=AudioResponse(
+                        audio=speech.audio_content,
+                    ),
+                    has_more=False,
+                )
 
 
 class FarmwiseService:
@@ -162,16 +164,18 @@ class FarmwiseService:
         contact = context.contact
 
         with trace(
-            "FarmWise",
-            trace_id=trace_id,
-            group_id=contact.phone_number,
-            metadata={"username": contact.name, "organization": contact.organization.slug},
+                "FarmWise",
+                trace_id=trace_id,
+                group_id=contact.phone_number,
+                metadata={"username": contact.name, "organization": contact.organization.slug},
         ):
             result: RunResultStreaming = Runner.run_streamed(
                 agent, input=input_items, context=context, hooks=hooks, previous_response_id=previous_response_id
             )
 
-            async for event in _batch_stream_events(result.stream_events()):
+            # TODO: tts = contact.config.text_to_speech
+            tts = False
+            async for event in _batch_stream_events(result.stream_events(), tts=tts):
                 yield event
 
         await set_session_state(
