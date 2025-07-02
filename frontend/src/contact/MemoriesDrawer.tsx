@@ -4,7 +4,6 @@ import {
   Typography,
   List,
   ListItem,
-  ListItemText,
   IconButton,
   Box,
   Chip,
