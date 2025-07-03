@@ -1,9 +1,10 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
+from pywa.types import Section, SectionRow
 
 from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
-from farmwise.schema import Section, SectionList, SectionRow, TextResponse
+from farmwise.schema import SectionList, TextResponse
 from farmwise.tools.farmbase import get_market_price_snapshot, get_markets
 
 

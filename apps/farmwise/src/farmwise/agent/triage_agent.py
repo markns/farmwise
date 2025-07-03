@@ -3,39 +3,41 @@ from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
-from farmwise.schema import Section, SectionList, SectionRow, TextResponse
+from farmwise.schema import TextResponse
+
 from farmwise.tools.farmbase import update_contact
+from farmwise.whatsapp.commands import activities
 
 
 def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    activities = SectionList(
-        button_title="Select activity",
-        sections=[
-            Section(
-                title="Agronomy",
-                rows=[
-                    SectionRow(title="Choose seed variety", callback_data="Choose seed variety"),
-                    SectionRow(title="Crop suitability", callback_data="Crop suitability"),
-                    SectionRow(title="Soil advice", callback_data="Get soil advice"),
-                    SectionRow(title="Disease & pest advice", callback_data="Disease & pest advice"),
-                ],
-            ),
-            Section(
-                title="Farm Management",
-                rows=[
-                    SectionRow(title="Get market prices", callback_data="Get market prices"),
-                    SectionRow(title="Register field", callback_data="Register field"),
-                ],
-            ),
-            Section(
-                title="Settings",
-                rows=[
-                    SectionRow(title="Update product interests", callback_data="Update product interests"),
-                    SectionRow(title="Show profile", callback_data="Show profile"),
-                ],
-            ),
-        ],
-    )
+    # activities = SectionList(
+    #     button_title="Select activity",
+    #     sections=[
+    #         Section(
+    #             title="Agronomy",
+    #             rows=[
+    #                 SectionRow(title="Choose seed variety", callback_data="Choose seed variety"),
+    #                 SectionRow(title="Crop suitability", callback_data="Crop suitability"),
+    #                 SectionRow(title="Soil advice", callback_data="Get soil advice"),
+    #                 SectionRow(title="Disease & pest advice", callback_data="Disease & pest advice"),
+    #             ],
+    #         ),
+    #         Section(
+    #             title="Farm Management",
+    #             rows=[
+    #                 SectionRow(title="Get market prices", callback_data="Get market prices"),
+    #                 SectionRow(title="Register field", callback_data="Register field"),
+    #             ],
+    #         ),
+    #         Section(
+    #             title="Settings",
+    #             rows=[
+    #                 SectionRow(title="Update product interests", callback_data="Update product interests"),
+    #                 SectionRow(title="Show profile", callback_data="Show profile"),
+    #             ],
+    #         ),
+    #     ],
+    # )
 
     return f"""{RECOMMENDED_PROMPT_PREFIX}
 Role and Purpose:

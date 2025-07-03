@@ -1,9 +1,9 @@
 import pathlib
 from enum import Enum
-from typing import Annotated, Any, Literal, NotRequired
+from typing import Any, Literal, NotRequired
 
-from annotated_types import Len
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, Field, ConfigDict
+from pywa.types import Button, SectionList
 from typing_extensions import TypedDict
 
 
@@ -86,25 +86,25 @@ class ToolCall(TypedDict):
 class Action(Enum):
     request_location = "request_location"
 
-
-class Button(BaseModel):
-    title: str
-    callback_data: str
-
-
-class SectionRow(BaseModel):
-    title: Annotated[str, StringConstraints(max_length=24)]
-    callback_data: str
-
-
-class Section(BaseModel):
-    title: Annotated[str, StringConstraints(max_length=24)]
-    rows: Annotated[list[SectionRow], Len(min_length=1, max_length=10)]
-
-
-class SectionList(BaseModel):
-    button_title: str
-    sections: list[Section]
+#
+# class Button(BaseModel):
+#     title: str
+#     callback_data: str
+#
+#
+# class SectionRow(BaseModel):
+#     title: Annotated[str, StringConstraints(max_length=24)]
+#     callback_data: str
+#
+#
+# class Section(BaseModel):
+#     title: Annotated[str, StringConstraints(max_length=24)]
+#     rows: Annotated[list[SectionRow], Len(min_length=1, max_length=10)]
+#
+#
+# class SectionList(BaseModel):
+#     button_title: str
+#     sections: list[Section]
 
 
 class Contact(BaseModel):
@@ -126,6 +126,8 @@ class Product(BaseModel):
 
 
 class TextResponse(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     content: str | None = Field(description="Content of the response.")
     actions: list[Action] = Field(
         default=[],

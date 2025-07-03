@@ -1,9 +1,10 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
+from pywa.types import SectionList, Section, SectionRow
 
 from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
-from farmwise.schema import Section, SectionList, SectionRow, TextResponse
+from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import update_contact
 from farmwise.tools.tools import aez_classification, elevation, growing_period, maize_varieties, soil_properties
 
