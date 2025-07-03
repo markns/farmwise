@@ -80,12 +80,12 @@ const AppDrawer: React.FC = () => {
       icon: <DataIcon />,
       group: 'data',
       children: [
-        {
-          title: 'Data Explorer',
-          icon: <DataIcon />,
-          path: `/${organization}/data`,
-          group: 'data-explorer',
-        },
+        // {
+        //   title: 'Data Explorer',
+        //   icon: <DataIcon />,
+        //   path: `/${organization}/data`,
+        //   group: 'data-explorer',
+        // },
         {
           title: 'Market Prices',
           icon: <MarketIcon />,

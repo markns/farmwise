@@ -1,16 +1,36 @@
 import React from 'react'
-import {AppBar,  Box, IconButton, Menu, MenuItem, Toolbar, Typography, InputBase, alpha, Breadcrumbs, Link} from '@mui/material'
-import {AccountCircle, ExitToApp, Menu as MenuIcon, Search as SearchIcon, Notifications, Help} from '@mui/icons-material'
-import { useNavigate, useLocation, useParams } from 'react-router-dom'
+import {
+    alpha,
+    AppBar,
+    Box,
+    Breadcrumbs,
+    IconButton,
+    InputBase,
+    Link,
+    Menu,
+    MenuItem,
+    Toolbar,
+    Typography
+} from '@mui/material'
+import {
+    AccountCircle,
+    ExitToApp,
+    Help,
+    Menu as MenuIcon,
+    Notifications,
+    Search as SearchIcon
+} from '@mui/icons-material'
+import {useLocation, useNavigate, useParams} from 'react-router-dom'
 import {useAppStore} from '../stores/appStore'
 import {useLogoutFunction, withAuthInfo, WithAuthInfoProps} from "@propelauth/react"
+import {config} from "@/config/env.ts";
 
 
 // This version expects WithAuthInfoProps from PropelAuth
 const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
     const navigate = useNavigate()
     const location = useLocation()
-    const { organization = 'default' } = useParams()
+    const {organization = 'default'} = useParams()
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
     const logoutFunction = useLogoutFunction()
     const toggleDrawer = useAppStore(state => state.toggleDrawer)
@@ -38,13 +58,13 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
     const generateBreadcrumbs = () => {
         const pathSegments = location.pathname.split('/').filter(segment => segment)
         const breadcrumbs = []
-        
+
         if (pathSegments.length > 1) {
             breadcrumbs.push({
                 label: organization.charAt(0).toUpperCase() + organization.slice(1),
                 path: `/${organization}`
             })
-            
+
             if (pathSegments[1]) {
                 const currentPage = pathSegments[1].charAt(0).toUpperCase() + pathSegments[1].slice(1)
                 breadcrumbs.push({
@@ -53,7 +73,7 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
                 })
             }
         }
-        
+
         return breadcrumbs
     }
 
@@ -63,8 +83,8 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
 
     return (
         <>
-            <AppBar 
-                position="static" 
+            <AppBar
+                position="static"
                 sx={{
                     zIndex: (theme) => theme.zIndex.drawer + 1,
                     backgroundColor: '#ffffff',
@@ -72,13 +92,13 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
                     boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
                 }}
             >
-                <Toolbar sx={{ minHeight: '64px !important', px: 2 }}>
+                <Toolbar sx={{minHeight: '64px !important', px: 2}}>
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
                         onClick={handleDrawerToggle}
                         edge="start"
-                        sx={{ 
+                        sx={{
                             mr: 2,
                             color: '#5f6368',
                             '&:hover': {
@@ -115,7 +135,7 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
                                 justifyContent: 'center',
                             }}
                         >
-                            <SearchIcon sx={{ color: '#5f6368' }} />
+                            <SearchIcon sx={{color: '#5f6368'}}/>
                         </Box>
                         <InputBase
                             placeholder="Search resources..."
@@ -131,29 +151,33 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
                         />
                     </Box>
 
-                    <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{flexGrow: 1}}/>
 
                     {/* Right side icons */}
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{display: 'flex', alignItems: 'center'}}>
                         <IconButton
-                            sx={{ 
+                            component="a"
+                            href={`${config.apiBaseUrl}/docs`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
                                 color: '#5f6368',
                                 '&:hover': {
                                     backgroundColor: 'rgba(60,64,67,0.08)',
                                 }
                             }}
                         >
-                            <Help />
+                            <Help/>
                         </IconButton>
                         <IconButton
-                            sx={{ 
+                            sx={{
                                 color: '#5f6368',
                                 '&:hover': {
                                     backgroundColor: 'rgba(60,64,67,0.08)',
                                 }
                             }}
                         >
-                            <Notifications />
+                            <Notifications/>
                         </IconButton>
 
                         {auth.isLoggedIn && auth.user && (
@@ -163,7 +187,7 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
                                 aria-controls="menu-appbar"
                                 aria-haspopup="true"
                                 onClick={handleMenu}
-                                sx={{ 
+                                sx={{
                                     ml: 1,
                                     color: '#5f6368',
                                     '&:hover': {
@@ -171,7 +195,7 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
                                     }
                                 }}
                             >
-                                <AccountCircle sx={{ fontSize: 32 }} />
+                                <AccountCircle sx={{fontSize: 32}}/>
                             </IconButton>
                         )}
 
@@ -197,12 +221,12 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
                                 }
                             }}
                         >
-                            <Box sx={{ px: 2, py: 1, borderBottom: '1px solid #e0e0e0' }}>
-                                <Typography variant="body2" sx={{ fontWeight: 500, color: '#3c4043' }}>
+                            <Box sx={{px: 2, py: 1, borderBottom: '1px solid #e0e0e0'}}>
+                                <Typography variant="body2" sx={{fontWeight: 500, color: '#3c4043'}}>
                                     {auth.user?.email}
                                 </Typography>
                             </Box>
-                            <MenuItem 
+                            <MenuItem
                                 onClick={handleLogout}
                                 sx={{
                                     py: 1.5,
@@ -211,14 +235,14 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
                                     }
                                 }}
                             >
-                                <ExitToApp sx={{ mr: 2, color: '#5f6368' }} />
+                                <ExitToApp sx={{mr: 2, color: '#5f6368'}}/>
                                 <Typography variant="body2">Sign out</Typography>
                             </MenuItem>
                         </Menu>
                     </Box>
                 </Toolbar>
             </AppBar>
-            
+
             {/* Breadcrumb Bar */}
             {breadcrumbs.length > 0 && (
                 <Box
@@ -240,10 +264,10 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
                     >
                         {breadcrumbs.map((crumb, index) => (
                             index === breadcrumbs.length - 1 ? (
-                                <Typography 
-                                    key={crumb.path} 
-                                    color="#3c4043" 
-                                    sx={{ fontSize: '14px', fontWeight: 500 }}
+                                <Typography
+                                    key={crumb.path}
+                                    color="#3c4043"
+                                    sx={{fontSize: '14px', fontWeight: 500}}
                                 >
                                     {crumb.label}
                                 </Typography>
@@ -256,7 +280,7 @@ const AppToolbar: React.FC<WithAuthInfoProps> = (auth) => {
                                         e.preventDefault()
                                         navigate(crumb.path)
                                     }}
-                                    sx={{ 
+                                    sx={{
                                         fontSize: '14px',
                                         textDecoration: 'none',
                                         '&:hover': {
