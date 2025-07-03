@@ -1,13 +1,11 @@
-# from agents import set_default_openai_key
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from pywa_async import WhatsApp
 
 from farmwise.settings import settings
-from farmwise.whatsapp import handlers
+from farmwise.whatsapp import handlers, commands
 
-# set_default_openai_key(settings.OPENAI_API_KEY.get_secret_value())
 
 
 @asynccontextmanager
@@ -21,11 +19,11 @@ async def lifespan(_):
     #     "🌱 Calculate fertilizer for my field",
     # ]
     # TODO: It's all or nothing with conversational automation, so we can't set commands and not ice breakers
-    # await wa.update_conversational_automation(
-    #     enable_chat_opened=True,
-    #     # ice_breakers=ice_breakers,
-    #     commands=[command.value for command in Commands],
-    # )
+    await wa.update_conversational_automation(
+        enable_chat_opened=True,
+        # ice_breakers=ice_breakers,
+        commands=[command.value for command in commands.Commands],
+    )
 
     yield  # Run the application
     print("Shutdown: Cleaning up resources...")

@@ -1013,6 +1013,7 @@ name = "farmbase-workflows"
 version = "0.1.0"
 source = { editable = "apps/farmbase-workflows" }
 dependencies = [
+    { name = "pywa" },
     { name = "temporalio" },
 ]
 
@@ -1024,7 +1025,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "temporalio", specifier = ">=1.11.1" }]
+requires-dist = [
+    { name = "pywa", git = "https://github.com/david-lev/pywa.git?branch=templates-v2" },
+    { name = "temporalio", specifier = ">=1.11.1" },
+]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1067,7 +1071,7 @@ requires-dist = [
     { name = "openai", specifier = ">=1.77.0" },
     { name = "openai-agents", extras = ["voice"], specifier = ">=0.0.19" },
     { name = "pydub", specifier = ">=0.25.1" },
-    { name = "pywa", extras = ["cryptography", "fastapi"], specifier = ">=2.10.0" },
+    { name = "pywa", extras = ["cryptography", "fastapi"], git = "https://github.com/david-lev/pywa.git?branch=templates-v2" },
     { name = "upstash-redis", specifier = ">=1.4.0" },
 ]
 
@@ -3603,13 +3607,9 @@ wheels = [
 [[package]]
 name = "pywa"
 version = "2.10.0"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/david-lev/pywa.git?branch=templates-v2#7d0930c834c80883469ad242b6f29b76c4758ba8" }
 dependencies = [
     { name = "httpx" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/44/f7/00a1785fe7e89d6ce3d8036e6e5124243b3bf6e971831535ac78f327d255/pywa-2.10.0.tar.gz", hash = "sha256:e325dbe85f24956c85f9a01859b86415ae7829f064683e01166413374e957c77", size = 200440 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a9/0a/92d4f251f48ea4dab2dba5e2db1313f91c21808f9b4b459130fa6e42a6f4/pywa-2.10.0-py3-none-any.whl", hash = "sha256:7657247acb9ef09295f3c44a2f6d5beada44b25eda7a1af86594a654587b5d7c", size = 194187 },
 ]
 
 [package.optional-dependencies]

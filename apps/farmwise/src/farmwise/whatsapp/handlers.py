@@ -1,10 +1,8 @@
 import logging
 import uuid
-from enum import Enum
 
 from loguru import logger
 from loguru_logging_intercept import InterceptHandler
-from pywa.types import Command
 from pywa_async import WhatsApp, filters, types
 
 from farmwise.context import user_context
@@ -12,18 +10,13 @@ from farmwise.schema import AudioResponse, TextResponse, UserInput
 from farmwise.service import farmwise
 from farmwise.settings import settings
 from farmwise.storage import make_blob_public, upload_bytes_to_gcs
+from farmwise.whatsapp import commands
 from farmwise.whatsapp.responses import _send_audio_response, _send_text_response
 from farmwise.whatsapp.store import record_callback_button, record_callback_selection, record_inbound_message
 
 # Intercept standard logging and route to loguru
 logging.basicConfig(handlers=[InterceptHandler()], level=logging.INFO, force=True)
 
-
-# TODO: load these commands from the FarmWise service
-class Commands(Enum):
-    REGISTER_FIELD = Command(name="Register a field", description="Register a new field")
-    SELECT_MAIZE_VARIETY = Command(name="Select a maize seed variety", description="Select a maize seed variety")
-    SHOW_SUITABLE_CROPS = Command(name="Show suitable crops", description="Show suitable crops for a location")
 
 
 # TODO: Chat opened is not being triggered...
@@ -80,6 +73,19 @@ async def message_status_handler(_: WhatsApp, status: types.MessageStatus):
     logger.info(f"STATUS {status}")
 
 
+@WhatsApp.on_message(filters.command("menu", prefixes="/", ignore_case=True), priority=1)
+async def on_menu_command(_: WhatsApp, msg: types.Message):
+    logger.info(f"ON MENU: {msg}")
+    await msg.indicate_typing()
+    await msg.reply_text(text="Please choose an activity", buttons=commands.activities)
+
+
+@WhatsApp.on_callback_selection(filters.startswith("/"), priority=1)
+async def on_command_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
+    await sel.reply_text(text=f"Your command was {sel.data}")
+
+
+
 @WhatsApp.on_message(filters.text)
 async def message_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"{msg}")
@@ -108,6 +114,7 @@ async def message_handler(_: WhatsApp, msg: types.Message):
 
 @WhatsApp.on_callback_selection
 async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
+
     logger.info(f"{sel}")
     await sel.mark_as_read()
     context = await user_context(wa_id=sel.from_user.wa_id, name=sel.from_user.name)
