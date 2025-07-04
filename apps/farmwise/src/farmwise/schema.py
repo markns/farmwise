@@ -1,8 +1,10 @@
 import pathlib
+from dataclasses import dataclass, field
 from enum import Enum
+from typing import Iterable
 
 from pydantic import BaseModel, Field, ConfigDict
-from pywa.types import Button, SectionList
+from pywa_async import types
 
 
 class AgentInfo(BaseModel):
@@ -41,7 +43,6 @@ class UserInput(BaseModel):
     )
 
 
-
 class Action(Enum):
     request_location = "request_location"
 
@@ -62,6 +63,36 @@ class Product(BaseModel):
     sku: str = Field(description="The product SKU")
     body: str | None = Field(default=None, description="Body text for the product message")
     footer: str | None = Field(default=None, description="Footer text for the product message")
+
+
+@dataclass
+class Button(types.Button):
+    title: str = field(metadata={"description": "The title of the button (up to 20 characters)"})
+
+
+@dataclass
+class SectionRow(types.SectionRow):
+    title: str = field(metadata={"description": "The title of the row (up to 24 characters)"})
+    callback_data: str = field(
+        metadata={"description": "The payload to send when the user clicks on the row up to 200 characters"})
+    description: str | None = field(default=None,
+                                    metadata={
+                                        "description": "The description of the row (optional, up to 72 characters)"})
+
+
+@dataclass
+class Section(types.Section):
+    title: str = field(metadata={"description": "The title of the section (up to 24 characters)"})
+    rows: Iterable[SectionRow] = field(
+        metadata={"description": "The rows in the section (at least 1, no more than 10)"})
+
+
+@dataclass
+class SectionList(types.SectionList):
+    button_title: str = field(
+        metadata={"description": "The title of the button that opens the section list (up to 20 characters)"})
+    sections: Iterable[Section] = field(
+        metadata={"description": "The sections in the section list (at least 1, no more than 10)"})
 
 
 class TextResponse(BaseModel):
@@ -97,4 +128,3 @@ class AudioResponse(BaseModel):
 class ResponseEvent(BaseModel):
     response: TextResponse | AudioResponse
     has_more: bool = True
-
