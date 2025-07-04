@@ -1,14 +1,9 @@
-import json
 import tempfile
 from datetime import UTC, datetime
 from typing import AsyncIterator
 
 import requests
 from agents import (
-    AgentUpdatedStreamEvent,
-    ItemHelpers,
-    RawResponsesStreamEvent,
-    RunItemStreamEvent,
     Runner,
     RunResultStreaming,
     gen_trace_id,
@@ -17,12 +12,10 @@ from agents import (
 from agents.voice import SingleAgentVoiceWorkflow, TTSModelSettings, VoicePipeline, VoicePipelineConfig
 from google.cloud import texttospeech
 from google.cloud.texttospeech_v1 import SynthesizeSpeechResponse
-from loguru import logger
 from openai.types.responses import (
     EasyInputMessageParam,
     ResponseInputImageParam,
     ResponseInputTextParam,
-    ResponseTextDeltaEvent,
 )
 
 from farmbase_client.api.contacts import contacts_create_run_result
@@ -34,8 +27,8 @@ from farmwise.farmbase import farmbase_api_client
 from farmwise.hooks import AgentHooks
 from farmwise.memory.memory import add_memory
 from farmwise.memory.session import get_session_state, set_session_state
-from farmwise.openai.enums import RunItemStreamEventName
-from farmwise.schema import AudioResponse, ResponseEvent, SessionState, TextResponse, UserInput
+from farmwise.schema import ResponseEvent, SessionState, TextResponse, UserInput
+from farmwise.stream import _batch_stream_events
 
 
 async def text_to_speech(text) -> SynthesizeSpeechResponse:
@@ -74,57 +67,6 @@ async def text_to_speech(text) -> SynthesizeSpeechResponse:
     # voice parameters and audio file type
     response = await client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
     return response
-
-
-async def _batch_stream_events(event_stream: AsyncIterator[
-    RawResponsesStreamEvent | RunItemStreamEvent | AgentUpdatedStreamEvent],
-                               tts: bool
-                               ) -> AsyncIterator[ResponseEvent]:
-    accumulated = ""
-    ready = ""
-    start_token = '"content":"'
-    end_token = '","actions":'
-    message_ready_token = "\\n\\n"
-    in_content = False
-
-    async for event in event_stream:
-        # logger.debug(event)
-        if event.type == RawResponsesStreamEvent.type and isinstance(event.data, ResponseTextDeltaEvent):
-            delta = event.data.delta
-            accumulated += delta
-
-            if start_token in accumulated:
-                in_content = True
-                _, accumulated = accumulated.split(start_token)
-
-            if in_content:
-                if message_ready_token in accumulated:
-                    ready, accumulated = accumulated.split(message_ready_token)
-                    # use json.loads to unescape newlines etc.
-                    yield ResponseEvent(response=TextResponse(content=json.loads(f'"{ready}"')))
-
-            if end_token in accumulated:
-                ready, accumulated = accumulated.split(end_token)
-                in_content = False
-
-        elif event.type == RunItemStreamEvent.type and event.name == RunItemStreamEventName.MESSAGE_OUTPUT_CREATED:
-            content = ItemHelpers.extract_last_content(event.item.raw_item)
-            # TODO: content might be a ResponseOutputRefusal
-            response = TextResponse.model_validate(json.loads(content))
-
-            full_content = response.content
-            response.content = ready
-            yield ResponseEvent(response=response, has_more=tts)
-
-            if tts:
-                logger.debug(f"Running text to speech for content: {full_content}")
-                speech = await text_to_speech(full_content)
-                yield ResponseEvent(
-                    response=AudioResponse(
-                        audio=speech.audio_content,
-                    ),
-                    has_more=False,
-                )
 
 
 class FarmwiseService:
