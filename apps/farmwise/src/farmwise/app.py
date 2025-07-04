@@ -22,7 +22,7 @@ async def lifespan(_):
     await wa.update_conversational_automation(
         enable_chat_opened=True,
         # ice_breakers=ice_breakers,
-        commands=[command.value for command in commands.Commands],
+        commands=commands.commands,
     )
 
     yield  # Run the application

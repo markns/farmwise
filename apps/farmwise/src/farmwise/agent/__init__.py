@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 
 from farmwise.schema import AgentInfo
 
-from ..context import UserContext
 from . import handoff_filters
 from .crop_pathogen_diagnosis_agent import crop_pathogen_diagnosis_agent
 from .crop_suitability_agent import crop_suitability_agent

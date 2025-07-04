@@ -70,10 +70,17 @@ class Button(types.Button):
     title: str = field(metadata={"description": "The title of the button (up to 20 characters)"})
 
 
+
+@dataclass(frozen=True, slots=True)
+class ActivityData(types.CallbackData):  # Subclass CallbackData
+    agent: str
+    text: str
+
+
 @dataclass
 class SectionRow(types.SectionRow):
     title: str = field(metadata={"description": "The title of the row (up to 24 characters)"})
-    callback_data: str = field(
+    callback_data: str | ActivityData = field(
         metadata={"description": "The payload to send when the user clicks on the row up to 200 characters"})
     description: str | None = field(default=None,
                                     metadata={

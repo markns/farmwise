@@ -8,6 +8,8 @@ from farmwise.tools.tools import soil_properties
 
 
 def soil_advisory_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
+    from farmwise.whatsapp.commands import activities
+
     return f"""{RECOMMENDED_PROMPT_PREFIX} 
 1. Role & Objectives
 
@@ -70,14 +72,16 @@ Extractable K	< 120 ppm	            120 – 300	> 300
 The advisory session is complete when the farmer:
 	1.	Confirms the crop(s) and field location(s).
 	2.	Receives soil-property-based recommendations for each field.
-	3.	Acknowledges understanding or ends the conversation.
+	3.	Acknowledges understanding or ends the conversation. 
 
-Finish with: “Happy farming! 🌱 Feel free to ask any time.” 
-and give an option to return to the main menu which should handoff to the triage agent 
+When the interaction is complete prompt the user to ask follow up questions, and add the following section list 
+to the response to offer the user a new list of activities: {activities}
 
 {get_profile_and_memories(ctx.context)}
 """
 
+
+# and give an option to return to the main menu which should handoff to the triage agent
 
 soil_advisor_agent: Agent[UserContext] = Agent(
     name="Soil advisor",

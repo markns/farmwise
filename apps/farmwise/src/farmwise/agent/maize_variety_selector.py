@@ -10,6 +10,7 @@ from farmwise.tools.tools import aez_classification, elevation, growing_period, 
 
 
 def maize_variety_selector_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
+    from farmwise.whatsapp.commands import activities
     # TODO: these diseases and pests can be loaded from a database
     diseases = SectionList(
         button_title="Select disease",
@@ -67,8 +68,10 @@ Follow this protocol:
     mentioned, and yield potential.
 3.3 Offer to find availability of these varieties by including a section_list in the response with the variety names.
 
-If the farmer asks a question that is not related to the routine, or when the routine is complete, transfer back to the
- triage agent.
+If the farmer asks a question that is not related to the routine, transfer back to the triage agent.
+ 
+When the interaction is complete prompt the user to ask follow up questions, and add the following section list 
+to the response to offer the user a new list of activities: {activities}
 
 {get_profile_and_memories(ctx.context)}
 """

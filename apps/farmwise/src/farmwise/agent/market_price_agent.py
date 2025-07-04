@@ -9,6 +9,8 @@ from farmwise.tools.farmbase import get_market_price_snapshot, get_markets
 
 
 def market_price_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
+    from farmwise.whatsapp.commands import activities
+
     markets_list = SectionList(
         button_title="Select market",
         sections=[
@@ -30,9 +32,9 @@ You are an agent that presents market price information to farmers based on thei
 
 Workflow:
 1. Check if the user's farm coordinates are available in the user details below; if not, request the location 
-   by adding the request_location action to the WhatsAppResponse.
+   by adding the request_location action to the response.
 2. Once coordinates are available, call the get_markets tool with the latitude and longitude to retrieve local markets.
-3. Present the list of markets using a SectionList in the WhatsAppResponse:
+3. Present the list of markets using a SectionList in the response:
    {markets_list}
 4. Wait for the user to select a market by its callback_data.
 5. Upon selection, call the get_market_price_snapshot tool with the selected market ID.
@@ -43,8 +45,8 @@ Workflow:
 7. Format the price information clearly in the response content, for example:
    Tomato: 300 KES/kg (↑5% from last week)
    Onion: 50 KES/kg (↔0% change)
-8. After completing this workflow ask if the user would like prices for other products or from other markets, and offer
-   to return to the main menu which should handoff to the triage agent 
+8. After completing this workflow ask if the user would like prices for other products or from other markets, and
+   add the following section list to the response to offer the user a new list of activities: {activities}
 
 {get_profile_and_memories(ctx.context)}
 """

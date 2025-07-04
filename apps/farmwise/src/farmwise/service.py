@@ -77,7 +77,7 @@ async def text_to_speech(text) -> SynthesizeSpeechResponse:
 
 
 async def _batch_stream_events(event_stream: AsyncIterator[
-                                   RawResponsesStreamEvent | RunItemStreamEvent | AgentUpdatedStreamEvent],
+    RawResponsesStreamEvent | RunItemStreamEvent | AgentUpdatedStreamEvent],
                                tts: bool
                                ) -> AsyncIterator[ResponseEvent]:
     accumulated = ""
@@ -129,10 +129,16 @@ async def _batch_stream_events(event_stream: AsyncIterator[
 
 class FarmwiseService:
     @classmethod
-    async def invoke(cls, context: UserContext, user_input: UserInput) -> AsyncIterator[ResponseEvent]:
+    async def invoke(cls,
+                     context: UserContext,
+                     user_input: UserInput,
+                     agent_name: str = None) -> AsyncIterator[ResponseEvent]:
+
         session_state = await get_session_state(context)
 
-        if context.new_user:
+        if agent_name:
+            agent = agents[agent_name]
+        elif context.new_user:
             agent = agents[ONBOARDING_AGENT]
         elif session_state:
             agent = agents.get(session_state.last_agent, DEFAULT_AGENT)

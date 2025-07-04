@@ -11,12 +11,12 @@ from farmwise.service import farmwise
 from farmwise.settings import settings
 from farmwise.storage import make_blob_public, upload_bytes_to_gcs
 from farmwise.whatsapp import commands
-from farmwise.whatsapp.responses import send_audio_reply, send_text_reply
+from farmwise.whatsapp.commands import ActivityData
+from farmwise.whatsapp.responses import send_audio_reply, send_text_reply, send_responses
 from farmwise.whatsapp.store import record_callback_button, record_callback_selection, record_inbound_message
 
 # Intercept standard logging and route to loguru
 logging.basicConfig(handlers=[InterceptHandler()], level=logging.INFO, force=True)
-
 
 
 # TODO: Chat opened is not being triggered...
@@ -55,17 +55,7 @@ async def location_handler(_: WhatsApp, msg: types.Message):
     user_input = UserInput(text=f"My location is {msg.location}")
 
     response_events = farmwise.invoke(context, user_input)
-    async for event in response_events:
-        match event.response:
-            case TextResponse():
-                await send_text_reply(contact, event.response, msg)
-            case AudioResponse():
-                await send_audio_reply(event.response, msg)
-            case _:
-                logger.error(f"Unknown response type: {event.response}")
-
-        if event.has_more:
-            await msg.indicate_typing()
+    await send_responses(contact, response_events, msg)
 
 
 @WhatsApp.on_message_status()
@@ -73,22 +63,26 @@ async def message_status_handler(_: WhatsApp, status: types.MessageStatus):
     logger.info(f"STATUS {status}")
 
 
-@WhatsApp.on_message(filters.command("menu", prefixes="/", ignore_case=True), priority=1)
-async def on_menu_command(_: WhatsApp, msg: types.Message):
-    logger.info(f"ON MENU: {msg}")
+cmds = [c.name for c in commands.commands]
+
+
+@WhatsApp.on_message(filters.command(*cmds, prefixes="/", ignore_case=True), priority=1)
+async def on_command(_: WhatsApp, msg: types.Message):
+    logger.info(f"ON COMMAND: {msg}")
     await msg.indicate_typing()
     context = await user_context(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
     contact = context.contact
     await record_inbound_message(contact, msg)
-    # await msg.reply_text(text="Please choose an activity", buttons=commands.activities)
-    await send_text_reply(contact, TextResponse(content="Please choose an activity",
-                                                section_list=commands.activities), msg)
 
-
-@WhatsApp.on_callback_selection(filters.startswith("/"), priority=1)
-async def on_command_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
-    await sel.reply_text(text=f"Your command was {sel.data}")
-
+    match msg.text:
+        case "/menu":
+            await send_text_reply(contact, TextResponse(content="Please choose an activity",
+                                                        section_list=commands.activities), msg)
+        case "/profile":
+            # TODO: Convert this to a flow
+            await send_text_reply(contact,
+                                  TextResponse(content=str(contact)),
+                                  msg)
 
 
 @WhatsApp.on_message(filters.text)
@@ -104,23 +98,27 @@ async def message_handler(_: WhatsApp, msg: types.Message):
     user_input = UserInput(text=msg.text)
 
     response_events = farmwise.invoke(context, user_input)
-    async for event in response_events:
-        match event.response:
-            case TextResponse():
-                await send_text_reply(contact, event.response, msg)
-            case AudioResponse():
-                await send_audio_reply(event.response, msg)
-            case _:
-                logger.error(f"Unknown response type: {event.response}")
+    await send_responses(contact, response_events, msg)
 
-        if event.has_more:
-            await msg.indicate_typing()
+
+@WhatsApp.on_callback_selection(factory=ActivityData, priority=1)
+async def on_activity_callback_selection(_: WhatsApp, sel: types.CallbackSelection[ActivityData]):
+    logger.info(f"ACTIVITY: {sel.data}")
+    await sel.indicate_typing()
+    context = await user_context(wa_id=sel.from_user.wa_id, name=sel.from_user.name)
+    contact = context.contact
+    await record_callback_selection(contact, sel)
+    await sel.indicate_typing()
+
+    user_input = UserInput(text=sel.data.text)
+
+    response_events = farmwise.invoke(context, user_input, agent_name=sel.data.agent)
+    await send_responses(contact, response_events, sel)
 
 
 @WhatsApp.on_callback_selection
 async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
-
-    logger.info(f"{sel}")
+    logger.info(f"CALLBACK: {sel}")
     await sel.mark_as_read()
     context = await user_context(wa_id=sel.from_user.wa_id, name=sel.from_user.name)
     contact = context.contact
@@ -130,17 +128,7 @@ async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
     user_input = UserInput(text=sel.data)
 
     response_events = farmwise.invoke(context, user_input)
-    async for event in response_events:
-        match event.response:
-            case TextResponse():
-                await send_text_reply(contact, event.response, sel)
-            case AudioResponse():
-                await send_audio_reply(event.response, sel)
-            case _:
-                logger.error(f"Unknown response type: {event.response}")
-
-        if event.has_more:
-            await sel.indicate_typing()
+    await send_responses(contact, response_events, sel)
 
 
 @WhatsApp.on_callback_button
@@ -155,17 +143,7 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
     user_input = UserInput(text=btn.data)
 
     response_events = farmwise.invoke(context, user_input)
-    async for event in response_events:
-        match event.response:
-            case TextResponse():
-                await send_text_reply(contact, event.response, btn)
-            case AudioResponse():
-                await send_audio_reply(event.response, btn)
-            case _:
-                logger.error(f"Unknown response type: {event.response}")
-
-        if event.has_more:
-            await btn.indicate_typing()
+    await send_responses(contact, response_events, btn)
 
 
 @WhatsApp.on_message(filters.image)

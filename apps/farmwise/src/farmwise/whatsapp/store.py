@@ -1,6 +1,8 @@
 from dataclasses import asdict
 from datetime import UTC, datetime
 
+from loguru import logger
+
 from farmbase_client.api.contacts import contacts_create_message
 from farmbase_client.models import ContactRead, MessageCreate, MessageDirection, MessageType
 from pywa_async.types import CallbackButton, CallbackSelection
@@ -28,6 +30,7 @@ async def record_outbound_message(contact: ContactRead, msg: SentMessage, text):
 
 
 async def record_inbound_message(contact: ContactRead, msg: Message, storage: dict = None):
+    # logger.debug(msg)
     await contacts_create_message.asyncio(
         organization=contact.organization.slug,
         contact_id=contact.id,
@@ -54,7 +57,7 @@ async def record_inbound_message(contact: ContactRead, msg: Message, storage: di
             system=msg.system,
             metadata=asdict(msg.metadata),
             from_user={"wa_id": msg.from_user.wa_id, "name": msg.from_user.name},
-            reply_to_message=msg.reply_to_message,
+            reply_to_message=asdict(msg.reply_to_message) if msg.reply_to_message else None,
             error=msg.error,
             contact_id=contact.id,
         ),
@@ -73,8 +76,8 @@ async def record_callback_selection(contact: ContactRead, sel: CallbackSelection
             type=sel.type,
             metadata=asdict(sel.metadata),
             from_user={"wa_id": sel.from_user.wa_id, "name": sel.from_user.name},
-            reply_to_message=asdict(sel.reply_to_message),
-            data=sel.data,
+            reply_to_message=asdict(sel.reply_to_message) if sel.reply_to_message else None,
+            data=str(sel.data),
             title=sel.title,
             description=sel.description,
             contact_id=contact.id,

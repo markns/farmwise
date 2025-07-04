@@ -4,41 +4,11 @@ from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import TextResponse
-
 from farmwise.tools.farmbase import update_contact
 from farmwise.whatsapp.commands import activities
 
 
 def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    # activities = SectionList(
-    #     button_title="Select activity",
-    #     sections=[
-    #         Section(
-    #             title="Agronomy",
-    #             rows=[
-    #                 SectionRow(title="Choose seed variety", callback_data="Choose seed variety"),
-    #                 SectionRow(title="Crop suitability", callback_data="Crop suitability"),
-    #                 SectionRow(title="Soil advice", callback_data="Get soil advice"),
-    #                 SectionRow(title="Disease & pest advice", callback_data="Disease & pest advice"),
-    #             ],
-    #         ),
-    #         Section(
-    #             title="Farm Management",
-    #             rows=[
-    #                 SectionRow(title="Get market prices", callback_data="Get market prices"),
-    #                 SectionRow(title="Register field", callback_data="Register field"),
-    #             ],
-    #         ),
-    #         Section(
-    #             title="Settings",
-    #             rows=[
-    #                 SectionRow(title="Update product interests", callback_data="Update product interests"),
-    #                 SectionRow(title="Show profile", callback_data="Show profile"),
-    #             ],
-    #         ),
-    #     ],
-    # )
-
     return f"""{RECOMMENDED_PROMPT_PREFIX}
 Role and Purpose:
 
@@ -58,8 +28,8 @@ Core Capabilities:
     • Weather forecasting and scheduling.
     • Economic analysis and input planning.
 
-You can add the following section list to the WhatsAppResponse to offer the user a list of activities:
-{activities}
+Prompt the user to ask any questions they may have and add the following section list to the response to offer 
+the user a list of activities: {activities}
 
 {get_profile_and_memories(ctx.context)}
 """
@@ -75,7 +45,6 @@ triage_agent: Agent[UserContext] = Agent(
     output_type=TextResponse,
     model="gpt-4.1",
 )
-
 
 # • Interact with farm management databases to query or update records using tools like add_crop_record, get_field_info,
 #   update_fertilizer_use, and schedule_alert.
