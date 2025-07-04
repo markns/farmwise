@@ -36,12 +36,20 @@ async def list_messages(
         if message.storage and isinstance(message.storage, dict):
             storage_url = message.storage.get("url")
 
+        match message.type:
+            case MessageType.INTERACTIVE:
+                text = message.title
+            case MessageType.LOCATION:
+                text = str(message.location)
+            case _:
+                text = message.text
+
         summary = MessageSummary(
             id=message.id,
             timestamp=message.timestamp,
             direction=message.direction,
             type=message.type,
-            text=message.title if message.type is MessageType.INTERACTIVE else message.text,
+            text=text,
             caption=message.caption,
             storage_url=storage_url,
         )
