@@ -7,7 +7,7 @@ from loguru import logger
 from openai.types.responses import ResponseTextDeltaEvent
 
 from farmwise.schema import ResponseEvent, TextResponse, AudioResponse
-from farmwise.service import text_to_speech
+from farmwise.voice import text_to_speech
 
 
 class RunItemStreamEventName(str, Enum):
