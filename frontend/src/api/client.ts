@@ -19,7 +19,7 @@ export class ApiClient {
 
     this.instance = axios.create({
       baseURL: config.baseURL || apiBaseUrl,
-      timeout: config.timeout || 20000,
+      timeout: config.timeout || 60000,
     })
 
     this.setupInterceptors()
