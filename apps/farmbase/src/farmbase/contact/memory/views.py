@@ -1,13 +1,18 @@
+import json
 import logging
+from textwrap import dedent
 from typing import Any, Dict
 
 from async_lru import alru_cache
 from fastapi import APIRouter, HTTPException
 from mem0 import AsyncMemory
+from mem0.configs import prompts
 from mem0.configs.base import MemoryItem
 
 from farmbase.config import settings
+from farmbase.contact import service as contact_service
 from farmbase.contact.memory.models import MemoryAddResults, MemoryCreate, MemoryResults, SearchRequest
+from farmbase.database.core import DbSession
 
 DEFAULT_CONFIG = {
     "version": "v1.1",
@@ -58,13 +63,29 @@ async def memory_instance() -> AsyncMemory:
 
 
 @router.post("/", summary="Create memories", response_model=MemoryAddResults)
-async def add_memory(organization: str, contact_id: int, memory_create: MemoryCreate):
+async def add_memory(db_session: DbSession, organization: str, contact_id: int, memory_create: MemoryCreate):
     """Store new memories."""
     try:
         memory = await memory_instance()
+
+        contact = await contact_service.get(db_session=db_session, contact_id=contact_id)
+
+        custom_prompt = prompts.FACT_RETRIEVAL_PROMPT.replace(
+            "Remember the following:",
+            dedent(f"""
+            IMPORTANT: Do not return anything that is already included in the users existing profile here:
+            {json.dumps(contact.dict(), default=str)} 
+            
+            Remember the following:
+            """))
+
+        memory.config.custom_fact_extraction_prompt = custom_prompt
+
         response = await memory.add(
             messages=[m.model_dump() for m in memory_create.messages], user_id=get_user_id(organization, contact_id)
         )
+        memory.config.custom_fact_extraction_prompt = None
+
         return response
     except Exception as e:
         logging.exception("Error in add_memory:")  # This will log the full traceback
@@ -73,8 +94,8 @@ async def add_memory(organization: str, contact_id: int, memory_create: MemoryCr
 
 @router.get("/", summary="Get memories", response_model=MemoryResults)
 async def get_all_memories(
-    organization: str,
-    contact_id: int,
+        organization: str,
+        contact_id: int,
 ):
     """Retrieve stored memories."""
     try:
