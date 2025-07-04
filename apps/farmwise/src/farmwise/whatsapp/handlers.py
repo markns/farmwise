@@ -11,7 +11,7 @@ from farmwise.service import farmwise
 from farmwise.settings import settings
 from farmwise.storage import make_blob_public, upload_bytes_to_gcs
 from farmwise.whatsapp import commands
-from farmwise.whatsapp.responses import _send_audio_response, _send_text_response
+from farmwise.whatsapp.responses import send_audio_reply, send_text_reply
 from farmwise.whatsapp.store import record_callback_button, record_callback_selection, record_inbound_message
 
 # Intercept standard logging and route to loguru
@@ -58,9 +58,9 @@ async def location_handler(_: WhatsApp, msg: types.Message):
     async for event in response_events:
         match event.response:
             case TextResponse():
-                await _send_text_response(contact, event.response, msg)
+                await send_text_reply(contact, event.response, msg)
             case AudioResponse():
-                await _send_audio_response(event.response, msg)
+                await send_audio_reply(event.response, msg)
             case _:
                 logger.error(f"Unknown response type: {event.response}")
 
@@ -77,7 +77,12 @@ async def message_status_handler(_: WhatsApp, status: types.MessageStatus):
 async def on_menu_command(_: WhatsApp, msg: types.Message):
     logger.info(f"ON MENU: {msg}")
     await msg.indicate_typing()
-    await msg.reply_text(text="Please choose an activity", buttons=commands.activities)
+    context = await user_context(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
+    contact = context.contact
+    await record_inbound_message(contact, msg)
+    # await msg.reply_text(text="Please choose an activity", buttons=commands.activities)
+    await send_text_reply(contact, TextResponse(content="Please choose an activity",
+                                                section_list=commands.activities), msg)
 
 
 @WhatsApp.on_callback_selection(filters.startswith("/"), priority=1)
@@ -102,9 +107,9 @@ async def message_handler(_: WhatsApp, msg: types.Message):
     async for event in response_events:
         match event.response:
             case TextResponse():
-                await _send_text_response(contact, event.response, msg)
+                await send_text_reply(contact, event.response, msg)
             case AudioResponse():
-                await _send_audio_response(event.response, msg)
+                await send_audio_reply(event.response, msg)
             case _:
                 logger.error(f"Unknown response type: {event.response}")
 
@@ -128,9 +133,9 @@ async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
     async for event in response_events:
         match event.response:
             case TextResponse():
-                await _send_text_response(contact, event.response, sel)
+                await send_text_reply(contact, event.response, sel)
             case AudioResponse():
-                await _send_audio_response(event.response, sel)
+                await send_audio_reply(event.response, sel)
             case _:
                 logger.error(f"Unknown response type: {event.response}")
 
@@ -153,9 +158,9 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
     async for event in response_events:
         match event.response:
             case TextResponse():
-                await _send_text_response(contact, event.response, btn)
+                await send_text_reply(contact, event.response, btn)
             case AudioResponse():
-                await _send_audio_response(event.response, btn)
+                await send_audio_reply(event.response, btn)
             case _:
                 logger.error(f"Unknown response type: {event.response}")
 
@@ -202,9 +207,9 @@ async def image_handler(_: WhatsApp, msg: types.Message):
     async for event in response_events:
         match event.response:
             case TextResponse():
-                await _send_text_response(contact, event.response, msg)
+                await send_text_reply(contact, event.response, msg)
             case AudioResponse():
-                await _send_audio_response(event.response, msg)
+                await send_audio_reply(event.response, msg)
             case _:
                 logger.error(f"Unknown response type: {event.response}")
 

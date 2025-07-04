@@ -6,7 +6,7 @@ from farmwise.whatsapp.store import record_outbound_message
 from farmwise.whatsapp.utils import _convert_md_to_whatsapp
 
 
-async def _send_text_response(contact: ContactRead, response: TextResponse, msg: BaseUserUpdateAsync):
+async def send_text_reply(contact: ContactRead, response: TextResponse, msg: BaseUserUpdateAsync):
     """Send a WhatsApp response using the appropriate message type based on response content."""
 
     text = _convert_md_to_whatsapp(response.content)
@@ -22,7 +22,7 @@ async def _send_text_response(contact: ContactRead, response: TextResponse, msg:
     await record_outbound_message(contact, sent_message, text)
 
 
-async def _send_audio_response(response: AudioResponse, msg):
+async def send_audio_reply(response: AudioResponse, msg):
     await msg.reply_audio(audio=response.audio, mime_type="audio/ogg")
 
 
