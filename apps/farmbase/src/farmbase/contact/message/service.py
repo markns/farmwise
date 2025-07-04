@@ -73,7 +73,7 @@ async def list_messages(
     if message_type:
         query = query.where(Message.type == message_type)
 
-    query = query.order_by(Message.created_at.desc()).limit(limit).offset(offset)
+    query = query.order_by(Message.created_at.asc()).limit(limit).offset(offset)
 
     result = await db_session.execute(query)
     return result.scalars().all()

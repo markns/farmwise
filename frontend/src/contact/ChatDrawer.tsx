@@ -107,7 +107,10 @@ const ChatDrawer: React.FC = () => {
             </Box>
           ) : (
             <List sx={{ p: 0 }}>
-              {messages.map((message, _) => (
+              {messages
+                .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+                .slice(-100)
+                .map((message, _) => (
                 <ListItem key={message.id} sx={{ px: 0, py: 1, alignItems: 'flex-start' }}>
                   <Box sx={{ width: '100%' }}>
                     {/* Message Header */}

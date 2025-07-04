@@ -41,7 +41,7 @@ async def list_messages(
             timestamp=message.timestamp,
             direction=message.direction,
             type=message.type,
-            text=message.text,
+            text=message.title if message.type is MessageType.INTERACTIVE else message.text,
             caption=message.caption,
             storage_url=storage_url,
         )
