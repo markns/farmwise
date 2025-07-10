@@ -4,6 +4,7 @@ import uuid
 from loguru import logger
 from loguru_logging_intercept import InterceptHandler
 from pywa_async import WhatsApp, filters, types
+from pywa_async.types import FlowButton, FlowStatus, FlowActionType
 
 from farmwise.context import user_context
 from farmwise.schema import AudioResponse, TextResponse, UserInput
@@ -83,6 +84,21 @@ async def on_command(_: WhatsApp, msg: types.Message):
             await send_text_reply(contact,
                                   TextResponse(content=str(contact)),
                                   msg)
+        case "/login":
+
+            await msg.reply_text(
+                # to="1234567890",
+                text="Welcome to our app! Click the button below to login or sign up",
+                buttons=FlowButton(
+                    title="Sign Up",
+                    flow_id=1284875346194391,
+                    flow_token="5749d4f8-4b74-464a-8405-c26b7770cc8c",
+                    mode=FlowStatus.DRAFT,
+                    flow_action_type=FlowActionType.NAVIGATE,
+                    flow_action_screen="START",
+                )
+            )
+
 
 
 @WhatsApp.on_message(filters.text)

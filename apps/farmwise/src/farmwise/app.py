@@ -5,6 +5,7 @@ from pywa_async import WhatsApp
 
 from farmwise.settings import settings
 from farmwise.whatsapp import handlers, commands
+from farmwise.whatsapp.flows.sign_up import handlers as sign_up_handlers
 
 
 
@@ -39,7 +40,11 @@ wa = WhatsApp(
     verify_token=settings.WHATSAPP_VERIFY_TOKEN,
     app_id=settings.WHATSAPP_APP_ID,
     app_secret=settings.WHATSAPP_APP_SECRET,
-    handlers_modules=[handlers],
+    handlers_modules=[handlers, sign_up_handlers],
+
+    business_account_id=settings.WHATSAPP_BUSINESS_ACCOUNT_ID,
+    business_private_key=settings.WHATSAPP_BUSINESS_PRIVATE_KEY,
+    business_private_key_password=settings.WHATSAPP_BUSINESS_PRIVATE_KEY_PASSWORD
 )
 
 

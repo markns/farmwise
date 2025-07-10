@@ -1,11 +1,11 @@
-from typing import Any
+from typing import Any, Optional
 
 from agents import set_default_openai_key
 from dotenv import find_dotenv
 from pydantic import (
     HttpUrl,
     SecretStr,
-    TypeAdapter,
+    TypeAdapter, Base64Str,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     WHATSAPP_VERIFY_TOKEN: str
     WHATSAPP_APP_ID: int
     WHATSAPP_APP_SECRET: str
+    WHATSAPP_BUSINESS_ACCOUNT_ID: str | None = None
+    WHATSAPP_BUSINESS_PRIVATE_KEY: Optional[Base64Str] = None
+    WHATSAPP_BUSINESS_PRIVATE_KEY_PASSWORD: str | None = None
+
     GCS_BUCKET: str = "gs://farmwise_media"
 
     UPSTASH_REDIS_REST_URL: str
