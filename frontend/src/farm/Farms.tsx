@@ -1,11 +1,11 @@
 import React, {useEffect} from 'react'
-import {Box, Button, Chip, Tooltip, Typography,} from '@mui/material'
+import {Box, Button, Tooltip, Typography,} from '@mui/material'
 import {DataGrid, GridActionsCellItem, GridColDef, GridToolbar,} from '@mui/x-data-grid'
 import {Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon, Note as NoteIcon,} from '@mui/icons-material'
-import {useNavigate, useParams} from 'react-router-dom'
 import {type Contact, FarmStoreProvider, useFarmStore, type FarmWithContacts} from '@/stores/farmStore'
 import {withApiClient, type ApiClient} from '@/api/client'
 import LocationPopover from './LocationPopover'
+import ContactPopover from './ContactPopover'
 import NotesDrawer from './NotesDrawer'
 import FarmCreateEditDialog from './FarmCreateEditDialog'
 import FarmDeleteDialog from './FarmDeleteDialog'
@@ -16,8 +16,6 @@ interface FarmsProps {
 
 // Inner component that uses the store
 const FarmsContent: React.FC = () => {
-    const navigate = useNavigate()
-    const {organization = 'default'} = useParams()
     const {
         table,
         getAll,
@@ -42,12 +40,6 @@ const FarmsContent: React.FC = () => {
             default:
                 return 'default'
         }
-    }
-
-    const navigateToContact = (contactId: string) => {
-        navigate(`/${organization}/contacts`, {
-            state: {contact_id: contactId}
-        })
     }
 
     const handleShowNotes = (farm: FarmWithContacts) => {
@@ -105,13 +97,10 @@ const FarmsContent: React.FC = () => {
                     return (
                         <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
                             {contacts.map((contact) => (
-                                <Chip
+                                <ContactPopover
                                     key={contact.id}
-                                    label={contact.name}
-                                    size="small"
-                                    color={getContactRoleColor(contact.role)}
-                                    onClick={() => navigateToContact(contact.id)}
-                                    sx={{cursor: 'pointer', margin: 0.25}}
+                                    contact={contact}
+                                    chipColor={getContactRoleColor(contact.role)}
                                 />
                             ))}
                         </Box>

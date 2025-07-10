@@ -10,6 +10,7 @@ export interface Contact {
   id: string
   name: string
   role: string
+  phone_number?: string
 }
 
 export interface FarmWithContacts extends Farm {
