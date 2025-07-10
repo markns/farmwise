@@ -5,12 +5,12 @@ from temporalio.client import (
 )
 
 from . import TASK_QUEUE
-from .workflows import SendWeatherWorkflow
+from .workflows import WeatherForecastWorkflow
 
 weather_schedules = {
     "daily-weather-forecast": Schedule(
         action=ScheduleActionStartWorkflow(
-            workflow=SendWeatherWorkflow.run,
+            workflow=WeatherForecastWorkflow.run,
             # "my schedule arg",
             id="daily-weather-workflow",
             task_queue=TASK_QUEUE,

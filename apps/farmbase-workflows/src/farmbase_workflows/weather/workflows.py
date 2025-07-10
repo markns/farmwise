@@ -7,8 +7,8 @@ from farmbase_workflows.weather.activities import WeatherActivities
 from farmbase_workflows.whatsapp.activities import WhatsAppActivities
 
 
-@workflow.defn
-class SendWeatherWorkflow:
+@workflow.defn(name="weather-forecast")
+class WeatherForecastWorkflow:
     @workflow.run
     async def run(self):
         retry_policy = RetryPolicy(
@@ -43,11 +43,5 @@ class SendWeatherWorkflow:
                 start_to_close_timeout=timedelta(seconds=10),
             )
 
-            # Save new messages to db
-            await workflow.execute_activity_method(
-                WhatsAppActivities.save_message,
-                args=[contact, "\n".join(forecast_summary.forecast)],
-                start_to_close_timeout=timedelta(seconds=10),
-            )
 
         # TODO: What is the right thing to return here?

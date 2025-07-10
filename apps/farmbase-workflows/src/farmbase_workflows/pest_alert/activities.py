@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import selectinload
 from temporalio import activity
 
-from ..whatsapp.shared import SimpleContact
+from ..whatsapp.schema import SimpleContact
 from .schema import AlertDetails, AlertMessage, FarmWithContacts
 
 

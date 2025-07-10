@@ -1,10 +1,10 @@
 import os
-from typing import Any
+from typing import Any, Optional
 from urllib import parse
 
 from dotenv import find_dotenv
 from loguru import logger
-from pydantic import AnyHttpUrl, Field, SecretStr, computed_field
+from pydantic import AnyHttpUrl, Field, SecretStr, computed_field, Base64Str, Base64Bytes
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # --- Helper for file-path based defaults ---
@@ -88,6 +88,18 @@ class Settings(BaseSettings):
     ALEMBIC_CORE_REVISION_PATH: str = os.path.join(_BASE_DIR, "database/revisions/core")
     ALEMBIC_TENANT_REVISION_PATH: str = os.path.join(_BASE_DIR, "database/revisions/tenant")
     ALEMBIC_INI_PATH: str = os.path.join(_BASE_DIR, "alembic.ini")
+
+    TEMPORAL_HOST: str
+    TEMPORAL_PORT: int = 7233
+    TEMPORAL_TLS_CA_DATA: Optional[Base64Bytes] = None
+    TEMPORAL_TLS_CERT_DATA: Optional[Base64Bytes] = None
+    TEMPORAL_TLS_KEY_DATA: Optional[Base64Bytes] = None
+
+    # noinspection PyPep8Naming
+    @property
+    def TEMPORAL_ENDPOINT(self) -> str:
+        return f"{self.TEMPORAL_HOST}:{self.TEMPORAL_PORT}"
+
 
     def model_post_init(self, __context: Any) -> None:
         """

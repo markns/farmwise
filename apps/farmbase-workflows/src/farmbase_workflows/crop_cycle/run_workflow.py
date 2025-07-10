@@ -11,7 +11,7 @@ from temporalio.client import Client
 from farmbase_workflows import crop_cycle
 from farmbase_workflows.crop_cycle.schema import CropCycleEvent
 from farmbase_workflows.crop_cycle.workflows import CropCycleWorkflow
-from farmbase_workflows.whatsapp.shared import SimpleContact
+from farmbase_workflows.whatsapp.schema import SimpleContact
 
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use

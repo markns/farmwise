@@ -1,19 +1,18 @@
-import asyncio
+import traceback
+from datetime import date
 
-from pywa_async import WhatsApp
+from fastapi import APIRouter, HTTPException
+from loguru import logger
 from temporalio import workflow
-from temporalio.client import Client
+from temporalio.client import Client, WorkflowFailureError
 from temporalio.service import TLSConfig
 
-from farmbase_workflows import workers
-from farmbase_workflows.schedules import create_or_update_schedules
-from farmbase_workflows.settings import settings
+from farmbase.config import settings
 
-# Always pass through external modules to the sandbox that you know are safe for
-# workflow use
 with workflow.unsafe.imports_passed_through():
     from temporalio.contrib.pydantic import pydantic_data_converter
 
+router = APIRouter()
 
 async def get_temporal_client() -> Client:
     if any([settings.TEMPORAL_TLS_CA_DATA, settings.TEMPORAL_TLS_CERT_DATA, settings.TEMPORAL_TLS_KEY_DATA]):
@@ -29,18 +28,20 @@ async def get_temporal_client() -> Client:
     return client
 
 
-async def main():
+@router.post("/weather-forecast")
+async def weather_forecast():
     client = await get_temporal_client()
-    whatsapp = WhatsApp(
-        phone_id=settings.WHATSAPP_PHONE_ID,
-        token=settings.WHATSAPP_TOKEN,
-    )
+    try:
+        result = await client.start_workflow(
+            "weather-forecast",
+            id=f"weather-forecast-{date.today()}",
+            task_queue="weather-task-queue",
+        )
 
-    await create_or_update_schedules(client)
+        logger.info(f"Result: {result}")
+        return {"success": True, "workflow_id": result.id}
 
-    # await ensure_topics()
-    await workers.run_all(client, whatsapp)
-
-
-if __name__ == '__main__':
-    asyncio.run(main())
+    except WorkflowFailureError as e:
+        logger.error("Got expected exception: ", traceback.format_exc())
+        raise HTTPException(status_code=500, detail=e.cause)
+        return {"success": False, "error": "Workflow failed"}

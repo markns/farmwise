@@ -27,7 +27,7 @@ async def run_all(client: Client, whatsapp: WhatsApp):
 
     # List of all workers to manage
     workers = [
-        pest_alert_worker(client, whatsapp),
+        # pest_alert_worker(client, whatsapp),
         weather_worker(client, whatsapp),
         crop_cycle_worker(client, whatsapp),
     ]
@@ -39,7 +39,7 @@ async def run_all(client: Client, whatsapp: WhatsApp):
         run_task = asyncio.gather(*worker_run_tasks)
         # Create a Task for the interrupt event so asyncio.wait can monitor it
         interrupt_task = asyncio.create_task(interrupt_event.wait())
-
+        print("All workers are running...")
         # Wait for the interrupt event OR for a worker to fail
         await asyncio.wait([run_task, interrupt_task],
                            return_when=asyncio.FIRST_COMPLETED)

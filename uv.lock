@@ -923,6 +923,7 @@ dependencies = [
     { name = "sqlalchemy-filterset" },
     { name = "sqlalchemy-utils" },
     { name = "tabulate" },
+    { name = "temporalio" },
     { name = "xarray" },
 ]
 
@@ -967,6 +968,7 @@ requires-dist = [
     { name = "sqlalchemy-filterset", specifier = ">=2.3.0" },
     { name = "sqlalchemy-utils", specifier = ">=0.41.2" },
     { name = "tabulate", specifier = ">=0.9.0" },
+    { name = "temporalio", specifier = ">=1.11.1" },
     { name = "xarray", specifier = ">=2025.6.1" },
 ]
 
@@ -1013,7 +1015,17 @@ name = "farmbase-workflows"
 version = "0.1.0"
 source = { editable = "apps/farmbase-workflows" }
 dependencies = [
+    { name = "farmbase" },
+    { name = "geoalchemy2" },
+    { name = "loguru" },
+    { name = "more-itertools" },
+    { name = "pydantic" },
+    { name = "pydantic-extra-types" },
+    { name = "pydantic-settings" },
+    { name = "python-dotenv" },
+    { name = "python-weather" },
     { name = "pywa" },
+    { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "temporalio" },
 ]
 
@@ -1026,7 +1038,17 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "farmbase", editable = "apps/farmbase" },
+    { name = "geoalchemy2", specifier = ">=0.17.1" },
+    { name = "loguru", specifier = ">=0.7.3" },
+    { name = "more-itertools", specifier = ">=10.6.0" },
+    { name = "pydantic", specifier = ">=2.10.6" },
+    { name = "pydantic-extra-types", specifier = ">=2.10.4" },
+    { name = "pydantic-settings", specifier = ">=2.6.1" },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "python-weather", specifier = ">=2.0.7" },
     { name = "pywa", git = "https://github.com/david-lev/pywa.git?branch=templates-v2" },
+    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.39" },
     { name = "temporalio", specifier = ">=1.11.1" },
 ]
 

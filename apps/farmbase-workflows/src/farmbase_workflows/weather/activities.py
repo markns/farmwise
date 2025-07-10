@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from temporalio import activity
 
 
-from ..whatsapp.shared import SimpleContact
+from ..whatsapp.schema import SimpleContact
 from .schema import ForecastDetails, ForecastSummary
 
 
@@ -52,7 +52,6 @@ class WeatherActivities:
     {forecast.hourly_descriptions}
 """
         response = client.responses.parse(model="gpt-4.1-nano", input=input_, text_format=ForecastSummary)
-        print(response.output_parsed)
         return response.output_parsed
 
     @activity.defn

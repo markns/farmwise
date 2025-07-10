@@ -4,7 +4,7 @@ from temporalio import workflow
 from temporalio.common import RetryPolicy
 
 from ..whatsapp.activities import WhatsAppActivities
-from ..whatsapp.shared import SimpleContact
+from ..whatsapp.schema import SimpleContact
 from .activities import CropCycleActivities
 from .schema import CropCycleEvent
 

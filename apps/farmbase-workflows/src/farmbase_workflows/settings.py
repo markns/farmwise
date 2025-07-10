@@ -1,5 +1,7 @@
+from typing import Optional
+
 from dotenv import find_dotenv
-from pydantic import SecretStr
+from pydantic import SecretStr, Base64Bytes
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,6 +20,9 @@ class Settings(BaseSettings):
 
     TEMPORAL_HOST: str
     TEMPORAL_PORT: int = 7233
+    TEMPORAL_TLS_CA_DATA: Optional[Base64Bytes] = None
+    TEMPORAL_TLS_CERT_DATA: Optional[Base64Bytes] = None
+    TEMPORAL_TLS_KEY_DATA: Optional[Base64Bytes] = None
 
     # noinspection PyPep8Naming
     @property

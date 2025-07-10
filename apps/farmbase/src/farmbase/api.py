@@ -15,6 +15,7 @@ from farmbase.organization.views import router as organization_router
 from farmbase.products.views import router as products_router
 from farmbase.topic.views import router as topic_router
 from farmbase.topic.views import subscription_router
+from farmbase.workflow.views import router as workflow_router
 
 api_router = APIRouter()
 
@@ -40,11 +41,12 @@ authenticated_organization_api_router.include_router(contact_router, prefix="/co
 authenticated_organization_api_router.include_router(products_router, prefix="/products", tags=["products"])
 authenticated_organization_api_router.include_router(farm_router, prefix="/farms", tags=["farms"])
 authenticated_organization_api_router.include_router(note_router, prefix="/notes", tags=["notes"])
+authenticated_organization_api_router.include_router(topic_router, prefix="/topics", tags=["topics"])
+authenticated_organization_api_router.include_router(subscription_router, prefix="/subscriptions", tags=["subscriptions"])
+authenticated_organization_api_router.include_router(workflow_router, prefix="/workflows", tags=["workflows"])
 authenticated_api_router.include_router(commodity_router, prefix="/commodities", tags=["commodities"])
 authenticated_api_router.include_router(market_router, prefix="/markets", tags=["markets"])
 authenticated_api_router.include_router(price_router, prefix="/market_prices", tags=["market_prices"])
-authenticated_api_router.include_router(topic_router, prefix="/topics", tags=["topics"])
-authenticated_api_router.include_router(subscription_router, prefix="/subscriptions", tags=["subscriptions"])
 
 
 @api_router.get("/healthcheck", include_in_schema=False)

@@ -20,7 +20,7 @@ def pest_alert_worker(client: Client, wa: WhatsApp):
             alert_activities.get_recent_notes,
             alert_activities.find_nearby_farms,
             alert_activities.generate_alert_message,
-            whatsapp_activities.send_whatsapp_message,
-            whatsapp_activities.save_message,
+            whatsapp_activities.send_whatsapp_template,
+            # whatsapp_activities.save_message,
         ],
     )

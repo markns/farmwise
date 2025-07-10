@@ -19,6 +19,5 @@ def crop_cycle_worker(client: Client, wa: WhatsApp):
         activities=[
             crop_cycle_activities.log_event_sent,
             whatsapp_activities.send_whatsapp_template,
-            whatsapp_activities.save_message,
         ],
     )

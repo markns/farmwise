@@ -1,6 +1,6 @@
 from temporalio import workflow
 
-from farmbase_workflows.whatsapp.shared import SimpleContact
+from farmbase_workflows.whatsapp.schema import SimpleContact
 
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use
