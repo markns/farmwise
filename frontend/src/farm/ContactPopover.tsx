@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import {
-  Button,
   Card,
   CardContent,
   Typography,
@@ -31,10 +30,10 @@ interface ContactPopoverProps {
 const ContactPopover: React.FC<ContactPopoverProps> = ({ contact, chipColor = 'default' }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation()
-    setAnchorEl(event.currentTarget)
-  }
+  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   event.stopPropagation()
+  //   setAnchorEl(event.currentTarget)
+  // }
 
   const handleClose = () => {
     setAnchorEl(null)
@@ -48,7 +47,7 @@ const ContactPopover: React.FC<ContactPopoverProps> = ({ contact, chipColor = 'd
         label={contact.name}
         size="small"
         color={chipColor}
-        onClick={handleClick}
+        // click={handleClick}
         sx={{ cursor: 'pointer', margin: 0.25 }}
       />
 
