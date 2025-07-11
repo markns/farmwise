@@ -27,7 +27,7 @@ async def run_all(client: Client, whatsapp: WhatsApp):
 
     # List of all workers to manage
     workers = [
-        # pest_alert_worker(client, whatsapp),
+        pest_alert_worker(client, whatsapp),
         weather_worker(client, whatsapp),
         crop_cycle_worker(client, whatsapp),
     ]

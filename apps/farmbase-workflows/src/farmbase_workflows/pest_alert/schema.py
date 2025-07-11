@@ -19,8 +19,9 @@ class AlertDetails(BaseModel):
 
 
 class AlertMessage(BaseModel):
+    header: str
     summary: str
-    actions: list[str]
+    actions: str
 
 
 class FarmWithContacts(BaseModel):

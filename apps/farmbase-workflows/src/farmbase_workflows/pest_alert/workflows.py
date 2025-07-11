@@ -1,11 +1,10 @@
 from datetime import timedelta
-from textwrap import dedent
 
 from temporalio import workflow
 from temporalio.common import RetryPolicy
 
-from ..whatsapp.activities import WhatsAppActivities
 from .activities import AlertActivities
+from ..whatsapp.activities import WhatsAppActivities
 
 # Always pass through external modules to the sandbox that you know are safe for
 # workflow use
@@ -13,7 +12,7 @@ with workflow.unsafe.imports_passed_through():
     pass
 
 
-@workflow.defn
+@workflow.defn(name="pest-alert")
 class PestAlertWorkflow:
     @workflow.run
     async def run(self) -> str:
@@ -38,7 +37,7 @@ class PestAlertWorkflow:
         )
 
         if not recent_notes:
-            return "No recent notes found in the last hour"
+            return "No recent notes found in the last 24 hours"
 
         total_alerts_sent = 0
         notes_processed = 0
@@ -67,33 +66,22 @@ class PestAlertWorkflow:
             )
 
             for farm in nearby_farms:
-                # Format the complete alert message
-                full_message = dedent(f"""
-                🚨 FARM ALERT - {note_details.farm_name}
-
-                {alert_message.summary}
-
-                📋 RECOMMENDED ACTIONS:
-                """)
-                for i, action in enumerate(alert_message.actions, 1):
-                    full_message += f"{i}. {action}\n"
-
-                full_message += f"\n📍 Distance: {farm.distance_km}km from affected area"
-
                 for contact in farm.contacts:
+
+                    # TODO: Use subscriptions here
                     if contact.phone_number.startswith("X"):
                         continue
 
-                    await workflow.execute_activity_method(
-                        WhatsAppActivities.send_whatsapp_message,
-                        args=[contact, full_message],
-                        start_to_close_timeout=timedelta(seconds=10),
-                    )
+                    body_vars = [
+                        alert_message.summary,
+                        alert_message.actions.replace("\n", " "),
+                        "2"  # TODO: actual distance
+                    ]
 
-                    # Save new messages to db
+                    print(body_vars)
                     await workflow.execute_activity_method(
-                        WhatsAppActivities.save_message,
-                        args=[contact, full_message],
+                        WhatsAppActivities.send_whatsapp_template,
+                        args=[contact, "crop_pest_alert", alert_message.header, body_vars],
                         start_to_close_timeout=timedelta(seconds=10),
                     )
 

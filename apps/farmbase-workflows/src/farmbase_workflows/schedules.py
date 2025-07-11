@@ -16,7 +16,7 @@ def merge_dicts(dicts):
 
 all_schedules = merge_dicts([
     weather_schedules,
-    # pest_alert_schedules
+    pest_alert_schedules
 ])
 
 

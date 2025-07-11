@@ -1,7 +1,5 @@
-
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from temporalio import activity, workflow
-
 
 from .schema import SimpleContact
 
@@ -29,14 +27,17 @@ class WhatsAppActivities:
         from farmbase.contact.message.schemas import MessageCreate
 
         body_values = [
-            Template.TextValue(s.replace("\n", " ").replace("\r", " ").replace("    ", " ")[:500]) for s in body_values
+            Template.TextValue((s.replace("\n", " ")
+                                .replace("\r", " ")
+                                .replace("    ", " "))) for s in body_values
         ]
+
         template = Template(
-                name=template_name,
-                language=Template.Language.ENGLISH,
-                header=Template.TextValue(header.replace("\n", " ")) if header else None,
-                body=body_values,
-            )
+            name=template_name,
+            language=Template.Language.ENGLISH,
+            header=Template.TextValue(header.replace("\n", " ")) if header else None,
+            body=body_values,
+        )
 
         sent_template: SentTemplate = await self.whatsapp.send_template(
             to=contact.phone_number,

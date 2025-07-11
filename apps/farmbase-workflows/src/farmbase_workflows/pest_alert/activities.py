@@ -5,22 +5,21 @@ from geoalchemy2.shape import to_shape
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import selectinload
-from temporalio import activity
+from temporalio import activity, workflow
 
 from ..whatsapp.schema import SimpleContact
 from .schema import AlertDetails, AlertMessage, FarmWithContacts
 
+with workflow.unsafe.imports_passed_through():
+    from ..settings import settings
 
 class AlertActivities:
     @activity.defn
     async def get_recent_notes(self) -> list[AlertDetails]:
         """Get notes created in the last hour."""
-        # from farmbase.auth.models import FarmbaseUserOrganization
         from farmbase.database.core import engine
         from farmbase.farm.models import Farm
         from farmbase.farm.note.models import Note
-        #
-        # FarmbaseUserOrganization.organization
 
         organization = "default"
         schema = f"farmbase_organization_{organization}"
@@ -30,7 +29,7 @@ class AlertActivities:
             expire_on_commit=False,
         )
 
-        one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+        one_hour_ago = datetime.utcnow() - timedelta(hours=24)
 
         async with async_session_factory() as session:
             # Query for notes created in the last hour with farm details
@@ -69,11 +68,8 @@ class AlertActivities:
     @activity.defn
     async def find_nearby_farms(self, note_details: AlertDetails, radius_km: float = 5.0) -> list[FarmWithContacts]:
         """Find farms within the specified radius of the note's farm location."""
-        from farmbase.auth.models import FarmbaseUserOrganization
         from farmbase.database.core import engine
-        from farmbase.farm.models import Farm, FarmContact
-
-        FarmbaseUserOrganization.organization
+        from farmbase import Farm, FarmContact
 
         organization = "default"
         schema = f"farmbase_organization_{organization}"
@@ -148,25 +144,25 @@ class AlertActivities:
         """Generate an alert message using OpenAI based on the note content."""
         from openai import OpenAI
 
-        client = OpenAI()
+        client = OpenAI(api_key=settings.OPENAI_API_KEY.get_secret_value())
 
         prompt = f"""
 Based on the following farm note, create an alert message for nearby farmers:
 
-Farm: {note_details.farm_name}
 Note: {note_details.note_text}
 Tags: {note_details.tags or "None"}
 Date: {note_details.created_at}
 
-Generate:
-1. A brief summary of the situation (1-2 sentences)
-2. A list of 2-3 specific actions that nearby farmers should take
+IMPORTANT: Do NOT repeat the affected farmer's name in the alert message if it's found in the details above 
 
-Format your response as a JSON object with 'summary' and 'actions' fields.
-The 'actions' field should be a list of strings.
+Generate:
+1. A header message for the alert - eg. Alert - Fall Armyworm found in your area! 
+2. A brief summary of the situation (1-2 sentences)
+3. Specific actions that nearby farmers should take. You can add additional advice beyond what is in the
+original note here. Use fewer than 500 characters. 
+
 Keep the language simple, practical and actionable for farmers.
 """
-
         response = client.responses.parse(model="gpt-4.1", input=prompt, text_format=AlertMessage)
 
         return response.output_parsed

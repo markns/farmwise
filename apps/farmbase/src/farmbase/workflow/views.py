@@ -14,6 +14,7 @@ with workflow.unsafe.imports_passed_through():
 
 router = APIRouter()
 
+
 async def get_temporal_client() -> Client:
     if any([settings.TEMPORAL_TLS_CA_DATA, settings.TEMPORAL_TLS_CERT_DATA, settings.TEMPORAL_TLS_KEY_DATA]):
         tls = TLSConfig(server_root_ca_cert=settings.TEMPORAL_TLS_CA_DATA,
@@ -44,4 +45,21 @@ async def weather_forecast():
     except WorkflowFailureError as e:
         logger.error("Got expected exception: ", traceback.format_exc())
         raise HTTPException(status_code=500, detail=e.cause)
-        return {"success": False, "error": "Workflow failed"}
+
+
+@router.post("/pest-alert")
+async def pest_alert():
+    client = await get_temporal_client()
+    try:
+        result = await client.start_workflow(
+            "pest-alert",
+            id=f"pest-alert-{date.today()}",
+            task_queue="pest-alert-task-queue",
+        )
+
+        logger.info(f"Result: {result}")
+        return {"success": True, "workflow_id": result.id}
+
+    except WorkflowFailureError as e:
+        logger.error("Got expected exception: ", traceback.format_exc())
+        raise HTTPException(status_code=500, detail=e.cause)
