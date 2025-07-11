@@ -33,6 +33,7 @@ const ResultList = React.lazy(() => import('@/search/ResultList'))
 const MarketPrices = React.lazy(() => import('@/market/MarketPrices'))
 const SeedVarieties = React.lazy(() => import('@/seedVarieties/SeedVarieties'))
 const CropCalendar = React.lazy(() => import('@/cropCalendar/CropCalendar'))
+const Development = React.lazy(() => import('@/development/Development'))
 
 
 export interface RouteConfig {
@@ -170,6 +171,24 @@ export const protectedRoutes: RouteConfig[] = [
         path: 'members',
         element: withSuspense(OrganizationMemberTable),
         meta: { title: 'Members', subMenu: 'organization', group: 'organization' },
+      },
+    ],
+  },
+  {
+    path: '/:organization/development',
+    element: <DefaultLayout />,
+    meta: {
+      title: 'Development',
+      icon: 'mdi-code-braces',
+      group: 'development',
+      menu: true,
+      requiresAuth: true,
+    },
+    children: [
+      {
+        index: true,
+        element: withSuspense(Development),
+        meta: { title: 'Tools' },
       },
     ],
   },

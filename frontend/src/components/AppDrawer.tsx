@@ -17,6 +17,7 @@ import {
   TrendingUp as MarketIcon,
   Grass as SeedIcon,
   CalendarMonth as CalendarIcon,
+  Code as DevelopmentIcon,
   ExpandLess,
   ExpandMore,
 } from '@mui/icons-material'
@@ -111,6 +112,12 @@ const AppDrawer: React.FC = () => {
       icon: <SettingsIcon />,
       path: `/${organization}/settings`,
       group: 'settings',
+    },
+    {
+      title: 'Development',
+      icon: <DevelopmentIcon />,
+      path: `/${organization}/development`,
+      group: 'development',
     },
   ]
 
