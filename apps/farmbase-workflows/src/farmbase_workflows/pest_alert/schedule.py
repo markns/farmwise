@@ -1,7 +1,7 @@
 from temporalio.client import (
     Schedule,
     ScheduleActionStartWorkflow,
-    ScheduleSpec,
+    ScheduleSpec, ScheduleState,
 )
 
 from .workflows import PestAlertWorkflow
@@ -18,6 +18,7 @@ pest_alert_schedules = {
             cron_expressions=["0 19 * * *"],
             time_zone_name="Africa/Nairobi",  # EAT timezone
         ),
+        state=ScheduleState(paused=True)
     )
 
 }

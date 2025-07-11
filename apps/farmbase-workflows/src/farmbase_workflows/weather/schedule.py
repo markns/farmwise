@@ -1,7 +1,7 @@
 from temporalio.client import (
     Schedule,
     ScheduleActionStartWorkflow,
-    ScheduleSpec,
+    ScheduleSpec, ScheduleState,
 )
 
 from . import TASK_QUEUE
@@ -19,6 +19,7 @@ weather_schedules = {
             cron_expressions=["0 7 * * *"],  # UTC time: 7 AM EAT = 4 AM UTC
             time_zone_name="Africa/Nairobi",  # EAT corresponds to this IANA zone
         ),
+        state=ScheduleState(paused=True)
     ),
     # TODO: weather warning?
 }
