@@ -54,7 +54,13 @@ const NotesDrawer: React.FC = () => {
       open={dialogs.showNotes}
       onClose={closeNotes}
       PaperProps={{
-        sx: { width: 600 }
+        sx: { 
+          width: 600,
+          zIndex: 1300 // Ensure it appears above the top navigation
+        }
+      }}
+      sx={{
+        zIndex: 1300 // Ensure the backdrop also has proper z-index
       }}
     >
       <Card sx={{ height: '100%', borderRadius: 0 }}>
@@ -91,7 +97,7 @@ const NotesDrawer: React.FC = () => {
 
           {/* Notes content */}
           {!notes.loading && (
-            <Box sx={{ maxHeight: '70vh', overflowY: 'auto' }}>
+            <Box sx={{ height: 'calc(100vh - 120px)', overflow: 'auto' }}>
               {notes.items.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 8, color: 'text.secondary' }}>
                   <NoteOffIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
