@@ -68,7 +68,8 @@ class Product(BaseModel):
 @dataclass
 class Button(types.Button):
     title: str = field(metadata={"description": "The title of the button (up to 20 characters)"})
-
+    callback_data: str = field(
+        metadata={"description": "The data to send when the user clicks on the button (up to 256 characters"})
 
 
 @dataclass(frozen=True, slots=True)

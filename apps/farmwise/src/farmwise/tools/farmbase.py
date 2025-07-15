@@ -43,7 +43,7 @@ async def update_contact(wrapper: RunContextWrapper[UserContext], contact_in: Co
 @function_tool
 async def data_collection_consent(wrapper: RunContextWrapper[UserContext]) -> ContactConsentRead:
     """
-    Record the contact's consent for collecting data
+    Use this tool when the contact consents for data collection
     """
     contact = wrapper.context.contact
     return await contacts_create_contact_consent.asyncio(

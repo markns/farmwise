@@ -1,4 +1,4 @@
-from agents import Agent, RunContextWrapper
+from agents import Agent, RunContextWrapper, ModelSettings
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 from farmwise.agent.prompt_utils import get_profile_and_memories
@@ -36,11 +36,13 @@ Conversation Workflow
 
 Step 1: Initiate Conversation and get consent for data collection.
 
-Begin with a warm greeting to establish rapport, and then request consent by adding an ✅ I agree button.
+Begin with a warm greeting to establish rapport, and then request consent by adding an 
+"✅ I agree" button, with callback_data of "I agree to data collection"
+
 If the user does not give consent, DO NOT continue to step 2. 
 Use the data_collection_consent tool to record the consent when given. 
 
-Example:
+<example>
 “Hello! Welcome to FarmWise – your trusted partner for smart farming advice.
 
 With FarmWise you can:
@@ -51,7 +53,8 @@ With FarmWise you can:
 ⏰ Get reminders for key farm activities
 
 To help us serve you better, we’d like your permission to collect some data. Please click the agree button
-to continue.
+to continue. 
+</example>
 
 Step 2: Determine Occupation
 Classify occupation as "farmer", "extension_officer". 
@@ -101,6 +104,8 @@ a new list of activities:
 {activities}
 
 {get_profile_and_memories(ctx.context)}
+
+IMPORTANT: Never include both a function call and output text in the same response.
 """
 
 
@@ -111,6 +116,7 @@ onboarding_agent: Agent[UserContext] = Agent(
     handoff_description="This agent is used for onboarding new users into the system",
     instructions=onboarding_agent_instructions,
     tools=[data_collection_consent, update_contact, create_farm],
+    model_settings=ModelSettings(tool_choice="auto"),
     output_type=TextResponse,
     model="gpt-4.1",
 )
