@@ -19,7 +19,10 @@ from farmbase.database.core import Base
 
 
 class Market(Base):
-    __table_args__ = {"schema": "farmbase_core"}
+    __table_args__ = (
+        UniqueConstraint("name", name="uq_market_name"),
+        {"schema": "farmbase_core"},
+    )
     __tablename__ = "market"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
