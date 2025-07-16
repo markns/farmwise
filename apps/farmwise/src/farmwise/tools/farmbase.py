@@ -1,7 +1,7 @@
-from typing import Any, Coroutine
+import csv
+import io
 
 from agents import RunContextWrapper, function_tool
-from fastapi.exceptions import RequestValidationError
 
 from farmbase_client.api.contacts import contacts_patch_contact, contacts_create_contact_consent
 from farmbase_client.api.farms import farms_create_farm
@@ -13,11 +13,9 @@ from farmbase_client.models import (
     FarmCreate,
     FarmRead,
     MarketPagination,
-    MarketSnapshotRead,
     NoteCreate,
     NoteRead, ContactConsentCreate, ContactConsentRead,
 )
-
 from farmwise.context import UserContext
 from farmwise.farmbase import farmbase_api_client
 from farmwise.utils import join_with
@@ -103,9 +101,48 @@ async def get_markets(_: RunContextWrapper[UserContext], latitude: float, longit
 
 @function_tool(
     description_override="""
-Get a snapshot of market prices for a given market
+Get a snapshot of market prices for a given market,
+ formatted as csv with commodities as rows and price date as columns  
 """
 )
-async def get_market_price_snapshot(_: RunContextWrapper[UserContext], market_id: int) -> MarketSnapshotRead:
+async def get_market_price_snapshot(_: RunContextWrapper[UserContext], market_id: int) -> str:
+
+    def format_market_snapshot_csv(snapshot):
+        # Gather all unique price dates across all commodities
+        all_price_dates = sorted({
+            date for price_snapshot in snapshot.latest_prices
+            for date in price_snapshot.price_date
+        })
+
+        # Prepare CSV header
+        header = ["Commodity", "Unit", "Currency"] + [d.isoformat() for d in all_price_dates]
+
+        # Prepare rows
+        rows = []
+        for price_snapshot in snapshot.latest_prices:
+            price_lookup = dict(zip(price_snapshot.price_date, price_snapshot.retail_price))
+            row = [
+                      price_snapshot.commodity.name,
+                      price_snapshot.retail_unit or "",
+                      price_snapshot.retail_ccy or ""
+                  ] + [
+                      str(price_lookup.get(d)) if price_lookup.get(d) is not None else ""
+                      for d in all_price_dates
+                  ]
+            rows.append(row)
+
+        # Write to CSV string
+        buffer = io.StringIO()
+        writer = csv.writer(buffer)
+        writer.writerow(["Market", snapshot.market.name])
+        writer.writerow([])  # blank line for separation
+        writer.writerow(header)
+        writer.writerows(rows)
+
+        return buffer.getvalue()
+
     result = await markets_get_market_snapshot_endpoint.asyncio(client=farmbase_api_client, market_id=market_id)
-    return result
+
+    snapshot_csv = format_market_snapshot_csv(snapshot=result)
+
+    return snapshot_csv

@@ -146,7 +146,7 @@ async def get_market_snapshot_endpoint(
     db_session: DbSession,
     market_id: PrimaryKey,
 ):
-    """Get market snapshot with latest prices (3 months) for each commodity traded in this market."""
+    """Get market snapshot with latest prices (1 month) for each commodity traded in this market."""
     market = await get_market(db_session=db_session, market_id=market_id)
     if not market:
         raise EntityDoesNotExistError(message="Market not found.")
