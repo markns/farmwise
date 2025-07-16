@@ -23,3 +23,8 @@ async def get_session_state(context: UserContext) -> SessionState | None:
 async def set_session_state(context: UserContext, session_state: SessionState):
     key = get_state_key(context)
     await redis.set(key, session_state.model_dump_json(), ex=settings.SESSION_TTL_SECS)
+
+
+async def clear_session_state(context: UserContext):
+    key = get_state_key(context)
+    await redis.delete(key)

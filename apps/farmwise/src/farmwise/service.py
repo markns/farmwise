@@ -2,6 +2,7 @@ import tempfile
 from datetime import UTC, datetime
 from typing import AsyncIterator
 
+import openai
 import requests
 from agents import (
     Runner,
@@ -10,6 +11,7 @@ from agents import (
     trace,
 )
 from agents.voice import SingleAgentVoiceWorkflow, TTSModelSettings, VoicePipeline, VoicePipelineConfig
+from loguru import logger
 from openai.types.responses import (
     EasyInputMessageParam,
     ResponseInputImageParam,
@@ -24,7 +26,7 @@ from farmwise.context import UserContext
 from farmwise.farmbase import farmbase_api_client
 from farmwise.hooks import AgentHooks
 from farmwise.memory.memory import add_memory
-from farmwise.memory.session import get_session_state, set_session_state
+from farmwise.memory.session import get_session_state, set_session_state, clear_session_state
 from farmwise.schema import ResponseEvent, SessionState, TextResponse, UserInput
 from farmwise.stream import _batch_stream_events
 
@@ -71,55 +73,64 @@ class FarmwiseService:
         trace_id = gen_trace_id()
         contact = context.contact
 
-        with trace(
-                "FarmWise",
-                trace_id=trace_id,
-                group_id=contact.phone_number,
-                metadata={"username": contact.name, "organization": contact.organization.slug},
-        ):
-            result: RunResultStreaming = Runner.run_streamed(
-                agent, input=input_items, context=context, hooks=hooks, previous_response_id=previous_response_id
+        logger.debug(f"Agent starting https://platform.openai.com/traces/trace?trace_id={trace_id}")
+        try:
+            with trace(
+                    "FarmWise",
+                    trace_id=trace_id,
+                    group_id=contact.phone_number,
+                    metadata={"username": contact.name, "organization": contact.organization.slug},
+            ):
+                result: RunResultStreaming = Runner.run_streamed(
+                    agent, input=input_items, context=context, hooks=hooks, previous_response_id=previous_response_id
+                )
+
+                # TODO: tts = contact.config.text_to_speech
+                tts = False
+                async for event in _batch_stream_events(result.stream_events(), tts=tts):
+                    yield event
+
+            await set_session_state(
+                context, SessionState(last_agent=result.last_agent.name, previous_response_id=result.last_response_id)
             )
 
-            # TODO: tts = contact.config.text_to_speech
-            tts = False
-            async for event in _batch_stream_events(result.stream_events(), tts=tts):
-                yield event
+            if user_input.text:
+                text_response: TextResponse = result.final_output_as(TextResponse)
+                await add_memory(
+                    contact,
+                    messages=[
+                        Message(role="user", content=user_input.text),
+                        Message(role="assistant", content=text_response.content),
+                    ],
+                )
 
-        await set_session_state(
-            context, SessionState(last_agent=result.last_agent.name, previous_response_id=result.last_response_id)
-        )
-
-        if user_input.text:
-            text_response: TextResponse = result.final_output_as(TextResponse)
-            await add_memory(
-                contact,
-                messages=[
-                    Message(role="user", content=user_input.text),
-                    Message(role="assistant", content=text_response.content),
-                ],
-            )
-
-        usage = result.context_wrapper.usage
-        await contacts_create_run_result.asyncio(
-            client=farmbase_api_client,
-            organization=contact.organization.slug,
-            contact_id=contact.id,
-            body=RunResultCreate(
-                created_at=datetime.now(UTC),
+            usage = result.context_wrapper.usage
+            await contacts_create_run_result.asyncio(
+                client=farmbase_api_client,
+                organization=contact.organization.slug,
                 contact_id=contact.id,
-                input=user_input.text,
-                final_output=result.final_output,
-                last_agent=AgentCreate(name=result.last_agent.name),
-                trace_id=trace_id,
-                requests=usage.requests,
-                input_tokens=usage.input_tokens,
-                input_tokens_cached=usage.input_tokens_details.cached_tokens,
-                output_tokens=usage.output_tokens,
-                output_tokens_reasoning=usage.output_tokens_details.reasoning_tokens,
-                total_tokens=usage.total_tokens,
-            ),
-        )
+                body=RunResultCreate(
+                    created_at=datetime.now(UTC),
+                    contact_id=contact.id,
+                    input=user_input.text,
+                    final_output=result.final_output,
+                    last_agent=AgentCreate(name=result.last_agent.name),
+                    trace_id=trace_id,
+                    requests=usage.requests,
+                    input_tokens=usage.input_tokens,
+                    input_tokens_cached=usage.input_tokens_details.cached_tokens,
+                    output_tokens=usage.output_tokens,
+                    output_tokens_reasoning=usage.output_tokens_details.reasoning_tokens,
+                    total_tokens=usage.total_tokens,
+                ),
+            )
+
+        except openai.APIError as e:
+            logger.exception("An OpenAI error has occurred")
+            yield ResponseEvent(response=TextResponse(
+                content=f"Sorry, there has been a problem. Please try again.\n\nDetail: {e.message}"),
+                                has_more=False)
+            await clear_session_state(context)
 
     async def invoke_voice(self, user_input: UserInput) -> str:
         agent = agents[DEFAULT_AGENT]
