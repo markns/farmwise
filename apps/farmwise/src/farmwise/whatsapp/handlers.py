@@ -1,10 +1,8 @@
-import logging
 import uuid
 
 from loguru import logger
-from loguru_logging_intercept import InterceptHandler
 from pywa_async import WhatsApp, filters, types
-from pywa_async.types import FlowButton, FlowStatus, FlowActionType
+from pywa_async.types import FlowActionType, FlowButton, FlowStatus
 
 from farmwise.context import user_context
 from farmwise.schema import AudioResponse, TextResponse, UserInput
@@ -13,11 +11,9 @@ from farmwise.settings import settings
 from farmwise.storage import make_blob_public, upload_bytes_to_gcs
 from farmwise.whatsapp import commands
 from farmwise.whatsapp.commands import ActivityData
-from farmwise.whatsapp.responses import send_audio_reply, send_text_reply, send_responses
+from farmwise.whatsapp.flows.profile_edit.main import PROFILE_EDIT_FLOW_NAME
+from farmwise.whatsapp.responses import send_audio_reply, send_responses, send_text_reply
 from farmwise.whatsapp.store import record_callback_button, record_callback_selection, record_inbound_message
-
-# Intercept standard logging and route to loguru
-logging.basicConfig(handlers=[InterceptHandler()], level=logging.INFO, force=True)
 
 
 # TODO: Chat opened is not being triggered...
@@ -77,28 +73,32 @@ async def on_command(_: WhatsApp, msg: types.Message):
 
     match msg.text:
         case "/menu":
-            await send_text_reply(contact, TextResponse(content="Please choose an activity",
-                                                        section_list=commands.activities), msg)
+            await send_text_reply(
+                contact, TextResponse(content="Please choose an activity", section_list=commands.activities), msg
+            )
         case "/profile":
-            # TODO: Convert this to a flow
-            await send_text_reply(contact,
-                                  TextResponse(content=str(contact)),
-                                  msg)
-        case "/login":
+            # Import and use the profile edit flow
+            import uuid
+
+            from farmwise.whatsapp.flows.profile_edit.handlers import store_flow_token
+
+            # Generate a unique flow token
+            flow_token = str(uuid.uuid4())
+
+            # Store the mapping between flow token and WhatsApp ID
+            await store_flow_token(flow_token, msg.from_user.wa_id)
 
             await msg.reply_text(
-                # to="1234567890",
-                text="Welcome to our app! Click the button below to login or sign up",
+                text="Click the button below to edit your profile",
                 buttons=FlowButton(
-                    title="Sign Up",
-                    flow_id=1284875346194391,
-                    flow_token="5749d4f8-4b74-464a-8405-c26b7770cc8c",
+                    title="Edit Profile",
+                    flow_name=PROFILE_EDIT_FLOW_NAME,
+                    flow_token=flow_token,
                     mode=FlowStatus.DRAFT,
-                    flow_action_type=FlowActionType.NAVIGATE,
-                    flow_action_screen="START",
-                )
+                    flow_action_type=FlowActionType.DATA_EXCHANGE,
+                    flow_action_screen="PROFILE_EDIT",
+                ),
             )
-
 
 
 @WhatsApp.on_message(filters.text)

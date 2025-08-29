@@ -23,7 +23,7 @@ class RunItemStreamEventName(str, Enum):
 
 async def _batch_stream_events(event_stream: AsyncIterator[
     RawResponsesStreamEvent | RunItemStreamEvent | AgentUpdatedStreamEvent],
-                               tts: bool
+                               tts: bool = False
                                ) -> AsyncIterator[ResponseEvent]:
     accumulated = ""
     ready = ""

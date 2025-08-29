@@ -1,18 +1,36 @@
+import logging
+import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from loguru import logger
+from loguru_logging_intercept import setup_loguru_logging_intercept
 from pywa_async import WhatsApp
 
 from farmwise.settings import settings
-from farmwise.whatsapp import handlers, commands
-from farmwise.whatsapp.flows.sign_up import handlers as sign_up_handlers
+from farmwise.whatsapp import commands, handlers
+from farmwise.whatsapp.flows.profile_edit import handlers as profile_edit_handlers
 
+logger.remove()
+logger.add(
+    sys.stderr,
+    format="<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
+    "<level>{level: <8}</level> | "
+    "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>",
+    filter={
+        "httpcore": False,
+    },
+    level="DEBUG",
+)
+
+# Intercept standard logging and route to loguru
+setup_loguru_logging_intercept(level=logging.DEBUG)
 
 
 @asynccontextmanager
 async def lifespan(_):
-    print("Startup: Initializing resources...")
-    print(f"Whatsapp phone ID: {wa.phone_id}")
+    logger.info("Startup: Initializing resources...")
+    logger.info(f"Whatsapp phone ID: {wa.phone_id}")
     # Ice breakers don't allow emojis when set via API, so set these in the WhatsApp Manager
     # ice_breakers = [
     #     "🌻 What crops are suitable for my area",
@@ -40,11 +58,10 @@ wa = WhatsApp(
     verify_token=settings.WHATSAPP_VERIFY_TOKEN,
     app_id=settings.WHATSAPP_APP_ID,
     app_secret=settings.WHATSAPP_APP_SECRET,
-    handlers_modules=[handlers, sign_up_handlers],
-
+    handlers_modules=[handlers, profile_edit_handlers],
     business_account_id=settings.WHATSAPP_BUSINESS_ACCOUNT_ID,
     business_private_key=settings.WHATSAPP_BUSINESS_PRIVATE_KEY,
-    business_private_key_password=settings.WHATSAPP_BUSINESS_PRIVATE_KEY_PASSWORD
+    business_private_key_password=settings.WHATSAPP_BUSINESS_PRIVATE_KEY_PASSWORD,
 )
 
 

@@ -15,6 +15,7 @@ dependencies = [
     "pydub>=0.25.1",
     "pywa[cryptography,fastapi]>=2.10.0",
     "upstash-redis>=1.4.0",
+    "google-api-python-client>=2.176.0",
 ]
 
 [dependency-groups]
