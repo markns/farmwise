@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 import requests
 
@@ -7,7 +7,7 @@ import requests
 def daily_ranges(back_years=5):
     """Yield start and end dates (same day) for each day over the past `back_years`."""
     today = datetime.now().date()
-    start_date = today - timedelta(days=back_years * 365)
+    start_date = date(2025, 6, 9)
     current = start_date
     while current <= today:
         yield current, current  # start and end are the same for daily range
@@ -18,7 +18,7 @@ def download_excel(start_date, end_date, session=None):
     base_url = "https://kamis.kilimo.go.ke/site/market_search"
     params = {"start": start_date.isoformat(), "end": end_date.isoformat(), "per_page": 3000, "export": "excel"}
 
-    filename = f"data/kamis/market_prices/kamis_{start_date}.xlsx"
+    filename = f"/Users/markns/workspace/farmwise_data/kamis/market_prices/kamis_{start_date}.xlsx"
     if os.path.exists(filename):
         print(f"⏩ Skipping existing file: {filename}")
         return
