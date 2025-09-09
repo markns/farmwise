@@ -9,7 +9,6 @@ from pywa_async import WhatsApp
 
 from farmwise.settings import settings
 from farmwise.whatsapp import commands, handlers
-from farmwise.whatsapp.flows.profile_edit import handlers as profile_edit_handlers
 
 logger.remove()
 logger.add(
@@ -58,10 +57,13 @@ wa = WhatsApp(
     verify_token=settings.WHATSAPP_VERIFY_TOKEN,
     app_id=settings.WHATSAPP_APP_ID,
     app_secret=settings.WHATSAPP_APP_SECRET,
-    handlers_modules=[handlers, profile_edit_handlers],
-    business_account_id=settings.WHATSAPP_BUSINESS_ACCOUNT_ID,
-    business_private_key=settings.WHATSAPP_BUSINESS_PRIVATE_KEY,
-    business_private_key_password=settings.WHATSAPP_BUSINESS_PRIVATE_KEY_PASSWORD,
+    handlers_modules=[
+        handlers,
+        # profile_edit_handlers
+    ],
+    # business_account_id=settings.WHATSAPP_BUSINESS_ACCOUNT_ID,
+    # business_private_key=settings.WHATSAPP_BUSINESS_PRIVATE_KEY,
+    # business_private_key_password=settings.WHATSAPP_BUSINESS_PRIVATE_KEY_PASSWORD,
 )
 
 
