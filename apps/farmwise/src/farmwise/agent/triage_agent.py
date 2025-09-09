@@ -5,7 +5,7 @@ from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import update_contact
-from farmwise.whatsapp.commands import activities
+from farmwise.whatsapp.activities import activities
 
 
 def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:

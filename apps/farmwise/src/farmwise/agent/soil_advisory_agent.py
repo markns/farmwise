@@ -8,7 +8,7 @@ from farmwise.tools.tools import soil_properties
 
 
 def soil_advisory_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.commands import activities
+    from farmwise.whatsapp.activities import activities
 
     return f"""{RECOMMENDED_PROMPT_PREFIX} 
 1. Role & Objectives

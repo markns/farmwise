@@ -9,7 +9,7 @@ from farmwise.tools.tools import suitability_index, soil_properties
 
 
 def crop_suitability_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.commands import activities
+    from farmwise.whatsapp.activities import activities
     return f"""{RECOMMENDED_PROMPT_PREFIX}
 You are an agent that gives advice on which agricultural crops are most suitable for a given area.
 specific locations in Kenya.

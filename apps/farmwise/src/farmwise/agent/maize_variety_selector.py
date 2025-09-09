@@ -1,6 +1,6 @@
 from agents import Agent, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
-from pywa.types import SectionList, Section, SectionRow
+from pywa.types import Section, SectionList, SectionRow
 
 from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
@@ -10,7 +10,8 @@ from farmwise.tools.tools import aez_classification, elevation, growing_period, 
 
 
 def maize_variety_selector_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.commands import activities
+    from farmwise.whatsapp.activities import activities
+
     # TODO: these diseases and pests can be loaded from a database
     diseases = SectionList(
         button_title="Select disease",

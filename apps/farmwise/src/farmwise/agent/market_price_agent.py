@@ -9,7 +9,7 @@ from farmwise.tools.farmbase import get_market_price_snapshot, get_markets
 
 
 def market_price_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.commands import activities
+    from farmwise.whatsapp.activities import activities
 
     markets_list = SectionList(
         button_title="Select market",

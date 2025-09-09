@@ -1,14 +1,14 @@
-from agents import Agent, RunContextWrapper, ModelSettings
+from agents import Agent, ModelSettings, RunContextWrapper
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 
 from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import TextResponse
-from farmwise.tools.farmbase import create_farm, update_contact, data_collection_consent
+from farmwise.tools.farmbase import create_farm, data_collection_consent, update_contact
 
 
 def onboarding_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.commands import activities
+    from farmwise.whatsapp.activities import activities
 
     return f"""{RECOMMENDED_PROMPT_PREFIX}
 System Prompt for Onboarding Agent

@@ -8,7 +8,7 @@ from farmwise.tools.farmbase import create_note
 
 
 def crop_pathogen_diagnosis_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.commands import activities
+    from farmwise.whatsapp.activities import activities
     return f"""{RECOMMENDED_PROMPT_PREFIX}
 
 Behavioral Instructions: ￼

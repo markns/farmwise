@@ -5,12 +5,11 @@ from pywa_async import WhatsApp, filters, types
 from pywa_async.types import FlowActionType, FlowButton, FlowStatus
 
 from farmwise.context import user_context
-from farmwise.schema import AudioResponse, TextResponse, UserInput
+from farmwise.schema import ActivityData, AudioResponse, TextResponse, UserInput
 from farmwise.service import farmwise
 from farmwise.settings import settings
 from farmwise.storage import make_blob_public, upload_bytes_to_gcs
 from farmwise.whatsapp import commands
-from farmwise.whatsapp.commands import ActivityData
 from farmwise.whatsapp.flows.profile_edit.main import PROFILE_EDIT_FLOW_NAME
 from farmwise.whatsapp.responses import send_audio_reply, send_responses, send_text_reply
 from farmwise.whatsapp.store import record_callback_button, record_callback_selection, record_inbound_message
