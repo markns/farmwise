@@ -1,20 +1,18 @@
 from pywa import utils
 from pywa.types.flows import (
-    FlowJSON,
-    Screen,
-    ScreenData,
-    Form,
-    Footer,
-    Layout,
-    Action,
-    FlowActionType,
-    InputType,
-    TextHeading,
-    TextInput,
-    Dropdown,
+    DataSource,
     # DataSource,
     DatePicker,
-    CompleteAction, DataSource,
+    Dropdown,
+    # Action,
+    FlowJSON,
+    Form,
+    InputType,
+    Layout,
+    Screen,
+    ScreenData,
+    TextHeading,
+    TextInput,
 )
 
 PROFILE_EDIT_FLOW_JSON = FlowJSON(
@@ -34,7 +32,7 @@ PROFILE_EDIT_FLOW_JSON = FlowJSON(
                 current_gender := ScreenData(key="current_gender", example="male"),
                 current_date_of_birth := ScreenData(key="current_date_of_birth", example="1990-01-01"),
                 # current_estimated_age := ScreenData(key="current_estimated_age", example=30),
-            current_role := ScreenData(key="current_role", example="farmer"),
+                current_role := ScreenData(key="current_role", example="farmer"),
                 current_experience := ScreenData(key="current_experience", example=5),
                 current_email := ScreenData(key="current_email", example="john@example.com"),
             ],
@@ -104,26 +102,26 @@ PROFILE_EDIT_FLOW_JSON = FlowJSON(
                                 input_type=InputType.EMAIL,
                                 init_value=current_email.ref,
                             ),
-                            Footer(
-                                label="Update Profile",
-                                on_click_action=Action(
-                                    name=FlowActionType.COMPLETE,
-                                    payload={
-                                        "name": name.ref,
-                                        "preferred_form_of_address": preferred_address.ref,
-                                        "gender": gender.ref,
-                                        "date_of_birth": date_of_birth.ref,
-                                        # "estimated_age": estimated_age.ref,
-                                        "role": role.ref,
-                                        "experience": experience.ref,
-                                        "email": email.ref,
-                                    },
-                                ),
-                            ),
-                        ]
-                    )
+                            # Footer(
+                            #     label="Update Profile",
+                            #     on_click_action=Action(
+                            #         name=FlowActionType.COMPLETE,
+                            #         payload={
+                            #             "name": name.ref,
+                            #             "preferred_form_of_address": preferred_address.ref,
+                            #             "gender": gender.ref,
+                            #             "date_of_birth": date_of_birth.ref,
+                            #             # "estimated_age": estimated_age.ref,
+                            #             "role": role.ref,
+                            #             "experience": experience.ref,
+                            #             "email": email.ref,
+                            #         },
+                            #     ),
+                            # ),
+                        ],
+                    ),
                 ]
-            )
+            ),
         )
-    ]
+    ],
 )
