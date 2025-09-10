@@ -61,7 +61,7 @@ wa = WhatsApp(
         handlers,
         # profile_edit_handlers
     ],
-    # business_account_id=settings.WHATSAPP_BUSINESS_ACCOUNT_ID,
+    business_account_id=settings.WHATSAPP_BUSINESS_ACCOUNT_ID,
     # business_private_key=settings.WHATSAPP_BUSINESS_PRIVATE_KEY,
     # business_private_key_password=settings.WHATSAPP_BUSINESS_PRIVATE_KEY_PASSWORD,
 )
