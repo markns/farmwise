@@ -34,3 +34,6 @@ pywa = { git = "https://github.com/david-lev/pywa.git", branch = "templates-v2" 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[project.scripts]
+farmwise-agents = "farmwise.repl:main"
