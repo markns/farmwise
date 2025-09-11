@@ -1,7 +1,6 @@
 import argparse
 import asyncio
 import os
-from pathlib import Path
 from typing import Optional
 
 from agents import ItemHelpers, Runner
@@ -11,6 +10,11 @@ from openai.types.responses import EasyInputMessageParam, ResponseInputTextParam
 
 from farmwise.agent import DEFAULT_AGENT, agents
 from farmwise.context import UserContext
+from farmwise.memory.session import (
+    get_session_state,
+    set_session_state,
+)
+from farmwise.schema import SessionState
 
 
 def _build_user_context(name: str, phone: str, organization_slug: str = "default") -> UserContext:
@@ -50,30 +54,9 @@ async def _run_sync(agent, text: str, previous_response_id: Optional[str], conte
     return res
 
 
-SESS_DIR = Path(os.environ.get("FARMWISE_SESS_DIR", Path.home() / ".farmwise" / "sessions"))
-
-
-def _load_previous_response_id(session_id: Optional[str]) -> Optional[str]:
-    if not session_id:
-        return None
-    path = SESS_DIR / f"{session_id}.txt"
-    try:
-        return path.read_text().strip() or None
-    except FileNotFoundError:
-        return None
-
-
-def _save_previous_response_id(session_id: Optional[str], response_id: Optional[str]) -> None:
-    if not session_id or not response_id:
-        return
-    SESS_DIR.mkdir(parents=True, exist_ok=True)
-    (SESS_DIR / f"{session_id}.txt").write_text(response_id)
-
-
 async def chat(
     agent_name: Optional[str],
     message: Optional[str],
-    session_id: Optional[str],
     interactive: bool,
     name: str,
     phone: str,
@@ -81,9 +64,18 @@ async def chat(
 ):
     load_dotenv()
 
-    agent = agents[agent_name] if agent_name else agents[DEFAULT_AGENT]
-    previous_response_id: Optional[str] = _load_previous_response_id(session_id)
+    # Build a minimal context keyed by phone/org for session lookup
     context = _build_user_context(name=name, phone=phone)
+
+    # Load persisted session state (last agent + previous_response_id)
+    sess = await get_session_state(context)
+    previous_response_id: Optional[str] = sess.previous_response_id if sess else None
+
+    # Select agent
+    if sess and sess.last_agent in agents:
+        agent = agents[sess.last_agent]
+    else:
+        agent = agents[DEFAULT_AGENT]
 
     if interactive:
         print(f"Interactive chat with '{agent.name}'. Ctrl-D or 'exit' to quit.")
@@ -102,8 +94,12 @@ async def chat(
                 else:
                     res = await _run_streamed(agent, user_text, previous_response_id, context)
 
+                # Update session state with last agent and response id
                 previous_response_id = res.last_response_id
-                _save_previous_response_id(session_id, previous_response_id)
+                await set_session_state(
+                    context,
+                    SessionState(last_agent=res.last_agent.name, previous_response_id=previous_response_id),
+                )
         except KeyboardInterrupt:
             print()
             return
@@ -116,7 +112,9 @@ async def chat(
             res = await _run_streamed(agent, message, previous_response_id, context)
 
         previous_response_id = res.last_response_id
-        _save_previous_response_id(session_id, previous_response_id)
+        await set_session_state(
+            context, SessionState(last_agent=res.last_agent.name, previous_response_id=previous_response_id)
+        )
 
 
 def list_agents():
@@ -138,11 +136,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_chat.add_argument("--agent", "-a", help="Agent name (defaults to triage/default)")
     p_chat.add_argument("--message", "-m", help="One-shot message (omit for interactive mode)")
     p_chat.add_argument("--interactive", "-i", action="store_true", help="Interactive REPL mode")
-    p_chat.add_argument(
-        "--session",
-        "-s",
-        help="Thread id for previous_response_id continuity (e.g. user_123)",
-    )
+    # Session continuity is handled via Redis by phone/org; no explicit session id needed.
     p_chat.add_argument("--name", default=os.environ.get("FW_NAME", "CLI User"), help="User name for context")
     p_chat.add_argument("--phone", default=os.environ.get("FW_PHONE", "+0000000000"), help="Phone for context")
     p_chat.add_argument("--non-stream", action="store_true", help="Disable streaming; print final output only")
@@ -151,7 +145,6 @@ def build_parser() -> argparse.ArgumentParser:
         await chat(
             agent_name=args.agent,
             message=args.message,
-            session_id=args.session,
             interactive=args.interactive or (args.message is None),
             name=args.name,
             phone=args.phone,
