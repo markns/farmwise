@@ -3,8 +3,9 @@ from datetime import UTC, datetime
 
 from farmbase_client.api.contacts import contacts_create_message
 from farmbase_client.models import ContactRead, MessageCreate, MessageDirection, MessageType
-from pywa_async.types import CallbackButton, CallbackSelection, SentMessage
+from pywa_async.types import CallbackButton, CallbackSelection
 from pywa_async.types.message import Message
+from pywa_async.types.sent_message import SentMessage
 
 from farmwise.farmbase import farmbase_api_client
 from farmwise.whatsapp.utils import asdict_with_exclusions
