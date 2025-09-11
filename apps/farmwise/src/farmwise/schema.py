@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Iterable
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from pywa_async import types
 
 
@@ -69,7 +69,8 @@ class Product(BaseModel):
 class Button(types.Button):
     title: str = field(metadata={"description": "The title of the button (up to 20 characters)"})
     callback_data: str = field(
-        metadata={"description": "The data to send when the user clicks on the button (up to 256 characters"})
+        metadata={"description": "The data to send when the user clicks on the button (up to 256 characters"}
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -82,25 +83,29 @@ class ActivityData(types.CallbackData):  # Subclass CallbackData
 class SectionRow(types.SectionRow):
     title: str = field(metadata={"description": "The title of the row (up to 24 characters)"})
     callback_data: str | ActivityData = field(
-        metadata={"description": "The payload to send when the user clicks on the row up to 200 characters"})
-    description: str | None = field(default=None,
-                                    metadata={
-                                        "description": "The description of the row (optional, up to 72 characters)"})
+        metadata={"description": "The payload to send when the user clicks on the row up to 200 characters"}
+    )
+    description: str | None = field(
+        default=None, metadata={"description": "The description of the row (optional, up to 72 characters)"}
+    )
 
 
 @dataclass
 class Section(types.Section):
     title: str = field(metadata={"description": "The title of the section (up to 24 characters)"})
     rows: Iterable[SectionRow] = field(
-        metadata={"description": "The rows in the section (at least 1, no more than 10)"})
+        metadata={"description": "The rows in the section (at least 1, no more than 10)"}
+    )
 
 
 @dataclass
 class SectionList(types.SectionList):
     button_title: str = field(
-        metadata={"description": "The title of the button that opens the section list (up to 20 characters)"})
+        metadata={"description": "The title of the button that opens the section list (up to 20 characters)"}
+    )
     sections: Iterable[Section] = field(
-        metadata={"description": "The sections in the section list (at least 1, no more than 10)"})
+        metadata={"description": "The sections in the section list (at least 1, no more than 10)"}
+    )
 
 
 class TextResponse(BaseModel):
@@ -127,6 +132,7 @@ class TextResponse(BaseModel):
     #     description="This field can be used by the LLM to tell the user that it's not clear how to respond, "
     #     "and how the user can improve subsequent requests"
     # )
+    agent_complete: bool = Field(default=False, description="Whether the agent has completed its task.")
 
 
 class AudioResponse(BaseModel):

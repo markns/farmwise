@@ -5,7 +5,6 @@ from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import update_contact
-from farmwise.whatsapp.activities import activities
 
 
 def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
@@ -28,8 +27,7 @@ Core Capabilities:
     • Weather forecasting and scheduling.
     • Economic analysis and input planning.
 
-Prompt the user to ask any questions they may have and add the following section list to the response to offer 
-the user a list of activities: {activities}
+Prompt the user to ask any questions they may have and set the agent_complete boolean to True.    
 
 {get_profile_and_memories(ctx.context)}
 """

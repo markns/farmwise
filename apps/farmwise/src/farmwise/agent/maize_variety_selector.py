@@ -10,8 +10,6 @@ from farmwise.tools.tools import aez_classification, elevation, growing_period, 
 
 
 def maize_variety_selector_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.activities import activities
-
     # TODO: these diseases and pests can be loaded from a database
     diseases = SectionList(
         button_title="Select disease",
@@ -71,8 +69,7 @@ Follow this protocol:
 
 If the farmer asks a question that is not related to the routine, transfer back to the triage agent.
  
-When the interaction is complete prompt the user to ask follow up questions, and add the following section list 
-to the response to offer the user a new list of activities: {activities}
+When the interaction is complete prompt the user to ask follow up questions, and set the agent_complete boolean to True.
 
 {get_profile_and_memories(ctx.context)}
 """

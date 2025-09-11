@@ -5,11 +5,10 @@ from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import TextResponse
 from farmwise.tools.farmbase import update_contact
-from farmwise.tools.tools import suitability_index, soil_properties
+from farmwise.tools.tools import soil_properties, suitability_index
 
 
 def crop_suitability_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.activities import activities
     return f"""{RECOMMENDED_PROMPT_PREFIX}
 You are an agent that gives advice on which agricultural crops are most suitable for a given area.
 specific locations in Kenya.
@@ -23,8 +22,7 @@ location
 
 If the farmer asks a question that is not related to the routine, transfer back to the triage agent.
  
-When the interaction is complete prompt the user to ask follow up questions, and add the following section list 
-to the response to offer the user a new list of activities: {activities}
+When the interaction is complete prompt set the agent_complete boolean to True.
 
 {get_profile_and_memories(ctx.context)}
 """

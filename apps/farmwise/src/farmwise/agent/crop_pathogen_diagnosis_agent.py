@@ -8,7 +8,6 @@ from farmwise.tools.farmbase import create_note
 
 
 def crop_pathogen_diagnosis_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.activities import activities
     return f"""{RECOMMENDED_PROMPT_PREFIX}
 
 Behavioral Instructions: ￼
@@ -59,8 +58,8 @@ Routine for Crop Pest and Disease Diagnosis Agent
     and alerting. 
 10.	Log the Diagnosis
     Summarise the diagnosis and advice and record for future reference using the create_note tool.
-11. When the interaction is complete prompt the user to ask follow up questions, and add the following section list 
-    to the response to offer the user a new list of activities: {activities}
+11. When the interaction is complete prompt the user to ask follow up questions, and set the agent_complete boolean 
+    to True.
 
 {get_profile_and_memories(ctx.context)}
 """

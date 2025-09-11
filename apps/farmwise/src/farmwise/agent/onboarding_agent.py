@@ -8,8 +8,6 @@ from farmwise.tools.farmbase import create_farm, data_collection_consent, update
 
 
 def onboarding_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.activities import activities
-
     return f"""{RECOMMENDED_PROMPT_PREFIX}
 System Prompt for Onboarding Agent
 
@@ -99,9 +97,7 @@ After gathering the location, use the create_farm tool to record the information
 The name of the farm should simply be the farmer's name with Farm. For example if the user's name is Hudson Ndege, the 
 name of the farm should be Hudson Ndege's Farm. 
 
-When the interaction is complete add the following section list to the response to offer the user 
-a new list of activities:
-{activities}
+When the interaction is complete prompt set the agent_complete boolean to True.
 
 {get_profile_and_memories(ctx.context)}
 

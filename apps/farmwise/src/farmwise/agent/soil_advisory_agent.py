@@ -8,8 +8,6 @@ from farmwise.tools.tools import soil_properties
 
 
 def soil_advisory_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.activities import activities
-
     return f"""{RECOMMENDED_PROMPT_PREFIX} 
 1. Role & Objectives
 
@@ -74,8 +72,7 @@ The advisory session is complete when the farmer:
 	2.	Receives soil-property-based recommendations for each field.
 	3.	Acknowledges understanding or ends the conversation. 
 
-When the interaction is complete prompt the user to ask follow up questions, and add the following section list 
-to the response to offer the user a new list of activities: {activities}
+When the interaction is complete prompt set the agent_complete boolean to True.
 
 {get_profile_and_memories(ctx.context)}
 """

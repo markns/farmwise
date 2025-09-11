@@ -9,8 +9,6 @@ from farmwise.tools.farmbase import get_market_price_snapshot, get_markets
 
 
 def market_price_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
-    from farmwise.whatsapp.activities import activities
-
     markets_list = SectionList(
         button_title="Select market",
         sections=[
@@ -45,8 +43,8 @@ Workflow:
 7. Format the price information clearly in the response content, for example:
    Tomato: 300 KES/kg (↑5% from last week)
    Onion: 50 KES/kg (↔0% change)
-8. After completing this workflow ask if the user would like prices for other products or from other markets, and
-   add the following section list to the response to offer the user a new list of activities: {activities}
+8. After completing this workflow ask if the user would like prices for other products or from other markets 
+   and set the agent_complete boolean to True.    
 
 {get_profile_and_memories(ctx.context)}
 """

@@ -1,8 +1,9 @@
+from farmbase_client.models import ContactRead
 from loguru import logger
 from pywa_async.types.base_update import BaseUserUpdateAsync
 
-from farmbase_client.models import ContactRead
-from farmwise.schema import Action, AudioResponse, TextResponse, SectionList, Button
+from farmwise.schema import Action, AudioResponse, Button, SectionList, TextResponse
+from farmwise.whatsapp.activities import activities
 from farmwise.whatsapp.store import record_outbound_message
 from farmwise.whatsapp.utils import _convert_md_to_whatsapp
 
@@ -26,14 +27,16 @@ async def send_text_reply(contact: ContactRead, response: TextResponse, msg: Bas
         sent_message = await msg.reply_location_request(response.content)
     elif response.section_list:
         section_list = ensure_valid_section_list(response.section_list)
-        sent_message = await msg.reply_text(text=text,
-                                            buttons=section_list)
+        sent_message = await msg.reply_text(text=text, buttons=section_list)
     elif response.buttons:
         buttons = ensure_valid_buttons(response.buttons)
-        sent_message = await msg.reply_text(text=text,
-                                            buttons=buttons)
+        sent_message = await msg.reply_text(text=text, buttons=buttons)
     else:
-        sent_message = await msg.reply_text(text)
+        if response.agent_complete:
+            section_list = ensure_valid_section_list(activities)
+        else:
+            section_list = None
+        sent_message = await msg.reply_text(text=text, buttons=section_list)
 
     await record_outbound_message(contact, sent_message, text)
 
