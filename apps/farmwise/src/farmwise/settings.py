@@ -3,9 +3,10 @@ from typing import Any, Optional
 from agents import set_default_openai_key
 from dotenv import find_dotenv
 from pydantic import (
+    Base64Str,
     HttpUrl,
     SecretStr,
-    TypeAdapter, Base64Str,
+    TypeAdapter,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -30,6 +31,10 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: SecretStr
     FARMBASE_ENDPOINT: str
     FARMBASE_API_KEY: SecretStr
+
+    FARMBETTER_ENDPOINT: str
+    FARMBETTER_TOKEN: SecretStr
+
     ISDA_USERNAME: str
     ISDA_PASSWORD: SecretStr
     WHATSAPP_TOKEN: str
