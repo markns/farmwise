@@ -11,10 +11,10 @@ from openai.types.responses import EasyInputMessageParam, ResponseInputTextParam
 from farmwise.agent import DEFAULT_AGENT, agents
 from farmwise.context import UserContext
 from farmwise.memory.session import (
-    get_session_state,
+    SessionState,
+    get_or_create_session,
     set_session_state,
 )
-from farmwise.schema import SessionState
 
 
 def _build_user_context(name: str, phone: str, organization_slug: str = "default") -> UserContext:
@@ -68,12 +68,12 @@ async def chat(
     context = _build_user_context(name=name, phone=phone)
 
     # Load persisted session state (last agent + previous_response_id)
-    sess = await get_session_state(context)
+    sess = await get_or_create_session(context)
     previous_response_id: Optional[str] = sess.previous_response_id if sess else None
 
     # Select agent
-    if sess and sess.last_agent in agents:
-        agent = agents[sess.last_agent]
+    if sess and sess.current_agent in agents:
+        agent = agents[sess.current_agent]
     else:
         agent = agents[DEFAULT_AGENT]
 
@@ -98,7 +98,7 @@ async def chat(
                 previous_response_id = res.last_response_id
                 await set_session_state(
                     context,
-                    SessionState(last_agent=res.last_agent.name, previous_response_id=previous_response_id),
+                    SessionState(current_agent=res.last_agent.name, previous_response_id=previous_response_id),
                 )
         except KeyboardInterrupt:
             print()
@@ -113,7 +113,7 @@ async def chat(
 
         previous_response_id = res.last_response_id
         await set_session_state(
-            context, SessionState(last_agent=res.last_agent.name, previous_response_id=previous_response_id)
+            context, SessionState(current_agent=res.last_agent.name, previous_response_id=previous_response_id)
         )
 
 

@@ -4,7 +4,6 @@ from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import TextResponse
-from farmwise.tools.farmbase import update_contact
 
 
 def triage_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
@@ -39,7 +38,9 @@ triage_agent: Agent[UserContext] = Agent(
     crop planning, pest management, input optimization, and farm data updates. Transfer back to this agent when the 
     message from the user isn't relevant to your instructions.""",
     instructions=triage_agent_instructions,
-    tools=[update_contact],
+    tools=[
+        # update_contact
+    ],
     output_type=TextResponse,
     model="gpt-4.1",
 )

@@ -2,17 +2,16 @@ import uuid
 
 from loguru import logger
 from pywa_async import WhatsApp, filters, types
-from pywa_async.types import FlowActionType, FlowButton, FlowStatus
 
-from farmwise.context import user_context
+from farmwise.context import get_or_create_user
 from farmwise.schema import ActivityData, AudioResponse, TextResponse, UserInput
 from farmwise.service import farmwise
 from farmwise.settings import settings
 from farmwise.storage import make_blob_public, upload_bytes_to_gcs
 from farmwise.whatsapp import commands
-from farmwise.whatsapp.flows.profile_edit.main import PROFILE_EDIT_FLOW_NAME
+from farmwise.whatsapp.activities import activities
 from farmwise.whatsapp.responses import send_audio_reply, send_responses, send_text_reply
-from farmwise.whatsapp.store import record_callback_button, record_callback_selection, record_inbound_message
+from farmwise.whatsapp.store import record_callback_selection
 
 
 # TODO: Chat opened is not being triggered...
@@ -43,20 +42,18 @@ async def location_handler(_: WhatsApp, msg: types.Message):
     logger.info(f"{msg}")
 
     await msg.mark_as_read()
-    context = await user_context(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
-    contact = context.contact
-    await record_inbound_message(contact, msg)
+    context = await get_or_create_user(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
     await msg.indicate_typing()
 
     user_input = UserInput(text=f"My location is {msg.location}")
 
     response_events = farmwise.invoke(context, user_input)
-    await send_responses(contact, response_events, msg)
+    await send_responses(response_events, msg)
 
 
 @WhatsApp.on_message_status()
 async def message_status_handler(_: WhatsApp, status: types.MessageStatus):
-    logger.info(f"STATUS {status}")
+    logger.debug(f"Status: {status}")
 
 
 cmds = [c.name for c in commands.commands]
@@ -64,108 +61,102 @@ cmds = [c.name for c in commands.commands]
 
 @WhatsApp.on_message(filters.command(*cmds, prefixes="/", ignore_case=True), priority=1)
 async def on_command(_: WhatsApp, msg: types.Message):
-    logger.info(f"ON COMMAND: {msg}")
+    logger.info(f"Command: {msg}")
     await msg.indicate_typing()
-    context = await user_context(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
-    contact = context.contact
-    await record_inbound_message(contact, msg)
 
     match msg.text:
         case "/menu":
             await send_text_reply(
-                contact, TextResponse(content="Please choose an activity", section_list=commands.activities), msg
+                TextResponse(content="Please choose an activity", section_list=activities.activities), msg
             )
-        case "/profile":
-            # Import and use the profile edit flow
-            import uuid
-
-            from farmwise.whatsapp.flows.profile_edit.handlers import store_flow_token
-
-            # Generate a unique flow token
-            flow_token = str(uuid.uuid4())
-
-            # Store the mapping between flow token and WhatsApp ID
-            await store_flow_token(flow_token, msg.from_user.wa_id)
-
-            await msg.reply_text(
-                text="Click the button below to edit your profile",
-                buttons=FlowButton(
-                    title="Edit Profile",
-                    flow_name=PROFILE_EDIT_FLOW_NAME,
-                    flow_token=flow_token,
-                    mode=FlowStatus.DRAFT,
-                    flow_action_type=FlowActionType.DATA_EXCHANGE,
-                    flow_action_screen="PROFILE_EDIT",
-                ),
-            )
+        # case "/profile":
+        #     # Import and use the profile edit flow
+        #     import uuid
+        #
+        #     from farmwise.whatsapp.flows.profile_edit.handlers import store_flow_token
+        #
+        #     # Generate a unique flow token
+        #     flow_token = str(uuid.uuid4())
+        #
+        #     # Store the mapping between flow token and WhatsApp ID
+        #     await store_flow_token(flow_token, msg.from_user.wa_id)
+        #
+        #     await msg.reply_text(
+        #         text="Click the button below to edit your profile",
+        #         buttons=FlowButton(
+        #             title="Edit Profile",
+        #             flow_name=PROFILE_EDIT_FLOW_NAME,
+        #             flow_token=flow_token,
+        #             mode=FlowStatus.DRAFT,
+        #             flow_action_type=FlowActionType.DATA_EXCHANGE,
+        #             flow_action_screen="PROFILE_EDIT",
+        #         ),
+        #     )
 
 
 @WhatsApp.on_message(filters.text)
 async def message_handler(_: WhatsApp, msg: types.Message):
-    logger.info(f"{msg}")
+    logger.info(f"Message: {msg}")
 
     await msg.mark_as_read()
-    context = await user_context(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
-    contact = context.contact
-    await record_inbound_message(contact, msg)
+    context = await get_or_create_user(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
+
+    # TODO: await record_inbound_message(user, msg)
     await msg.indicate_typing()
 
     user_input = UserInput(text=msg.text)
 
     response_events = farmwise.invoke(context, user_input)
-    await send_responses(contact, response_events, msg)
+    await send_responses(response_events, msg)
 
 
 @WhatsApp.on_callback_selection(factory=ActivityData, priority=1)
 async def on_activity_callback_selection(_: WhatsApp, sel: types.CallbackSelection[ActivityData]):
-    logger.info(f"ACTIVITY: {sel.data}")
+    logger.info(f"Activity: {sel.data}")
     await sel.indicate_typing()
-    context = await user_context(wa_id=sel.from_user.wa_id, name=sel.from_user.name)
-    contact = context.contact
-    await record_callback_selection(contact, sel)
+    context = await get_or_create_user(wa_id=sel.from_user.wa_id, name=sel.from_user.name)
+    user = context.user
     await sel.indicate_typing()
 
     user_input = UserInput(text=sel.data.text)
 
     response_events = farmwise.invoke(context, user_input, agent_name=sel.data.agent)
-    await send_responses(contact, response_events, sel)
+    await send_responses(response_events, sel)
 
 
 @WhatsApp.on_callback_selection
 async def on_callback_selection(_: WhatsApp, sel: types.CallbackSelection):
-    logger.info(f"CALLBACK: {sel}")
+    logger.info(f"Callback: {sel}")
     await sel.mark_as_read()
-    context = await user_context(wa_id=sel.from_user.wa_id, name=sel.from_user.name)
-    contact = context.contact
-    await record_callback_selection(contact, sel)
+    context = await get_or_create_user(wa_id=sel.from_user.wa_id, name=sel.from_user.name)
+    user = context.user
+    await record_callback_selection(user, sel)
     await sel.indicate_typing()
 
     user_input = UserInput(text=sel.data)
 
     response_events = farmwise.invoke(context, user_input)
-    await send_responses(contact, response_events, sel)
+    await send_responses(user, response_events, sel)
 
 
 @WhatsApp.on_callback_button
 async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
-    logger.info(f"{btn}")
+    logger.info(f"Button: {btn}")
     await btn.mark_as_read()
-    context = await user_context(wa_id=btn.from_user.wa_id, name=btn.from_user.name)
-    contact = context.contact
-    await record_callback_button(contact, btn)
+    context = await get_or_create_user(wa_id=btn.from_user.wa_id, name=btn.from_user.name)
     await btn.indicate_typing()
 
     user_input = UserInput(text=btn.data)
 
     response_events = farmwise.invoke(context, user_input)
-    await send_responses(contact, response_events, btn)
+    await send_responses(response_events, btn)
 
 
 @WhatsApp.on_message(filters.image)
 async def image_handler(_: WhatsApp, msg: types.Message):
     await msg.mark_as_read()
-    context = await user_context(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
-    contact = context.contact
+    context = await get_or_create_user(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
+    user = context.user
 
     image_bytes = await msg.image.download(in_memory=True)
     await msg.indicate_typing()
@@ -191,7 +182,7 @@ async def image_handler(_: WhatsApp, msg: types.Message):
         await msg.reply_text("Sorry, there was an error processing your image.")
         return
 
-    await record_inbound_message(contact, msg, storage={"blob": blob_name, "url": url})
+    # await record_inbound_message(user, msg, storage={"blob": blob_name, "url": url})
 
     await msg.indicate_typing()
     user_input = UserInput(text=msg.caption, image=url)
@@ -200,7 +191,7 @@ async def image_handler(_: WhatsApp, msg: types.Message):
     async for event in response_events:
         match event.response:
             case TextResponse():
-                await send_text_reply(contact, event.response, msg)
+                await send_text_reply(user, event.response, msg)
             case AudioResponse():
                 await send_audio_reply(event.response, msg)
             case _:

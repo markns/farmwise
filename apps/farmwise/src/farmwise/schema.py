@@ -20,11 +20,6 @@ class AgentInfo(BaseModel):
     )
 
 
-class SessionState(BaseModel):
-    last_agent: str
-    previous_response_id: str
-
-
 class UserInput(BaseModel):
     """Basic user input for the agent."""
 

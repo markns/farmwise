@@ -19,7 +19,7 @@ logger.add(
     filter={
         "httpcore": False,
     },
-    level="DEBUG",
+    level=settings.LOG_LEVEL,
 )
 
 # Intercept standard logging and route to loguru

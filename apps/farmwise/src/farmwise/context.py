@@ -1,46 +1,37 @@
-from farmbase_client.api.contacts import contacts_create_contact as create_contact
-from farmbase_client.api.contacts import contacts_get_all_memories
-from farmbase_client.api.contacts import contacts_get_contact_by_phone as get_contact_by_phone
-from farmbase_client.models import ContactCreate, ContactRead, MemoryItem
+import phonenumbers
 from loguru import logger
 from pydantic import BaseModel
 
-from farmwise.farmbase import farmbase_api_client
+from farmwise.farmbetter.users import User, get_user
 
 
 class UserContext(BaseModel):
-    contact: ContactRead
+    user: User
     new_user: bool = False
-    memories: list[MemoryItem] = []
+    memories: str | None = None
 
 
-# TODO: how does organization get set -
-#  maybe an endpoint that searches all schemas?
-async def user_context(wa_id: str, name: str, organization="default") -> UserContext:
-    # TODO: Handle errors better, more consistently in farmbase.
-    #  - in particular, look at client. raise_on_unexpected_status
-    #  and https://fastapi.tiangolo.com/tutorial/handling-errors/#requestvalidationerror-vs-validationerror
+async def get_or_create_user(wa_id: str, name: str, organization="default") -> UserContext:
+    # TODO: how to update my phone number?
+    if wa_id == "31657775781":
+        wa_id = "254712345676"
+        # wa_id = "254111269800"
+
     try:
-        contact = await get_contact_by_phone.asyncio(
-            client=farmbase_api_client,
-            organization=organization,
-            phone=wa_id,
-        )
-        memories = await contacts_get_all_memories.asyncio(
-            organization=contact.organization.slug, contact_id=contact.id, client=farmbase_api_client
-        )
-
-        return UserContext(contact=contact, memories=memories.results)
+        number = phonenumbers.parse(f"+{wa_id}")
+        user = await get_user(number.country_code, number.national_number)
+        return UserContext(user=user)
     except Exception as e:
-        logger.warning(f"User not found: {e}")
+        logger.warning(f"User with wa_id {wa_id} name {name} not found: ({type(e)}) {e}")
+        raise
+        # TODO: Create user in farmbetter?
+        # user = await create_contact.asyncio(
+        #     client=farmbase_api_client,
+        #     organization=organization,
+        #     body=ContactCreate(
+        #         name=name,
+        #         phone_number=wa_id,
+        #     ),
+        # )
 
-        contact = await create_contact.asyncio(
-            client=farmbase_api_client,
-            organization=organization,
-            body=ContactCreate(
-                name=name,
-                phone_number=wa_id,
-            ),
-        )
-
-        return UserContext(contact=contact, new_user=True)
+        # return UserContext(user=user, new_user=True)

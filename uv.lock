@@ -1081,6 +1081,7 @@ dependencies = [
     { name = "google-api-python-client" },
     { name = "google-cloud-storage" },
     { name = "google-cloud-texttospeech" },
+    { name = "gql", extra = ["httpx"] },
     { name = "isdasoil-api-client" },
     { name = "loguru-logging-intercept" },
     { name = "openai" },
@@ -1088,6 +1089,7 @@ dependencies = [
     { name = "pydub" },
     { name = "pywa", extra = ["cryptography", "fastapi"] },
     { name = "upstash-redis" },
+    { name = "zep-cloud" },
 ]
 
 [package.dev-dependencies]
@@ -1103,6 +1105,7 @@ requires-dist = [
     { name = "google-api-python-client", specifier = ">=2.176.0" },
     { name = "google-cloud-storage", specifier = ">=3.1.1" },
     { name = "google-cloud-texttospeech", specifier = ">=2.27.0" },
+    { name = "gql", extras = ["httpx"], specifier = ">=4.0.0" },
     { name = "isdasoil-api-client", editable = "libs/isdasoil-api-client" },
     { name = "loguru-logging-intercept", specifier = ">=0.1.5" },
     { name = "openai", specifier = ">=1.95.0" },
@@ -1110,6 +1113,7 @@ requires-dist = [
     { name = "pydub", specifier = ">=0.25.1" },
     { name = "pywa", extras = ["cryptography", "fastapi"], git = "https://github.com/david-lev/pywa.git?branch=templates-v2" },
     { name = "upstash-redis", specifier = ">=1.4.0" },
+    { name = "zep-cloud", specifier = ">=3.4.3" },
 ]
 
 [package.metadata.requires-dev]
@@ -1556,6 +1560,35 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/39/24/33db22342cf4a2ea27c9955e6713140fedd51e8b141b5ce5260897020f1a/googleapis_common_protos-1.70.0.tar.gz", hash = "sha256:0e1b44e0ea153e6594f9f394fef15193a68aaaea2d843f83e2742717ca753257", size = 145903 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/86/f1/62a193f0227cf15a920390abe675f386dec35f7ae3ffe6da582d3ade42c7/googleapis_common_protos-1.70.0-py3-none-any.whl", hash = "sha256:b8bfcca8c25a2bb253e0e0b0adaf8c00773e5e6af6fd92397576680b807e0fd8", size = 294530 },
+]
+
+[[package]]
+name = "gql"
+version = "4.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "backoff" },
+    { name = "graphql-core" },
+    { name = "yarl" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/06/9f/cf224a88ed71eb223b7aa0b9ff0aa10d7ecc9a4acdca2279eb046c26d5dc/gql-4.0.0.tar.gz", hash = "sha256:f22980844eb6a7c0266ffc70f111b9c7e7c7c13da38c3b439afc7eab3d7c9c8e", size = 215644 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ac/94/30bbd09e8d45339fa77a48f5778d74d47e9242c11b3cd1093b3d994770a5/gql-4.0.0-py3-none-any.whl", hash = "sha256:f3beed7c531218eb24d97cb7df031b4a84fdb462f4a2beb86e2633d395937479", size = 89900 },
+]
+
+[package.optional-dependencies]
+httpx = [
+    { name = "httpx" },
+]
+
+[[package]]
+name = "graphql-core"
+version = "3.2.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/16/7574029da84834349b60ed71614d66ca3afe46e9bf9c7b9562102acb7d4f/graphql_core-3.2.6.tar.gz", hash = "sha256:c08eec22f9e40f0bd61d805907e3b3b1b9a320bc606e23dc145eebca07c8fbab", size = 505353 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ae/4f/7297663840621022bc73c22d7d9d80dbc78b4db6297f764b545cd5dd462d/graphql_core-3.2.6-py3-none-any.whl", hash = "sha256:78b016718c161a6fb20a7d97bbf107f331cd1afe53e45566c59f776ed7f0b45f", size = 203416 },
 ]
 
 [[package]]
@@ -5139,4 +5172,21 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ed/f7/f0f2500cf0c469beb2050b522c7815c575811627e6d3eb9ec7550ddd0bfe/yarl-1.20.0-cp313-cp313t-win32.whl", hash = "sha256:65a4053580fe88a63e8e4056b427224cd01edfb5f951498bfefca4052f0ce0ac", size = 93816 },
     { url = "https://files.pythonhosted.org/packages/3f/93/f73b61353b2a699d489e782c3f5998b59f974ec3156a2050a52dfd7e8946/yarl-1.20.0-cp313-cp313t-win_amd64.whl", hash = "sha256:53b2da3a6ca0a541c1ae799c349788d480e5144cac47dba0266c7cb6c76151fe", size = 101093 },
     { url = "https://files.pythonhosted.org/packages/ea/1f/70c57b3d7278e94ed22d85e09685d3f0a38ebdd8c5c73b65ba4c0d0fe002/yarl-1.20.0-py3-none-any.whl", hash = "sha256:5d0fe6af927a47a230f31e6004621fd0959eaa915fc62acfafa67ff7229a3124", size = 46124 },
+]
+
+[[package]]
+name = "zep-cloud"
+version = "3.4.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "openai" },
+    { name = "pydantic" },
+    { name = "pydantic-core" },
+    { name = "python-dateutil" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f6/c0/72fe95441d6002fae362651057bc929502c293514d1c48612f0d5453046c/zep_cloud-3.4.3.tar.gz", hash = "sha256:9e811131c6703c83206344c8f3de4d14c9796302df1a4232173e3f4a2c4fcabf", size = 55265 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/52/d8/85b653bcaf62d8d7b281678ce762d188efa0e006833ec4b16d2489595808/zep_cloud-3.4.3-py3-none-any.whl", hash = "sha256:c04b8de1173c9d4c1dbad3570a16a49806a22a534060cc59f24e1773f4f4c201", size = 92370 },
 ]
