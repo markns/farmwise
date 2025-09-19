@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from gql import gql
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 
 from farmwise.farmbetter import farmbetter_client
 
@@ -53,6 +53,9 @@ class ExtensionAgent(BaseGraphQLModel):
 class User(BaseGraphQLModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
+    country_code: Optional[str] = None
+    phone_number: Optional[str] = None
+    email: Optional[str] = None
     type: Optional[str] = None
     date_of_birth: Optional[str] = None  # could be datetime if API returns ISO
     gender: Optional[str] = None
@@ -63,6 +66,22 @@ class User(BaseGraphQLModel):
     specialization: Optional[List[Specialization]] = None
     location: Optional[Location] = None
     assigned_extension_agent_model: Optional[ExtensionAgent] = None
+
+    # (Optional) be explicit about eq/hash semantics
+    def __hash__(self) -> int:
+        return hash(self.wa_id)
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, User) and self.wa_id == other.wa_id
+
+    @computed_field(return_type=Optional[str])
+    def full_name(self) -> Optional[str]:
+        return f"{self.first_name} {self.last_name}"
+
+    @computed_field(return_type=Optional[str])
+    def wa_id(self) -> Optional[str]:
+        """WhatsApp ID: E.164 numeric without '+' = country_code + national number."""
+        return f"{self.country_code}{self.phone_number}"
 
 
 class GetUserResponse(BaseGraphQLModel):
@@ -86,6 +105,9 @@ async def get_user(country_code: int, national_number: int):
                   firstName
                   lastName
                   type
+                  countryCode
+                  phoneNumber
+                  email
                   dateOfBirth
                   gender
                   maritalStatus

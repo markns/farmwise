@@ -25,10 +25,12 @@ class Settings(BaseSettings):
         validate_default=False,
     )
     ENV: str = "DEV"
+    LOG_LEVEL: str
     MODE: str | None = None
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     OPENAI_API_KEY: SecretStr
+    ZEP_API_KEY: SecretStr
     FARMBASE_ENDPOINT: str
     FARMBASE_API_KEY: SecretStr
 
@@ -51,7 +53,7 @@ class Settings(BaseSettings):
 
     UPSTASH_REDIS_REST_URL: str
     UPSTASH_REDIS_REST_TOKEN: str
-    SESSION_TTL_SECS: int = 7200  # default 2 hour session
+    SESSION_TTL_SECS: int = 60 * 60 * 6  # default 6 hour session
 
     def is_dev(self) -> bool:
         return self.MODE == "dev"
