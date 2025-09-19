@@ -1077,6 +1077,7 @@ name = "farmwise"
 version = "0.1.0"
 source = { editable = "apps/farmwise" }
 dependencies = [
+    { name = "async-lru" },
     { name = "farmbase-client" },
     { name = "google-api-python-client" },
     { name = "google-cloud-storage" },
@@ -1102,6 +1103,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "async-lru", specifier = ">=2.0.4" },
     { name = "farmbase-client", editable = "libs/farmbase-client" },
     { name = "google-api-python-client", specifier = ">=2.176.0" },
     { name = "google-cloud-storage", specifier = ">=3.1.1" },
