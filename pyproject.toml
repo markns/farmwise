@@ -27,6 +27,7 @@ dev = [
     "pytest-asyncio",
     "openapi-python-client",
     "poethepoet",
+    "docling>=2.54.0",
 ]
 
 [tool.ruff]

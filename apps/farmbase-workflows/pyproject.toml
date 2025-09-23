@@ -32,7 +32,6 @@ dev = [
 
 [tool.uv.sources]
 farmbase = { workspace = true }
-pywa = { git = "https://github.com/david-lev/pywa.git", branch = "templates-v2" }
 
 [build-system]
 requires = ["hatchling"]
