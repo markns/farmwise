@@ -1,142 +1,204 @@
-from typing import List, Optional
-
 from gql import gql
-from pydantic import BaseModel, computed_field
 
 from farmwise.farmbetter import farmbetter_client
+from farmwise.farmbetter.models import (
+    FieldGqUserModel,
+    GqUserModelDto,
+    OmittedUpdateUserRequest,
+)
 
 
-def to_snake(string: str) -> str:
-    """Convert GraphQL camelCase fields to snake_case for Python attributes."""
-    import re
-
-    return re.sub(r"(?<!^)(?=[A-Z])", "_", string).lower()
+class FarmBetterAPIError(Exception):
+    pass
 
 
-# add next to your to_snake (you can keep to_snake if you use it elsewhere)
-def to_camel(s: str) -> str:
-    """Convert snake_case field names to camelCase aliases used by GraphQL."""
-    parts = s.split("_")
-    return parts[0] + "".join(p.capitalize() for p in parts[1:]) if parts else s
+def _strip_typename(data):
+    if isinstance(data, dict):
+        return {k: _strip_typename(v) for k, v in data.items() if k != "typename__"}
+    elif isinstance(data, list):
+        return [_strip_typename(v) for v in data]
+    return data
 
 
-class BaseGraphQLModel(BaseModel):
-    model_config = {
-        "alias_generator": to_camel,  # generate aliases like getUser, firstName, ...
-        "populate_by_name": True,  # allow either alias or field name
-    }
-
-
-class Livestock(BaseGraphQLModel):
-    name: str
-
-
-class Crop(BaseGraphQLModel):
-    name: str
-
-
-class Specialization(BaseGraphQLModel):
-    name: str
-
-
-class Location(BaseGraphQLModel):
-    lat: float
-    lng: float
-
-
-class ExtensionAgent(BaseGraphQLModel):
-    first_name: str
-    last_name: str
-    id: str
-
-
-class User(BaseGraphQLModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    country_code: Optional[str] = None
-    phone_number: Optional[str] = None
-    email: Optional[str] = None
-    type: Optional[str] = None
-    date_of_birth: Optional[str] = None  # could be datetime if API returns ISO
-    gender: Optional[str] = None
-    marital_status: Optional[str] = None
-    preferred_language: Optional[str] = None
-    livestock: Optional[List[Livestock]] = None
-    crops: Optional[List[Crop]] = None
-    specialization: Optional[List[Specialization]] = None
-    location: Optional[Location] = None
-    assigned_extension_agent_model: Optional[ExtensionAgent] = None
-
-    # (Optional) be explicit about eq/hash semantics
-    def __hash__(self) -> int:
-        return hash(self.wa_id)
-
-    def __eq__(self, other) -> bool:
-        return isinstance(other, User) and self.wa_id == other.wa_id
-
-    @computed_field(return_type=Optional[str])
-    def full_name(self) -> Optional[str]:
-        return f"{self.first_name} {self.last_name}"
-
-    @computed_field(return_type=Optional[str])
-    def wa_id(self) -> Optional[str]:
-        """WhatsApp ID: E.164 numeric without '+' = country_code + national number."""
-        return f"{self.country_code}{self.phone_number}"
-
-
-class GetUserResponse(BaseGraphQLModel):
-    message: str
-    status: int
-    payload: Optional[User] = None
-
-
-class GetUserData(BaseGraphQLModel):
-    get_user: GetUserResponse
-
-
-async def get_user(country_code: int, national_number: int):
-    async with farmbetter_client as session:
-        query = gql("""
-            query GetUser($phoneNumber: GqPhoneNumberUserRequest) {
-              getUser(phoneNumber: $phoneNumber) {
+async def get_user(
+    user_id: str | None = None,
+    email: str | None = None,
+    country_code: int | None = None,
+    national_number: int | None = None,
+) -> GqUserModelDto:
+    query = gql(
+        """
+        query GetUser($id: String, $email: String, $phoneNumber: GqPhoneNumberUserRequest) {
+            getUser(id: $id, email: $email, phoneNumber: $phoneNumber) {
                 message
                 status
                 payload {
-                  firstName
-                  lastName
-                  type
-                  countryCode
-                  phoneNumber
-                  email
-                  dateOfBirth
-                  gender
-                  maritalStatus
-                  preferredLanguage
-                  livestock {
-                    name
-                  }
-                  crops {
-                    name
-                  }
-                  specialization {
-                    name
-                  }      
-                  location {
-                    lat
-                    lng
-                  }
-                  assignedExtensionAgentModel {
+                    id
                     firstName
                     lastName
-                    id
-                  }
+                    phoneNumber
+                    countryCode
+                    countryIso
+                    email
+                    preferredLanguage
+                    status
+                    type
+                    created
+                    updated
+                    crops {
+                        id
+                        name
+                    }
+                    livestock {
+                        id
+                        name
+                    }
+                    fcmNotificationTokens
+                    tenantIds
+                    dateOfBirth
+                    gender
+                    maritalStatus
+                    education
+                    occupation
+                    location {
+                        lat
+                        lng
+                        name
+                    }
                 }
-              }
             }
-        """)
-        result = await session.execute(
-            query, variable_values={"phoneNumber": {"countryCode": str(country_code), "phone": str(national_number)}}
-        )
-        parsed = GetUserData.model_validate(result)
+        }
+        """
+    )
 
-        return parsed.get_user.payload
+    variables: dict = {"id": user_id, "email": email}
+    if country_code and national_number:
+        variables["phoneNumber"] = {
+            "countryCode": str(country_code),
+            "phone": str(national_number),
+        }
+
+    async with farmbetter_client as session:
+        result = await session.execute(query, variable_values=variables)
+
+    response = result["getUser"]
+    if response["status"] != 200:
+        raise FarmBetterAPIError(response.get("message", "Unknown error"))
+
+    return GqUserModelDto(**response["payload"])
+
+
+async def create_user(user: FieldGqUserModel) -> GqUserModelDto:
+    mutation = gql(
+        """
+        mutation CreateUser($user: _GqUserModel!) {
+            createUser(user: $user) {
+                message
+                status
+                payload {
+                    id
+                    firstName
+                    lastName
+                    phoneNumber
+                    countryCode
+                    countryIso
+                    email
+                    preferredLanguage
+                    status
+                    type
+                    created
+                    updated
+                    crops {
+                        id
+                        name
+                    }
+                    livestock {
+                        id
+                        name
+                    }
+                    fcmNotificationTokens
+                    tenantIds
+                    dateOfBirth
+                    gender
+                    maritalStatus
+                    education
+                    occupation
+                    location {
+                        lat
+                        lng
+                        name
+                    }
+                }
+            }
+        }
+        """
+    )
+
+    async with farmbetter_client as session:
+        result = await session.execute(
+            mutation, variable_values={"user": _strip_typename(user.model_dump(exclude_none=True))}
+        )
+
+    response = result["createUser"]
+    if response["status"] != 200:
+        raise FarmBetterAPIError(response.get("message", "Unknown error"))
+
+    return GqUserModelDto(**response["payload"])
+
+
+async def update_user(user: OmittedUpdateUserRequest) -> GqUserModelDto:
+    mutation = gql(
+        """
+        mutation UpdateUser($user: OmittedUpdateUserRequest!) {
+            updateUser(user: $user) {
+                message
+                status
+                payload {
+                    id
+                    firstName
+                    lastName
+                    phoneNumber
+                    countryCode
+                    countryIso
+                    email
+                    preferredLanguage
+                    status
+                    type
+                    created
+                    updated
+                    crops {
+                        id
+                        name
+                    }
+                    livestock {
+                        id
+                        name
+                    }
+                    fcmNotificationTokens
+                    tenantIds
+                    dateOfBirth
+                    gender
+                    maritalStatus
+                    education
+                    occupation
+                    location {
+                        lat
+                        lng
+                        name
+                    }
+                }
+            }
+        }
+        """
+    )
+
+    async with farmbetter_client as session:
+        result = await session.execute(
+            mutation, variable_values={"user": _strip_typename(user.model_dump(exclude_none=True))}
+        )
+
+    response = result["updateUser"]
+    if response["status"] != 200:
+        raise FarmBetterAPIError(response.get("message", "Unknown error"))
+
+    return GqUserModelDto(**response["payload"])

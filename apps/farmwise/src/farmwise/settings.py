@@ -36,6 +36,7 @@ class Settings(BaseSettings):
 
     FARMBETTER_ENDPOINT: str
     FARMBETTER_TOKEN: SecretStr
+    FARMBETTER_DEFAULT_TENANT: str
 
     ISDA_USERNAME: str
     ISDA_PASSWORD: SecretStr

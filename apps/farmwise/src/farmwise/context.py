@@ -2,11 +2,18 @@ import phonenumbers
 from loguru import logger
 from pydantic import BaseModel
 
-from farmwise.farmbetter.users import User, get_user
+from farmwise.farmbetter.models import (
+    FieldGqUserModel,
+    GqTenantInput,
+    GqUserLocationInput,
+    GqUserModelDto,
+)
+from farmwise.farmbetter.users import FarmBetterAPIError, create_user, get_user
+from farmwise.settings import settings
 
 
 class UserContext(BaseModel):
-    user: User
+    user: GqUserModelDto
     new_user: bool = False
     memories: str | None = None
 
@@ -14,24 +21,27 @@ class UserContext(BaseModel):
 async def get_or_create_user(wa_id: str, name: str, organization="default") -> UserContext:
     # TODO: how to update my phone number?
     if wa_id == "31657775781":
-        wa_id = "254712345676"
+        wa_id = "31657775788"
         # wa_id = "254111269800"
 
+    number = phonenumbers.parse(f"+{wa_id}")
     try:
-        number = phonenumbers.parse(f"+{wa_id}")
-        user = await get_user(number.country_code, number.national_number)
+        user = await get_user(country_code=number.country_code, national_number=number.national_number)
         return UserContext(user=user)
-    except Exception as e:
+    except FarmBetterAPIError as e:
         logger.warning(f"User with wa_id {wa_id} name {name} not found: ({type(e)}) {e}")
-        raise
-        # TODO: Create user in farmbetter?
-        # user = await create_contact.asyncio(
-        #     client=farmbase_api_client,
-        #     organization=organization,
-        #     body=ContactCreate(
-        #         name=name,
-        #         phone_number=wa_id,
-        #     ),
-        # )
 
-        # return UserContext(user=user, new_user=True)
+        user = await create_user(
+            FieldGqUserModel(
+                countryCode=str(number.country_code),
+                phoneNumber=str(number.national_number),
+                firstName="unknown",
+                lastName="unknown",
+                tenants=[GqTenantInput(id=settings.FARMBETTER_DEFAULT_TENANT, isPrivate=False)],
+                location=GqUserLocationInput(lat=0, lng=0, name="Unknown"),
+                gender="other",
+                type="farmer",
+                signUpMode="whatsapp",
+            )
+        )
+        return UserContext(user=user, new_user=True)

@@ -18,7 +18,7 @@ from openai.types.responses import (
 )
 from zep_cloud import Message
 
-from farmwise.agent import DEFAULT_AGENT, agents
+from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
 from farmwise.audio import load_oga_as_audio_input
 from farmwise.context import UserContext
 from farmwise.hooks import AgentHooks
@@ -43,9 +43,8 @@ class FarmwiseService:
 
         if agent_name:
             agent = agents[agent_name]
-        # TODO: how to handle onboarding with FarmBetter?
-        # elif context.new_user:
-        #     agent = agents[ONBOARDING_AGENT]
+        elif context.new_user:
+            agent = agents[ONBOARDING_AGENT]
         else:
             agent = agents[session_state.current_agent]
 

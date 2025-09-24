@@ -7,14 +7,14 @@ from zep_cloud import Message, NotFoundError
 # Zep Cloud imports
 from zep_cloud.client import AsyncZep
 
-from farmwise.farmbetter.users import User
+from farmwise.farmbetter.models import GqUserModelDto
 from farmwise.settings import settings
 
 zep_client = AsyncZep(api_key=settings.ZEP_API_KEY.get_secret_value())
 
 
 @alru_cache(maxsize=100)
-async def get_or_create_user(user: User):
+async def get_or_create_user(user: GqUserModelDto):
     # Create or get the user
     try:
         # Try to get the user first
@@ -23,15 +23,15 @@ async def get_or_create_user(user: User):
     except NotFoundError:
         new_user = await zep_client.user.add(
             user_id=user.wa_id,
-            first_name=user.first_name,
-            last_name=user.last_name,
+            first_name=user.firstName,
+            last_name=user.lastName,
             email=user.email,
         )
         logger.info(f"Created new Zep user {new_user}")
         return new_user
 
 
-async def create_thread(thread_id: str, user: User):
+async def create_thread(thread_id: str, user: GqUserModelDto):
     zep_user = await get_or_create_user(user)
 
     await zep_client.thread.create(thread_id=thread_id, user_id=zep_user.user_id)

@@ -115,7 +115,6 @@ async def on_activity_callback_selection(_: WhatsApp, sel: types.CallbackSelecti
     logger.info(f"Activity: {sel.data}")
     await sel.indicate_typing()
     context = await get_or_create_user(wa_id=sel.from_user.wa_id, name=sel.from_user.name)
-    user = context.user
     await sel.indicate_typing()
 
     user_input = UserInput(text=sel.data.text)
