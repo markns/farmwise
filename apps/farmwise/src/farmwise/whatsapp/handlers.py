@@ -155,7 +155,6 @@ async def on_callback_button(_: WhatsApp, btn: types.CallbackButton):
 async def image_handler(_: WhatsApp, msg: types.Message):
     await msg.mark_as_read()
     context = await get_or_create_user(wa_id=msg.from_user.wa_id, name=msg.from_user.name)
-    user = context.user
 
     image_bytes = await msg.image.download(in_memory=True)
     await msg.indicate_typing()
@@ -190,7 +189,7 @@ async def image_handler(_: WhatsApp, msg: types.Message):
     async for event in response_events:
         match event.response:
             case TextResponse():
-                await send_text_reply(user, event.response, msg)
+                await send_text_reply(event.response, msg)
             case AudioResponse():
                 await send_audio_reply(event.response, msg)
             case _:

@@ -91,6 +91,7 @@ class FarmwiseService:
                 ),
             )
 
+            # We only update the memory if we have a text input
             if user_input.text:
                 text_response: TextResponse = result.final_output_as(TextResponse)
 
