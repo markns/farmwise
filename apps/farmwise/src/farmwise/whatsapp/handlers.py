@@ -10,6 +10,7 @@ from farmwise.settings import settings
 from farmwise.storage import make_blob_public, upload_bytes_to_gcs
 from farmwise.whatsapp import commands
 from farmwise.whatsapp.activities import activities
+from farmwise.whatsapp.flows.edit_profile.handlers import launch_edit_profile_flow
 from farmwise.whatsapp.responses import send_audio_reply, send_responses, send_text_reply
 from farmwise.whatsapp.store import record_callback_selection
 
@@ -60,7 +61,7 @@ cmds = [c.name for c in commands.commands]
 
 
 @WhatsApp.on_message(filters.command(*cmds, prefixes="/", ignore_case=True), priority=1)
-async def on_command(_: WhatsApp, msg: types.Message):
+async def on_command(client: WhatsApp, msg: types.Message):
     logger.info(f"Command: {msg}")
     await msg.indicate_typing()
 
@@ -69,29 +70,15 @@ async def on_command(_: WhatsApp, msg: types.Message):
             await send_text_reply(
                 TextResponse(content="Please choose an activity", section_list=activities.activities), msg
             )
-        # case "/profile":
-        #     # Import and use the profile edit flow
-        #     import uuid
-        #
-        #     from farmwise.whatsapp.flows.profile_edit.handlers import store_flow_token
-        #
-        #     # Generate a unique flow token
-        #     flow_token = str(uuid.uuid4())
-        #
-        #     # Store the mapping between flow token and WhatsApp ID
-        #     await store_flow_token(flow_token, msg.from_user.wa_id)
-        #
-        #     await msg.reply_text(
-        #         text="Click the button below to edit your profile",
-        #         buttons=FlowButton(
-        #             title="Edit Profile",
-        #             flow_name=PROFILE_EDIT_FLOW_NAME,
-        #             flow_token=flow_token,
-        #             mode=FlowStatus.DRAFT,
-        #             flow_action_type=FlowActionType.DATA_EXCHANGE,
-        #             flow_action_screen="PROFILE_EDIT",
-        #         ),
-        #     )
+        case "/profile":
+            await launch_edit_profile_flow(
+                client,
+                to=msg.from_user.wa_id,
+                wa_user_name=msg.from_user.name,
+            )
+        case "/location":
+            # TODO: add functionality to set location
+            ...
 
 
 @WhatsApp.on_message(filters.text)

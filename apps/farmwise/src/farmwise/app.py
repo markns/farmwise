@@ -2,6 +2,7 @@ import logging
 import sys
 from contextlib import asynccontextmanager
 
+import httpx
 from fastapi import FastAPI
 from loguru import logger
 from loguru_logging_intercept import setup_loguru_logging_intercept
@@ -9,6 +10,7 @@ from pywa_async import WhatsApp
 
 from farmwise.settings import settings
 from farmwise.whatsapp import commands, handlers
+from farmwise.whatsapp.flows.edit_profile import handlers as edit_profile_handlers
 
 logger.remove()
 logger.add(
@@ -50,6 +52,8 @@ async def lifespan(_):
 app = FastAPI(debug=settings.is_dev(), lifespan=lifespan)
 
 wa = WhatsApp(
+    session=httpx.AsyncClient(timeout=10),
+    # webhook_challenge_delay=60,
     phone_id=settings.WHATSAPP_PHONE_ID,
     token=settings.WHATSAPP_TOKEN,
     server=app,
@@ -57,13 +61,10 @@ wa = WhatsApp(
     verify_token=settings.WHATSAPP_VERIFY_TOKEN,
     app_id=settings.WHATSAPP_APP_ID,
     app_secret=settings.WHATSAPP_APP_SECRET,
-    handlers_modules=[
-        handlers,
-        # profile_edit_handlers
-    ],
+    handlers_modules=[handlers, edit_profile_handlers],
     business_account_id=settings.WHATSAPP_BUSINESS_ACCOUNT_ID,
-    # business_private_key=settings.WHATSAPP_BUSINESS_PRIVATE_KEY,
-    # business_private_key_password=settings.WHATSAPP_BUSINESS_PRIVATE_KEY_PASSWORD,
+    business_private_key=settings.WHATSAPP_BUSINESS_PRIVATE_KEY,
+    business_private_key_password=settings.WHATSAPP_BUSINESS_PRIVATE_KEY_PASSWORD,
 )
 
 
