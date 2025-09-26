@@ -28,7 +28,7 @@ async def create_or_update_flows(wa: WhatsApp):
                 asset.url
                 # todo: diff with existing and only update if changed? How to handle versioning/ published?
 
-        new_json = build_edit_profile_flow_json()
+        new_json = await build_edit_profile_flow_json()
 
         res = await flow.update_json(flow_json=new_json)
 

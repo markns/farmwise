@@ -3,6 +3,11 @@ from gql.transport.httpx import HTTPXAsyncTransport
 
 from farmwise.settings import settings
 
+
+class FarmBetterAPIError(Exception):
+    """Raised when the FarmBetter API responds with a non-success status."""
+
+
 TIMEOUT = 20
 
 transport = HTTPXAsyncTransport(

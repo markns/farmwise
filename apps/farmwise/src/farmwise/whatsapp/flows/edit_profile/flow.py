@@ -1,12 +1,8 @@
 from __future__ import annotations
 
-import time
-from typing import Iterable, Sequence
-
-from gql import gql
-from loguru import logger
 from pywa import Version
 from pywa.types.flows import (
+    ChipsSelector,
     CompleteAction,
     DataSource,
     DatePicker,
@@ -22,8 +18,6 @@ from pywa.types.flows import (
     TextInput,
 )
 
-from farmwise.farmbetter import farmbetter_client
-
 FLOW_ENDPOINT = "/flows/edit-profile"
 FLOW_NAME = "edit_profile"
 EDIT_PROFILE_SCREEN_ID = "EDIT_PROFILE"
@@ -37,60 +31,32 @@ _GENDER_OPTIONS: tuple[DataSource, ...] = (
 
 _LANGUAGE_OPTIONS: tuple[DataSource, ...] = (
     DataSource(id="en", title="English"),
-    DataSource(id="fr", title="French"),
-    DataSource(id="pt", title="Portuguese"),
-    DataSource(id="sw", title="Swahili"),
-    DataSource(id="es", title="Spanish"),
+    DataSource(id="es", title="Español (Spanish)"),
+    DataSource(id="hi", title="हिन्दी (Hindi)"),
+    DataSource(id="fr", title="Français (French)"),
+    DataSource(id="sw", title="Kiswahili (Swahili)"),
+    DataSource(id="vi", title="Tiếng Việt (Vietnamese)"),
+    DataSource(id="lg", title="Luganda"),
+    DataSource(id="ne", title="नेपाली (Nepali)"),
 )
 
-# Cached catalog lookups so we avoid round-tripping to FarmBetter on every flow request.
-_CROP_CACHE: tuple[list[DataSource], float] | None = None
-_LIVESTOCK_CACHE: tuple[list[DataSource], float] | None = None
-_CATALOG_TTL_SECONDS = 60 * 60  # 1 hour cache window
 
-
-def build_edit_profile_flow_json() -> FlowJSON:
+async def build_edit_profile_flow_json() -> FlowJSON:
     """Construct the Flow JSON definition for the edit profile experience."""
 
-    language_default = ScreenData(key="language_initial_value", example=_LANGUAGE_OPTIONS[0].id)
-    crop_options = ScreenData(key="crop_options", example=[DataSource(id="crop-example", title="Maize")])
+    fruit_options = ScreenData(key="fruit_options", example=[DataSource(id="fruit-example", title="Maize")])
     livestock_options = ScreenData(key="livestock_options", example=[DataSource(id="livestock-example", title="Goat")])
-    crop_initial_ids = ScreenData(key="initial_crop_ids", example=["crop-example"])
+    fruit_initial_ids = ScreenData(key="initial_fruit_ids", example=["fruit-example"])
     livestock_initial_ids = ScreenData(key="initial_livestock_ids", example=["livestock-example"])
 
-    #         # TextInput(
-    #         #     name="age",
-    #         #     label="Age",
-    #         #     required=True,
-    #         #     helper_text="Whole number between 13 and 120",
-    #         #     input_type=InputType.NUMBER,
-    #         #     init_value=age_default.ref,
-    #         # ),
-    #         # RadioButtonsGroup(
-    #         #     name="preferred_language",
-    #         #     label="Preferred language",
-    #         #     required=True,
-    #         #     data_source=list(_LANGUAGE_OPTIONS),
-    #         #     init_value=language_default.ref,
-    #         # ),
     #         # ChipsSelector(
-    #         #     name="crop_ids",
-    #         #     label="Crop interests",
-    #         #     description="Select up to 5 crops you grow or plan to grow",
-    #         #     data_source=crop_options.ref,
+    #         #     name="fruit_ids",
+    #         #     label="fruit interests",
+    #         #     description="Select up to 5 fruits you grow or plan to grow",
+    #         #     data_source=fruit_options.ref,
     #         #     max_selected_items=5,
-    #         #     init_value=crop_initial_ids.ref,
+    #         #     init_value=fruit_initial_ids.ref,
     #         # ),
-    #         # ChipsSelector(
-    #         #     name="livestock_ids",
-    #         #     label="Livestock interests",
-    #         #     description="Select up to 5 livestock types you keep",
-    #         #     data_source=livestock_options.ref,
-    #         #     max_selected_items=5,
-    #         #     init_value=livestock_initial_ids.ref,
-    #         # ),
-    #     ],
-    # )
 
     return FlowJSON(
         version=Version.FLOW_JSON,
@@ -109,13 +75,22 @@ def build_edit_profile_flow_json() -> FlowJSON:
                     last_name_default := ScreenData(key="last_name_initial_value", example="Ndege"),
                     gender_default := ScreenData(key="gender_initial_value", example=_GENDER_OPTIONS[0].id),
                     dob_default := ScreenData(key="dob_initial_value", example="1979-03-06"),
-                    # gender_default,
-                    # age_default,
-                    # language_default,
-                    # crop_options,
-                    # livestock_options,
-                    # crop_initial_ids,
-                    # livestock_initial_ids,
+                    language_default := ScreenData(key="language_initial_value", example=_LANGUAGE_OPTIONS[0].id),
+                    fruit_options := ScreenData(
+                        key="fruit_options",
+                        example=[
+                            DataSource(id="apples", title="Apples"),
+                            DataSource(id="bananas", title="Bananas"),
+                        ],
+                    ),
+                    # vegetable_options := ScreenData(
+                    #     key="vegetable_options", example=[DataSource(id="vegetable-example", title="Maize")]
+                    # ),
+                    # livestock_options := ScreenData(
+                    #     key="livestock_options", example=[DataSource(id="livestock-example", title="Goat")]
+                    # ),
+                    fruit_initial_ids := ScreenData(key="initial_fruit_ids", example=["apples"]),
+                    # livestock_initial_ids := ScreenData(key="initial_livestock_ids", example=["livestock-example"]),
                 ],
                 layout=Layout(
                     children=[
@@ -152,12 +127,25 @@ def build_edit_profile_flow_json() -> FlowJSON:
                                     init_value=gender_default.ref,
                                 ),
                                 DatePicker(
-                                    name="dob",
+                                    name="date_of_birth",
                                     label="Date of birth",
                                     required=False,
                                     # max_date="today",
                                     helper_text="Enter your date of birth (optional)",
                                     init_value=dob_default.ref,
+                                ),
+                                Dropdown(
+                                    name="preferred_language",
+                                    label="Preferred language",
+                                    required=True,
+                                    data_source=list(_LANGUAGE_OPTIONS),
+                                    init_value=language_default.ref,
+                                ),
+                                ChipsSelector(
+                                    name="fruits",
+                                    label="🥝 Fruits",
+                                    data_source=fruit_options.ref,
+                                    init_value=fruit_initial_ids.ref,
                                 ),
                             ],
                         ),
@@ -174,107 +162,3 @@ def build_edit_profile_flow_json() -> FlowJSON:
             )
         ],
     )
-
-
-def ensure_gender_option(value: str | None) -> str:
-    if value and value in {option.id for option in _GENDER_OPTIONS}:
-        return value
-    return _GENDER_OPTIONS[-1].id  # default to "Prefer not to say"
-
-
-def ensure_language_option(value: str | None) -> str:
-    if value and value in {option.id for option in _LANGUAGE_OPTIONS}:
-        return value
-    return _LANGUAGE_OPTIONS[0].id
-
-
-async def fetch_crop_options(*, size: int = 100) -> list[DataSource]:
-    global _CROP_CACHE
-    if _CROP_CACHE and (time.time() - _CROP_CACHE[1]) < _CATALOG_TTL_SECONDS:
-        return _CROP_CACHE[0]
-
-    query = gql(
-        """
-        query GetCrops($size: Int!) {
-            getCrops(size: $size) {
-                status
-                message
-                payload {
-                    id
-                    name
-                }
-            }
-        }
-        """
-    )
-
-    async with farmbetter_client as session:
-        result = await session.execute(query, variable_values={"size": size})
-
-    response = result["getCrops"]
-    if response["status"] != 200:
-        logger.warning("FarmBetter returned %s when fetching crops: %s", response["status"], response.get("message"))
-        return _CROP_CACHE[0] if _CROP_CACHE else []
-
-    options = [DataSource(id=item["id"], title=item["name"]) for item in response["payload"]]
-    _CROP_CACHE = (options, time.time())
-    return options
-
-
-async def fetch_livestock_options(*, size: int = 100) -> list[DataSource]:
-    global _LIVESTOCK_CACHE
-    if _LIVESTOCK_CACHE and (time.time() - _LIVESTOCK_CACHE[1]) < _CATALOG_TTL_SECONDS:
-        return _LIVESTOCK_CACHE[0]
-
-    query = gql(
-        """
-        query GetLivestock($size: Int!) {
-            getLivestock(size: $size) {
-                status
-                message
-                payload {
-                    id
-                    name
-                }
-            }
-        }
-        """
-    )
-
-    async with farmbetter_client as session:
-        result = await session.execute(query, variable_values={"size": size})
-
-    response = result["getLivestock"]
-    if response["status"] != 200:
-        logger.warning(
-            "FarmBetter returned %s when fetching livestock: %s", response["status"], response.get("message")
-        )
-        return _LIVESTOCK_CACHE[0] if _LIVESTOCK_CACHE else []
-
-    options = [DataSource(id=item["id"], title=item["name"]) for item in response["payload"]]
-    _LIVESTOCK_CACHE = (options, time.time())
-    return options
-
-
-def select_data_sources(
-    *,
-    all_options: Sequence[DataSource],
-    required_ids: Iterable[str],
-) -> list[DataSource]:
-    """Ensure that options include every required id even if the catalog response omits them."""
-
-    lookup = {option.id: option for option in all_options}
-    selected = list(all_options)
-    existing_ids = set(lookup)
-
-    for item_id in required_ids:
-        if not item_id or item_id in existing_ids:
-            continue
-        option = lookup.get(item_id) or DataSource(
-            id=item_id,
-            title=item_id.replace("_", " ").title(),
-        )
-        selected.append(option)
-        existing_ids.add(item_id)
-
-    return selected

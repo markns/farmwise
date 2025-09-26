@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 import uuid
+from collections import defaultdict
 
 import phonenumbers
+from graphql.pyutils import snake_to_camel
 from loguru import logger
+from pywa.types.flows import (
+    DataSource,
+)
 from pywa_async import WhatsApp
 from pywa_async.types import FlowButton
 from pywa_async.types.flows import (
@@ -14,7 +19,9 @@ from pywa_async.types.flows import (
     FlowStatus,
 )
 
+from farmwise.farmbetter.concepts import get_concepts
 from farmwise.farmbetter.models import (
+    GqConceptDto,
     OmittedUpdateUserRequest,
 )
 from farmwise.farmbetter.users import FarmBetterAPIError, get_user, update_user
@@ -48,12 +55,15 @@ async def on_edit_profile_init(_: WhatsApp, req: FlowRequest) -> FlowResponse:
     number = phonenumbers.parse(f"+{session.wa_id}")
     user = await get_user(country_code=number.country_code, national_number=number.national_number)
 
+    concepts = await fetch_concepts()
+
     return req.respond(
         screen=EDIT_PROFILE_SCREEN_ID,
         data={
             "first_name_initial_value": user.firstName,
             "last_name_initial_value": user.lastName,
             "gender_initial_value": user.gender,
+            "fruit_options": concepts.get("fruits", []),
         },
     )
 
@@ -71,11 +81,9 @@ async def on_edit_profile_completion(client: WhatsApp, flow: FlowCompletion) -> 
     number = phonenumbers.parse(f"+{wa_id}")
     user = await get_user(country_code=number.country_code, national_number=number.national_number)
 
-    first_name = flow.response.get("first_name")
-    last_name = flow.response.get("last_name")
-    gender = flow.response.get("gender")
-
-    update_payload = OmittedUpdateUserRequest(id=user.id, firstName=first_name, lastName=last_name, gender=gender)
+    update_args = {snake_to_camel(k): v for k, v in flow.response.items()}
+    logger.info(f"Updating farmbetter profile for {wa_id} with {update_args}")
+    update_payload = OmittedUpdateUserRequest(id=user.id, **update_args)
 
     try:
         updated_user = await update_user(update_payload)
@@ -120,3 +128,26 @@ async def launch_edit_profile_flow(
             flow_name=FLOW_NAME,
         ),
     )
+
+
+async def fetch_concepts() -> dict[str, list[DataSource]]:
+    concepts = await get_concepts()
+
+    def _group_and_sort(items: list[GqConceptDto]):
+        grouped = defaultdict(list)
+        # group items by parentId
+        for item in items:
+            grouped[item.parentId].append(item)
+        # sort each group by the 'name' field
+        for key in grouped:
+            grouped[key] = sorted(grouped[key], key=lambda x: x.name.lower())
+        return dict(grouped)
+
+    concepts = _group_and_sort(concepts)
+
+    options = {}
+    for concept, values in concepts.items():
+        options[concept] = [DataSource(id=v.id, title=v.name) for v in values]
+        print(f"{concept}: {[v.name for v in values]}")
+
+    return options

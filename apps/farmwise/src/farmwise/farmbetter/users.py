@@ -1,16 +1,11 @@
 from gql import gql
 
-from farmwise.farmbetter import farmbetter_client
+from farmwise.farmbetter import FarmBetterAPIError, farmbetter_client
 from farmwise.farmbetter.models import (
     FieldGqUserModel,
     GqUserModelDto,
     OmittedUpdateUserRequest,
 )
-
-
-class FarmBetterAPIError(Exception):
-    pass
-
 
 def _strip_typename(data):
     if isinstance(data, dict):
