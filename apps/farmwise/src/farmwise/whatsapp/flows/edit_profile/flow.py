@@ -9,6 +9,8 @@ from pywa import Version
 from pywa.types.flows import (
     CompleteAction,
     DataSource,
+    DatePicker,
+    Dropdown,
     FlowJSON,
     Footer,
     Form,
@@ -26,15 +28,11 @@ FLOW_ENDPOINT = "/flows/edit-profile"
 FLOW_NAME = "edit_profile"
 EDIT_PROFILE_SCREEN_ID = "EDIT_PROFILE"
 PROFILE_FORM_NAME = "profile_form"
-# FLOW_JSON_VERSION = utils.Version.FLOW_JSON
-# FLOW_DATA_API_VERSION = utils.Version.FLOW_DATA_API
 
 _GENDER_OPTIONS: tuple[DataSource, ...] = (
-    DataSource(id="female", title="Female"),
     DataSource(id="male", title="Male"),
-    DataSource(id="non_binary", title="Non-binary"),
-    DataSource(id="other", title="Other"),
-    DataSource(id="prefer_not_to_say", title="Prefer not to say"),
+    DataSource(id="female", title="Female"),
+    DataSource(id="other", title="Keep private"),
 )
 
 _LANGUAGE_OPTIONS: tuple[DataSource, ...] = (
@@ -54,48 +52,12 @@ _CATALOG_TTL_SECONDS = 60 * 60  # 1 hour cache window
 def build_edit_profile_flow_json() -> FlowJSON:
     """Construct the Flow JSON definition for the edit profile experience."""
 
-    gender_default = ScreenData(key="gender_initial_value", example=_GENDER_OPTIONS[0].id)
-    age_default = ScreenData(key="age_initial_value", example="30")
     language_default = ScreenData(key="language_initial_value", example=_LANGUAGE_OPTIONS[0].id)
-    crop_options = ScreenData(
-        key="crop_options",
-        example=[DataSource(id="crop-example", title="Maize")],
-    )
-    livestock_options = ScreenData(
-        key="livestock_options",
-        example=[DataSource(id="livestock-example", title="Goat")],
-    )
+    crop_options = ScreenData(key="crop_options", example=[DataSource(id="crop-example", title="Maize")])
+    livestock_options = ScreenData(key="livestock_options", example=[DataSource(id="livestock-example", title="Goat")])
     crop_initial_ids = ScreenData(key="initial_crop_ids", example=["crop-example"])
     livestock_initial_ids = ScreenData(key="initial_livestock_ids", example=["livestock-example"])
 
-    # profile_form = Form(
-    #     name=PROFILE_FORM_NAME,
-    #     children=[
-    #         TextInput(
-    #             name="first_name",
-    #             label="First name",
-    #             required=True,
-    #             min_chars=2,
-    #             max_chars=80,
-    #             helper_text="Enter your first name",
-    #             init_value=first_name_default.ref,
-    #         ),
-    #         TextInput(
-    #             name="last_name",
-    #             label="Last name",
-    #             required=True,
-    #             min_chars=2,
-    #             max_chars=80,
-    #             helper_text="Enter your last name",
-    #             init_value=last_name_default.ref,
-    #         ),
-    #         # RadioButtonsGroup(
-    #         #     name="gender",
-    #         #     label="Gender",
-    #         #     required=True,
-    #         #     data_source=list(_GENDER_OPTIONS),
-    #         #     init_value=gender_default.ref,
-    #         # ),
     #         # TextInput(
     #         #     name="age",
     #         #     label="Age",
@@ -143,8 +105,10 @@ def build_edit_profile_flow_json() -> FlowJSON:
                 terminal=True,
                 success=True,
                 data=[
-                    first_name_default := ScreenData(key="first_name_initial_value", example="Jane"),
+                    first_name_default := ScreenData(key="first_name_initial_value", example="Hudson"),
                     last_name_default := ScreenData(key="last_name_initial_value", example="Ndege"),
+                    gender_default := ScreenData(key="gender_initial_value", example=_GENDER_OPTIONS[0].id),
+                    dob_default := ScreenData(key="dob_initial_value", example="1979-03-06"),
                     # gender_default,
                     # age_default,
                     # language_default,
@@ -179,6 +143,21 @@ def build_edit_profile_flow_json() -> FlowJSON:
                                     max_chars=80,
                                     helper_text="Enter your last name",
                                     init_value=last_name_default.ref,
+                                ),
+                                Dropdown(
+                                    name="gender",
+                                    label="Gender",
+                                    required=True,
+                                    data_source=list(_GENDER_OPTIONS),
+                                    init_value=gender_default.ref,
+                                ),
+                                DatePicker(
+                                    name="dob",
+                                    label="Date of birth",
+                                    required=False,
+                                    # max_date="today",
+                                    helper_text="Enter your date of birth (optional)",
+                                    init_value=dob_default.ref,
                                 ),
                             ],
                         ),
