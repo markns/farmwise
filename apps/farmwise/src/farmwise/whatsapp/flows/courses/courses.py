@@ -17,40 +17,38 @@ courses_section_list = SectionList(
             title="Reg Ag Practices",
             rows=[
                 SectionRow(
-                    title="Integrated Pest Management",
-                    callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
+                    title="Integrated Pest Mgmt",
+                    callback_data=CourseData(title="Integrated Pest Management", name=push_pull.FLOW_NAME),
                 ),
                 SectionRow(
-                    title="Agroforestry (intro lesson)",
-                    callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
+                    title="Agroforestry",
+                    callback_data=CourseData(title="Agroforestry", name=push_pull.FLOW_NAME),
                 ),
-                SectionRow(
-                    title="Pruning", callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME)
-                ),
-                SectionRow(
-                    title="Alley cropping",
-                    callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
-                ),
-                SectionRow(
-                    title="Conservation tillage",
-                    callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
-                ),
-                SectionRow(
-                    title="Composting",
-                    callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
-                ),
-                SectionRow(
-                    title="Crop-Livestock Integration (in review)",
-                    callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
-                ),
-                SectionRow(
-                    title="Intercropping",
-                    callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
-                ),
-                SectionRow(
-                    title="Crop rotation",
-                    callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
-                ),
+                SectionRow(title="Pruning", callback_data=CourseData(title="Pruning", name=push_pull.FLOW_NAME)),
+                # SectionRow(
+                #     title="Alley cropping",
+                #     callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
+                # ),
+                # SectionRow(
+                #     title="Conservation tillage",
+                #     callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
+                # ),
+                # SectionRow(
+                #     title="Composting",
+                #     callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
+                # ),
+                # SectionRow(
+                #     title="Crop-Livestock Integration (in review)",
+                #     callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
+                # ),
+                # SectionRow(
+                #     title="Intercropping",
+                #     callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
+                # ),
+                # SectionRow(
+                #     title="Crop rotation",
+                #     callback_data=CourseData(title="The Push-Pull technique", name=push_pull.FLOW_NAME),
+                # ),
             ],
         ),
         # Section(
