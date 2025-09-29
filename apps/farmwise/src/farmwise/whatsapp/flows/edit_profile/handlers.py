@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from collections import defaultdict
+from textwrap import dedent
 
 import phonenumbers
 from graphql.pyutils import snake_to_camel
@@ -32,13 +33,6 @@ from farmwise.whatsapp.flows.edit_profile.flow import (
 )
 from farmwise.whatsapp.flows.flow_tokens import FlowSession, clear_flow_session, get_flow_session, store_flow_session
 
-_CONFIRMATION_TEMPLATE = (
-    "✅ Profile updated successfully!\n• Name: {name}\n• Gender: {gender}\n• Age: {age}\n"
-    # "• Language: {language}\n"
-    # "• Crops: {crops}\n"
-    # "• Livestock: {livestock}"
-)
-
 
 @WhatsApp.on_flow_request(endpoint=FLOW_ENDPOINT)
 async def edit_profile_flow(_: WhatsApp, req: FlowRequest) -> FlowResponse:
@@ -54,8 +48,13 @@ async def on_edit_profile_init(_: WhatsApp, req: FlowRequest) -> FlowResponse:
 
     number = phonenumbers.parse(f"+{session.wa_id}")
     user = await get_user(country_code=number.country_code, national_number=number.national_number)
-
     concepts = await fetch_concepts()
+
+    user_crops = {c.id for c in user.crops}
+    user_livestock = {c.id for c in user.livestock}
+
+    def _to_datasources(items: list[GqConceptDto]) -> list[DataSource]:
+        return [DataSource(id=item.id, title=item.name) for item in items]
 
     return req.respond(
         screen=EDIT_PROFILE_SCREEN_ID,
@@ -63,14 +62,20 @@ async def on_edit_profile_init(_: WhatsApp, req: FlowRequest) -> FlowResponse:
             "first_name_initial_value": user.firstName,
             "last_name_initial_value": user.lastName,
             "gender_initial_value": user.gender,
-            "fruit_options": concepts.get("fruits", []),
+            "dob_initial_value": user.dateOfBirth,
+            "language_initial_value": user.preferredLanguage,
+            "cereal_options": _to_datasources(concepts.get("cereals", [])),
+            "cereal_ids": user_crops.intersection({c.id for c in concepts["cereals"]}),
+            "fruit_options": _to_datasources(concepts.get("fruits", [])),
+            "fruit_ids": user_crops.intersection({c.id for c in concepts["fruits"]}),
+            "vegetable_options": _to_datasources(concepts.get("vegetables", [])),
+            "vegetable_ids": user_crops.intersection({c.id for c in concepts["vegetables"]}),
+            "livestock_options": _to_datasources(concepts.get("livestock", [])),
+            "livestock_ids": user_livestock.intersection({c.id for c in concepts["livestock"]}),
+            "poultry_options": _to_datasources(concepts.get("poultry", [])),
+            "poultry_ids": user_livestock.intersection({c.id for c in concepts["poultry"]}),
         },
     )
-
-
-@edit_profile_flow.on_data_exchange()
-async def on_edit_profile_data_exchange(_: WhatsApp, req: FlowRequest):
-    logger.info(f"Flow data exchange: {req}")
 
 
 @edit_profile_flow.on_completion()
@@ -81,12 +86,25 @@ async def on_edit_profile_completion(client: WhatsApp, flow: FlowCompletion) -> 
     number = phonenumbers.parse(f"+{wa_id}")
     user = await get_user(country_code=number.country_code, national_number=number.national_number)
 
-    update_args = {snake_to_camel(k): v for k, v in flow.response.items()}
+    poultry = flow.response.pop("poultry")
+    livestock = flow.response.pop("livestock")
+    vegetables = flow.response.pop("vegetables")
+    fruits = flow.response.pop("fruits")
+    cereals = flow.response.pop("cereals")
+
+    livestock = [{"id": pl, "name": pl} for pl in poultry + livestock]
+    crops = [{"id": vfc, "name": vfc} for vfc in vegetables + fruits + cereals]
+
+    update_args = {snake_to_camel(k, upper=False): v for k, v in flow.response.items()}
+    update_args["crops"] = crops
+    # update_args["livestock"] = livestock
+    update_args["livestock"] = []
+
     logger.info(f"Updating farmbetter profile for {wa_id} with {update_args}")
     update_payload = OmittedUpdateUserRequest(id=user.id, **update_args)
 
     try:
-        updated_user = await update_user(update_payload)
+        await update_user(update_payload)
     except FarmBetterAPIError as exc:
         logger.exception("Failed to update FarmBetter profile for %s: %s", wa_id, exc)
         await client.send_message(
@@ -97,9 +115,7 @@ async def on_edit_profile_completion(client: WhatsApp, flow: FlowCompletion) -> 
 
     await client.send_message(
         to=wa_id,
-        text=_CONFIRMATION_TEMPLATE.format(
-            name=f"{updated_user.firstName} {updated_user.lastName}".strip(),
-        ),
+        text=dedent("✅ Profile updated successfully!"),
     )
 
     if flow.token:
@@ -130,7 +146,7 @@ async def launch_edit_profile_flow(
     )
 
 
-async def fetch_concepts() -> dict[str, list[DataSource]]:
+async def fetch_concepts() -> dict[str, list[GqConceptDto]]:
     concepts = await get_concepts()
 
     def _group_and_sort(items: list[GqConceptDto]):
@@ -144,10 +160,9 @@ async def fetch_concepts() -> dict[str, list[DataSource]]:
         return dict(grouped)
 
     concepts = _group_and_sort(concepts)
+    #
+    # options = {}
+    # for concept, values in concepts.items():
+    #     options[concept] = values
 
-    options = {}
-    for concept, values in concepts.items():
-        options[concept] = [DataSource(id=v.id, title=v.name) for v in values]
-        print(f"{concept}: {[v.name for v in values]}")
-
-    return options
+    return concepts
