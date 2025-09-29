@@ -46,7 +46,7 @@ _LANGUAGE_OPTIONS: tuple[DataSource, ...] = (
 )
 
 
-async def build_edit_profile_flow_json() -> FlowJSON:
+def build_flow() -> FlowJSON:
     """Construct the Flow JSON definition for the edit profile experience."""
     return FlowJSON(
         version=Version.FLOW_JSON,

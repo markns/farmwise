@@ -7,7 +7,7 @@ from farmwise.agent import (
 )
 from farmwise.schema import ActivityData, Section, SectionList, SectionRow
 
-activities = SectionList(
+activities_section_list = SectionList(
     button_title="Select activity",
     sections=[
         Section(

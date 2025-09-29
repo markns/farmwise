@@ -2,17 +2,15 @@ from loguru import logger
 from pywa_async.types.base_update import BaseUserUpdateAsync
 
 from farmwise.schema import Action, AudioResponse, Button, SectionList, TextResponse
-from farmwise.whatsapp.activities import activities
+from farmwise.whatsapp.activities import activities_section_list
 from farmwise.whatsapp.utils import _convert_md_to_whatsapp
 
 
 def ensure_valid_section_list(section_list: SectionList):
-    print(section_list)
     return section_list
 
 
 def ensure_valid_buttons(buttons: list[Button]):
-    print(buttons)
     return buttons
 
 
@@ -31,7 +29,7 @@ async def send_text_reply(response: TextResponse, msg: BaseUserUpdateAsync):
         sent_message = await msg.reply_text(text=text, buttons=buttons)
     else:
         if response.agent_complete:
-            section_list = ensure_valid_section_list(activities)
+            section_list = ensure_valid_section_list(activities_section_list)
         else:
             section_list = None
         sent_message = await msg.reply_text(text=text, buttons=section_list)

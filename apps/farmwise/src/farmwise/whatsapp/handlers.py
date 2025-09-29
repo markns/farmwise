@@ -1,15 +1,17 @@
 import uuid
 
 from loguru import logger
+from pywa.types import FlowActionType, FlowButton
 from pywa_async import WhatsApp, filters, types
 
 from farmwise.context import get_or_create_user
-from farmwise.schema import ActivityData, AudioResponse, TextResponse, UserInput
+from farmwise.schema import ActivityData, AudioResponse, CourseData, TextResponse, UserInput
 from farmwise.service import farmwise
 from farmwise.settings import settings
 from farmwise.storage import make_blob_public, upload_bytes_to_gcs
 from farmwise.whatsapp import commands
-from farmwise.whatsapp.activities import activities
+from farmwise.whatsapp.activities import activities_section_list
+from farmwise.whatsapp.flows.courses.courses import courses_section_list
 from farmwise.whatsapp.flows.edit_profile.handlers import launch_edit_profile_flow
 from farmwise.whatsapp.responses import send_audio_reply, send_responses, send_text_reply
 from farmwise.whatsapp.store import record_callback_selection
@@ -68,7 +70,7 @@ async def on_command(client: WhatsApp, msg: types.Message):
     match msg.text:
         case "/menu":
             await send_text_reply(
-                TextResponse(content="Please choose an activity", section_list=activities.activities), msg
+                TextResponse(content="Please choose an activity", section_list=activities_section_list), msg
             )
         case "/profile":
             await launch_edit_profile_flow(
@@ -79,6 +81,10 @@ async def on_command(client: WhatsApp, msg: types.Message):
         case "/location":
             # TODO: add functionality to set location
             ...
+        case "/courses":
+            await send_text_reply(
+                TextResponse(content="Please select a course", section_list=courses_section_list), msg
+            )
 
 
 @WhatsApp.on_message(filters.text)
@@ -108,6 +114,22 @@ async def on_activity_callback_selection(_: WhatsApp, sel: types.CallbackSelecti
 
     response_events = farmwise.invoke(context, user_input, agent_name=sel.data.agent)
     await send_responses(response_events, sel)
+
+
+@WhatsApp.on_callback_selection(factory=CourseData, priority=1)
+async def on_course_callback_selection(client: WhatsApp, sel: types.CallbackSelection[CourseData]):
+    logger.info(f"Course: {sel.data}")
+
+    course = sel.data
+    await sel.reply_text(
+        text=f"Tap the button to access the {course.title} course",
+        buttons=FlowButton(
+            title="Start course",
+            flow_action_type=FlowActionType.NAVIGATE,
+            flow_action_screen="LESSON_ONE",
+            flow_name=course.name,
+        ),
+    )
 
 
 @WhatsApp.on_callback_selection

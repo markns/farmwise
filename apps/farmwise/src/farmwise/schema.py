@@ -74,10 +74,16 @@ class ActivityData(types.CallbackData):  # Subclass CallbackData
     text: str
 
 
+@dataclass(frozen=True, slots=True)
+class CourseData(types.CallbackData):  # Subclass CallbackData
+    title: str
+    name: str
+
+
 @dataclass
 class SectionRow(types.SectionRow):
     title: str = field(metadata={"description": "The title of the row (up to 24 characters)"})
-    callback_data: str | ActivityData = field(
+    callback_data: str | ActivityData | CourseData = field(
         metadata={"description": "The payload to send when the user clicks on the row up to 200 characters"}
     )
     description: str | None = field(
