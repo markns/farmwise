@@ -19,11 +19,6 @@ class UserContext(BaseModel):
 
 
 async def get_or_create_user(wa_id: str, name: str, organization="default") -> UserContext:
-    # TODO: how to update my phone number?
-    if wa_id == "31657775781":
-        wa_id = "31657775788"
-        # wa_id = "254111269800"
-
     number = phonenumbers.parse(f"+{wa_id}")
     try:
         user = await get_user(country_code=number.country_code, national_number=number.national_number)
