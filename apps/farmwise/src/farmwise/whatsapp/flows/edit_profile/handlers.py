@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from collections import defaultdict
+from copy import copy
 from textwrap import dedent
 
 import phonenumbers
@@ -122,6 +123,17 @@ async def on_edit_profile_completion(client: WhatsApp, flow: FlowCompletion) -> 
         await clear_flow_session(flow.token)
 
 
+button = FlowButton(
+    title="Edit profile",
+    # flow_id=flow_id,
+    # flow_token=flow_token,
+    flow_action_type=FlowActionType.DATA_EXCHANGE,
+    flow_action_screen=EDIT_PROFILE_SCREEN_ID,
+    mode=FlowStatus.PUBLISHED,
+    flow_name=FLOW_NAME,
+)
+
+
 async def launch_edit_profile_flow(
     client: WhatsApp,
     *,
@@ -131,19 +143,9 @@ async def launch_edit_profile_flow(
     flow_token = uuid.uuid4().hex
     await store_flow_session(flow_token, FlowSession(wa_id=to, name=wa_user_name))
 
-    await client.send_message(
-        to=to,
-        text="Tap below to review and update your farmbetter profile.",
-        buttons=FlowButton(
-            title="Edit profile",
-            # flow_id=flow_id,
-            flow_token=flow_token,
-            flow_action_type=FlowActionType.DATA_EXCHANGE,
-            flow_action_screen=EDIT_PROFILE_SCREEN_ID,
-            mode=FlowStatus.PUBLISHED,
-            flow_name=FLOW_NAME,
-        ),
-    )
+    _button = copy(button)
+    _button.flow_token = flow_token
+    await client.send_message(to=to, text="Tap below to review and update your farmbetter profile.", buttons=_button)
 
 
 async def fetch_concepts() -> dict[str, list[GqConceptDto]]:
