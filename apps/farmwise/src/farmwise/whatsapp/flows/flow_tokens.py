@@ -7,7 +7,7 @@ from upstash_redis.asyncio import Redis
 
 from farmwise.settings import settings
 
-_FLOW_TOKEN_TTL_SECONDS = 15 * 60  # 15 minutes gives users time to finish the flow
+_FLOW_TOKEN_TTL_SECONDS = 60 * 60  # 60 minutes gives users time to finish the flow
 
 
 @dataclass(slots=True)
@@ -31,7 +31,9 @@ def _make_key(flow_token: str) -> str:
     return f"{settings.ENV}:wa_flow:{flow_token}"
 
 
-async def store_flow_session(flow_token: str, session: FlowSession, *, ttl_seconds: int = _FLOW_TOKEN_TTL_SECONDS) -> None:
+async def store_flow_session(
+    flow_token: str, session: FlowSession, *, ttl_seconds: int = _FLOW_TOKEN_TTL_SECONDS
+) -> None:
     """Persist the flow session mapping so subsequent requests can resolve the WhatsApp user."""
 
     await redis.set(_make_key(flow_token), session.to_json(), ex=ttl_seconds)

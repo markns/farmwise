@@ -11,7 +11,7 @@ from farmwise.settings import settings
 from farmwise.storage import make_blob_public, upload_bytes_to_gcs
 from farmwise.whatsapp import commands
 from farmwise.whatsapp.activities import activities_section_list
-from farmwise.whatsapp.flows.courses.courses import courses_section_list
+from farmwise.whatsapp.flows.courses.courses import get_courses_section_list
 from farmwise.whatsapp.flows.edit_profile.handlers import launch_edit_profile_flow
 from farmwise.whatsapp.responses import send_audio_reply, send_responses, send_text_reply
 from farmwise.whatsapp.store import record_callback_selection
@@ -26,7 +26,7 @@ async def chat_opened(client: WhatsApp, chat_opened: types.ChatOpened):
     logger.info(f"CHAT OPENED USER: {chat_opened}")
     # TODO: Do we already want to register a user here?
     await chat_opened.reply_text(f"""
-Hi {chat_opened.from_user.name}! 👋 You're now connected to FarmWise – your trusted partner for smart farming advice.
+Hi {chat_opened.from_user.name}! 👋 You're now connected to farmbetter – your trusted partner for smart farming advice.
 
 Here's what you can do:
 ✅ Get tailored recommendations for your crops
@@ -83,7 +83,7 @@ async def on_command(client: WhatsApp, msg: types.Message):
             ...
         case "/courses":
             await send_text_reply(
-                TextResponse(content="Please select a course", section_list=courses_section_list), msg
+                TextResponse(content="Please select a course", section_list=get_courses_section_list()), msg
             )
 
 

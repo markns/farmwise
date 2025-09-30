@@ -60,12 +60,12 @@ class Product(BaseModel):
     footer: str | None = Field(default=None, description="Footer text for the product message")
 
 
-@dataclass
-class Button(types.Button):
-    title: str = field(metadata={"description": "The title of the button (up to 20 characters)"})
-    callback_data: str = field(
-        metadata={"description": "The data to send when the user clicks on the button (up to 256 characters"}
-    )
+# @dataclass
+# class Button(types.Button):
+#     title: str = field(metadata={"description": "The title of the button (up to 20 characters)"})
+#     callback_data: str = field(
+#         metadata={"description": "The data to send when the user clicks on the button (up to 256 characters"}
+#     )
 
 
 @dataclass(frozen=True, slots=True)
@@ -122,7 +122,10 @@ class TextResponse(BaseModel):
     # image_url: str | None = Field(default=None, description="An image url that should be sent to the user.")
     # contact: Contact | None = Field(default=None, description="Contact information to share with the user.")
     # product: Product | None = Field(default=None, description="Product information to share with the user.")
-    buttons: list[Button] = Field(
+    flow_button: types.FlowButton | None = Field(
+        default=None, description="Flow button that can be added to the response. Should be left null unless specified."
+    )
+    buttons: list[types.Button] = Field(
         default=[],
         description="Buttons that can be added to the response. Should be left empty unless specified.",
     )

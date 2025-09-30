@@ -1,8 +1,12 @@
+import uuid
+
 from loguru import logger
+from pywa_async.types import Button
 from pywa_async.types.base_update import BaseUserUpdateAsync
 
-from farmwise.schema import Action, AudioResponse, Button, SectionList, TextResponse
+from farmwise.schema import Action, AudioResponse, SectionList, TextResponse
 from farmwise.whatsapp.activities import activities_section_list
+from farmwise.whatsapp.flows.flow_tokens import FlowSession, store_flow_session
 from farmwise.whatsapp.utils import _convert_md_to_whatsapp
 
 
@@ -20,19 +24,26 @@ async def send_text_reply(response: TextResponse, msg: BaseUserUpdateAsync):
     text = _convert_md_to_whatsapp(response.content)
 
     if Action.request_location in response.actions:
-        sent_message = await msg.reply_location_request(response.content)
+        await msg.reply_location_request(response.content)
     elif response.section_list:
         section_list = ensure_valid_section_list(response.section_list)
-        sent_message = await msg.reply_text(text=text, buttons=section_list)
+        await msg.reply_text(text=text, buttons=section_list)
+    elif response.flow_button:
+        flow_button = response.flow_button
+        flow_token = uuid.uuid4().hex
+        await store_flow_session(flow_token, FlowSession(wa_id=msg.from_user.wa_id, name=msg.from_user.name))
+        flow_button.flow_token = flow_token
+
+        await msg.reply_text(text=text, buttons=flow_button)
     elif response.buttons:
         buttons = ensure_valid_buttons(response.buttons)
-        sent_message = await msg.reply_text(text=text, buttons=buttons)
+        await msg.reply_text(text=text, buttons=buttons)
     else:
         if response.agent_complete:
             section_list = ensure_valid_section_list(activities_section_list)
         else:
             section_list = None
-        sent_message = await msg.reply_text(text=text, buttons=section_list)
+        await msg.reply_text(text=text, buttons=section_list)
 
     # TODO: await record_outbound_message(user, sent_message, text)
 

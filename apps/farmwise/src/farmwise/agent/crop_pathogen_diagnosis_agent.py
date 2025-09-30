@@ -4,7 +4,7 @@ from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import TextResponse
-from farmwise.tools.farmbase import create_note
+from farmwise.tools.courses import available_courses
 
 
 def crop_pathogen_diagnosis_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
@@ -54,10 +54,8 @@ Routine for Crop Pest and Disease Diagnosis Agent
         •	Preventative tips for future including a calendar of actions tailored to the crop and location
 8.	Warn About Uncertainty When Appropriate
     If the image does not provide enough information, explain that a field inspection or lab test may be necessary.
-9.  Always request the user shares the exact location where the photo was taken, so it can be used for future reference 
-    and alerting. 
-10.	Log the Diagnosis
-    Summarise the diagnosis and advice and record for future reference using the create_note tool.
+9.  Use the available_courses tool to load all available courses. Determine if a course is relevant to the diagnosis,
+    using the course description, and if so, add the related flow_button to the response. 
 11. When the interaction is complete prompt the user to ask follow up questions, and set the agent_complete boolean 
     to True.
 
@@ -65,11 +63,19 @@ Routine for Crop Pest and Disease Diagnosis Agent
 """
 
 
+# 10a ask if the farmer is satisfied with the diagnosis
+# 10.	Log the Diagnosis (with escalation)
+#     Summarise the diagnosis and advice and record for future reference using the create_note tool.
+
+
 crop_pathogen_diagnosis_agent: Agent[UserContext] = Agent(
     name="Crop pathogen diagnosis agent",
     handoff_description="An agent that can identify crop pests and diseases from an image",
     instructions=crop_pathogen_diagnosis_agent_instructions,
     output_type=TextResponse,
-    tools=[create_note],
+    tools=[
+        # create_note
+        available_courses
+    ],
     model="gpt-4.1",
 )
