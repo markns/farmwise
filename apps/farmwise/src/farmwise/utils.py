@@ -4,6 +4,16 @@ import base64
 from pathlib import Path
 
 
+def image_to_base64(file_path: Path | str) -> str:
+    """Read an image file and return its base64-encoded string."""
+    file = Path(file_path)
+    if not file.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    with file.open("rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
+
+
 def copy_doc(from_func):
     def decorator(to_func):
         to_func.__doc__ = from_func.__doc__
@@ -24,12 +34,6 @@ def join_with(words, join_word="or"):
 
 def image_to_data_url(file_path: str) -> str:
     """Convert a JPEG file to a base64-encoded data URL."""
-    file = Path(file_path)
-    if not file.exists():
-        raise FileNotFoundError(f"File not found: {file_path}")
-
     mime_type = "image/jpeg"  # You can make this dynamic if needed
-
-    with file.open("rb") as image_file:
-        encoded = base64.b64encode(image_file.read()).decode("utf-8")
-        return f"data:{mime_type};base64,{encoded}"
+    encoded = image_to_base64(file_path)
+    return f"data:{mime_type};base64,{encoded}"

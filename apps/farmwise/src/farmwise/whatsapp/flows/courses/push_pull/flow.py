@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import base64
 from pathlib import Path
 
 from pywa.types.flows import (
@@ -16,17 +15,10 @@ from pywa.types.flows import (
     TextHeading,
 )
 
+from farmwise.utils import image_to_base64
 from farmwise.whatsapp.flows.courses.courses import FlowCourse
 
-
-def image_to_base64(image: str) -> str:
-    module_path = Path(__file__).resolve().parent
-    image_path = module_path.joinpath(Path(f"images/{image}"))
-
-    with open(image_path, "rb") as image_file:
-        encoded_bytes = base64.b64encode(image_file.read())
-        encoded_str = encoded_bytes.decode("utf-8")
-    return encoded_str
+IMAGES_DIR = Path(__file__).resolve().parent / "images"
 
 
 class PushPullCourse(FlowCourse):
@@ -52,7 +44,9 @@ class PushPullCourse(FlowCourse):
                     layout=Layout(
                         children=[
                             TextHeading(text="What is push–pull?"),
-                            Image(src=image_to_base64("lesson1.jpg"), aspect_ratio=2, width=508, height=220),
+                            Image(
+                                src=image_to_base64(IMAGES_DIR / "lesson1.jpg"), aspect_ratio=2, width=508, height=220
+                            ),
                             TextBody(
                                 text="""Push–pull is a way of farming that protects maize and sorghum from pests. 
 
@@ -80,7 +74,9 @@ Together they stop insects like stemborer and fall armyworm, and they also fight
                     layout=Layout(
                         children=[
                             TextHeading(text="How to plan your field"),
-                            Image(src=image_to_base64("lesson2.jpg"), aspect_ratio=2, width=508, height=220),
+                            Image(
+                                src=image_to_base64(IMAGES_DIR / "lesson2.jpg"), aspect_ratio=2, width=508, height=220
+                            ),
                             TextBody(
                                 text="""First, choose your push crop - Desmodium is the best for this.
 
@@ -108,7 +104,7 @@ Always plant at the beginning of the rains so that everything grows well."""
                     layout=Layout(
                         children=[
                             TextHeading(text="What you will need"),
-                            Image(src=image_to_base64("lesson3.jpg"), aspect_ratio=1),
+                            Image(src=image_to_base64(IMAGES_DIR / "lesson3.jpg"), aspect_ratio=1),
                             TextBody(
                                 text="""You will need desmodium seed or vines, and planting materials for Napier or Brachiaria grass.
 
@@ -132,7 +128,7 @@ A hoe, pegs, and a tape measure will help you to lay out the field neatly."""
                     layout=Layout(
                         children=[
                             TextHeading(text="How to set up the field"),
-                            Image(src=image_to_base64("lesson4.jpg"), aspect_ratio=1),
+                            Image(src=image_to_base64(IMAGES_DIR / "lesson4.jpg"), aspect_ratio=1),
                             TextBody(
                                 text="""Start by planting the border grass. Plant three rows of Napier or three to four rows of Brachiaria all around the outside of your field.
 
@@ -185,7 +181,7 @@ Make sure you plant when the rains have started, or water well if possible."""
                     layout=Layout(
                         children=[
                             TextHeading(text="Looking after the young plants"),
-                            Image(src=image_to_base64("lesson6.jpg"), aspect_ratio=1),
+                            Image(src=image_to_base64(IMAGES_DIR / "lesson6.jpg"), aspect_ratio=1),
                             TextBody(
                                 text="""Keep weeds away so that desmodium and maize can grow well.
 
@@ -211,7 +207,7 @@ If any border grass fails to grow, replant quickly so the border is strong."""
                     layout=Layout(
                         children=[
                             TextHeading(text="Checking for pests"),
-                            Image(src=image_to_base64("lesson7.jpg"), aspect_ratio=1),
+                            Image(src=image_to_base64(IMAGES_DIR / "lesson7.jpg"), aspect_ratio=1),
                             TextBody(
                                 text="""Each week, look at your maize leaves. If you see damage, check the Napier or Brachiaria grass at the edge.
 
