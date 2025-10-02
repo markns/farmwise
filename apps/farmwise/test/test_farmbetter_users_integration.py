@@ -28,9 +28,9 @@ async def test_get_user_integration():
     cc = 254
     num = 712345676
 
-    from farmwise.farmbetter.users import get_user
+    from farmwise.farmbetter.users import get_user_by_phone
 
-    user = await get_user(country_code=cc, national_number=num)
+    user = await get_user_by_phone(country_code=cc, national_number=num)
     assert isinstance(user, GqUserModelDto)
     assert user.id
     assert user.firstName

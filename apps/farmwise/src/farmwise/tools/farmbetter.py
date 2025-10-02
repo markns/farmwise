@@ -6,7 +6,7 @@ from farmwise.farmbetter.models import (
     GqUserModelDto,
     OmittedUpdateUserRequest,
 )
-from farmwise.farmbetter.users import create_user, get_user, update_user
+from farmwise.farmbetter.users import create_user, get_user_by_phone, update_user
 
 
 @function_tool(
@@ -29,7 +29,7 @@ async def get_farmbetter_user(
     ):
         return wrapper.context.user
 
-    user = await get_user(
+    user = await get_user_by_phone(
         user_id=user_id,
         email=email,
         country_code=country_code,
@@ -45,9 +45,7 @@ async def get_farmbetter_user(
 Create a new FarmBetter user. Provide the details required by the FarmBetter API in the user payload.
 """
 )
-async def create_farmbetter_user(
-    wrapper: RunContextWrapper[UserContext], user: FieldGqUserModel
-) -> GqUserModelDto:
+async def create_farmbetter_user(wrapper: RunContextWrapper[UserContext], user: FieldGqUserModel) -> GqUserModelDto:
     created_user = await create_user(user=user)
     wrapper.context.user = created_user
     wrapper.context.new_user = True

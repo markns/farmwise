@@ -8,7 +8,7 @@ from farmwise.farmbetter.models import (
     GqUserLocationInput,
     GqUserModelDto,
 )
-from farmwise.farmbetter.users import FarmBetterAPIError, create_user, get_user
+from farmwise.farmbetter.users import FarmBetterAPIError, create_user, get_user_by_phone
 from farmwise.settings import settings
 
 
@@ -21,7 +21,7 @@ class UserContext(BaseModel):
 async def get_or_create_user(wa_id: str, name: str, organization="default") -> UserContext:
     number = phonenumbers.parse(f"+{wa_id}")
     try:
-        user = await get_user(country_code=number.country_code, national_number=number.national_number)
+        user = await get_user_by_phone(country_code=number.country_code, national_number=number.national_number)
         return UserContext(user=user)
     except FarmBetterAPIError as e:
         logger.warning(f"User with wa_id {wa_id} name {name} not found: ({type(e)}) {e}")

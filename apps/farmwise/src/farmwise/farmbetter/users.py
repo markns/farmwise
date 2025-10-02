@@ -7,6 +7,7 @@ from farmwise.farmbetter.models import (
     OmittedUpdateUserRequest,
 )
 
+
 def _strip_typename(data):
     if isinstance(data, dict):
         return {k: _strip_typename(v) for k, v in data.items() if k != "typename__"}
@@ -15,16 +16,14 @@ def _strip_typename(data):
     return data
 
 
-async def get_user(
-    user_id: str | None = None,
-    email: str | None = None,
+async def get_user_by_phone(
     country_code: int | None = None,
     national_number: int | None = None,
 ) -> GqUserModelDto:
     query = gql(
         """
-        query GetUser($id: String, $email: String, $phoneNumber: GqPhoneNumberUserRequest) {
-            getUser(id: $id, email: $email, phoneNumber: $phoneNumber) {
+        query GetUser($phoneNumber: GqPhoneNumberUserRequest) {
+            getUser(phoneNumber: $phoneNumber) {
                 message
                 status
                 payload {
@@ -66,12 +65,12 @@ async def get_user(
         """
     )
 
-    variables: dict = {"id": user_id, "email": email}
-    if country_code and national_number:
-        variables["phoneNumber"] = {
+    variables = {
+        "phoneNumber": {
             "countryCode": str(country_code),
             "phone": str(national_number),
         }
+    }
 
     async with farmbetter_client as session:
         result = await session.execute(query, variable_values=variables)

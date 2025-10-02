@@ -31,6 +31,7 @@ async def create_or_update_flows(wa: WhatsApp):
         new_json = build_flow()
 
         res = await flow.update_json(flow_json=new_json)
+        await flow.publish()
 
     await flow.update_metadata(endpoint_uri=f"{settings.WHATSAPP_CALLBACK_URL}{FLOW_ENDPOINT}")
 

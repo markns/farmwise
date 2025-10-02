@@ -26,7 +26,7 @@ from farmwise.farmbetter.models import (
     GqConceptDto,
     OmittedUpdateUserRequest,
 )
-from farmwise.farmbetter.users import FarmBetterAPIError, get_user, update_user
+from farmwise.farmbetter.users import FarmBetterAPIError, get_user_by_phone, update_user
 from farmwise.whatsapp.flows.edit_profile.flow import (
     EDIT_PROFILE_SCREEN_ID,
     FLOW_ENDPOINT,
@@ -48,7 +48,7 @@ async def on_edit_profile_init(_: WhatsApp, req: FlowRequest) -> FlowResponse:
         req.token_no_longer_valid("Session expired. Please open the profile flow again.")
 
     number = phonenumbers.parse(f"+{session.wa_id}")
-    user = await get_user(country_code=number.country_code, national_number=number.national_number)
+    user = await get_user_by_phone(country_code=number.country_code, national_number=number.national_number)
     concepts = await fetch_concepts()
 
     user_crops = {c.id for c in user.crops}
@@ -85,7 +85,7 @@ async def on_edit_profile_completion(client: WhatsApp, flow: FlowCompletion) -> 
 
     wa_id = flow.from_user.wa_id
     number = phonenumbers.parse(f"+{wa_id}")
-    user = await get_user(country_code=number.country_code, national_number=number.national_number)
+    user = await get_user_by_phone(country_code=number.country_code, national_number=number.national_number)
 
     poultry = flow.response.pop("poultry")
     livestock = flow.response.pop("livestock")
@@ -98,8 +98,7 @@ async def on_edit_profile_completion(client: WhatsApp, flow: FlowCompletion) -> 
 
     update_args = {snake_to_camel(k, upper=False): v for k, v in flow.response.items()}
     update_args["crops"] = crops
-    # update_args["livestock"] = livestock
-    update_args["livestock"] = []
+    update_args["livestock"] = livestock
 
     logger.info(f"Updating farmbetter profile for {wa_id} with {update_args}")
     update_payload = OmittedUpdateUserRequest(id=user.id, **update_args)
