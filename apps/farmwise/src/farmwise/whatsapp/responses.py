@@ -15,6 +15,9 @@ def ensure_valid_section_list(section_list: SectionList):
 
 
 def ensure_valid_buttons(buttons: list[Button]):
+    if len(buttons) > 3:
+        logger.warning(f"Invalid buttons count. Min allowed buttons: 1, Max allowed buttons: 3': {buttons}")
+        return buttons[:3]
     return buttons
 
 
