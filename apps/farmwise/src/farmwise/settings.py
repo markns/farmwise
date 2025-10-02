@@ -31,8 +31,6 @@ class Settings(BaseSettings):
     PORT: int = 8000
     OPENAI_API_KEY: SecretStr
     ZEP_API_KEY: SecretStr
-    FARMBASE_ENDPOINT: str
-    FARMBASE_API_KEY: SecretStr
 
     FARMBETTER_ENDPOINT: str
     FARMBETTER_TOKEN: SecretStr
@@ -55,6 +53,7 @@ class Settings(BaseSettings):
     UPSTASH_REDIS_REST_URL: str
     UPSTASH_REDIS_REST_TOKEN: str
     SESSION_TTL_SECS: int = 60 * 60 * 6  # default 6 hour session
+    PINECONE_API_KEY: SecretStr
 
     def is_dev(self) -> bool:
         return self.MODE == "dev"
