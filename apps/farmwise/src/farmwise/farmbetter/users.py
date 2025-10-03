@@ -6,14 +6,7 @@ from farmwise.farmbetter.models import (
     GqUserModelDto,
     OmittedUpdateUserRequest,
 )
-
-
-def _strip_typename(data):
-    if isinstance(data, dict):
-        return {k: _strip_typename(v) for k, v in data.items() if k != "typename__"}
-    elif isinstance(data, list):
-        return [_strip_typename(v) for v in data]
-    return data
+from farmwise.farmbetter.utils import strip_typename
 
 
 async def get_user_by_phone(
@@ -130,7 +123,7 @@ async def create_user(user: FieldGqUserModel) -> GqUserModelDto:
 
     async with farmbetter_client as session:
         result = await session.execute(
-            mutation, variable_values={"user": _strip_typename(user.model_dump(exclude_none=True))}
+            mutation, variable_values={"user": strip_typename(user.model_dump(exclude_none=True))}
         )
 
     response = result["createUser"]
@@ -188,7 +181,7 @@ async def update_user(user: OmittedUpdateUserRequest) -> GqUserModelDto:
 
     async with farmbetter_client as session:
         result = await session.execute(
-            mutation, variable_values={"user": _strip_typename(user.model_dump(exclude_none=True))}
+            mutation, variable_values={"user": strip_typename(user.model_dump(exclude_none=True))}
         )
 
     response = result["updateUser"]

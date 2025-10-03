@@ -20,6 +20,7 @@ dependencies = [
     "zep-cloud>=3.4.3",
     "phonenumbers>=9.0.4",
     "async-lru>=2.0.4",
+    "pinecone>=7.3.0",
 ]
 
 [dependency-groups]

@@ -119,7 +119,8 @@ class TextResponse(BaseModel):
     )
     # TODO: use a oneOf here to make sure not everything is set -
     #  https://docs.pydantic.dev/latest/concepts/fields/#discriminator
-    # image_url: str | None = Field(default=None, description="An image url that should be sent to the user.")
+    image: str | None = Field(default=None, description="The url of an image that should be sent to the user.")
+    video: str | None = Field(default=None, description="The url of a video that should be sent to the user.")
     # contact: Contact | None = Field(default=None, description="Contact information to share with the user.")
     # product: Product | None = Field(default=None, description="Product information to share with the user.")
     flow_button: types.FlowButton | None = Field(

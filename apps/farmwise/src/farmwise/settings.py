@@ -48,7 +48,8 @@ class Settings(BaseSettings):
     WHATSAPP_BUSINESS_PRIVATE_KEY: Optional[Base64Str] = None
     WHATSAPP_BUSINESS_PRIVATE_KEY_PASSWORD: str | None = None
 
-    GCS_BUCKET: str = "gs://farmwise_media"
+    FARMBETTER_STORAGE: str
+    FARMBETTER_ASSISTANT_USER_ID: str
 
     UPSTASH_REDIS_REST_URL: str
     UPSTASH_REDIS_REST_TOKEN: str

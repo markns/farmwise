@@ -342,7 +342,7 @@ input CreateGqReportedProblemRequest {
   source: String
   status: String = "pending"
   tenant: String
-  timeline: [_GqTimelineEntryInput!] = []
+  timeline: [GqTimelineEntryInput!] = []
   updated: String
 }
 
@@ -1174,7 +1174,7 @@ type GqReportedProblemModelDto {
   id: String
   status: String!
   tenant: String!
-  timeline: [_GqTimelineEntryDto!]!
+  timeline: [GqTimelineEntryDto!]!
   updated: String
 }
 
@@ -1187,7 +1187,7 @@ input GqReportedProblemModelInput {
   id: String
   status: String! = "pending"
   tenant: String!
-  timeline: [_GqTimelineEntryInput!]! = []
+  timeline: [GqTimelineEntryInput!]! = []
   updated: String
 }
 
@@ -2769,7 +2769,7 @@ input _GqTenantModelInputOptional {
   updatedBy: GqUserModelInput
 }
 
-type _GqTimelineEntryDto {
+type GqTimelineEntryDto {
   audioMedia: [String!]
   created: String!
   documentMedia: [String!]
@@ -2780,7 +2780,7 @@ type _GqTimelineEntryDto {
   videoMedia: [String!]
 }
 
-input _GqTimelineEntryInput {
+input GqTimelineEntryInput {
   audioMedia: [String!] = []
   created: String!
   documentMedia: [String!] = []

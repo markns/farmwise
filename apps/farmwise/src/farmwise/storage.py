@@ -104,7 +104,7 @@ def upload_file_to_gcs(
 def upload_bytes_to_gcs(
     data: bytes, bucket_name: str, blob_name: str, content_type: str = None, service_account_file: Optional[str] = None
 ) -> bool:
-    """Upload bytes data to Google Cloud Storage.
+    """Upload byte data to Google Cloud Storage.
 
     Args:
         data (bytes): Data to upload
@@ -121,11 +121,11 @@ def upload_bytes_to_gcs(
         bucket = storage_client.bucket(bucket_name)
         blob = bucket.blob(blob_name)
 
-        if content_type:
-            blob.content_type = content_type
+        # if content_type:
+        #     blob.content_type = content_type
 
         blob.upload_from_string(data)
-        logger.info(f"Successfully uploaded data to gs://{bucket_name}/{blob_name}")
+        logger.info(f"Successfully uploaded {content_type} data to gs://{bucket_name}/{blob_name}")
         return True
 
     except Exception as e:

@@ -52,8 +52,11 @@ class FarmwiseService:
         if user_input.text:
             content.append(ResponseInputTextParam(text=user_input.text, type="input_text"))
         if user_input.image:
-            content.append(
-                ResponseInputImageParam(detail="auto", image_url=user_input.image, type="input_image"),
+            content.extend(
+                [
+                    ResponseInputImageParam(detail="auto", image_url=user_input.image, type="input_image"),
+                    ResponseInputTextParam(text=f"image_url={user_input.image}", type="input_text"),
+                ]
             )
 
         input_items = [EasyInputMessageParam(content=content, role="user")]

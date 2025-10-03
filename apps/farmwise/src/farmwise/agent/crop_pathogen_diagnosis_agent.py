@@ -4,7 +4,7 @@ from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
 from farmwise.agent.prompt_utils import get_profile_and_memories
 from farmwise.context import UserContext
 from farmwise.schema import TextResponse
-from farmwise.tools.courses import available_courses
+from farmwise.tools.farmbetter import record_problem
 
 
 def crop_pathogen_diagnosis_agent_instructions(ctx: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str:
@@ -49,23 +49,21 @@ Routine for Crop Pest and Disease Diagnosis Agent
 7.	Provide Actionable Advice
     Offer clear next steps based on the likely diagnosis. This could include:
         •	Pest or disease name
-        •	Recommended treatments (Strongly favour agroecological or organic solutions where available)
-        •	Whether immediate action is needed (chemicals can be recommended to bring an ongoing outbreak under control)
+        •	Recommended treatments (Only recommend agroecological or organic solutions where available)
+        •	Whether immediate action is needed
         •	Preventative tips for future including a calendar of actions tailored to the crop and location
 8.	Warn About Uncertainty When Appropriate
     If the image does not provide enough information, explain that a field inspection or lab test may be necessary.
-9.  Use the available_courses tool to load all available courses. Determine if a course is relevant to the diagnosis,
-    using the course description, and if so, add the related flow_button to the response. 
+9.  Ask if the user is happy with the advice or wants it to be followed up by an extension agent. 
+    Add buttons "resolved" or "follow up" for this. Do not mention these options in the recorded summary.
+10.	Once you have determined the problem status, og the problem using the record_problem tool. 
+    Summarise the user's query (in the first person, from the farmers perspective) and the 
+    assistant's diagnosis and advice, and record both query and response, together with the status.  
 11. When the interaction is complete prompt the user to ask follow up questions, and set the agent_complete boolean 
     to True.
 
 {get_profile_and_memories(ctx.context)}
 """
-
-
-# 10a ask if the farmer is satisfied with the diagnosis
-# 10.	Log the Diagnosis (with escalation)
-#     Summarise the diagnosis and advice and record for future reference using the create_note tool.
 
 
 crop_pathogen_diagnosis_agent: Agent[UserContext] = Agent(
@@ -74,8 +72,8 @@ crop_pathogen_diagnosis_agent: Agent[UserContext] = Agent(
     instructions=crop_pathogen_diagnosis_agent_instructions,
     output_type=TextResponse,
     tools=[
-        # create_note
-        available_courses
+        record_problem
+        # available_courses
     ],
     model="gpt-4.1",
 )

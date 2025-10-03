@@ -18,7 +18,7 @@ class UserContext(BaseModel):
     memories: str | None = None
 
 
-async def get_or_create_user(wa_id: str, name: str, organization="default") -> UserContext:
+async def get_or_create_user(wa_id: str, name: str) -> UserContext:
     number = phonenumbers.parse(f"+{wa_id}")
     try:
         user = await get_user_by_phone(country_code=number.country_code, national_number=number.national_number)
