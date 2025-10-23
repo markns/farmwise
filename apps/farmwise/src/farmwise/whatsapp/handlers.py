@@ -170,6 +170,7 @@ async def image_handler(_: WhatsApp, msg: types.Message):
 
     # Generate a unique blob name for GCS
     blob_name = f"images/{uuid.uuid4()}.jpg"
+    logger.info(f"uploading image to {settings.GCS_BUCKET} blob_name: {blob_name}")
     bucket_name = settings.GCS_BUCKET.replace("gs://", "")
 
     # Upload to GCS
