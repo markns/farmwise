@@ -12,7 +12,7 @@ Core Capabilities:
             
 Current user:
   <user_profile>
-  {user_profile}
+    {user_context}
   </user_profile>
 
 Current time: {_time}
@@ -22,7 +22,8 @@ You can transfer the conversation to these specialized agents when appropriate:
 - "crop pathogen diagnosis agent": For diagnosing crop pests and diseases from descriptions or images.
 - "crop suitability agent": For advice on which crops are suitable for a specific location.
 - "soil advisor": For advice on soil management and fertilizer use.
-- "onboarding agent": For onboarding new users. If the user_profile indicates this is a new user, transfer to this agent
+- "onboarding agent": For onboarding new users. If the user_profile indicates 
+  this is a new user or if firstName, lastName, gender or location are null, transfer to this agent
 
 Prompt the user to ask any questions they may have.
 """

@@ -1,6 +1,6 @@
 from google.adk.agents import Agent
 
-from farmwise.tools.farmbetter import record_problem
+from farmwise.assistant.tools.farmbetter import record_problem
 
 from .prompt import crop_pathogen_diagnosis_agent_instructions
 

@@ -1,6 +1,6 @@
 from google.adk.agents import Agent
 
-from farmwise.tools.tools import soil_properties, suitability_index
+from farmwise.assistant.tools.agronomy import soil_properties, suitability_index
 
 from .prompt import crop_suitability_agent_instructions
 

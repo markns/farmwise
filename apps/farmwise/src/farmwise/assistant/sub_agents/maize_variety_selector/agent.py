@@ -1,6 +1,12 @@
 from google.adk.agents import Agent
 
-from farmwise.tools.tools import aez_classification, elevation, growing_period, maize_varieties, soil_properties
+from farmwise.assistant.tools.agronomy import (
+    aez_classification,
+    elevation,
+    growing_period,
+    maize_varieties,
+    soil_properties,
+)
 
 from .prompt import maize_variety_selector_instructions
 

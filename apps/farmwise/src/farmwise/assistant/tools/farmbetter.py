@@ -7,13 +7,13 @@ from pydantic import BaseModel, Field
 
 from farmwise.context import UserContext
 from farmwise.farmbetter.models import (
-    FieldGqUserModel,
     GqTimelineEntryInput,
+    GqUserLocationInput,
     GqUserModelDto,
     OmittedUpdateUserRequest,
 )
 from farmwise.farmbetter.problems import create_reported_problem
-from farmwise.farmbetter.users import create_user, get_user_by_phone, update_user
+from farmwise.farmbetter.users import get_user_by_phone, update_user
 from farmwise.settings import settings
 
 
@@ -44,18 +44,44 @@ async def get_farmbetter_user(
     return user
 
 
-async def create_farmbetter_user(tool_context: ToolContext, user: FieldGqUserModel) -> GqUserModelDto:
-    created_user = await create_user(user=user)
-    user_context: UserContext = tool_context.state.get("user_context")
-    user_context.user = created_user
-    user_context.new_user = True
-    return created_user
-
-
 async def update_farmbetter_user(
-    tool_context: ToolContext, user: OmittedUpdateUserRequest
+    tool_context: ToolContext,
+    first_name: str | None = None,
+    last_name: str | None = None,
+    gender: str | None = None,
+    date_of_birth: str | None = None,
+    preferred_language: str | None = None,
+    phone_number: str | None = None,
+    location_lat: float | None = None,
+    location_lng: float | None = None,
+    location_name: str | None = None,
+    education: str | None = None,
+    marital_status: str | None = None,
+    occupation: str | None = None,
+    country_code: str | None = None,
+    country_iso: str | None = None,
 ) -> GqUserModelDto:
     user_context: UserContext = tool_context.state.get("user_context")
+
+    location = None
+    if location_lat is not None or location_lng is not None or location_name is not None:
+        location = GqUserLocationInput(lat=location_lat, lng=location_lng, name=location_name)
+
+    user = OmittedUpdateUserRequest(
+        firstName=first_name,
+        lastName=last_name,
+        gender=gender,
+        dateOfBirth=date_of_birth,
+        preferredLanguage=preferred_language,
+        phoneNumber=phone_number,
+        location=location,
+        education=education,
+        maritalStatus=marital_status,
+        occupation=occupation,
+        countryCode=country_code,
+        countryIso=country_iso,
+    )
+
     if user.id is None and user_context.user is not None and user_context.user.id is not None:
         user = user.model_copy(update={"id": user_context.user.id})
 

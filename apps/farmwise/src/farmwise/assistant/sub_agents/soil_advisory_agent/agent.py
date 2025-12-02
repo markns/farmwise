@@ -1,6 +1,6 @@
 from google.adk.agents import Agent
 
-from farmwise.tools.tools import soil_properties
+from farmwise.assistant.tools.agronomy import soil_properties
 
 from .prompt import soil_advisory_instructions
 
