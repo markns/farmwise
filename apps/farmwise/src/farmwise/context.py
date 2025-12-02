@@ -15,16 +15,16 @@ from farmwise.settings import settings
 class UserContext(BaseModel):
     user: GqUserModelDto
     new_user: bool = False
-    memories: str | None = None
 
 
-async def get_or_create_user(wa_id: str, name: str) -> UserContext:
+async def get_or_create_user(wa_id: str) -> UserContext:
     number = phonenumbers.parse(f"+{wa_id}")
     try:
         user = await get_user_by_phone(country_code=number.country_code, national_number=number.national_number)
+        logger.info(f"loaded user {user}")
         return UserContext(user=user)
     except FarmBetterAPIError as e:
-        logger.warning(f"User with wa_id {wa_id} name {name} not found: ({type(e)}) {e}")
+        logger.warning(f"User with wa_id {wa_id} not found: ({type(e)}) {e}")
 
         user = await create_user(
             FieldGqUserModel(

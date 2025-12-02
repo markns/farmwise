@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from agents import RunContextWrapper, function_tool
+from google.adk.tools import ToolContext
 from pywa.types import FlowButton
 
 from farmwise.context import UserContext
@@ -13,8 +13,7 @@ class AvailableCourse:
     flow_button: FlowButton
 
 
-@function_tool
-async def available_courses(_: RunContextWrapper[UserContext]) -> list[AvailableCourse]:
+async def available_courses(tool_context: ToolContext) -> list[AvailableCourse]:
     """
     Fetches the list of available courses.
 

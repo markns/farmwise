@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from agents import RunContextWrapper, function_tool
+from google.adk.tools import ToolContext
 from loguru import logger
 from pydantic import BaseModel, Field
 
@@ -17,25 +17,21 @@ from farmwise.farmbetter.users import create_user, get_user_by_phone, update_use
 from farmwise.settings import settings
 
 
-@function_tool(
-    description_override="""
-Fetch a FarmBetter user by id, email, or phone number. Defaults to the current user in context when no lookup parameters are supplied.
-"""
-)
 async def get_farmbetter_user(
-    wrapper: RunContextWrapper[UserContext],
+    tool_context: ToolContext,
     user_id: str | None = None,
     email: str | None = None,
     country_code: int | None = None,
     national_number: int | None = None,
 ) -> GqUserModelDto:
+    user_context: UserContext = tool_context.state.get("user_context")
     if (
         user_id is None
         and email is None
         and (country_code is None or national_number is None)
-        and wrapper.context.user is not None
+        and user_context.user is not None
     ):
-        return wrapper.context.user
+        return user_context.user
 
     user = await get_user_by_phone(
         user_id=user_id,
@@ -43,37 +39,29 @@ async def get_farmbetter_user(
         country_code=country_code,
         national_number=national_number,
     )
-    wrapper.context.user = user
-    wrapper.context.new_user = False
+    user_context.user = user
+    user_context.new_user = False
     return user
 
 
-@function_tool(
-    description_override="""
-Create a new FarmBetter user. Provide the details required by the FarmBetter API in the user payload.
-"""
-)
-async def create_farmbetter_user(wrapper: RunContextWrapper[UserContext], user: FieldGqUserModel) -> GqUserModelDto:
+async def create_farmbetter_user(tool_context: ToolContext, user: FieldGqUserModel) -> GqUserModelDto:
     created_user = await create_user(user=user)
-    wrapper.context.user = created_user
-    wrapper.context.new_user = True
+    user_context: UserContext = tool_context.state.get("user_context")
+    user_context.user = created_user
+    user_context.new_user = True
     return created_user
 
 
-@function_tool(
-    description_override="""
-Update an existing FarmBetter user. If the payload omits an id, the current user from context will be used.
-"""
-)
 async def update_farmbetter_user(
-    wrapper: RunContextWrapper[UserContext], user: OmittedUpdateUserRequest
+    tool_context: ToolContext, user: OmittedUpdateUserRequest
 ) -> GqUserModelDto:
-    if user.id is None and wrapper.context.user is not None and wrapper.context.user.id is not None:
-        user = user.model_copy(update={"id": wrapper.context.user.id})
+    user_context: UserContext = tool_context.state.get("user_context")
+    if user.id is None and user_context.user is not None and user_context.user.id is not None:
+        user = user.model_copy(update={"id": user_context.user.id})
 
     updated_user = await update_user(user=user)
-    wrapper.context.user = updated_user
-    wrapper.context.new_user = False
+    user_context.user = updated_user
+    user_context.new_user = False
     return updated_user
 
 
@@ -96,9 +84,8 @@ class TimelineEntry(BaseModel):
     video_url: list[str] = Field(default_factory=list)
 
 
-@function_tool
 async def record_problem(
-    wrapper: RunContextWrapper[UserContext],
+    tool_context: ToolContext,
     status: ProblemStatus,
     user_summary: TimelineEntry,
     assistant_summary: TimelineEntry,
@@ -107,7 +94,7 @@ async def record_problem(
     Records a farmer's problem in the farmbetter API.
 
     Args:
-        wrapper: Wrapper containing the user context and other execution context details.
+        tool_context: ToolContext containing the user context and other execution context details.
         status: Status of the problem. Use `in-progress` if the problem should be followed up by
             an extension agent, or `resolved` if the problem has been resolved by the assistant.
         user_summary: Summary of the user's input for the problem they reported. Any media
@@ -122,12 +109,13 @@ async def record_problem(
         ValueError: If the user context is not available in the execution
             wrapper.
     """
-    if wrapper.context.user is None:
+    user_context: UserContext = tool_context.state.get("user_context")
+    if user_context.user is None:
         raise ValueError("No user context available")
 
-    logger.info(f"Creating problem for {wrapper.context.user.id} {user_summary} {assistant_summary}")
+    logger.info(f"Creating problem for {user_context.user.id} {user_summary} {assistant_summary}")
 
-    user = wrapper.context.user
+    user = user_context.user
     created_problem = await create_reported_problem(
         status=status.value,
         farmer_id=user.id,

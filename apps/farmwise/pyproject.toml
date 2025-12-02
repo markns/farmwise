@@ -10,8 +10,6 @@ dependencies = [
     "google-cloud-storage>=3.1.1",
     "google-cloud-texttospeech>=2.27.0",
     "loguru-logging-intercept>=0.1.5",
-    "openai>=1.95.0",
-    "openai-agents[voice]>=0.1.0",
     "pydub>=0.25.1",
     "pywa[cryptography,fastapi]>=3.1.1",
     "upstash-redis>=1.4.0",
@@ -21,6 +19,8 @@ dependencies = [
     "phonenumbers>=9.0.4",
     "async-lru>=2.0.4",
     "pinecone>=7.3.0",
+    "google-adk==1.19.0",
+    "google-generativeai",
 ]
 
 [dependency-groups]

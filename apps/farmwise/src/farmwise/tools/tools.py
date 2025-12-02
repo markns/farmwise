@@ -3,13 +3,10 @@ from __future__ import annotations as _annotations
 import asyncio
 
 import httpx
-from agents import (
-    RunContextWrapper,
-    function_tool,
-)
 from farmbase_client.api.crop_varieties import crop_varieties_get_maize_varieties
 from farmbase_client.api.gaez import gaez_aez_classification, gaez_growing_period, gaez_suitability_index
 from farmbase_client.models import CropVarietiesResponse, SuitabilityIndexResponse
+from google.adk.tools import ToolContext
 from isdasoil_api_client import AuthenticatedClient as AuthenticatedIsdaClient
 from isdasoil_api_client import Client as IsdaClient
 from isdasoil_api_client.api.authentication import login_login_post
@@ -22,25 +19,19 @@ from isdasoil_api_client.models.get_soil_data_isdasoil_v2_soilproperty_get_prope
     GetSoilDataIsdasoilV2SoilpropertyGetPropertyType0 as PropertyType,
 )
 
-from farmwise.context import UserContext
-from farmwise.farmbase import farmbase_api_client
 from farmwise.settings import settings
 from farmwise.utils import copy_doc
 
 ISDA_URL = "https://api.isda-africa.com"
 
 
-@function_tool
 @copy_doc(gaez_suitability_index.asyncio)
-async def suitability_index(
-    _: RunContextWrapper[UserContext], latitude: float, longitude: float
-) -> SuitabilityIndexResponse:
+async def suitability_index(tool_context: ToolContext, latitude: float, longitude: float) -> SuitabilityIndexResponse:
     return await gaez_suitability_index.asyncio(client=farmbase_api_client, latitude=latitude, longitude=longitude)
 
 
-@function_tool
 @copy_doc(gaez_aez_classification.asyncio)
-async def aez_classification(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> str:
+async def aez_classification(tool_context: ToolContext, latitude: float, longitude: float) -> str:
     return await gaez_aez_classification.asyncio(client=farmbase_api_client, latitude=latitude, longitude=longitude)
 
 
@@ -55,24 +46,21 @@ async def aez_classification(_: RunContextWrapper[UserContext], latitude: float,
 # Very late,>150
 
 
-@function_tool
 @copy_doc(gaez_growing_period.asyncio)
-async def growing_period(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> int:
+async def growing_period(tool_context: ToolContext, latitude: float, longitude: float) -> int:
     return await gaez_growing_period.asyncio(client=farmbase_api_client, latitude=latitude, longitude=longitude)
 
 
-@function_tool
 @copy_doc(crop_varieties_get_maize_varieties.asyncio)
 async def maize_varieties(
-    _: RunContextWrapper[UserContext], altitude: float, growing_period_days: int
+    tool_context: ToolContext, altitude: float, growing_period_days: int
 ) -> CropVarietiesResponse:
     return await crop_varieties_get_maize_varieties.asyncio(
         client=farmbase_api_client, altitude=altitude, growing_period=growing_period_days
     )
 
 
-@function_tool
-async def elevation(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> float:
+async def elevation(tool_context: ToolContext, latitude: float, longitude: float) -> float:
     """Fetch the elevation in metres for a given location.
 
     Args:
@@ -103,8 +91,7 @@ async def get_soil_property(client, lat, lon, property_, depth):
     )
 
 
-@function_tool
-async def soil_properties(_: RunContextWrapper[UserContext], latitude: float, longitude: float) -> dict[str, str]:
+async def soil_properties(tool_context: ToolContext, latitude: float, longitude: float) -> dict[str, str]:
     """Fetch soil properties for a given location."""
 
     properties = [

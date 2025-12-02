@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 from pathlib import Path
 
+from google.genai import types
 
 def image_to_base64(file_path: Path | str) -> str:
     """Read an image file and return its base64-encoded string."""
@@ -32,8 +33,23 @@ def join_with(words, join_word="or"):
     return ", ".join(words[:-1]) + f" {join_word} " + words[-1]
 
 
-def image_to_data_url(file_path: str) -> str:
-    """Convert a JPEG file to a base64-encoded data URL."""
+def image_to_data_url(file_path: str) -> types.Part:
+    """Convert an image file to a Google GenAI Part object."""
     mime_type = "image/jpeg"  # You can make this dynamic if needed
-    encoded = image_to_base64(file_path)
-    return f"data:{mime_type};base64,{encoded}"
+    with open(file_path, "rb") as image_file:
+        image_bytes = image_file.read()
+    return types.Part.from_data(data=image_bytes, mime_type=mime_type)
+
+def to_adk_content(user_input: "UserInput") -> list[types.Part]:
+    content_parts = []
+    if user_input.text:
+        content_parts.append(types.Part.from_text(user_input.text))
+    if user_input.image:
+        # Assuming user_input.image is a local file path
+        # If it's a URL, you'd need to fetch it first
+        try:
+            content_parts.append(image_to_data_url(user_input.image))
+        except FileNotFoundError:
+            # Handle case where image file might not exist
+            pass
+    return content_parts

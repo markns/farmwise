@@ -1,6 +1,5 @@
-from typing import Any, Optional
+from typing import Optional
 
-from agents import set_default_openai_key
 from dotenv import find_dotenv
 from pydantic import (
     Base64Str,
@@ -58,9 +57,6 @@ class Settings(BaseSettings):
 
     def is_dev(self) -> bool:
         return self.MODE == "dev"
-
-    def model_post_init(self, __context: Any) -> None:
-        set_default_openai_key(self.OPENAI_API_KEY.get_secret_value())
 
 
 settings = Settings()
