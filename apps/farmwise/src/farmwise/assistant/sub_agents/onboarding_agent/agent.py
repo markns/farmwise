@@ -1,6 +1,6 @@
 from google.adk.agents import Agent
 
-from farmwise.tools.farmbetter import update_farmbetter_user
+from farmwise.assistant.tools.farmbetter import update_farmbetter_user
 
 from .prompt import onboarding_agent_instructions
 

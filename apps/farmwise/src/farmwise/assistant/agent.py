@@ -3,7 +3,7 @@ from google.adk.apps import App
 from google.adk.apps.app import EventsCompactionConfig
 from google.adk.plugins.global_instruction_plugin import GlobalInstructionPlugin
 
-from farmwise.tools.courses import available_courses
+from farmwise.assistant.tools.courses import available_courses
 
 from .prompt import triage_agent_instructions
 from .shared_libraries.callbacks import before_agent
@@ -26,6 +26,7 @@ root_agent = Agent(
         onboarding_agent,
         soil_advisor_agent,
     ],
+    # output_schema=
     before_agent_callback=before_agent,
 )
 

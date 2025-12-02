@@ -11,8 +11,8 @@ from farmwise.context import get_or_create_user
 async def before_agent(callback_context: CallbackContext) -> None:
     logger.debug(f"Callback context state: {callback_context.state.to_dict()}")
 
-    if "user_profile" not in callback_context.state:
-        callback_context.state["user_profile"] = await get_or_create_user(
+    if "user_context" not in callback_context.state:
+        callback_context.state["user_context"] = await get_or_create_user(
             wa_id=callback_context.user_id,
         )
 
