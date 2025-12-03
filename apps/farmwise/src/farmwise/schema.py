@@ -7,19 +7,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from pywa_async import types
 
 
-class AgentInfo(BaseModel):
-    """Info about an available agent."""
-
-    key: str = Field(
-        description="Agent key.",
-        examples=["research-assistant"],
-    )
-    description: str = Field(
-        description="Description of the agent.",
-        examples=["A research assistant for generating research papers."],
-    )
-
-
 class UserInput(BaseModel):
     """Basic user input for the agent."""
 
