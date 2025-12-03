@@ -9,39 +9,11 @@ from farmwise.context import UserContext
 from farmwise.farmbetter.models import (
     GqTimelineEntryInput,
     GqUserLocationInput,
-    GqUserModelDto,
     OmittedUpdateUserRequest,
 )
 from farmwise.farmbetter.problems import create_reported_problem
-from farmwise.farmbetter.users import get_user_by_phone, update_user
+from farmwise.farmbetter.users import update_user
 from farmwise.settings import settings
-
-
-async def get_farmbetter_user(
-    tool_context: ToolContext,
-    user_id: str | None = None,
-    email: str | None = None,
-    country_code: int | None = None,
-    national_number: int | None = None,
-) -> GqUserModelDto:
-    user_context: UserContext = tool_context.state.get("user_context")
-    if (
-        user_id is None
-        and email is None
-        and (country_code is None or national_number is None)
-        and user_context.user is not None
-    ):
-        return user_context.user
-
-    user = await get_user_by_phone(
-        user_id=user_id,
-        email=email,
-        country_code=country_code,
-        national_number=national_number,
-    )
-    user_context.user = user
-    user_context.new_user = False
-    return user
 
 
 async def update_farmbetter_user(
@@ -60,7 +32,7 @@ async def update_farmbetter_user(
     occupation: str | None = None,
     country_code: str | None = None,
     country_iso: str | None = None,
-) -> GqUserModelDto:
+) -> None:
     user_context: UserContext = tool_context.state.get("user_context")
 
     location = None
@@ -88,7 +60,8 @@ async def update_farmbetter_user(
     updated_user = await update_user(user=user)
     user_context.user = updated_user
     user_context.new_user = False
-    return updated_user
+
+    tool_context.state["user_context"] = user_context
 
 
 class ProblemStatus(Enum):
