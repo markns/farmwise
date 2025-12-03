@@ -1,0 +1,3010 @@
+"""
+Indicates exactly one field must be supplied and this field must not be `null`.
+"""
+directive @oneOf on INPUT_OBJECT
+
+type ActivityCategoryTranslationsDto {
+  key: String!
+  value: String
+}
+
+input ActivityCategoryTranslationsInput {
+  key: String!
+  value: String
+}
+
+type ActivityCustomSolutionDto {
+  description: String
+  documentMedia: [String!]!
+  name: String
+}
+
+input ActivityCustomSolutionInput {
+  description: String!
+  documentMedia: [GqActivityMediaInput!]! = []
+  name: String!
+}
+
+type ActivityModelDto {
+  activityCategory: GqActivityCategoryModelDto
+  activityDate: String
+  created: String
+  description: String
+  extensionAgentId: String
+  goodPracticeId: String
+  id: String
+  location: GqLocationDto
+  media: [String!]!
+  sectionIds: [String!]
+  solution: ActivityCustomSolutionDto
+  tenant: String
+  title: String
+  updated: String
+}
+
+input ActivityModelInput {
+  activityCategory: GqActivityCategoryModelInput
+  activityDate: String
+  created: String
+  description: String
+  extensionAgentId: String
+  goodPracticeId: String = ""
+  id: String
+  location: GqLocationInput
+  media: [GqActivityMediaInput!]! = []
+  sectionIds: [String!] = []
+  solution: ActivityCustomSolutionInput
+  tenant: String = ""
+  title: String
+  updated: String
+}
+
+input AddTimelineToReportedProblemRequest {
+  audioMedia: [String!] = []
+  created: String
+  documentMedia: [String!] = []
+  from: String
+  media: [String!] = []
+  message: String = ""
+  preferredLanguage: String
+  reportedProblemId: String
+  source: String
+  tenant: String
+  videoMedia: [String!] = []
+}
+
+type AddTimelineToReportedProblemResponse {
+  message: String
+  payload: GqReportedProblemModelDto
+  status: Float
+}
+
+type AgentOrdersSummaryData {
+  assignedFarmersCount: Float!
+  cancelled: Float!
+  collected: Float!
+  delivered: Float!
+  paid: Float!
+  pending: Float!
+  requested: Float!
+  totalOrders: Float!
+  totalRevenue: Float!
+}
+
+type AgentOrdersSummaryResponse {
+  message: String
+  payload: AgentOrdersSummaryData
+  status: Float!
+}
+
+type AgentOrdersTimeSeriesData {
+  collected: Float!
+  delivered: Float!
+  month: String!
+  paid: Float!
+  requested: Float!
+}
+
+type AgentOrdersTimeSeriesPayload {
+  data: [AgentOrdersTimeSeriesData!]!
+  totalMonths: Float!
+}
+
+type AgentOrdersTimeSeriesResponse {
+  message: String
+  payload: AgentOrdersTimeSeriesPayload
+  status: Float!
+}
+
+input AssignUserGqRoleRequest {
+  id: String
+  preferredLanguage: String
+  roleId: String
+  source: String
+  tenant: String
+  userId: String
+}
+
+type AssignUserGqRoleResponse {
+  message: String
+  status: Float!
+}
+
+"""Type of audit log action"""
+enum AuditLogAction {
+  ORDER_CREATED
+  ORDER_UPDATED
+  STATUS_CHANGED
+}
+
+type AuthOtpModel {
+  created: String
+  deleted: String
+  id: String
+  otp: String!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+"""Category of marketplace catalog item"""
+enum CatalogItemCategory {
+  FERTILIZER
+  MECHANIZATION
+  SEEDS
+}
+
+type CatalogItemModel {
+  category: CatalogItemCategory!
+  created: String
+  deleted: String
+  description: String
+  fertilizerTypes: [FertilizerTypes!]
+  id: String!
+  isActive: Boolean!
+  name: String!
+  serviceTypes: [ServiceTypes!]
+  tenantId: String
+  type: CatalogItemType!
+  uom: UnitOfMeasure!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  varieties: [SeedVariety!]
+}
+
+"""Type of marketplace catalog item"""
+enum CatalogItemType {
+  INPUT
+  SERVICE
+}
+
+type CategoryBreakdownData {
+  Fertilisers: CategoryBreakdownItem
+  Mechanization: CategoryBreakdownItem
+  Seeds: CategoryBreakdownItem
+}
+
+type CategoryBreakdownItem {
+  """Key-value pairs: name -> quantity"""
+  breakdown: [[String!]!]!
+  totalSold: Float!
+}
+
+type CategoryBreakdownResponse {
+  message: String
+  payload: CategoryBreakdownData
+  status: Float!
+}
+
+type CommunityModelDto {
+  created: String
+  deleted: String
+  extensionAgent: GqUserModelDto
+  extensionAgentId: String!
+  id: String!
+  link: String!
+  name: String!
+  tenant: String!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+input CommunityModelInput {
+  extensionAgent: GqUserModelInput
+  extensionAgentId: String!
+  id: String!
+  link: String!
+  name: String!
+  tenant: String!
+}
+
+type CreateBulkCommunitiesResponse {
+  message: String
+  payload: _CreateBulkCommunitiesResponse
+  status: Float!
+}
+
+input CreateCatalogItemInput {
+  category: CatalogItemCategory!
+  description: String
+  isActive: Boolean
+  name: String!
+  type: CatalogItemType!
+  uom: UnitOfMeasure!
+}
+
+type CreateCatalogItemResponse {
+  message: String
+  payload: _CreateCatalogItemResponse
+  status: Float
+}
+
+input CreateFertilizerTypeInput {
+  availableStock: Float!
+  catalogItemId: String!
+  description: String
+  fertilizerType: String!
+  packagingSize: String!
+  unitPrice: Float!
+}
+
+type CreateFertilizerTypeResponse {
+  message: String
+  payload: FertilizerTypes
+  status: Float!
+}
+
+input CreateGqActivityCategoryRequest {
+  created: String
+  id: String
+  name: String
+  names: [ActivityCategoryTranslationsInput!] = []
+  preferredLanguage: String
+  source: String
+  tenant: String
+  updated: String
+}
+
+type CreateGqBulkActivitiesResponse {
+  message: String
+  payload: _GetGqBulkActivitiesResponse
+  status: Float!
+}
+
+type CreateGqBulkActivityCategoriesResponse {
+  message: String
+  payload: _CreateGqBulkActivityCategoriesResponse
+  status: Float!
+}
+
+type CreateGqBulkCropsResponse {
+  message: String
+  payload: _CreateGqBulkCropsResponse
+  status: Float!
+}
+
+type CreateGqBulkGroupsResponse {
+  message: String
+  payload: _CreateGqBulkGroupsResponse
+  status: Float!
+}
+
+type CreateGqBulkLivestockResponse {
+  message: String
+  payload: _CreateGqBulkLivestockResponse
+  status: Float!
+}
+
+type CreateGqBulkSpecializationsResponse {
+  message: String
+  payload: _CreateGqBulkSpecializationsResponse
+  status: Float!
+}
+
+type CreateGqBulkTenantsResponse {
+  message: String
+  payload: _CreateGqBulkTenantsResponse
+  status: Float!
+}
+
+type CreateGqBulkUsersResponse {
+  message: String
+  payload: _GetGqBulkUsersResponse
+  status: Float!
+}
+
+input CreateGqCropRequest {
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+input CreateGqLivestockRequest {
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+input CreateGqReportedProblemRequest {
+  created: String
+  extensionAgent: GqUserModelInput
+  extensionAgentId: String
+  farmer: GqUserModelInput
+  farmerId: String
+  id: String
+  preferredLanguage: String
+  source: String
+  status: String = "pending"
+  tenant: String
+  timeline: [GqTimelineEntryInput!] = []
+  updated: String
+}
+
+input CreateGqRoleRequest {
+  id: String
+  name: String
+  permissions: [String!] = []
+  preferredLanguage: String
+  source: String
+  tenant: String
+  tenantId: String
+}
+
+input CreateGqSpecializationRequest {
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+input CreateGqTenantRequest {
+  code: String
+  created: String
+  id: String
+  isPrivate: Boolean = true
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+  updated: String
+  updatedBy: GqUserModelInput
+}
+
+input CreateGroupRequest {
+  extensionAgentId: String
+  farmers: [GqFarmerInput!] = []
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+input CreateOrderV2Input {
+  orderLineItems: [OrderLineItemInput!]!
+  paymentReference: String
+}
+
+type CreateOrderV2Response {
+  message: String
+  payload: OrderV2
+  status: Float
+}
+
+input CreateSeedVarietyInput {
+  catalogItemId: String!
+  classes: [SeedClassInput!]!
+  description: String
+  name: String!
+}
+
+type CreateSeedVarietyResponse {
+  message: String
+  payload: SeedVariety
+  status: Float!
+}
+
+input CreateServiceTypeInput {
+  catalogItemId: String!
+  isAvailable: Boolean
+  ratePerUom: Float
+  serviceDescription: String
+}
+
+type CreateServiceTypeResponse {
+  message: String
+  payload: ServiceTypes
+  status: Float!
+}
+
+input DeleteCatalogItemRequest {
+  id: String!
+}
+
+type DeleteCatalogItemResponse {
+  message: String
+  payload: _DeleteCatalogItemResponse
+  status: Float
+}
+
+type DeleteFertilizerTypeResponse {
+  message: String!
+  status: Float!
+}
+
+type DeleteSeedVarietyResponse {
+  message: String!
+  status: Float!
+}
+
+type DeleteServiceTypeResponse {
+  message: String!
+  status: Float!
+}
+
+type FertilizerTypePerformance {
+  fertilizerTypeId: String!
+  fertilizerTypeName: String!
+  totalRevenue: Float!
+  totalUnitsPurchased: Float!
+}
+
+type FertilizerTypeQuantityAnalysis {
+  fertilizerTypeName: String!
+  quantityData: [QuantitySoldDataPoint!]!
+}
+
+type FertilizerTypes {
+  availableStock: Float
+  catalogItem: CatalogItemModel!
+  created: String
+  deleted: String
+  description: String
+  fertilizerType: String!
+  id: String!
+  isActive: Boolean!
+  itemId: String!
+  manufacturer: String
+  packagingSize: String!
+  unitPrice: Float!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+input FertilizerTypesInput {
+  availableStock: Float
+  catalogItem: _CatalogItemModelInput!
+  description: String
+  fertilizerType: String!
+  id: String!
+  isActive: Boolean!
+  itemId: String!
+  manufacturer: String
+  packagingSize: String!
+  unitPrice: Float!
+}
+
+type FindAllPaymentTransactionsResponse {
+  count: Float
+  message: String
+  payload: [PaymentTransactionDto!]
+  status: Float
+}
+
+type FindOnePaymentTransactionResponse {
+  message: String
+  payload: PaymentTransactionDto
+  status: Float
+}
+
+type ForgotPasswordResponse {
+  message: String
+  status: Float
+}
+
+type GetActivityFarmersResponse {
+  message: String
+  payload: _GetActivityFarmersResponse
+  status: Float
+}
+
+type GetAgentsLeaderboardResponse {
+  count: Float
+  message: String
+  payload: [_GetAgentsLeaderboardResponse!]
+  status: Float
+}
+
+type GetAllCommunitiesResponse {
+  count: Float!
+  message: String
+  payload: [CommunityModelDto!]!
+  status: Float!
+}
+
+input GetAllGroupsRequest {
+  extensionAgentId: String
+  lastAccessedId: String
+  order: String
+  orderBy: String
+  preferredLanguage: String
+  size: Int = 20
+  source: String
+  tenant: String
+}
+
+type GetAllGroupsResponse {
+  count: Float!
+  message: String
+  payload: [GqGroupModel!]!
+  status: Float!
+}
+
+type GetAllReportedProblemsStatsResponse {
+  count: Float
+  message: String
+  payload: [_GetAllReportedProblemsStatsResponse!]
+  status: Float
+}
+
+type GetCatalogItemsResponse {
+  count: Float!
+  message: String
+  payload: [CatalogItemModel!]!
+  status: Float!
+}
+
+type GetFertilizerTypesResponse {
+  count: Float!
+  message: String
+  payload: [FertilizerTypes!]!
+  status: Float!
+}
+
+type GetGqAllActivitiesResponse {
+  count: Float
+  message: String
+  payload: [ActivityModelDto!]
+  status: Float
+}
+
+type GetGqAllActivityCategoriesResponse {
+  count: Float!
+  message: String
+  payload: [GqActivityCategoryModelDto!]!
+  status: Float!
+}
+
+type GetGqAllConceptsResponse {
+  count: Float!
+  message: String
+  payload: [GqConceptDto!]!
+  status: Float!
+}
+
+type GetGqAllCropsResponse {
+  count: Float!
+  message: String
+  payload: [GqCropDto!]!
+  status: Float!
+}
+
+type GetGqAllGoodPracticeMessagesResponse {
+  count: Float
+  message: String
+  payload: [GoodPracticeMessageModelDto!]
+  status: Float
+}
+
+type GetGqAllLivestockResponse {
+  count: Float!
+  message: String
+  payload: [GqLivestockDto!]!
+  status: Float!
+}
+
+type GetGqAllPermissionsResponse {
+  count: Float!
+  message: String
+  payload: [GqPermissionDto!]!
+  status: Float!
+}
+
+type GetGqAllReportedProblemsResponse {
+  count: Float
+  message: String
+  payload: [GqReportedProblemModelDto!]
+  status: Float
+}
+
+type GetGqAllRolesResponse {
+  count: Float!
+  message: String
+  payload: [GqRoleModel!]!
+  status: Float!
+}
+
+type GetGqAllSpecializationsResponse {
+  count: Float!
+  message: String
+  payload: [GqSpecializationDto!]!
+  status: Float!
+}
+
+type GetGqAllTenantsResponse {
+  count: Float!
+  message: String
+  payload: [GqTenantModel!]!
+  status: Float!
+}
+
+type GetGqAllUserTargetsResponse {
+  count: Float
+  message: String
+  payload: [UserTargetsModelDto!]
+  status: Float
+}
+
+type GetGqAllUsersResponse {
+  count: Float
+  message: String
+  payload: [OmittedGetAllUsersResponse!]
+  status: Float
+}
+
+type GetGqSingleTenantResponse {
+  message: String
+  payload: GqTenantModel
+  status: Float
+}
+
+type GetGqUserGenderStatsResponse {
+  message: String
+  payload: _GetGqUserGenderStatsResponse
+  status: Float!
+}
+
+type GetGqUserMaritalStatusStatsResponse {
+  message: String
+  payload: _GetGqUserMaritalStatusStatsResponse
+  status: Float!
+}
+
+type GetGqUserOnboardingStatsResponse {
+  message: String
+  payload: _GetGqUserOnboardingStatsResponse
+  status: Float!
+}
+
+type GetGqUserSignupsStatsResponse {
+  message: String
+  payload: _GetGqUserSignupsStatsResponse
+  status: Float!
+}
+
+type GetGqUserStatusStatsResponse {
+  message: String
+  payload: _GetGqUserStatusStatsResponse
+  status: Float!
+}
+
+type GetGqUserTypeStatsResponse {
+  message: String
+  payload: _GetGqUserTypeStatsResponse
+  status: Float!
+}
+
+type GetMarketplaceOptinUsersResponse {
+  count: Float
+  message: String
+  payload: [_GetMarketplaceOptinUsersResponse!]
+  status: Float
+}
+
+type GetOrderAuditLogsResponse {
+  count: Float!
+  message: String
+  payload: [OrderAuditLog!]!
+  status: Float!
+}
+
+type GetOrdersV2Response {
+  count: Float!
+  message: String
+  payload: [OrderV2!]!
+  status: Float!
+}
+
+type GetSeedVarietiesResponse {
+  count: Float!
+  message: String
+  payload: [SeedVariety!]!
+  status: Float!
+}
+
+type GetServiceTypesResponse {
+  count: Float!
+  message: String
+  payload: [ServiceTypes!]!
+  status: Float!
+}
+
+type GetSingleActivityResponse {
+  message: String
+  payload: ActivityModelDto
+  status: Float
+}
+
+type GetSingleCommunityResponse {
+  message: String
+  payload: CommunityModelDto
+  status: Float
+}
+
+type GetSingleGoodPracticeMessageResponse {
+  message: String
+  payload: GoodPracticeMessageModelDto
+  status: Float
+}
+
+type GetSingleGqReportedProblemResponse {
+  message: String
+  payload: GqReportedProblemModelDto
+  status: Float
+}
+
+type GetSingleUserTargetsResponse {
+  message: String
+  payload: UserTargetsModelDto
+  status: Float
+}
+
+type GetTransactionStatsPerTenantResponse {
+  count: Float!
+  message: String
+  payload: [TransactionStatsBody!]!
+  status: Float!
+}
+
+type GetTransactionStatsResponse {
+  message: String
+  payload: TransactionStatsResponse
+  status: Float!
+}
+
+type GetUserInteractionStatsResponse {
+  count: Float
+  message: String
+  payload: [_GetUserInteractionStatsResponse!]
+  status: Float
+}
+
+type GetWhatsAppUserInteractionStatsResponse {
+  count: Float
+  message: String
+  payload: [_GetWhatsAppUserInteractionStatsResponse!]
+  status: Float
+}
+
+type GoodPracticeMessageModelDto {
+  created: String
+  deleted: String
+  extensionAgent: GqUserModelDto
+  farmer: GqUserModelDto
+  farmerId: String!
+  goodPracticeId: String!
+  id: String!
+  sectionIds: [String!]
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+input GoodPracticeMessageModelInput {
+  farmerId: String!
+  goodPracticeId: String!
+  id: String
+  sectionIds: [String!] = []
+}
+
+type GqActivityCategoryModelDto {
+  created: String
+  id: String
+  name: String
+  names: [ActivityCategoryTranslationsDto!]
+  updated: String
+}
+
+input GqActivityCategoryModelInput {
+  created: String
+  id: String
+  name: String
+  names: [ActivityCategoryTranslationsInput!] = []
+  updated: String
+}
+
+input GqActivityMediaInput {
+  fileContents: String!
+  fileName: String!
+}
+
+type GqAllBestPracticesResponse {
+  count: Float
+  message: String
+  payload: [GqBestPracticeModelDto!]
+  status: Float
+}
+
+type GqAuthLoginModel {
+  access_token: String!
+  id: String!
+  signupMode: String!
+  userType: String!
+}
+
+type GqAuthLoginResponse {
+  message: String
+  payload: GqAuthLoginModel
+  status: Float
+}
+
+type GqBestPracticeIndexDto {
+  createdBy: String
+  createdOn: String
+  id: String!
+  labels: [String!]!
+  order: [String!]!
+  updatedBy: String
+  updatedOn: String
+}
+
+input GqBestPracticeIndexInput {
+  createdBy: String
+  createdOn: String
+  id: String!
+  labels: [String!]! = []
+  order: [String!]! = []
+  updatedBy: String
+  updatedOn: String
+}
+
+type GqBestPracticeModelDto {
+  approvalStatus: String
+  author: String
+  climateChangeImpact: String
+  created: String
+  createdBy: String
+  deleted: String
+  filters: GqFiltersDto
+  id: String
+  index: GqBestPracticeIndexDto
+  lang: String
+  sections: [GqSectionsDto!]
+  source: GqSourceDto
+  summary: GqSummaryDto
+  tenantIds: [String!]
+  tenants: [_GqBestPracticeModelTenantDto!]
+  theme: String
+  type: String
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  views: Float
+}
+
+input GqBestPracticeModelInput {
+  approvalStatus: String = "pending"
+  author: String
+  climateChangeImpact: String
+  created: String
+  createdBy: String
+  deleted: String
+  filters: GqFiltersInput
+  id: String
+  lang: String
+  sections: [GqSectionsInput!] = []
+  source: GqSourceInput
+  summary: GqSummaryInput
+  tenantIds: [String!] = []
+  tenants: [_GqBestPracticeModelTenantInput!] = []
+  theme: String
+  type: String = "best-practice"
+  updated: String
+  updatedBy: GqUserModelInput
+  updatedById: String
+}
+
+type GqChildrenDto {
+  children: [GqChildrenDto!]!
+  description: String
+  id: String
+  label: String
+  ordered: Boolean
+  type: String!
+  url: String
+}
+
+input GqChildrenInput {
+  children: [GqChildrenInput!]! = []
+  description: String
+  id: String
+  label: String
+  ordered: Boolean
+  type: String!
+  url: String
+}
+
+type GqConceptDto {
+  id: String!
+  name: String!
+  parentId: String
+}
+
+input GqConceptInput {
+  id: String!
+  name: String!
+  parentId: String
+}
+
+type GqCropDto {
+  id: String!
+  name: String!
+}
+
+input GqCropInput {
+  id: String!
+  name: String!
+}
+
+input GqFarmerInput {
+  firstName: String
+  id: String!
+  lastName: String
+}
+
+type GqFarmerModelDto {
+  firstName: String
+  id: String!
+  lastName: String
+}
+
+type GqFiltersDto {
+  completeness: Float
+  cropFarming: Boolean
+  crops: [String!]
+  geodata: GqGeoDataDto
+  impact: GqImpactDto
+  livestock: [String!]
+  livestockFarming: Boolean
+  tags: [String!]
+}
+
+input GqFiltersInput {
+  completeness: Float
+  cropFarming: Boolean
+  crops: [String!] = []
+  geodata: GqGeoDataInput
+  impact: GqImpactInput
+  livestock: [String!] = []
+  livestockFarming: Boolean
+  tags: [String!] = []
+}
+
+type GqGeoDataDto {
+  aezCode: Float
+  aezCodeGroup: [String!]
+  altitude: Float
+  altitudeCode: Float
+  altitudeCodeGroup: [String!]
+  annualPrecipitation: Float
+  countryCode: String
+  geohash: String
+  irrigatedCultivatedLand: Float
+  irrigatedCultivatedLandCode: Float
+  latitude: Float
+  longitude: Float
+  referenceLengthGrowingPeriodCode: Float
+  referenceLengthGrowingPeriodCodeGroup: [String!]
+  slopeCode: Float
+  slopeCodeGroup: [String!]
+  soilCode: Float
+  soilCodeGroup: [String!]
+  temperature: Float
+  temperatureCode: Float
+  temperatureCodeGroup: [String!]
+}
+
+input GqGeoDataInput {
+  aezCode: Float
+  aezCodeGroup: [String!] = []
+  altitude: Float
+  altitudeCode: Float
+  altitudeCodeGroup: [String!] = []
+  annualPrecipitation: Float
+  countryCode: String
+  geohash: String
+  irrigatedCultivatedLand: Float
+  irrigatedCultivatedLandCode: Float
+  latitude: Float
+  longitude: Float
+  referenceLengthGrowingPeriodCode: Float
+  referenceLengthGrowingPeriodCodeGroup: [String!] = []
+  slopeCode: Float
+  slopeCodeGroup: [String!] = []
+  soilCode: Float
+  soilCodeGroup: [String!] = []
+  temperature: Float
+  temperatureCode: Float
+  temperatureCodeGroup: [String!] = []
+}
+
+type GqGetNotificationResponseDto {
+  count: Float
+  message: String
+  payload: [GqNotificationModelDto!]
+  status: Float
+}
+
+type GqGroupModel {
+  extensionAgentId: String
+  farmers: [GqFarmerModelDto!]!
+  id: String!
+  name: String!
+}
+
+type GqImpactDto {
+  accessToInformation: Float
+  cropProductivity: Float
+  dietaryDiversity: Float
+  durability: Float
+  farmImpact: Float
+  floodingImpactReduction: Float
+  improvingEnvironment: Float
+  income: Float
+  increaseYields: Float
+  investment: Float
+  labour: Float
+  livestockProductivity: Float
+  pestDamage: Float
+  soilQuality: Float
+  stormProtection: Float
+  urgency: Float
+  waterDemand: Float
+}
+
+input GqImpactInput {
+  accessToInformation: Float
+  cropProductivity: Float
+  dietaryDiversity: Float
+  durability: Float
+  farmImpact: Float
+  floodingImpactReduction: Float
+  improvingEnvironment: Float
+  income: Float
+  increaseYields: Float
+  investment: Float
+  labour: Float
+  livestockProductivity: Float
+  pestDamage: Float
+  soilQuality: Float
+  stormProtection: Float
+  urgency: Float
+  waterDemand: Float
+}
+
+type GqLivestockDto {
+  id: String!
+  name: String!
+}
+
+input GqLivestockInput {
+  id: String!
+  name: String!
+}
+
+type GqLocationDto {
+  lat: Float!
+  lng: Float!
+  name: String!
+}
+
+input GqLocationInput {
+  lat: Float!
+  lng: Float!
+  name: String!
+}
+
+type GqNotificationModelDto {
+  body: String!
+  created: String
+  deleted: String
+  eventId: String!
+  id: String
+  read: Boolean!
+  tenantId: String
+  title: String!
+  type: String!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  userId: String!
+}
+
+input GqNotificationModelInput {
+  body: String!
+  created: String
+  eventId: String!
+  id: String
+  read: Boolean! = false
+  tenantId: String
+  title: String!
+  type: String!
+  userId: String!
+}
+
+type GqPermissionDto {
+  id: String!
+  name: String!
+}
+
+input GqPermissionInput {
+  id: String!
+  name: String!
+}
+
+input GqPhoneNumberUserRequest {
+  countryCode: String!
+  phone: String!
+}
+
+type GqReportedProblemModelDto {
+  created: String
+  extensionAgent: GqUserModelDto
+  extensionAgentId: String
+  farmer: GqUserModelDto
+  farmerId: String
+  id: String
+  status: String!
+  tenant: String!
+  timeline: [GqTimelineEntryDto!]!
+  updated: String
+}
+
+input GqReportedProblemModelInput {
+  created: String
+  extensionAgent: GqUserModelInput
+  extensionAgentId: String
+  farmer: GqUserModelInput
+  farmerId: String
+  id: String
+  status: String! = "pending"
+  tenant: String!
+  timeline: [GqTimelineEntryInput!]! = []
+  updated: String
+}
+
+input GqRoleInput {
+  id: String!
+  name: String
+  permissions: [String!]! = []
+  tenantId: String
+}
+
+type GqRoleModel {
+  id: String!
+  name: String
+  permissions: [String!]!
+  tenantId: String
+}
+
+type GqSectionsDto {
+  children: [GqChildrenDto!]
+  createdOn: String
+  description: String
+  id: String
+  label: String
+  type: String
+  updatedOn: String
+}
+
+input GqSectionsInput {
+  children: [GqChildrenInput!] = []
+  createdOn: String
+  description: String
+  id: String
+  label: String
+  type: String
+  updatedOn: String
+}
+
+type GqSingleActivityCategoryResponse {
+  message: String
+  payload: GqActivityCategoryModelDto
+  status: Float
+}
+
+type GqSingleBestPracticeResponse {
+  message: String
+  payload: GqBestPracticeModelDto
+  status: Float
+}
+
+type GqSingleCropResponse {
+  message: String
+  payload: GqCropDto
+  status: Float
+}
+
+type GqSingleLivestockResponse {
+  message: String
+  payload: GqLivestockDto
+  status: Float
+}
+
+type GqSingleRoleResponse {
+  message: String
+  payload: GqRoleModel
+  status: Float
+}
+
+type GqSingleSpecializationResponse {
+  message: String
+  payload: GqSpecializationDto
+  status: Float
+}
+
+type GqSingleUserResponse {
+  message: String
+  payload: OmittedGqUserModel
+  status: Float
+}
+
+type GqSourceDto {
+  id: String
+  imageUrl: String
+  tenantId: String
+  url: String
+}
+
+input GqSourceInput {
+  id: String
+  imageUrl: String
+  tenantId: String
+  url: String
+}
+
+type GqSpecializationDto {
+  id: String!
+  name: String!
+}
+
+input GqSpecializationInput {
+  id: String!
+  name: String!
+}
+
+type GqSummaryDto {
+  country: String
+  createdBy: String
+  createdOn: String
+  description: String
+  id: String
+  imageUrl: String
+  label: String
+  updatedBy: String
+  updatedOn: String
+}
+
+input GqSummaryInput {
+  country: String
+  createdBy: String
+  createdOn: String
+  description: String
+  id: String
+  imageUrl: String
+  label: String
+  updatedBy: String
+  updatedOn: String
+}
+
+input GqTenantInput {
+  code: String
+  created: String
+  id: String!
+  isPrivate: Boolean! = true
+  name: String
+  updated: String
+  updatedBy: GqUserModelInput
+}
+
+type GqTenantModel {
+  code: String
+  created: String
+  id: String!
+  isPrivate: Boolean!
+  name: String
+  updated: String
+  updatedBy: GqUserModelDto
+}
+
+type GqUpdateNotificationResponseDto {
+  message: String
+  payload: GqNotificationModelDto
+  status: Float
+}
+
+type GqUserLocationDto {
+  lat: Float
+  lng: Float
+  name: String
+}
+
+input GqUserLocationInput {
+  lat: Float
+  lng: Float
+  name: String
+}
+
+type GqUserModelDto {
+  assignedExtensionAgent: String
+  assignedExtensionAgentModel: GqUserModelDto
+  countryCode: String
+  countryIso: String
+  created: String
+  crops: [GqCropDto!]!
+  dateOfBirth: String
+  deleted: String
+  education: String
+  email: String
+  fcmNotificationTokens: [String!]!
+  firstName: String!
+  gender: String
+  id: String!
+  idNumber: String
+  lastName: String!
+  livestock: [GqLivestockDto!]!
+  location: GqUserLocationDto
+  maritalStatus: String
+  occupation: String
+  password: String
+  phoneNumber: String
+  preferredLanguage: String!
+  reportingTo: String
+  roles: [GqRoleModel!]
+  signUpMode: String
+  specialization: GqSpecializationDto
+  status: String!
+  tenantIds: [String!]!
+  tenants: [GqTenantModel!]
+  type: String
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+input GqUserModelInput {
+  assignedExtensionAgent: String = ""
+  assignedExtensionAgentModel: GqUserModelInput
+  countryCode: String
+  countryIso: String
+  created: String
+  crops: [GqCropInput!]! = []
+  dateOfBirth: String
+  education: String
+  email: String
+  fcmNotificationTokens: [String!]! = []
+  firstName: String!
+  gender: String
+  id: String!
+  idNumber: String
+  lastName: String!
+  livestock: [GqLivestockInput!]! = []
+  location: GqUserLocationInput
+  maritalStatus: String = "other"
+  occupation: String
+  password: String
+  phoneNumber: String
+  preferredLanguage: String! = "en"
+  reportingTo: String
+  roles: [GqRoleInput!] = []
+  signUpMode: String
+  specialization: GqSpecializationInput
+  status: String! = "active"
+  tenantIds: [String!]! = []
+  tenants: [GqTenantInput!] = []
+  type: String
+  updated: String
+}
+
+type GraphqlStandardEmptyResponse {
+  message: String
+  status: Float!
+}
+
+type InitiatePaymentResponse {
+  message: String
+  status: Float!
+}
+
+type InputItem {
+  inputId: String!
+  inputName: String!
+  inputType: String!
+  inputVariety: String!
+  price: Float!
+  quantity: Int!
+  units: String!
+}
+
+type LinkBulkUsersResponse {
+  message: String
+  payload: _LinkBulkUsersResponse
+  status: Float!
+}
+
+type MechanizationPerformance {
+  serviceTypeId: String!
+  serviceTypeName: String!
+  totalRevenue: Float!
+  totalUnitsPurchased: Float!
+}
+
+type Mutation {
+  addFarmersToActivity(activityId: String!, farmerIds: [String!]!, lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GraphqlStandardEmptyResponse!
+  addTimelineToReportedProblem(timeline: AddTimelineToReportedProblemRequest!): AddTimelineToReportedProblemResponse!
+  assignUserRole(userRole: AssignUserGqRoleRequest!): AssignUserGqRoleResponse!
+  bulkAssignUsersToExtensionAgent(extensionAgentId: String!, farmerIds: [String!]!, preferredLanguage: String, source: String, tenant: String): LinkBulkUsersResponse!
+  bulkCreateActivities(activities: [ActivityModelInput!]! = [], preferredLanguage: String, source: String, tenant: String): CreateGqBulkActivitiesResponse!
+  bulkCreateActivityCategories(categories: [_GqActivityCategoryModelInputOptional!]! = [], preferredLanguage: String, source: String, tenant: String): CreateGqBulkActivityCategoriesResponse!
+  bulkCreateCommunities(communities: [CommunityModelInput!]! = [], preferredLanguage: String, source: String, tenant: String): CreateBulkCommunitiesResponse!
+  bulkCreateCrops(crops: [_GqCropModelInputOptional!]! = [], preferredLanguage: String, source: String, tenant: String): CreateGqBulkCropsResponse!
+  bulkCreateGroups(groups: [_GqGroupModelInputOptional!]! = [], preferredLanguage: String, source: String, tenant: String): CreateGqBulkGroupsResponse!
+  bulkCreateLivestock(livestock: [_GqLivestockModelInputOptional!]! = [], preferredLanguage: String, source: String, tenant: String): CreateGqBulkLivestockResponse!
+  bulkCreateSpecializations(preferredLanguage: String, source: String, specializations: [_GqSpecializationModelInputOptional!]! = [], tenant: String): CreateGqBulkSpecializationsResponse!
+  bulkCreateTenants(preferredLanguage: String, source: String, tenant: String, tenants: [_GqTenantModelInputOptional!]! = []): CreateGqBulkTenantsResponse!
+  bulkCreateUsers(preferredLanguage: String, source: String, tenant: String, users: [_GqUserModelInputOptional!]! = []): CreateGqBulkUsersResponse!
+  createActivity(activity: ActivityModelInput!, preferredLanguage: String, source: String, tenant: String): GetSingleActivityResponse!
+  createActivityCategory(activityCategory: CreateGqActivityCategoryRequest!): GqSingleActivityCategoryResponse!
+  createBestPractice(bestPractice: GqBestPracticeModelInput!, preferredLanguage: String, source: String, tenant: String): GqSingleBestPracticeResponse!
+  createCatalogItem(catalogItem: CreateCatalogItemInput!, preferredLanguage: String, source: String, tenant: String): CreateCatalogItemResponse!
+  createCommunity(community: _CreateCommunityRequest!, preferredLanguage: String, source: String, tenant: String): GetSingleCommunityResponse!
+  createCrop(crop: CreateGqCropRequest!): GqSingleCropResponse!
+  createFertilizerType(fertilizerType: CreateFertilizerTypeInput!, preferredLanguage: String, source: String, tenant: String): CreateFertilizerTypeResponse!
+  createGoodPracticeMessage(goodPracticeMessage: GoodPracticeMessageModelInput!, preferredLanguage: String, source: String, tenant: String): GetSingleGoodPracticeMessageResponse!
+  createGroup(group: CreateGroupRequest!): SingleGroupResponse!
+  createLivestock(livestock: CreateGqLivestockRequest!): GqSingleLivestockResponse!
+  createMultipleGoodPracticeMessages(goodPracticeMessage: [GoodPracticeMessageModelInput!]!, preferredLanguage: String, source: String, tenant: String): GetGqAllGoodPracticeMessagesResponse!
+  createOrderV2(order: CreateOrderV2Input!, preferredLanguage: String, source: String, tenant: String): CreateOrderV2Response!
+  createReportedProblem(problem: CreateGqReportedProblemRequest!): GetSingleGqReportedProblemResponse!
+  createRole(role: CreateGqRoleRequest!): GqSingleRoleResponse!
+  createSeedVariety(preferredLanguage: String, seedVariety: CreateSeedVarietyInput!, source: String, tenant: String): CreateSeedVarietyResponse!
+  createServiceType(preferredLanguage: String, serviceType: CreateServiceTypeInput!, source: String, tenant: String): CreateServiceTypeResponse!
+  createSpecialization(specialization: CreateGqSpecializationRequest!): GqSingleSpecializationResponse!
+  createTenant(tenant: CreateGqTenantRequest!): GetGqSingleTenantResponse!
+  createUser(preferredLanguage: String, source: String, tenant: String, user: _GqUserModel!): GqSingleUserResponse!
+  createUserTarget(preferredLanguage: String, source: String, tenant: String, userTarget: UserTargetsModelInput!): GetSingleUserTargetsResponse!
+  deleteActivity(id: String!): GraphqlStandardEmptyResponse!
+  deleteActivityCategory(id: String!): GraphqlStandardEmptyResponse!
+  deleteBestPractice(id: String!): GraphqlStandardEmptyResponse!
+  deleteCatalogItem(input: DeleteCatalogItemRequest!): DeleteCatalogItemResponse!
+  deleteCommunity(id: String, preferredLanguage: String, source: String, tenant: String): GraphqlStandardEmptyResponse!
+  deleteCrop(id: String!): GraphqlStandardEmptyResponse!
+  deleteFertilizerType(id: String!, preferredLanguage: String, source: String, tenant: String): DeleteFertilizerTypeResponse!
+  deleteGoodPracticeMessage(id: String!, preferredLanguage: String, source: String, tenant: String): GraphqlStandardEmptyResponse!
+  deleteGroup(id: String!): GraphqlStandardEmptyResponse!
+  deleteLivestock(id: String!): GraphqlStandardEmptyResponse!
+  deleteReportedProblem(id: String!): GraphqlStandardEmptyResponse!
+  deleteRole(id: String!): GraphqlStandardEmptyResponse!
+  deleteSeedVariety(id: String!, preferredLanguage: String, source: String, tenant: String): DeleteSeedVarietyResponse!
+  deleteServiceType(id: String!, preferredLanguage: String, source: String, tenant: String): DeleteServiceTypeResponse!
+  deleteSpecialization(id: String!): GraphqlStandardEmptyResponse!
+  deleteTenant(id: String!): GraphqlStandardEmptyResponse!
+  deleteUser(id: String!): GraphqlStandardEmptyResponse!
+  deleteUserTarget(id: String!, preferredLanguage: String, source: String, tenant: String): GetSingleUserTargetsResponse!
+  forgotPassword(email: String!, preferredLanguage: String, source: String, tenant: String): ForgotPasswordResponse!
+  initiatePaymentRequest(orderId: String!, preferredLanguage: String, source: String, tenant: String): InitiatePaymentResponse!
+  removeFarmersFromActivity(activityId: String!, farmerIds: [String!]!, lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GraphqlStandardEmptyResponse!
+  resetPassword(password: String!, passwordConfirmation: String!, preferredLanguage: String, source: String, tenant: String, token: String!): ResetPasswordResponse!
+  revealOtp(countryCode: String!, phoneNumber: String!, preferredLanguage: String, source: String, tenant: String): ResendOtpResponse!
+  saveUserFCMToken(preferredLanguage: String, source: String, tenant: String, token: String!): GraphqlStandardEmptyResponse!
+  sendWaMessage(message: String!, preferredLanguage: String, source: String, tenant: String, userIds: [String!]! = []): SendWaMessageResponse!
+  signInWithEmailAndPassword(email: String!, password: String!, preferredLanguage: String, source: String, tenant: String): GqAuthLoginResponse!
+  signInWithFacebookAccount(idToken: String!, preferredLanguage: String, source: String, tenant: String, userInfo: UserInfo!): GqAuthLoginResponse!
+  signInWithGoogleAccount(idToken: String!, preferredLanguage: String, source: String, tenant: String, userInfo: UserInfo!): GqAuthLoginResponse!
+  signInWithPhoneNumber(countryCode: String!, phoneNumber: String!, preferredLanguage: String, source: String, tenant: String): GraphqlStandardEmptyResponse!
+  unAssignUserRole(userRole: UnAssignUserGqRoleRequest!): UnAssignUserGqRoleResponse!
+  updateActivity(activity: ActivityModelInput!, preferredLanguage: String, source: String, tenant: String): GetSingleActivityResponse!
+  updateActivityCategory(activityCategory: UpdateGqActivityCategoryRequest!): GqSingleActivityCategoryResponse!
+  updateBestPractice(bestPractice: GqBestPracticeModelInput!, preferredLanguage: String, source: String, tenant: String): GqSingleBestPracticeResponse!
+  updateBestPracticeSection(bestPracticeId: String!, preferredLanguage: String, section: GqSectionsInput!, source: String, tenant: String): UpdateBestPracticeSectionResponse!
+  updateCatalogItem(catalogItem: UpdateCatalogItemInput!, preferredLanguage: String, source: String, tenant: String): UpdateCatalogItemResponse!
+  updateCommunity(community: _UpdateCommunityRequest!, preferredLanguage: String, source: String, tenant: String): GetSingleCommunityResponse!
+  updateCrop(crop: UpdateGqCropRequest!): GqSingleCropResponse!
+  updateFertilizerType(fertilizerType: UpdateFertilizerTypeInput!, preferredLanguage: String, source: String, tenant: String): UpdateFertilizerTypeResponse!
+  updateGoodPracticeMessage(goodPracticeMessage: GoodPracticeMessageModelInput!, preferredLanguage: String, source: String, tenant: String): GetSingleGoodPracticeMessageResponse!
+  updateGroup(group: UpdateGroupRequest!): SingleGroupResponse!
+  updateLivestock(livestock: UpdateGqLivestockRequest!): GqSingleLivestockResponse!
+  updateNotification(notification: _OmittedUpdateNotificationRequest!, preferredLanguage: String, source: String, tenant: String): GqUpdateNotificationResponseDto!
+  updateOrderV2(order: UpdateOrderV2Input!, preferredLanguage: String, source: String, tenant: String): UpdateOrderV2Response!
+  updateReportedProblem(problem: CreateGqReportedProblemRequest!): GetSingleGqReportedProblemResponse!
+  updateRole(role: UpdateGqRoleRequest!): GqSingleRoleResponse!
+  updateSeedVariety(preferredLanguage: String, seedVariety: UpdateSeedVarietyInput!, source: String, tenant: String): UpdateSeedVarietyResponse!
+  updateServiceType(preferredLanguage: String, serviceType: UpdateServiceTypeInput!, source: String, tenant: String): UpdateServiceTypeResponse!
+  updateSpecialization(specialization: UpdateGqSpecializationRequest!): GqSingleSpecializationResponse!
+  updateStock(input: UpdateStockRequest!): UpdateStockResponse!
+  updateTenant(tenant: UpdateGqTenantRequest!): GetGqSingleTenantResponse!
+  updateUser(preferredLanguage: String, source: String, tenant: String, user: OmittedUpdateUserRequest!): GqSingleUserResponse!
+  updateUserTarget(preferredLanguage: String, source: String, tenant: String, userTarget: UserTargetsModelDtoInput!): GetSingleUserTargetsResponse!
+  validateOtp(countryCode: String!, otp: String!, phoneNumber: String!, preferredLanguage: String, source: String, tenant: String): GqAuthLoginResponse!
+}
+
+type OmittedGetAllUsersResponse {
+  assignedExtensionAgent: String
+  assignedExtensionAgentModel: GqUserModelDto
+  countryCode: String
+  countryIso: String
+  created: String
+  crops: [GqCropDto!]
+  dateOfBirth: String
+  deleted: String
+  education: String
+  email: String
+  fcmNotificationTokens: [String!]
+  firstName: String
+  gender: String
+  id: String
+  idNumber: String
+  lastName: String
+  livestock: [GqLivestockDto!]
+  location: GqUserLocationDto
+  maritalStatus: String
+  occupation: String
+  phoneNumber: String
+  preferredLanguage: String
+  reportingTo: String
+  roles: [GqRoleModel!]
+  signUpMode: String
+  specialization: GqSpecializationDto
+  status: String
+  tenantIds: [String!]
+  tenants: [GqTenantModel!]
+  type: String
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+type OmittedGqUserModel {
+  assignedExtensionAgent: String
+  assignedExtensionAgentModel: GqUserModelDto
+  countryCode: String
+  countryIso: String
+  created: String
+  crops: [GqCropDto!]
+  dateOfBirth: String
+  deleted: String
+  education: String
+  email: String
+  fcmNotificationTokens: [String!]
+  firstName: String
+  gender: String
+  id: String
+  idNumber: String
+  lastName: String
+  livestock: [GqLivestockDto!]
+  location: GqUserLocationDto
+  maritalStatus: String
+  occupation: String
+  phoneNumber: String
+  preferredLanguage: String
+  reportingTo: String
+  roles: [GqRoleModel!]
+  signUpMode: String
+  specialization: GqSpecializationDto
+  status: String
+  tenantIds: [String!]
+  tenants: [GqTenantModel!]
+  type: String
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+input OmittedUpdateUserRequest {
+  assignedExtensionAgent: String = ""
+  assignedExtensionAgentModel: GqUserModelInput
+  countryCode: String
+  countryIso: String
+  created: String
+  crops: [GqCropInput!] = []
+  dateOfBirth: String
+  deleted: String
+  education: String
+  email: String
+  fcmNotificationTokens: [String!] = []
+  firstName: String
+  gender: String
+  id: String
+  idNumber: String
+  lastName: String
+  livestock: [GqLivestockInput!] = []
+  location: GqUserLocationInput
+  maritalStatus: String = "other"
+  occupation: String
+  password: String
+  phoneNumber: String
+  preferredLanguage: String = "en"
+  reportingTo: String
+  roles: [GqRoleInput!] = []
+  signUpMode: String
+  specialization: GqSpecializationInput
+  status: String = "active"
+  tenantIds: [String!] = []
+  tenants: [GqTenantInput!] = []
+  type: String
+  updated: String
+  updatedBy: GqUserModelInput
+  updatedById: String
+}
+
+type OrderAuditLog {
+  action: AuditLogAction!
+  created: String
+  deleted: String
+  id: String!
+  newStatus: OrderV2Status
+  oldStatus: OrderV2Status
+  orderId: String!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  user: PartialUserDto
+  userId: String!
+}
+
+type OrderLineItem {
+  catalogItem: CatalogItemModel!
+  created: String
+  deleted: String
+  fertilizerType: FertilizerTypes
+  id: String!
+  orderId: String!
+  quantityOrdered: Int!
+  seedClass: SeedClass
+  seedVariety: SeedVariety
+  serviceDetail: ServiceTypes
+  totalAmount: Float!
+  unitPrice: Float!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+input OrderLineItemInput {
+  fertilizerTypeId: String
+  itemId: String!
+  quantityOrdered: Int!
+  seedClassId: String
+  seedVarietyId: String
+  serviceDetailId: String
+}
+
+type OrderStatsData {
+  cancelled: Float!
+  collected: Float!
+  completed: Float!
+  delivered: Float!
+  paid: Float!
+  pending: Float!
+  requested: Float!
+  total: Float!
+}
+
+type OrderStatsResponse {
+  message: String
+  payload: OrderStatsData
+  status: Float!
+}
+
+type OrderV2 {
+  created: String
+  deleted: String
+  id: String!
+  orderLineItems: [OrderLineItem!]
+  shortId: String!
+  status: OrderV2Status!
+  tenantId: String
+  totalAmount: Float!
+  transactions: [PaymentTransaction!]!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  user: PartialUserDto
+}
+
+input OrderV2Input {
+  created: String
+  id: String!
+  orderLineItems: [_OrderLineItemInput!]
+  shortId: String!
+  status: OrderV2Status!
+  tenantId: String
+  totalAmount: Float!
+  transactions: [PaymentTransactionInput!]! = []
+  updated: String
+  user: PartialUserInput
+}
+
+type OrderV2Payments {
+  created: String
+  deleted: String
+  id: String!
+  orderLineItems: [OrderLineItem!]
+  shortId: String!
+  status: OrderV2Status!
+  tenantId: String
+  totalAmount: Float!
+  transactions: [PaymentTransaction!]!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+"""Status of an order in v2 system"""
+enum OrderV2Status {
+  CANCELLED
+  COLLECTED
+  COMPLETED
+  DELIVERED
+  PAID
+  PENDING
+  REQUESTED
+}
+
+type PartialUserDto {
+  countryCode: String
+  firstName: String!
+  id: String!
+  lastName: String!
+  phoneNumber: String
+}
+
+input PartialUserInput {
+  countryCode: String
+  firstName: String!
+  id: String!
+  lastName: String!
+  phoneNumber: String
+}
+
+type PaymentSummaryData {
+  """Payment summary data grouped by tenant"""
+  data: [PaymentSummaryItem!]!
+}
+
+type PaymentSummaryItem {
+  """Count of completed transactions for this tenant"""
+  completedCount: Float!
+
+  """Name of the tenant"""
+  tenantName: String!
+
+  """Total amount of completed payment transactions for this tenant"""
+  totalCompletedAmount: Float!
+}
+
+type PaymentSummaryResponse {
+  message: String
+  payload: PaymentSummaryData
+  status: Float!
+}
+
+type PaymentTransaction {
+  created: String
+  deleted: String
+  id: String!
+  order: OrderV2!
+  payloadDetails: String!
+  referenceNumber: String!
+  status: String!
+  tenantId: String!
+  totalAmount: Float!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  userId: String!
+}
+
+type PaymentTransactionDto {
+  created: String
+  deleted: String
+  id: String!
+  order: OrderV2Payments
+  payloadDetails: String!
+  referenceNumber: String!
+  status: String!
+  tenantId: String!
+  totalAmount: Float!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  user: GqUserModelDto
+  userId: String!
+}
+
+input PaymentTransactionInput {
+  id: String!
+  order: OrderV2Input!
+  payloadDetails: String!
+  referenceNumber: String!
+  status: String! = "pending"
+  tenantId: String!
+  totalAmount: Float!
+  userId: String!
+}
+
+type QuantitySoldAnalysisGraphResponse {
+  message: String
+  payload: QuantitySoldAnalysisResponse
+  status: Float!
+}
+
+type QuantitySoldAnalysisResponse {
+  catalogItemName: String!
+  category: String!
+  fertilizerTypesAnalysis: [FertilizerTypeQuantityAnalysis!]
+  granularity: String!
+  periods: [String!]!
+  seedClassesAnalysis: [SeedClassQuantityAnalysis!]
+  serviceTypesAnalysis: [ServiceTypeQuantityAnalysis!]
+  totalPeriodQuantity: Float!
+  totalPeriodRevenue: Float!
+}
+
+type QuantitySoldDataPoint {
+  period: String!
+  totalQuantity: Float!
+  totalRevenue: Float!
+}
+
+type Query {
+  getActivities(activityCategoryId: String, extensionAgentId: String, farmerId: String, lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetGqAllActivitiesResponse!
+  getActivity(extensionAgentId: String, id: String, preferredLanguage: String, source: String, tenant: String): GetSingleActivityResponse!
+  getActivityCategories(id: String, lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetGqAllActivityCategoriesResponse!
+  getActivityCategory(id: String, name: String, preferredLanguage: String, source: String, tenant: String): GqSingleActivityCategoryResponse!
+  getActivityFarmers(activityId: String!, lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetActivityFarmersResponse!
+  getAgentOrdersSummary: AgentOrdersSummaryResponse!
+  getAgentOrdersTimeSeries(months: Float! = 6): AgentOrdersTimeSeriesResponse!
+  getAgentsLeaderboard(endDate: String, lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, startDate: String, tenant: String): GetAgentsLeaderboardResponse!
+  getAllReportedProblemsStats(endDate: String!, groupBy: String! = "month", orderBy: String! = "created", preferredLanguage: String, source: String, startDate: String!, tenant: String): GetAllReportedProblemsStatsResponse!
+  getBestPractice(id: String, lang: String, preferredLanguage: String, source: String, tenant: String): GqSingleBestPracticeResponse!
+  getBestPractices(approvalStatus: String = "approved", lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, searchTerm: String = "", size: Int = 20, source: String, tenant: String, type: String = ""): GqAllBestPracticesResponse!
+  getCatalogItem(id: String!): CatalogItemModel!
+  getCatalogItems(category: CatalogItemCategory, isActive: Boolean, order: String, orderBy: String, page: Float! = 1, preferredLanguage: String, search: String, seedClass: String, seedVariety: String, size: Float = 20, source: String, tenant: String, type: CatalogItemType): GetCatalogItemsResponse!
+  getCommunities(extensionAgentId: String, lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetAllCommunitiesResponse!
+  getCommunity(id: String, preferredLanguage: String, source: String, tenant: String): GetSingleCommunityResponse!
+  getConcepts(conceptId: String, conceptIds: [String!]! = [], lastAccessedId: String, order: String, orderBy: String, parentId: String, parentIds: [String!]! = [], preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetGqAllConceptsResponse!
+  getCrop(id: String!): GqSingleCropResponse!
+  getCrops(lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetGqAllCropsResponse!
+  getFertilizerTypesByCatalogItem(catalogItemId: String!): GetFertilizerTypesResponse!
+  getGoodPracticeMessage(id: String!, preferredLanguage: String, source: String, tenant: String): GetSingleGoodPracticeMessageResponse!
+  getGoodPracticeMessages(extensionAgentId: String, farmerId: String, goodPracticeId: String, lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetGqAllGoodPracticeMessagesResponse!
+  getGroup(args: SingleGroupRequest!): SingleGroupResponse!
+  getGroups(args: GetAllGroupsRequest!): GetAllGroupsResponse!
+  getLivestock(lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetGqAllLivestockResponse!
+  getLoggedInUser: GqSingleUserResponse!
+  getMarketplaceUsers(lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetMarketplaceOptinUsersResponse!
+  getOrderStats: OrderStatsResponse!
+  getOrderV2AuditLogs(orderId: String!): GetOrderAuditLogsResponse!
+  getOrderV2ByShortId(shortId: String!): OrderV2!
+  getOrdersV2(endDate: String, itemCategory: CatalogItemCategory, itemType: CatalogItemType, order: String, orderBy: String, page: Int! = 1, preferredLanguage: String, search: String, size: Int = 20, source: String, startDate: String, status: OrderV2Status, tenant: String, tenantId: String): GetOrdersV2Response!
+  getPaymentSummary(endDate: String, preferredLanguage: String, source: String, startDate: String, tenant: String, tenantId: String): PaymentSummaryResponse!
+  getPaymentTransaction(id: String!, preferredLanguage: String, source: String, tenant: String): FindOnePaymentTransactionResponse!
+  getPaymentTransactions(endDate: String, order: String, orderBy: String, orderId: String, page: Int! = 1, preferredLanguage: String, size: Int = 20, source: String, startDate: String, status: String, tenant: String, userId: String): FindAllPaymentTransactionsResponse!
+  getPermissions(preferredLanguage: String, source: String, tenant: String): GetGqAllPermissionsResponse!
+  getQuantitySoldAnalysis(catalogItemId: String!, category: CatalogItemCategory!, endDate: String, granularity: TimeGranularity! = WEEKLY, preferredLanguage: String, seedVarietyId: String, source: String, startDate: String, tenant: String, tenantId: String!): QuantitySoldAnalysisGraphResponse!
+  getReportedProblem(id: String, preferredLanguage: String, source: String, status: String = "pending", tenant: String): GetSingleGqReportedProblemResponse!
+  getReportedProblems(extensionAgentId: String, farmerId: String, id: String, lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, status: String, tenant: String): GetGqAllReportedProblemsResponse!
+  getRole(id: String!, preferredLanguage: String, source: String, tenant: String): GqSingleRoleResponse!
+  getRoles(lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetGqAllRolesResponse!
+  getSeedVarietiesByCatalogItem(catalogItemId: String!): GetSeedVarietiesResponse!
+  getServiceTypesByCatalogItem(catalogItemId: String!): GetServiceTypesResponse!
+  getSingleLivestock(id: String!): GqSingleLivestockResponse!
+  getSpecialization(id: String!): GqSingleSpecializationResponse!
+  getSpecializations(lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetGqAllSpecializationsResponse!
+  getStockPerformance(endDate: String, preferredLanguage: String, source: String, startDate: String, tenant: String, tenantId: String): CategoryBreakdownResponse!
+  getTenant(code: String, id: String, preferredLanguage: String, source: String, tenant: String): GetGqSingleTenantResponse!
+  getTenants(isPrivate: Boolean, lastAccessedId: String, name: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String): GetGqAllTenantsResponse!
+  getTransactionStats(endDate: String, preferredLanguage: String, source: String, startDate: String, tenant: String, tenantId: String): GetTransactionStatsResponse!
+  getTransactionStatsPerTenant(endDate: String, preferredLanguage: String, source: String, startDate: String, tenant: String): GetTransactionStatsPerTenantResponse!
+  getUser(email: String, id: String, phoneNumber: GqPhoneNumberUserRequest, preferredLanguage: String, source: String, tenant: String): GqSingleUserResponse!
+  getUserGenderStats(preferredLanguage: String, source: String, tenant: String, userType: String, year: Float): GetGqUserGenderStatsResponse!
+  getUserInteractions(endDate: String!, groupBy: String! = "month", id: String!, orderBy: String! = "created", preferredLanguage: String, source: String, startDate: String!, tenant: String, type: String! = "extension-agent"): GetUserInteractionStatsResponse!
+  getUserMaritalStatusStats(preferredLanguage: String, source: String, tenant: String, userType: String, year: Float): GetGqUserMaritalStatusStatsResponse!
+  getUserNotifications(isRead: Boolean! = false, lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String, userId: String!): GqGetNotificationResponseDto!
+  getUserOnboardingStats(preferredLanguage: String, source: String, tenant: String, userType: String, year: Float): GetGqUserOnboardingStatsResponse!
+  getUserSignupsStats(preferredLanguage: String, source: String, tenant: String, userType: String, year: Float): GetGqUserSignupsStatsResponse!
+  getUserStatusStats(preferredLanguage: String, source: String, tenant: String, userType: String, year: Float): GetGqUserStatusStatsResponse!
+  getUserTarget(id: String!, preferredLanguage: String, source: String, tenant: String): GetSingleUserTargetsResponse!
+  getUserTargets(lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, size: Int = 20, source: String, tenant: String, tenantId: String, userType: String): GetGqAllUserTargetsResponse!
+  getUserTypeStats(preferredLanguage: String, source: String, tenant: String, userType: String, year: Float): GetGqUserTypeStatsResponse!
+  getUsers(assignedExtensionAgentId: String, email: String, gender: String, lastAccessedId: String, order: String, orderBy: String, preferredLanguage: String, searchTerm: String, signupMode: String, size: Int = 20, source: String, status: String, tenant: String, type: String): GetGqAllUsersResponse!
+  getWhatsAppUserInteractions(endDate: String!, preferredLanguage: String, source: String, startDate: String!, tenant: String): GetWhatsAppUserInteractionStatsResponse!
+  sendOnboardingMessage(email: String, id: String, phoneNumber: GqPhoneNumberUserRequest, preferredLanguage: String, source: String, tenant: String): GqSingleUserResponse!
+}
+
+type ResendOtpResponse {
+  message: String
+  payload: AuthOtpModel
+  status: Float
+}
+
+type ResetPasswordResponse {
+  message: String
+  status: Float
+}
+
+type SeedClass {
+  availableStock: Float
+  created: String
+  deleted: String
+  description: String
+  id: String!
+  isActive: Boolean!
+  name: String!
+  packagingSize: String
+  unitPrice: Float!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  varietyId: String!
+  weight: Float
+}
+
+input SeedClassInput {
+  availableStock: Float!
+  description: String
+  name: String!
+  packagingSize: String!
+  unitPrice: Float!
+  weight: Float!
+}
+
+type SeedClassQuantityAnalysis {
+  quantityData: [QuantitySoldDataPoint!]!
+  seedClassName: String!
+}
+
+type SeedVariety {
+  classes: [SeedClass!]
+  created: String
+  deleted: String
+  description: String
+  id: String!
+  isActive: Boolean!
+  itemId: String!
+  name: String!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+type SeedVarietyPerformance {
+  seedVarietyId: String!
+  seedVarietyName: String!
+  totalRevenue: Float!
+  totalUnitsPurchased: Float!
+}
+
+type SendWaMessageResponse {
+  message: String
+  status: Float!
+}
+
+type ServiceItem {
+  price: Float!
+  quantity: Int!
+  serviceId: String!
+  serviceName: String!
+  serviceType: String!
+  units: String!
+}
+
+type ServiceTypeQuantityAnalysis {
+  quantityData: [QuantitySoldDataPoint!]!
+  serviceTypeName: String!
+}
+
+type ServiceTypes {
+  created: String
+  deleted: String
+  id: String!
+  isAvailable: Boolean
+  itemId: String!
+  ratePerUom: Float
+  serviceDescription: String
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+input ServiceTypesInput {
+  id: String!
+  isAvailable: Boolean
+  itemId: String!
+  ratePerUom: Float
+  serviceDescription: String
+}
+
+input SingleGroupRequest {
+  extensionAgentId: String
+  id: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+type SingleGroupResponse {
+  message: String
+  payload: GqGroupModel
+  status: Float
+}
+
+type StockPerformanceData {
+  fertilizerPerformance: [FertilizerTypePerformance!]!
+  mechanizationPerformance: [MechanizationPerformance!]!
+  seedPerformance: [SeedVarietyPerformance!]!
+  totalOrdersAnalyzed: Float!
+  totalRevenue: Float!
+}
+
+"""Time granularity for quantity sold analysis"""
+enum TimeGranularity {
+  MONTHLY
+  WEEKLY
+}
+
+type TransactionStatsBody {
+  tenantId: String!
+  tenantName: String!
+  totalExpected: Float!
+  totalExpectedCount: Float!
+  totalPaid: Float!
+  totalPaidCount: Float!
+  totalPending: Float!
+  totalPendingCount: Float!
+  totalTransactions: Float!
+  totalTransactionsCount: Float!
+}
+
+type TransactionStatsResponse {
+  """Count of completed transactions"""
+  completedCount: Float!
+
+  """Total of completed transactions"""
+  completedTotal: Float!
+
+  """Count of failed transactions"""
+  failedCount: Float!
+
+  """Total of failed transactions"""
+  failedTotal: Float!
+
+  """Count of pending transactions"""
+  pendingCount: Float!
+
+  """Total of pending transactions"""
+  pendingTotal: Float!
+
+  """Total count of all transactions"""
+  total: Float!
+
+  """Total count of all transactions"""
+  totalCount: Float!
+}
+
+input UnAssignUserGqRoleRequest {
+  id: String!
+}
+
+type UnAssignUserGqRoleResponse {
+  message: String
+  status: Float!
+}
+
+"""Unit of measure for catalog items"""
+enum UnitOfMeasure {
+  ACRE
+  BAG
+  DAY
+  HOUR
+  KG
+  LITER
+  METER
+  PIECE
+}
+
+type UpdateBestPracticeSectionResponse {
+  message: String
+  payload: _UpdateBestPracticeSectionResponse
+  status: Float
+}
+
+input UpdateCatalogItemInput {
+  category: CatalogItemCategory
+  description: String
+  id: String!
+  isActive: Boolean
+  name: String
+  type: CatalogItemType
+  uom: UnitOfMeasure
+}
+
+type UpdateCatalogItemResponse {
+  message: String
+  payload: _UpdateCatalogItemResponse
+  status: Float
+}
+
+input UpdateFertilizerTypeInput {
+  availableStock: Float
+  description: String
+  fertilizerType: String
+  id: String!
+  packagingSize: String
+  unitPrice: Float
+}
+
+type UpdateFertilizerTypeResponse {
+  message: String
+  payload: FertilizerTypes
+  status: Float!
+}
+
+input UpdateGqActivityCategoryRequest {
+  created: String
+  id: String
+  name: String
+  names: [ActivityCategoryTranslationsInput!] = []
+  preferredLanguage: String
+  source: String
+  tenant: String
+  updated: String
+}
+
+input UpdateGqCropRequest {
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+input UpdateGqLivestockRequest {
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+input UpdateGqRoleRequest {
+  id: String
+  name: String
+  permissions: [String!] = []
+  preferredLanguage: String
+  source: String
+  tenant: String
+  tenantId: String
+}
+
+input UpdateGqSpecializationRequest {
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+input UpdateGqTenantRequest {
+  code: String
+  created: String
+  id: String
+  isPrivate: Boolean = true
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+  updated: String
+  updatedBy: GqUserModelInput
+}
+
+input UpdateGroupRequest {
+  extensionAgentId: String
+  farmers: [GqFarmerInput!] = []
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+input UpdateOrderV2Input {
+  id: String!
+  orderLineItems: [OrderLineItemInput!] = []
+  status: OrderV2Status
+}
+
+type UpdateOrderV2Response {
+  message: String
+  payload: OrderV2
+  status: Float!
+}
+
+input UpdateSeedClassInput {
+  availableStock: Float
+  description: String
+  id: String
+  name: String
+  packagingSize: String
+  unitPrice: Float
+  weight: Float
+}
+
+input UpdateSeedVarietyInput {
+  classes: [UpdateSeedClassInput!]
+  description: String
+  id: String!
+  name: String
+}
+
+type UpdateSeedVarietyResponse {
+  message: String
+  payload: SeedVariety
+  status: Float!
+}
+
+input UpdateServiceTypeInput {
+  id: String!
+  isAvailable: Boolean
+  ratePerUom: Float
+  serviceDescription: String
+}
+
+type UpdateServiceTypeResponse {
+  message: String
+  payload: ServiceTypes
+  status: Float!
+}
+
+input UpdateStockRequest {
+  itemId: String!
+  quantity: Float!
+  seedClass: String!
+  seedVariety: String!
+}
+
+type UpdateStockResponse {
+  message: String
+  payload: CatalogItemModel
+  status: Float!
+}
+
+input UserInfo {
+  email: String!
+}
+
+type UserOnboardingStatsResponse {
+  all: Float!
+  dashboard: Float!
+  extensionAgentApp: Float!
+  facebook: Float!
+  farmerApp: Float!
+  whatsapp: Float!
+}
+
+type UserTargetsModelDto {
+  created: String
+  deleted: String
+  id: String!
+  target: Int!
+  tenantId: String!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  userType: String!
+}
+
+input UserTargetsModelDtoInput {
+  id: String!
+  target: Int!
+  tenantId: String!
+  userType: String!
+}
+
+input UserTargetsModelInput {
+  id: String
+  target: Int!
+  tenantId: String!
+  userType: String!
+}
+
+type _AttendanceModel {
+  assignedExtensionAgent: String
+  assignedExtensionAgentModel: GqUserModelDto
+  countryCode: String
+  countryIso: String
+  created: String
+  crops: [GqCropDto!]!
+  dateOfBirth: String
+  deleted: String
+  education: String
+  email: String
+  fcmNotificationTokens: [String!]!
+  firstName: String!
+  gender: String
+  id: String!
+  idNumber: String
+  isAttending: Boolean
+  lastName: String!
+  livestock: [GqLivestockDto!]!
+  location: GqUserLocationDto
+  maritalStatus: String
+  occupation: String
+  password: String
+  phoneNumber: String
+  preferredLanguage: String!
+  reportingTo: String
+  roles: [GqRoleModel!]
+  signUpMode: String
+  specialization: GqSpecializationDto
+  status: String!
+  tenantIds: [String!]!
+  tenants: [GqTenantModel!]
+  type: String
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+input _CatalogItemModelInput {
+  category: CatalogItemCategory!
+  description: String
+  fertilizerTypes: [FertilizerTypesInput!]
+  id: String!
+  isActive: Boolean!
+  name: String!
+  serviceTypes: [ServiceTypesInput!]
+  tenantId: String
+  type: CatalogItemType!
+  uom: UnitOfMeasure!
+  varieties: [_SeedVarietyInput!]
+}
+
+type _CommunityModelExtended {
+  created: String
+  deleted: String
+  error: String!
+  extensionAgent: GqUserModelDto
+  extensionAgentId: String!
+  id: String!
+  link: String!
+  name: String!
+  tenant: String!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+type _CreateBulkCommunitiesResponse {
+  failedCommunities: [_CommunityModelExtended!]!
+}
+
+type _CreateCatalogItemResponse {
+  category: CatalogItemCategory!
+  created: String
+  deleted: String
+  description: String
+  fertilizerTypes: [FertilizerTypes!]
+  id: String!
+  isActive: Boolean!
+  name: String!
+  serviceTypes: [ServiceTypes!]
+  tenantId: String
+  type: CatalogItemType!
+  uom: UnitOfMeasure!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  varieties: [SeedVariety!]
+}
+
+input _CreateCommunityRequest {
+  extensionAgent: GqUserModelInput
+  extensionAgentId: String!
+  id: String
+  link: String!
+  name: String!
+  tenant: String!
+}
+
+type _CreateGqBulkActivityCategoriesResponse {
+  failedCategories: [_GqActivityCategoryModelExtended!]!
+}
+
+type _CreateGqBulkCropsResponse {
+  failedCrops: [_GqCropModelExtended!]!
+}
+
+type _CreateGqBulkGroupsResponse {
+  failedGroups: [_GqGroupModelExtended!]!
+}
+
+type _CreateGqBulkLivestockResponse {
+  failedLivestock: [_GqLivestockModelExtended!]!
+}
+
+type _CreateGqBulkSpecializationsResponse {
+  failedSpecializations: [_GqSpecializationModelExtended!]!
+}
+
+type _CreateGqBulkTenantsResponse {
+  failedTenants: [_GqTenantModelExtended!]!
+}
+
+type _CreateOrderResponse {
+  created: String
+  deleted: String
+  id: String!
+  inputItem: InputItem
+  reference: String!
+  serviceItem: ServiceItem
+  status: String!
+  tenantId: String!
+  totalAmount: Float!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  userId: String!
+}
+
+type _DeleteCatalogItemResponse {
+  id: String!
+  message: String!
+}
+
+type _GetActivityFarmersResponse {
+  farmers: [_AttendanceModel!]!
+}
+
+type _GetAgentsLeaderboardResponse {
+  activities: Float!
+  activitiesPoints: Float!
+  extensionAgent: GqUserModelDto!
+  goodPractices: Float!
+  goodPracticesPoints: Float!
+  points: Float!
+  reportedProblems: Float!
+  reportedProblemsPoints: Float!
+}
+
+type _GetAllReportedProblemsStatsResponse {
+  completed: Float!
+  date: String!
+  inProgress: Float!
+  pending: Float!
+}
+
+type _GetGqBulkActivitiesResponse {
+  failedActivities: [_GqActivityModelExtended!]!
+}
+
+type _GetGqBulkUsersResponse {
+  failedUsers: [_GqUserModelExtended!]!
+}
+
+type _GetGqUserGenderStatsResponse {
+  female: Float!
+  male: Float!
+  other: Float!
+}
+
+type _GetGqUserMaritalStatusStatsResponse {
+  married: Float!
+  other: Float!
+  single: Float!
+}
+
+type _GetGqUserOnboardingStatsResponse {
+  values: [UserOnboardingStatsResponse!]!
+}
+
+type _GetGqUserSignupsStatsResponse {
+  dashboard: Float!
+  extensionAgentApp: Float!
+  facebook: Float!
+  farmerApp: Float!
+  whatsapp: Float!
+}
+
+type _GetGqUserStatusStatsResponse {
+  active: Float!
+  inactive: Float!
+  pending: Float!
+}
+
+type _GetGqUserTypeStatsResponse {
+  extensionAgents: Float!
+  farmers: Float!
+  other: Float!
+}
+
+type _GetMarketplaceOptinUsersResponse {
+  assignedExtensionAgent: String
+  assignedExtensionAgentModel: GqUserModelDto
+  countryCode: String
+  countryIso: String
+  created: String
+  crops: [GqCropDto!]
+  dateOfBirth: String
+  deleted: String
+  education: String
+  email: String
+  fcmNotificationTokens: [String!]
+  firstName: String
+  gender: String
+  id: String
+  idNumber: String
+  lastName: String
+  livestock: [GqLivestockDto!]
+  location: GqUserLocationDto
+  maritalStatus: String
+  occupation: String
+  phoneNumber: String
+  preferredLanguage: String
+  reportingTo: String
+  roles: [GqRoleModel!]
+  signUpMode: String
+  specialization: GqSpecializationDto
+  status: String
+  tenantIds: [String!]
+  tenants: [GqTenantModel!]
+  type: String
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+type _GetOrderResponse {
+  created: String
+  deleted: String
+  id: String!
+  inputItem: InputItem
+  reference: String!
+  serviceItem: ServiceItem
+  status: String!
+  tenantId: String!
+  totalAmount: Float!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  userId: String!
+}
+
+type _GetUserInteractionStatsResponse {
+  activities: Float!
+  date: String!
+  goodPractices: Float!
+  reportedProblems: Float!
+}
+
+type _GetUserOrdersResponse {
+  created: String
+  deleted: String
+  id: String!
+  inputItem: InputItem
+  reference: String!
+  serviceItem: ServiceItem
+  status: String!
+  tenantId: String!
+  totalAmount: Float!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  userId: String!
+}
+
+type _GetWhatsAppUserInteractionStatsResponse {
+  countryCode: String!
+  totalMessages: Float!
+  totalReceivedMessages: Float!
+  totalSentMessages: Float!
+}
+
+type _GqActivityCategoryModelExtended {
+  created: String
+  error: String!
+  id: String
+  name: String
+  names: [ActivityCategoryTranslationsDto!]
+  updated: String
+}
+
+input _GqActivityCategoryModelInputOptional {
+  created: String
+  id: String
+  name: String
+  names: [ActivityCategoryTranslationsInput!] = []
+  preferredLanguage: String
+  source: String
+  tenant: String
+  updated: String
+}
+
+type _GqActivityModelExtended {
+  activityCategory: GqActivityCategoryModelDto
+  activityDate: String
+  created: String
+  description: String
+  error: String!
+  extensionAgentId: String
+  goodPracticeId: String
+  id: String
+  location: GqLocationDto
+  media: [String!]!
+  sectionIds: [String!]
+  solution: ActivityCustomSolutionDto
+  tenant: String
+  title: String
+  updated: String
+}
+
+type _GqBestPracticeModelTenantDto {
+  code: String
+  created: String
+  id: String
+  isPrivate: Boolean
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+  updated: String
+  updatedBy: GqUserModelDto
+}
+
+input _GqBestPracticeModelTenantInput {
+  id: String
+  name: String
+}
+
+type _GqCropModelExtended {
+  error: String!
+  id: String!
+  name: String!
+}
+
+input _GqCropModelInputOptional {
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+type _GqGroupModelExtended {
+  error: String!
+  extensionAgentId: String
+  farmers: [GqFarmerModelDto!]!
+  id: String!
+  name: String!
+}
+
+input _GqGroupModelInputOptional {
+  extensionAgentId: String
+  farmers: [GqFarmerInput!] = []
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+type _GqLivestockModelExtended {
+  error: String!
+  id: String!
+  name: String!
+}
+
+input _GqLivestockModelInputOptional {
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+type _GqSpecializationModelExtended {
+  error: String!
+  id: String!
+  name: String!
+}
+
+input _GqSpecializationModelInputOptional {
+  id: String
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+}
+
+type _GqTenantModelExtended {
+  code: String
+  created: String
+  error: String!
+  id: String!
+  isPrivate: Boolean!
+  name: String
+  updated: String
+  updatedBy: GqUserModelDto
+}
+
+input _GqTenantModelInputOptional {
+  code: String
+  created: String
+  id: String
+  isPrivate: Boolean = true
+  name: String
+  preferredLanguage: String
+  source: String
+  tenant: String
+  updated: String
+  updatedBy: GqUserModelInput
+}
+
+type GqTimelineEntryDto {
+  audioMedia: [String!]
+  created: String!
+  documentMedia: [String!]
+  from: String
+  media: [String!]
+  message: String!
+  reportedProblemId: String
+  videoMedia: [String!]
+}
+
+input GqTimelineEntryInput {
+  audioMedia: [String!] = []
+  created: String!
+  documentMedia: [String!] = []
+  from: String
+  media: [String!] = []
+  message: String! = ""
+  reportedProblemId: String
+  videoMedia: [String!] = []
+}
+
+input _GqUserModel {
+  assignedExtensionAgent: String = ""
+  assignedExtensionAgentModel: GqUserModelInput
+  countryCode: String
+  countryIso: String
+  created: String
+  crops: [GqCropInput!] = []
+  dateOfBirth: String
+  deleted: String
+  education: String
+  email: String
+  fcmNotificationTokens: [String!] = []
+  firstName: String
+  gender: String
+  id: String
+  idNumber: String
+  lastName: String
+  livestock: [GqLivestockInput!] = []
+  location: GqUserLocationInput
+  maritalStatus: String = "other"
+  occupation: String
+  password: String
+  phoneNumber: String
+  preferredLanguage: String = "en"
+  reportingTo: String
+  roles: [GqRoleInput!] = []
+  signUpMode: String
+  specialization: GqSpecializationInput
+  status: String = "active"
+  tenantIds: [String!] = []
+  tenants: [GqTenantInput!] = []
+  type: String
+  updated: String
+  updatedBy: GqUserModelInput
+  updatedById: String
+}
+
+type _GqUserModelExtended {
+  assignedExtensionAgent: String
+  assignedExtensionAgentModel: GqUserModelDto
+  countryCode: String
+  countryIso: String
+  created: String
+  crops: [GqCropDto!]!
+  dateOfBirth: String
+  deleted: String
+  education: String
+  email: String
+  error: String!
+  fcmNotificationTokens: [String!]!
+  firstName: String!
+  gender: String
+  id: String!
+  idNumber: String
+  lastName: String!
+  livestock: [GqLivestockDto!]!
+  location: GqUserLocationDto
+  maritalStatus: String
+  occupation: String
+  password: String
+  phoneNumber: String
+  preferredLanguage: String!
+  reportingTo: String
+  roles: [GqRoleModel!]
+  signUpMode: String
+  specialization: GqSpecializationDto
+  status: String!
+  tenantIds: [String!]!
+  tenants: [GqTenantModel!]
+  type: String
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+}
+
+input _GqUserModelInputOptional {
+  assignedExtensionAgent: String = ""
+  assignedExtensionAgentModel: GqUserModelInput
+  countryCode: String
+  countryIso: String
+  created: String
+  crops: [GqCropInput!] = []
+  dateOfBirth: String
+  deleted: String
+  education: String
+  email: String
+  fcmNotificationTokens: [String!] = []
+  firstName: String
+  gender: String
+  id: String
+  idNumber: String
+  lastName: String
+  livestock: [GqLivestockInput!] = []
+  location: GqUserLocationInput
+  maritalStatus: String = "other"
+  occupation: String
+  password: String
+  phoneNumber: String
+  preferredLanguage: String = "en"
+  reportingTo: String
+  roles: [GqRoleInput!] = []
+  signUpMode: String
+  specialization: GqSpecializationInput
+  status: String = "active"
+  tenantIds: [String!] = []
+  tenants: [GqTenantInput!] = []
+  type: String
+  updated: String
+  updatedBy: GqUserModelInput
+  updatedById: String
+}
+
+type _InitiateMpesaStkPushResponse {
+  transactionId: String!
+}
+
+type _LinkBulkUsersResponse {
+  failedUsers: [_LinkUserModelExtended!]!
+}
+
+type _LinkUserModelExtended {
+  error: String!
+  id: String!
+}
+
+input _OmittedUpdateNotificationRequest {
+  created: String
+  deleted: String
+  id: String
+  read: Boolean = false
+  updated: String
+  updatedBy: GqUserModelInput
+  updatedById: String
+  userId: String
+}
+
+input _OrderLineItemInput {
+  catalogItem: _CatalogItemModelInput!
+  fertilizerType: FertilizerTypesInput
+  id: String!
+  orderId: String!
+  quantityOrdered: Int!
+  seedClass: _SeedClassInput
+  seedVariety: _SeedVarietyInput
+  serviceDetail: ServiceTypesInput
+  totalAmount: Float!
+  unitPrice: Float!
+}
+
+input _SeedClassInput {
+  availableStock: Float
+  description: String
+  id: String!
+  isActive: Boolean!
+  name: String!
+  packagingSize: String
+  unitPrice: Float!
+  varietyId: String!
+  weight: Float
+}
+
+input _SeedVarietyInput {
+  classes: [_SeedClassInput!]
+  description: String
+  id: String!
+  isActive: Boolean!
+  itemId: String!
+  name: String!
+}
+
+type _UpdateBestPracticeSectionResponse {
+  section: GqSectionsDto
+}
+
+type _UpdateCatalogItemResponse {
+  category: CatalogItemCategory
+  created: String
+  deleted: String
+  description: String
+  fertilizerTypes: [FertilizerTypes!]
+  id: String
+  isActive: Boolean
+  name: String
+  serviceTypes: [ServiceTypes!]
+  tenantId: String
+  type: CatalogItemType
+  uom: UnitOfMeasure
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  varieties: [SeedVariety!]
+}
+
+input _UpdateCommunityRequest {
+  extensionAgent: GqUserModelInput
+  extensionAgentId: String!
+  id: String!
+  link: String!
+  name: String!
+  tenant: String!
+}
+
+type _UpdateOrderResponse {
+  created: String
+  deleted: String
+  id: String!
+  inputItem: InputItem
+  reference: String!
+  serviceItem: ServiceItem
+  status: String!
+  tenantId: String!
+  totalAmount: Float!
+  updated: String
+  updatedBy: GqUserModelDto
+  updatedById: String
+  userId: String!
+}

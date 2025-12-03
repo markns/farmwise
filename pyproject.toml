@@ -3,7 +3,7 @@ name = "farmwise-parent"
 version = "0.1.0"
 description = "Empowering African Farmers with Smart Agriculture"
 readme = "README.md"
-requires-python = "<=3.13"
+requires-python = ">=3.10,<3.14"
 
 dependencies = [
 #    "fastapi~=0.115.8",
@@ -28,6 +28,7 @@ dev = [
     "openapi-python-client",
     "poethepoet",
     "datamodel-code-generator[graphql]>=0.33.0",
+    "google-cloud-firestore>=2.21.0",
 ]
 
 [tool.ruff]
@@ -65,10 +66,13 @@ lint = "ruff check --fix apps"
 check = "basedpyright"
 test = "pytest"
 client-gen = "libs/farmbase-client/gen-client.sh"
-farmbetter-gen = "datamodel-codegen --input schema.graphql  --input-file-type graphql --output apps/farmwise/src/farmwise/farmbetter/models.py --exclude-field typename__"
+farmbetter-gen = "datamodel-codegen --input apps/farmwise/src/farmwise/farmbetter/schema.graphql  --input-file-type graphql --output apps/farmwise/src/farmwise/farmbetter/models.py --use-default-kwarg --use-standard-collections --use-union-operator --use-annotated"
 # run all the above
 all = [{ ref = "fmt" }, { ref = "lint" }, { ref = "check" }, { ref = "test" }]
 
 
 [tool.uv.workspace]
-members = ["libs/*", "apps/*"]
+members = [
+    "libs/*",
+    "apps/*"
+]
