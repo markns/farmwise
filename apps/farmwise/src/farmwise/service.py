@@ -1,31 +1,19 @@
 import tempfile
 from typing import AsyncIterator
 
-import openai
+import google.generativeai as genai
 import requests
-from agents import (
-    Runner,
-    RunResultStreaming,
-    gen_trace_id,
-    trace,
-)
-from agents.voice import SingleAgentVoiceWorkflow, TTSModelSettings, VoicePipeline, VoicePipelineConfig
 from loguru import logger
-from openai.types.responses import (
-    EasyInputMessageParam,
-    ResponseInputImageParam,
-    ResponseInputTextParam,
-)
 from zep_cloud import Message
 
-from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, agents
+from farmwise.agent import DEFAULT_AGENT, ONBOARDING_AGENT, get_agents
 from farmwise.audio import load_oga_as_audio_input
 from farmwise.context import UserContext
-from farmwise.hooks import AgentHooks
 from farmwise.memory.session import SessionState, clear_session_state, get_or_create_session, set_session_state
 from farmwise.memory.zep import add_messages, get_memory
 from farmwise.schema import ResponseEvent, TextResponse, UserInput
 from farmwise.stream import _batch_stream_events
+from farmwise.utils import to_adk_content
 
 
 class FarmwiseService:
@@ -34,10 +22,21 @@ class FarmwiseService:
         cls, context: UserContext, user_input: UserInput, agent_name: str = None
     ) -> AsyncIterator[ResponseEvent]:
         session_state = await get_or_create_session(context)
+        
+        # Retrieve agents from the factory/registry
+        # In a real request-scoped scenario, we might want to create a fresh hierarchy here
+        # But for now, we use the global singleton or factory return
+        agents = get_agents()
 
         memories = await get_memory(thread_id=session_state.thread_id)
         if memories:
             context.memories = memories
+            # Convert Zep messages to ADK/Gemini history format
+            context.history = [
+                genai.types.Content(role="user" if m.role == "user" else "model", parts=[genai.types.Part.from_text(m.content)])
+                for m in memories
+            ]
+            context.thread_id = session_state.thread_id
 
         user = context.user
 
@@ -48,104 +47,73 @@ class FarmwiseService:
         else:
             agent = agents[session_state.current_agent]
 
-        content = []
-        if user_input.text:
-            content.append(ResponseInputTextParam(text=user_input.text, type="input_text"))
-        if user_input.image:
-            content.extend(
-                [
-                    ResponseInputImageParam(detail="auto", image_url=user_input.image, type="input_image"),
-                    ResponseInputTextParam(text=f"image_url={user_input.image}", type="input_text"),
-                ]
+        # Convert UserInput to ADK-compatible content
+        adk_content_parts = to_adk_content(user_input)
+
+        try:
+            # Initialize the generative model with the selected agent's tools
+            model = genai.GenerativeModel(
+                model_name=agent.model,
+                tools=agent.tools,
+                system_instruction=agent.instruction,
             )
 
-        input_items = [EasyInputMessageParam(content=content, role="user")]
+            # Start a chat session with the model
+            # Pass existing history from memory
+            chat_session = model.start_chat(history=context.history)
 
-        hooks = AgentHooks()
-        trace_id = gen_trace_id()
+            # Send the message and get the streaming response
+            # Note: ADK's `ToolContext` is usually managed implicitly when running agents
+            # directly via `adk.agents.Agent.run()`. Here, we're using `generativeai.GenerativeModel`
+            # directly for streaming, so `ToolContext` will need to be managed by the tools themselves
+            # or populated before tool execution. For now, assuming tools access `UserContext`
+            # directly or through global state if not passed explicitly here.
+            stream_result = await chat_session.send_message_async(adk_content_parts, stream=True)
 
-        logger.info(f"Agent starting https://platform.openai.com/traces/trace?trace_id={trace_id}")
-        try:
-            with trace(
-                "FarmWise",
-                trace_id=trace_id,
-                group_id=user.wa_id,
-                metadata={"full_name": user.full_name},
-            ):
-                result: RunResultStreaming = Runner.run_streamed(
-                    agent,
-                    input=input_items,
-                    context=context,
-                    hooks=hooks,
-                    previous_response_id=session_state.previous_response_id,
-                )
+            async for event in _batch_stream_events(stream_result, tts=False): # tts is hardcoded to False for now
+                yield event
 
-                # TODO: tts = user.config.text_to_speech
-                tts = False
-                async for event in _batch_stream_events(result.stream_events(), tts=tts):
-                    yield event
+            # After the stream, get the final accumulated content if needed for memory update
+            final_response_content = ""
+            # This part needs adjustment based on how _batch_stream_events accumulates final content
+            # For now, let's assume the last event from _batch_stream_events contains the full response
+            # A more robust solution would be to modify _batch_stream_events to return the final content
+            # or iterate through the stream_result again to get the final text.
+            # For simplicity, we'll extract it from chat_session.history[-1] after send_message completes
+            if chat_session.history and chat_session.history[-1].role == "model":
+                final_response_content = chat_session.history[-1].parts[0].text
+
 
             await set_session_state(
                 context,
                 SessionState(
-                    current_agent=result.last_agent.name,
+                    current_agent=agent.name,
                     thread_id=session_state.thread_id,
-                    previous_response_id=result.last_response_id,
+                    previous_response_id=None,
                 ),
             )
 
-            # We only update the memory if we have a text input
-            if user_input.text:
-                text_response: TextResponse = result.final_output_as(TextResponse)
-
+            # We only update the memory if we have a text input and a final response
+            if user_input.text and final_response_content:
                 await add_messages(
                     session_state.thread_id,
                     messages=[
                         Message(name=user.full_name, role="user", content=user_input.text),
-                        Message(name=result.last_agent.name, role="assistant", content=text_response.content),
+                        Message(name=agent.name, role="assistant", content=final_response_content),
                     ],
                 )
 
-        except openai.APIError as e:
-            logger.exception("An OpenAI error has occurred")
+        except Exception as e:
+            logger.exception("An error has occurred during agent invocation")
             yield ResponseEvent(
                 response=TextResponse(
-                    content=f"Sorry, there has been a problem. Please try again.\n\nDetail: {e.message}"
+                    content=f"Sorry, there has been a problem. Please try again.\n\nDetail: {str(e)}"
                 ),
                 has_more=False,
             )
             await clear_session_state(context)
 
-    async def invoke_voice(self, user_input: UserInput) -> str:
-        agent = agents[DEFAULT_AGENT]
-
-        with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as temp_f:
-            temp_file_path = temp_f.name
-            print(f"Created temporary file: {temp_file_path}")
-
-            # Make a request to the URL, streaming the response
-            print(f"Downloading from {user_input.voice}...")
-            with requests.get(user_input.voice, stream=True) as r:
-                # Check if the request was successful
-                r.raise_for_status()
-
-                # Write the content to the temporary file in chunks
-                for chunk in r.iter_content(chunk_size=8192):
-                    temp_f.write(chunk)
-
-            audio_input = load_oga_as_audio_input(temp_file_path)
-
-            pipeline = VoicePipeline(
-                workflow=SingleAgentVoiceWorkflow(agent),
-                config=VoicePipelineConfig(workflow_name="FarmWise", tts_settings=TTSModelSettings(voice="onyx")),
-            )
-
-            result = await pipeline.run(audio_input)
-
-            # output_path = user_input.voice.replace(".oga", "_response.oga")
-            # await write_stream_to_ogg(result.stream(), output_path)
-            #
-            # return output_path
+    # invoke_voice method removed as part of migration
 
 
 farmwise = FarmwiseService()
