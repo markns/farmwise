@@ -1,0 +1,2807 @@
+manifest:
+  version: "0.1.2"
+  schema: https://a2as.org/cert/schema
+  subject:
+    name: markns/farmwise
+    source: https://github.com/markns/farmwise
+    branch: main
+    commit: "064612ba"
+    scope: [apps/farmbase-workflows/src/farmbase_workflows/pest_alert/activities.py, apps/farmbase/src/farmbase/contact/runresult/models.py,
+      apps/farmbase/src/farmbase/contact/runresult/service.py, apps/farmbase/src/farmbase/data/crops/views.py, apps/farmbase/src/farmbase/data/gaez/models.py,
+      apps/farmbase/src/farmbase/farm/note/views.py, apps/farmbase/src/farmbase/farm/views.py, apps/farmwise/src/farmwise/agent/__init__.py,
+      apps/farmwise/src/farmwise/agent/crop_pathogen_diagnosis_agent.py, apps/farmwise/src/farmwise/agent/crop_suitability_agent.py,
+      apps/farmwise/src/farmwise/agent/field_registration_agent.py, apps/farmwise/src/farmwise/agent/maize_variety_selector.py,
+      apps/farmwise/src/farmwise/agent/market_price_agent.py, apps/farmwise/src/farmwise/agent/onboarding_agent.py, apps/farmwise/src/farmwise/agent/soil_advisory_agent.py,
+      apps/farmwise/src/farmwise/agent/triage_agent.py, apps/farmwise/src/farmwise/tools/courses.py, apps/farmwise/src/farmwise/tools/farmbase.py,
+      apps/farmwise/src/farmwise/tools/farmbetter.py, apps/farmwise/src/farmwise/tools/tools.py, apps/farmwise/src/farmwise/whatsapp/activities.py,
+      apps/farmwise/src/farmwise/whatsapp/handlers.py, libs/farmbase-client/src/farmbase_client/api/crop_varieties/crop_varieties_get_maize_varieties.py,
+      libs/farmbase-client/src/farmbase_client/models/__init__.py]
+  issued:
+    by: A2AS.org
+    at: '2026-01-26T16:15:53Z'
+  signatures:
+    digest: sha256:jph6GkaAlyHn8KEbhbjH7T0W08MgJjJHZVGgw_TWzUo
+    key: ed25519:jpw0pKwsC7dK0oOjx-eTQYVjQKKTO529gf3PHVw2X6Q
+    sig: ed25519:Z60IpmlaxPOxEpHxKN3taBeq5KcNBZmy35pyjdHKVR6TyqfUEi-OQ6GavnInMzGUK9o8CcnlHYmQXHpbJshdBg
+
+agents:
+  agent:
+    type: instance
+    models: [gpt-4.1]
+    params:
+      function: get_or_create_agent_by_name
+  crop_pathogen_diagnosis_agent:
+    type: instance
+    models: [gpt-4.1]
+    tools: [available_courses]
+    params:
+      name: Crop pathogen diagnosis agent
+      handoff_description: An agent that can identify crop pests and diseases from an image
+      output_type: TextResponse
+      instructions: [crop_pathogen_diagnosis_agent_instructions]
+  crop_suitability_agent:
+    type: instance
+    models: [gpt-4.1]
+    tools: [suitability_index, update_contact, soil_properties]
+    params:
+      name: Crop Suitability Agent
+      handoff_description: A helpful agent that can answer questions about crop suitability.
+      output_type: TextResponse
+      instructions: [crop_suitability_agent_instructions]
+  farm_registration_agent:
+    type: instance
+    models: [gpt-4.1]
+    tools: [update_contact]
+    params:
+      name: Field Registration Agent
+      handoff_description: This agent is used for registering a field in the system
+      output_type: TextResponse
+      instructions: [farm_registration_agent_instructions]
+  maize_variety_selector:
+    type: instance
+    models: [gpt-4.1]
+    tools: [elevation, soil_properties, aez_classification, growing_period, maize_varieties, update_contact]
+    params:
+      name: Maize Variety Selector
+      handoff_description: An agent that can recommend suitable varieties of Maize
+      output_type: TextResponse
+      instructions: [maize_variety_selector_instructions]
+  market_price_agent:
+    type: instance
+    models: [gpt-4.1]
+    tools: [get_markets, get_market_price_snapshot]
+    params:
+      name: Market Price Agent
+      handoff_description: Provides current market prices based on farm location and product interests.
+      output_type: TextResponse
+      instructions: [market_price_agent_instructions]
+  onboarding_agent:
+    type: instance
+    models: [gpt-4.1]
+    tools: [update_farmbetter_user]
+    params:
+      name: Onboarding Agent
+      handoff_description: This agent is used for onboarding new users into the system
+      model_settings: ModelSettings(tool_choice=auto)
+      output_type: TextResponse
+      instructions: [onboarding_agent_instructions]
+  soil_advisor_agent:
+    type: instance
+    models: [gpt-4.1]
+    tools: [soil_properties]
+    params:
+      name: Soil advisor
+      handoff_description: An agent that can advises on soil management for farmers
+      output_type: TextResponse
+      instructions: [soil_advisory_instructions]
+  triage_agent:
+    type: instance
+    models: [gpt-4.1]
+    tools: [available_courses]
+    params:
+      name: Triage Agent
+      output_type: TextResponse
+      instructions: [triage_agent_instructions]
+
+models:
+  gpt-4.1:
+    type: literal
+    agents: [onboarding_agent, farm_registration_agent, crop_suitability_agent, maize_variety_selector, crop_pathogen_diagnosis_agent,
+      market_price_agent, agent, triage_agent, soil_advisor_agent]
+
+tools:
+  aez_classification:
+    type: variable
+    agents: [maize_variety_selector]
+    params:
+      dynamic: "True"
+      description: Get the AEZ (Agro-Ecological Zone) classification for a given geographical coordinate.
+  available_courses:
+    type: decorator
+    agents: [crop_pathogen_diagnosis_agent, triage_agent]
+    params:
+      description: |-
+        Fetches the list of available courses.
+
+        This function retrieves all the courses and returns them in the form of
+        `AvailableCourse` objects. Each course object includes a description and a flow button.
+
+        Args:
+            _: RunContextWrapper[UserContext]: The runtime context wrapper
+                containing user-specific context and execution environment.
+
+        Returns:
+            list[AvailableCourse]: A list of courses represented as
+                `AvailableCourse` objects, where each includes a course
+                description and a flow button.
+  create_farm:
+    type: decorator
+    params:
+      description: |2
+
+        Create a farm with an optional location, and associated contacts
+  create_farmbetter_user:
+    type: decorator
+    params:
+      description: |2
+
+        Create a new FarmBetter user. Provide the details required by the FarmBetter API in the user payload.
+  create_note:
+    type: decorator
+    params:
+      description: |2
+
+        Create a note with an optional location. Use the current contact's ID for the contact_id_created_by field.
+  data_collection_consent:
+    type: decorator
+    params:
+      description: Use this tool when the contact consents for data collection
+  elevation:
+    type: variable
+    agents: [maize_variety_selector]
+    params:
+      dynamic: "True"
+      description: |-
+        Fetch the elevation in metres for a given location.
+
+        Args:
+            latitude: The latitude of the location.
+            longitude: The longitude of the location.
+  get_farmbetter_user:
+    type: decorator
+    params:
+      description: |2
+
+        Fetch a FarmBetter user by id, email, or phone number. Defaults to the current user in context when no lookup parameters are supplied.
+  get_market_price_snapshot:
+    type: decorator
+    agents: [market_price_agent]
+    params:
+      description: "\nGet a snapshot of market prices for a given market,\n formatted as csv with commodities as rows and\
+        \ price date as columns  \n"
+  get_markets:
+    type: decorator
+    agents: [market_price_agent]
+    params:
+      description: |2
+
+        Get the closest markets to a given coordinate
+  growing_period:
+    type: variable
+    agents: [maize_variety_selector]
+    params:
+      dynamic: "True"
+      description: Get the growing period length in days for a given geographical coordinate.
+  maize_varieties:
+    type: variable
+    agents: [maize_variety_selector]
+    params:
+      dynamic: "True"
+  soil_properties:
+    type: variable
+    agents: [crop_suitability_agent, maize_variety_selector, soil_advisor_agent]
+    params:
+      dynamic: "True"
+      description: Fetch soil properties for a given location.
+  suitability_index:
+    type: variable
+    agents: [crop_suitability_agent]
+    params:
+      dynamic: "True"
+      description: Get the crop suitability index values for a given geographical coordinate.
+  update_contact:
+    type: variable
+    agents: [farm_registration_agent, crop_suitability_agent, maize_variety_selector]
+    params:
+      dynamic: "True"
+  update_farmbetter_user:
+    type: variable
+    agents: [onboarding_agent]
+    params:
+      dynamic: "True"
+
+imports:
+  '*': farmbase.plugins.base.v1.*
+  __version__: farmbase.__version__
+  _annotations: __future__.annotations
+  _attrs_define: attrs.define
+  _attrs_field: attrs.field
+  _convert_md_to_whatsapp: farmwise.whatsapp.utils._convert_md_to_whatsapp
+  absolute_import: __future__.absolute_import
+  Action: farmwise.schema.Action
+  activities_section_list: farmwise.whatsapp.activities.activities_section_list
+  activity: temporalio.activity
+  ActivityData: farmwise.schema.ActivityData
+  ActivityProduct: farm.activity.models.ActivityProduct
+  ActivityType: farm.activity.models.ActivityType
+  add_exception_handler: fastapi_problem.handler.add_exception_handler
+  AesEngine: sqlalchemy_utils.types.encrypted.encrypted_type.AesEngine
+  aez_classification: farmwise.tools.tools.aez_classification
+  Agent: agents.Agent
+  AgentInfo: farmwise.schema.AgentInfo
+  agronomy_router: farmbase.agronomy.views.router
+  AgronomyGetCropSummaryInfoResponseAgronomyGetCropSummaryInfo: models.AgronomyGetCropSummaryInfoResponseAgronomyGetCropSummaryInfo
+  AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory: models.AgronomyGetEventCountsByCategoryResponseAgronomyGetEventCountsByCategory
+  AgronomyGetPathogenCountsByClassResponseAgronomyGetPathogenCountsByClass: models.AgronomyGetPathogenCountsByClassResponseAgronomyGetPathogenCountsByClass
+  alembic_command: alembic.command
+  alembic_helpers: geoalchemy2.alembic_helpers
+  AlembicConfig: alembic.config.Config
+  AlertActivities: farmbase_workflows.pest_alert.activities.AlertActivities
+  AlertDetails: schema.AlertDetails
+  AlertMessage: schema.AlertMessage
+  alru_cache: async_lru.alru_cache
+  and_: sqlalchemy.and_
+  Annotated: typing.Annotated
+  annotations: __future__.annotations
+  Any: typing.Any
+  api_router: farmbase.main.api_router
+  APIKeyHeader: fastapi.security.APIKeyHeader
+  APIRoute: fastapi.routing.APIRoute
+  APIRouter: fastapi.APIRouter
+  argparse: argparse
+  association_proxy: sqlalchemy.ext.associationproxy.association_proxy
+  async_scoped_session: sqlalchemy.ext.asyncio.async_scoped_session
+  async_sessionmaker: sqlalchemy.ext.asyncio.async_sessionmaker
+  AsyncEngine: sqlalchemy.ext.asyncio.AsyncEngine
+  AsyncFilterSet: sqlalchemy_filterset.AsyncFilterSet
+  asyncio: asyncio
+  AsyncMemory: mem0.AsyncMemory
+  AsyncSession: sqlalchemy.ext.asyncio.AsyncSession
+  AudioResponse: farmwise.schema.AudioResponse
+  authenticate_user_or_machine: farmbase.auth.authenticate_user_or_machine
+  AuthenticatedClient: client.AuthenticatedClient
+  AuthenticatedIsdaClient: isdasoil_api_client.AuthenticatedClient
+  AuthenticationProviderPlugin: auth_provider.AuthenticationProviderPlugin
+  available_courses: farmwise.tools.courses.available_courses
+  Base: farmbase.database.core.Base
+  base64: base64
+  BaseFilterSet: database.core.BaseFilterSet
+  BaseModel: pydantic.BaseModel
+  BaseUserUpdateAsync: pywa_async.types.base_update.BaseUserUpdateAsync
+  BigInteger: sqlalchemy.BigInteger
+  BodyAgronomyCreateNewCropCycle: models.BodyAgronomyCreateNewCropCycle
+  BodyAgronomyUpdateExistingCropCycle: models.BodyAgronomyUpdateExistingCropCycle
+  BodyLoginLoginPost: isdasoil_api_client.models.BodyLoginLoginPost
+  Boolean: sqlalchemy.Boolean
+  BoundaryDefinitionActivity: farm.field.models.BoundaryDefinitionActivity
+  Button: pywa_async.types.Button
+  Callable: typing.Callable
+  cast: typing.cast
+  check_output: subprocess.check_output
+  CheckConstraint: sqlalchemy.CheckConstraint
+  ClassVar: typing.ClassVar
+  click: click
+  Client: client.Client
+  Column: sqlalchemy.Column
+  commands: farmwise.whatsapp.commands
+  Commodity: farmbase.Commodity
+  commodity_router: farmbase.commodity.views.router
+  CommodityCreate: models.CommodityCreate
+  CommodityPagination: models.CommodityPagination
+  CommodityPriceSnapshot: schemas.CommodityPriceSnapshot
+  CommodityRead: models.CommodityRead
+  CommodityUpdate: models.CommodityUpdate
+  CommonParameters: farmbase.database.service.CommonParameters
+  compile_path: starlette.routing.compile_path
+  Computed: sqlalchemy.sql.schema.Computed
+  conint: pydantic.conint
+  constr: pydantic.constr
+  Contact: contact.models.Contact
+  contact_init_flow: flows.contact_init_flow
+  contact_router: farmbase.contact.views.router
+  contact_service: farmbase.contact.service
+  ContactConsent: models.ContactConsent
+  ContactConsentCreate: schemas.ContactConsentCreate
+  ContactConsentRead: models.ContactConsentRead
+  ContactCreate: schemas.ContactCreate
+  ContactFilterSet: filterset.ContactFilterSet
+  ContactPagination: schemas.ContactPagination
+  ContactPatch: schemas.ContactPatch
+  ContactQueryParams: filterset.ContactQueryParams
+  ContactRead: schemas.ContactRead
+  ContactRole: farmbase.enums.ContactRole
+  contacts_create_contact_consent: farmbase_client.api.contacts.contacts_create_contact_consent
+  contacts_patch_contact: farmbase_client.api.contacts.contacts_patch_contact
+  ContactSubscriptionRead: models.ContactSubscriptionRead
+  context: alembic.context
+  ContextVar: contextvars.ContextVar
+  copy_doc: farmwise.utils.copy_doc
+  CORSMiddleware: starlette.middleware.cors.CORSMiddleware
+  count: service.count
+  count_events_by_category: farmbase.agronomy.service.count_events_by_category
+  count_market_prices: service.count_market_prices
+  count_pathogens_by_class: farmbase.agronomy.service.count_pathogens_by_class
+  count_subscriptions: service.count_subscriptions
+  count_topics: service.count_topics
+  CountryType: sqlalchemy_utils.CountryType
+  CourseData: farmwise.schema.CourseData
+  create: service.create
+  create_async_engine: sqlalchemy.ext.asyncio.create_async_engine
+  create_consent: service.create_consent
+  create_crop: farmbase.agronomy.service.create_crop
+  create_crop_cycle: farmbase.agronomy.service.create_crop_cycle
+  create_database: sqlalchemy_utils.create_database
+  create_engine: sqlalchemy.create_engine
+  create_event: farmbase.agronomy.service.create_event
+  create_instance: service.create_instance
+  create_market: service.create_market
+  create_pathogen: farmbase.agronomy.service.create_pathogen
+  create_subscription: service.create_subscription
+  create_topic: service.create_topic
+  create_user: farmwise.farmbetter.users.create_user
+  CreateSchema: sqlalchemy.schema.CreateSchema
+  Crop: farmbase.agronomy.models.Crop
+  crop_cycle: farmbase_workflows.crop_cycle
+  crop_pathogen_diagnosis_agent: crop_pathogen_diagnosis_agent.crop_pathogen_diagnosis_agent
+  crop_suitability_agent: crop_suitability_agent.crop_suitability_agent
+  crop_varieties_get_maize_varieties: farmbase_client.api.crop_varieties.crop_varieties_get_maize_varieties
+  CropCreate: models.CropCreate
+  CropCycle: farmbase.agronomy.models.CropCycle
+  CropCycleActivities: activities.CropCycleActivities
+  CropCycleCreate: farmbase.agronomy.schemas.CropCycleCreate
+  CropCycleEvent: farmbase.agronomy.models.CropCycleEvent
+  CropCycleEventCreate: farmbase.agronomy.schemas.CropCycleEventCreate
+  CropCycleEventRead: models.CropCycleEventRead
+  CropCyclePagination: models.CropCyclePagination
+  CropCycleRead: models.CropCycleRead
+  CropCycleStage: farmbase.agronomy.models.CropCycleStage
+  CropCycleStageCreate: farmbase.agronomy.schemas.CropCycleStageCreate
+  CropCycleStageRead: models.CropCycleStageRead
+  CropCycleUpdate: farmbase.agronomy.schemas.CropCycleUpdate
+  CropCycleWorkflow: farmbase_workflows.crop_cycle.workflows.CropCycleWorkflow
+  CropPagination: models.CropPagination
+  CropRead: models.CropRead
+  crops_router: farmbase.data.crops.views.router
+  CropUpdate: models.CropUpdate
+  CropVarietiesResponse: models.CropVarietiesResponse
+  CropVarietyResponse: farmbase.data.crops.models.CropVarietyResponse
+  csv: csv
+  CultivationType: farmbase.agronomy.models.CultivationType
+  CurrencyType: sqlalchemy_utils.CurrencyType
+  CurrentOrganization: organization.service.CurrentOrganization
+  database_exists: sqlalchemy_utils.database_exists
+  dataclass: dataclasses.dataclass
+  date: datetime.date
+  Date: sqlalchemy.Date
+  datetime: datetime.datetime
+  DateTime: sqlalchemy.DateTime
+  DbSession: farmbase.database.core.DbSession
+  DECIMAL: sqlalchemy.DECIMAL
+  DeclarativeBase: sqlalchemy.orm.DeclarativeBase
+  dedent: textwrap.dedent
+  defaultdict: collections.defaultdict
+  delete: service.delete
+  delete_crop: farmbase.agronomy.service.delete_crop
+  delete_crop_cycle: farmbase.agronomy.service.delete_crop_cycle
+  delete_event: farmbase.agronomy.service.delete_event
+  delete_instance: service.delete_instance
+  delete_market: service.delete_market
+  delete_pathogen: farmbase.agronomy.service.delete_pathogen
+  delete_subscription: service.delete_subscription
+  delete_topic: service.delete_topic
+  Depends: fastapi.Depends
+  DepthType: isdasoil_api_client.models.get_soil_data_isdasoil_v2_soilproperty_get_depth_type_0.GetSoilDataIsdasoilV2SoilpropertyGetDepthType0
+  Dict: typing.Dict
+  drop_database: sqlalchemy_utils.drop_database
+  edit_profile_button: farmwise.whatsapp.flows.edit_profile.handlers.button
+  elevation: farmwise.tools.tools.elevation
+  engine: farmbase.database.core.engine
+  engine_from_config: sqlalchemy.engine_from_config
+  EntityAlreadyExistsError: exceptions.exceptions.EntityAlreadyExistsError
+  EntityDoesNotExistError: exceptions.exceptions.EntityDoesNotExistError
+  entry_points: importlib.metadata.entry_points
+  Enum: enum.Enum
+  errors: errors
+  Event: farmbase.agronomy.models.Event
+  event_crop_association: farmbase.agronomy.models.event_crop_association
+  event_pathogen_association: farmbase.agronomy.models.event_pathogen_association
+  EventCategory: models.EventCategory
+  EventCreate: models.EventCreate
+  EventPagination: models.EventPagination
+  EventRead: models.EventRead
+  EventSearchResponse: models.EventSearchResponse
+  EventType: farmbase.agronomy.models.EventType
+  EventUpdate: models.EventUpdate
+  Farm: models.Farm
+  farm_router: farmbase.farm.views.router
+  FarmActivity: farmbase.farm.activity.models.FarmActivity
+  farmbase_api_client: farmwise.farmbase.farmbase_api_client
+  FARMBASE_AUTHENTICATION_PROVIDER_HEADER_NAME: farmbase.config.FARMBASE_AUTHENTICATION_PROVIDER_HEADER_NAME
+  FARMBASE_AUTHENTICATION_PROVIDER_PKCE_JWKS: farmbase.config.FARMBASE_AUTHENTICATION_PROVIDER_PKCE_JWKS
+  FARMBASE_JWT_AUDIENCE: farmbase.config.FARMBASE_JWT_AUDIENCE
+  FARMBASE_JWT_EMAIL_OVERRIDE: farmbase.config.FARMBASE_JWT_EMAIL_OVERRIDE
+  FARMBASE_JWT_SECRET: farmbase.config.FARMBASE_JWT_SECRET
+  FARMBASE_ORGANIZATION_SCHEMA_PREFIX: enums.FARMBASE_ORGANIZATION_SCHEMA_PREFIX
+  FARMBASE_PKCE_DONT_VERIFY_AT_HASH: farmbase.config.FARMBASE_PKCE_DONT_VERIFY_AT_HASH
+  farmbase_plugin: farmbase.plugins.farmbase_core
+  FarmbaseBase: farmbase.models.FarmbaseBase
+  FarmbaseEnum: farmbase.enums.FarmbaseEnum
+  FarmContact: models.FarmContact
+  FarmContactCreate: models.FarmContactCreate
+  FarmContactFilterSet: filterset.FarmContactFilterSet
+  FarmContactPagination: models.FarmContactPagination
+  FarmContactQueryParams: filterset.FarmContactQueryParams
+  FarmContactRead: models.FarmContactRead
+  FarmContactRole: farmbase.enums.FarmContactRole
+  FarmContactUpdate: models.FarmContactUpdate
+  FarmCreate: models.FarmCreate
+  FarmFilterSet: filterset.FarmFilterSet
+  FarmPagination: models.FarmPagination
+  FarmQueryParams: filterset.FarmQueryParams
+  FarmRead: models.FarmRead
+  farms_create_farm: farmbase_client.api.farms.farms_create_farm
+  FarmSummary: farm.models.FarmSummary
+  FarmUpdate: models.FarmUpdate
+  farmwise: farmwise.service.farmwise
+  FarmWithContacts: schema.FarmWithContacts
+  FastAPI: fastapi.FastAPI
+  Field: pydantic.Field
+  field_serializer: pydantic.field_serializer
+  field_validator: pydantic.field_validator
+  FieldGqUserModel: farmwise.farmbetter.models.FieldGqUserModel
+  FieldGroup: farm.field.models.FieldGroup
+  FieldGroupMember: farm.field.models.FieldGroupMember
+  Filter: sqlalchemy_filterset.Filter
+  filters: pywa_async.filters
+  Final: typing.Final
+  flatten: more_itertools.flatten
+  Float: sqlalchemy.Float
+  FlowActionType: pywa.types.FlowActionType
+  FlowButton: pywa.types.FlowButton
+  FlowSession: farmwise.whatsapp.flows.flow_tokens.FlowSession
+  Forecast: python_weather.forecast.Forecast
+  ForecastDetails: schema.ForecastDetails
+  ForecastSummary: schema.ForecastSummary
+  ForeignKey: sqlalchemy.ForeignKey
+  func: sqlalchemy.func
+  function_tool: agents.function_tool
+  functools: functools
+  gaez_aez_classification: farmbase_client.api.gaez.gaez_aez_classification
+  gaez_growing_period: farmbase_client.api.gaez.gaez_growing_period
+  gaez_router: farmbase.data.gaez.views.router
+  gaez_suitability_index: farmbase_client.api.gaez.gaez_suitability_index
+  gcsfs: gcsfs
+  Gender: farmbase.enums.Gender
+  Geometry: geoalchemy2.Geometry
+  get: service.get
+  get_all: service.get_all
+  get_all_crop_cycles: farmbase.agronomy.service.get_all_crop_cycles
+  get_all_crops: farmbase.agronomy.service.get_all_crops
+  get_all_events: farmbase.agronomy.service.get_all_events
+  get_all_markets: service.get_all_markets
+  get_all_pathogens: farmbase.agronomy.service.get_all_pathogens
+  get_all_subscriptions: service.get_all_subscriptions
+  get_all_topics: service.get_all_topics
+  get_all_with_location: farmbase.contact.service.get_all_with_location
+  get_authorization_scheme_param: fastapi.security.utils.get_authorization_scheme_param
+  get_by_name: service.get_by_name
+  get_by_phone_number: service.get_by_phone_number
+  get_courses_section_list: farmwise.whatsapp.flows.courses.courses.get_courses_section_list
+  get_crop: farmbase.agronomy.service.get_crop
+  get_crop_cycle: farmbase.agronomy.service.get_crop_cycle
+  get_crop_cycle_events_by_time_range: farmbase.agronomy.service.get_crop_cycle_events_by_time_range
+  get_crop_cycle_events_for_crop_cycle: farmbase.agronomy.service.get_crop_cycle_events_for_crop_cycle
+  get_crop_cycle_stages_for_crop_cycle: farmbase.agronomy.service.get_crop_cycle_stages_for_crop_cycle
+  get_crop_cycles_for_crop: farmbase.agronomy.service.get_crop_cycles_for_crop
+  get_crop_summary: farmbase.agronomy.service.get_crop_summary
+  get_event: farmbase.agronomy.service.get_event
+  get_events_for_crop: farmbase.agronomy.service.get_events_for_crop
+  get_instance: service.get_instance
+  get_mapper: sqlalchemy_utils.get_mapper
+  get_market: service.get_market
+  get_market_by_name: service.get_market_by_name
+  get_market_price_snapshot: farmwise.tools.farmbase.get_market_price_snapshot
+  get_market_prices_by_commodity: service.get_market_prices_by_commodity
+  get_market_prices_by_market: service.get_market_prices_by_market
+  get_market_snapshot: service.get_market_snapshot
+  get_markets: farmwise.tools.farmbase.get_markets
+  get_markets_near_location: service.get_markets_near_location
+  get_or_create_user: farmwise.context.get_or_create_user
+  get_pathogen: farmbase.agronomy.service.get_pathogen
+  get_preventive_events_for_pathogen: farmbase.agronomy.service.get_preventive_events_for_pathogen
+  get_profile_and_memories: farmwise.agent.prompt_utils.get_profile_and_memories
+  get_schema_names: database.core.get_schema_names
+  get_soil_data_isdasoil_v2_soilproperty_get: isdasoil_api_client.api.version_2.get_soil_data_isdasoil_v2_soilproperty_get
+  get_subscription: service.get_subscription
+  get_subscriptions_by_contact: service.get_subscriptions_by_contact
+  get_subscriptions_by_topic: service.get_subscriptions_by_topic
+  get_topic: service.get_topic
+  get_topic_by_name: service.get_topic_by_name
+  get_user_by_phone: farmwise.farmbetter.users.get_user_by_phone
+  GetSoilDataIsdasoilV2SoilpropertyGetDepthType0: models.get_soil_data_isdasoil_v2_soilproperty_get_depth_type_0.GetSoilDataIsdasoilV2SoilpropertyGetDepthType0
+  GetSoilDataIsdasoilV2SoilpropertyGetPropertyType0: models.get_soil_data_isdasoil_v2_soilproperty_get_property_type_0.GetSoilDataIsdasoilV2SoilpropertyGetPropertyType0
+  GetSoilDataV1SoilpropertyGetDepthType0: models.get_soil_data_v1_soilproperty_get_depth_type_0.GetSoilDataV1SoilpropertyGetDepthType0
+  GetSoilDataV1SoilpropertyGetPropertyType0: models.get_soil_data_v1_soilproperty_get_property_type_0.GetSoilDataV1SoilpropertyGetPropertyType0
+  GqUserModelDto: farmwise.farmbetter.models.GqUserModelDto
+  growing_period: farmwise.tools.tools.growing_period
+  GrowthStage: farmbase.agronomy.models.GrowthStage
+  GZipMiddleware: starlette.middleware.gzip.GZipMiddleware
+  handoff: agents.handoff
+  handoff_filters: handoff_filters
+  HandoffInputData: agents.HandoffInputData
+  HarvestLoad: farmbase.farm.harvest.models.HarvestLoad
+  HTTP_401_UNAUTHORIZED: starlette.status.HTTP_401_UNAUTHORIZED
+  HTTPException: fastapi.HTTPException
+  HTTPStatus: http.HTTPStatus
+  HTTPValidationError: models.http_validation_error.HTTPValidationError
+  httpx: httpx
+  hybrid_property: sqlalchemy.ext.hybrid.hybrid_property
+  init_auth: propelauth_fastapi.init_auth
+  init_database: database.manage.init_database
+  init_schema: farmbase.database.manage.init_schema
+  insert: sqlalchemy.dialects.postgresql.insert
+  inspect: sqlalchemy.inspect
+  install_plugin_events: common.utils.cli.install_plugin_events
+  install_plugins: farmbase.common.utils.cli.install_plugins
+  InstanceManager: farmbase.common.managers.InstanceManager
+  Integer: sqlalchemy.Integer
+  io: io
+  IPython: IPython
+  IsdaClient: isdasoil_api_client.Client
+  isoparse: dateutil.parser.isoparse
+  join_with: farmwise.utils.join_with
+  JoinStrategy: sqlalchemy_filterset.JoinStrategy
+  JSON: sqlalchemy.JSON
+  json: json
+  JSONResponse: fastapi.responses.JSONResponse
+  JWKError: jose.exceptions.JWKError
+  jwt: jose.jwt
+  JWTError: jose.JWTError
+  LaborLevel: farmbase.agronomy.models.LaborLevel
+  launch_edit_profile_flow: farmwise.whatsapp.flows.edit_profile.handlers.launch_edit_profile_flow
+  LayersDepth: models.layers_depth.LayersDepth
+  LayersDepthValuesItem: models.layers_depth_values_item.LayersDepthValuesItem
+  LayersResponse: models.layers_response.LayersResponse
+  LayersResponseProperty: models.layers_response_property.LayersResponseProperty
+  LimitOffsetFilter: sqlalchemy_filterset.LimitOffsetFilter
+  List: typing.List
+  listen: sqlalchemy.event.listen
+  load_courses: farmwise.whatsapp.flows.courses.courses.load_courses
+  load_default_config: IPython.terminal.ipapp.load_default_config
+  Location: farmbase.models.Location
+  logger: loguru.logger
+  logging: logging
+  login_login_post: isdasoil_api_client.api.authentication.login_login_post
+  lru_cache: functools.lru_cache
+  LtreeType: sqlalchemy_utils.types.ltree.LtreeType
+  maize_varieties: farmwise.tools.tools.maize_varieties
+  maize_variety_selector: maize_variety_selector.maize_variety_selector
+  make_blob_public: farmwise.storage.make_blob_public
+  Manufacturer: products.models.Manufacturer
+  Mapped: sqlalchemy.orm.Mapped
+  mapped_column: sqlalchemy.orm.mapped_column
+  Mapping: collections.abc.Mapping
+  Market: farmbase.Market
+  market_price_agent: market_price_agent.market_price_agent
+  market_router: farmbase.market.views.router
+  MarketCreate: schemas.MarketCreate
+  MarketPagination: models.MarketPagination
+  MarketPrice: farmbase.MarketPrice
+  MarketPriceCreate: schemas.MarketPriceCreate
+  MarketPricePagination: models.MarketPricePagination
+  MarketPriceRead: schemas.MarketPriceRead
+  MarketPriceUpdate: schemas.MarketPriceUpdate
+  MarketRead: models.MarketRead
+  markets_get_market_snapshot_endpoint: farmbase_client.api.markets.markets_get_market_snapshot_endpoint
+  markets_get_markets: farmbase_client.api.markets.markets_get_markets
+  MarketSnapshotRead: models.MarketSnapshotRead
+  MarketUpdate: models.MarketUpdate
+  math: math
+  memory_router: memory.views.router
+  MemoryAddResults: models.MemoryAddResults
+  MemoryCreate: models.MemoryCreate
+  MemoryItem: mem0.configs.base.MemoryItem
+  MemoryResults: models.MemoryResults
+  Message: contact.message.models.Message
+  message_router: message.views.router
+  MessageCreate: schemas.MessageCreate
+  MessageDirection: models.MessageDirection
+  MessageRead: schemas.MessageRead
+  MessageSummary: models.MessageSummary
+  MessageType: models.MessageType
+  Model: sqlalchemy_filterset.filtersets.Model
+  ModelSettings: agents.ModelSettings
+  must_not_be_blank: farmbase.validators.must_not_be_blank
+  new_exception_handler: fastapi_problem.handler.new_exception_handler
+  Note: farmbase.farm.note.models.Note
+  note_router: farmbase.farm.note.views.router
+  NoteCreate: farmbase.farm.note.models.NoteCreate
+  NoteFilterSet: filterset.NoteFilterSet
+  NotePagination: models.NotePagination
+  NoteQueryParams: filterset.NoteQueryParams
+  NoteRead: models.NoteRead
+  notes_create_note: farmbase_client.api.notes.notes_create_note
+  NoteUpdate: farmbase.farm.note.models.NoteUpdate
+  object_session: sqlalchemy.orm.object_session
+  OmittedUpdateUserRequest: farmwise.farmbetter.models.OmittedUpdateUserRequest
+  onboarding_agent: onboarding_agent.onboarding_agent
+  OpenAI: openai.OpenAI
+  Optional: typing.Optional
+  OrderingField: sqlalchemy_filterset.OrderingField
+  OrderingFilter: sqlalchemy_filterset.OrderingFilter
+  Organization: models.Organization
+  organization_router: farmbase.organization.views.router
+  OrganizationCreate: models.OrganizationCreate
+  OrganizationFilterSet: filterset.OrganizationFilterSet
+  OrganizationPagination: models.OrganizationPagination
+  OrganizationQueryParams: filterset.OrganizationQueryParams
+  OrganizationRead: farmbase.organization.models.OrganizationRead
+  OrganizationSlug: farmbase.models.OrganizationSlug
+  OrganizationUpdate: models.OrganizationUpdate
+  os: os
+  Pagination: farmbase.models.Pagination
+  PaginationParams: models.PaginationParams
+  patch: service.patch
+  Path: pathlib.Path
+  path: os.path
+  Pathogen: farmbase.agronomy.models.Pathogen
+  pathogen_crop_association: farmbase.agronomy.models.pathogen_crop_association
+  PathogenClass: farmbase.agronomy.models.PathogenClass
+  PathogenCreate: models.PathogenCreate
+  PathogenImage: farmbase.agronomy.models.PathogenImage
+  PathogenPagination: farmbase.agronomy.schemas.PathogenPagination
+  PathogenRead: models.PathogenRead
+  PathogenSearchResponse: farmbase.agronomy.schemas.PathogenSearchResponse
+  PathogenUpdate: farmbase.agronomy.schemas.PathogenUpdate
+  pd: pandas
+  PermissionsDependency: farmbase.auth.permissions.PermissionsDependency
+  PestAlertWorkflow: farmbase_workflows.pest_alert.workflows.PestAlertWorkflow
+  Planting: farmbase.farm.planting.models.Planting
+  Platform: farmbase.farm.platform.models.Platform
+  Plugin: plugin.models.Plugin
+  plugin_service: farmbase.plugin.service
+  PluginEvent: plugin.models.PluginEvent
+  PluginEventCreate: models.PluginEventCreate
+  PluginEventPagination: models.PluginEventPagination
+  PluginInstance: plugin.models.PluginInstance
+  PluginInstanceCreate: models.PluginInstanceCreate
+  PluginInstancePagination: models.PluginInstancePagination
+  PluginInstanceRead: models.PluginInstanceRead
+  PluginInstanceUpdate: models.PluginInstanceUpdate
+  PluginManager: farmbase.plugins.base.manager.PluginManager
+  PluginPagination: models.PluginPagination
+  plugins: farmbase.plugins.base.plugins
+  pool: sqlalchemy.pool
+  price_router: farmbase.market.views.price_router
+  PrimaryKey: farmbase.models.PrimaryKey
+  print_function: __future__.print_function
+  Product: farmbase.products.models.Product
+  ProductCategory: enums.ProductCategory
+  ProductCreate: farmbase.products.models.ProductCreate
+  ProductFilterSet: filterset.ProductFilterSet
+  ProductPagination: models.ProductPagination
+  ProductQueryParams: filterset.ProductQueryParams
+  ProductRead: models.ProductRead
+  products_router: farmbase.products.views.router
+  ProductUpdate: farmbase.products.models.ProductUpdate
+  project_service: farmbase.project.service
+  prompts: mem0.configs.prompts
+  PropertyResponse: models.property_response.PropertyResponse
+  PropertyResponseProperty: models.property_response_property.PropertyResponseProperty
+  PropertyType: isdasoil_api_client.models.get_soil_data_isdasoil_v2_soilproperty_get_property_type_0.GetSoilDataIsdasoilV2SoilpropertyGetPropertyType0
+  pydantic_data_converter: temporalio.contrib.pydantic.pydantic_data_converter
+  pydantic_encoder: pydantic.json.pydantic_encoder
+  PydanticField: pydantic.Field
+  python_weather: python_weather
+  Query: fastapi.Query
+  RawConfigParser: configparser.RawConfigParser
+  re: re
+  RECOMMENDED_PROMPT_PREFIX: agents.extensions.handoff_prompt.RECOMMENDED_PROMPT_PREFIX
+  record_callback_selection: farmwise.whatsapp.store.record_callback_selection
+  Region: geospatial.models.Region
+  register: farmbase.plugins.base.register
+  relationship: sqlalchemy.orm.relationship
+  remove_all_tools: agents.extensions.handoff_filters.remove_all_tools
+  Request: starlette.requests.Request
+  requests: requests
+  RequestValidationError: fastapi.exceptions.RequestValidationError
+  Response: types.Response
+  RetryPolicy: temporalio.common.RetryPolicy
+  rioxarray: rioxarray
+  RunContextWrapper: agents.RunContextWrapper
+  RunResult: contact.runresult.models.RunResult
+  runresult_router: runresult.views.router
+  RunResultCreate: models.RunResultCreate
+  search_filter_sort_paginate: farmbase.database.service.search_filter_sort_paginate
+  search_pathogens_by_crop: farmbase.agronomy.service.search_pathogens_by_crop
+  SearchFilter: sqlalchemy_filterset.SearchFilter
+  SearchFilters: farmbase.agronomy.schemas.SearchFilters
+  SearchRequest: farmbase.contact.memory.models.SearchRequest
+  SecretStr: pydantic.SecretStr
+  Section: pywa.types.Section
+  SectionList: farmwise.schema.SectionList
+  SectionRow: pywa.types.SectionRow
+  Security: fastapi.Security
+  select: sqlalchemy.select
+  selectinload: sqlalchemy.orm.selectinload
+  send_audio_reply: farmwise.whatsapp.responses.send_audio_reply
+  send_responses: farmwise.whatsapp.responses.send_responses
+  send_text_reply: farmwise.whatsapp.responses.send_text_reply
+  SensitiveProjectActionPermission: farmbase.auth.permissions.SensitiveProjectActionPermission
+  SentMessage: pywa_async.types.sent_message.SentMessage
+  SentTemplate: pywa_async.types.sent_message.SentTemplate
+  Sequence: typing.Sequence
+  service: service
+  Session: sqlalchemy.orm.Session
+  SessionLocal: farmbase.database.core.SessionLocal
+  sessionmaker: sqlalchemy.orm.sessionmaker
+  SessionTracker: farmbase.database.logging.SessionTracker
+  settings: farmbase.config.settings
+  SimpleContact: whatsapp.schema.SimpleContact
+  slugify: slugify.slugify
+  soil_advisor_agent: soil_advisory_agent.soil_advisor_agent
+  soil_properties: farmwise.tools.tools.soil_properties
+  SoilData: models.soil_data.SoilData
+  SoilPropertyDepth: models.soil_property_depth.SoilPropertyDepth
+  SoilPropertyMetadata: models.soil_property_metadata.SoilPropertyMetadata
+  SoilPropertyMetadataValue: models.soil_property_metadata_value.SoilPropertyMetadataValue
+  SoilPropertyValue: models.soil_property_value.SoilPropertyValue
+  SpreadRisk: farmbase.agronomy.models.SpreadRisk
+  SQLAlchemyError: sqlalchemy.exc.SQLAlchemyError
+  SqlEnum: sqlalchemy.Enum
+  ST_Distance: geoalchemy2.functions.ST_Distance
+  ST_MakePoint: geoalchemy2.functions.ST_MakePoint
+  ST_SetSRID: geoalchemy2.functions.ST_SetSRID
+  ST_Transform: geoalchemy2.functions.ST_Transform
+  status: starlette.status
+  StorageLocation: farm.harvest.models.StorageLocation
+  store_flow_session: farmwise.whatsapp.flows.flow_tokens.store_flow_session
+  String: sqlalchemy.String
+  StringEncryptedType: sqlalchemy_utils.StringEncryptedType
+  Subregion: geospatial.models.Subregion
+  subscribe_contact_to_topic: service.subscribe_contact_to_topic
+  Subscription: topic.models.Subscription
+  subscription_router: farmbase.topic.views.subscription_router
+  SubscriptionCreate: models.SubscriptionCreate
+  SubscriptionPagination: schemas.SubscriptionPagination
+  SubscriptionRead: models.SubscriptionRead
+  SubscriptionUpdate: models.SubscriptionUpdate
+  suitability_index: farmwise.tools.tools.suitability_index
+  SuitabilityIndexResponse: farmbase.data.gaez.models.SuitabilityIndexResponse
+  sys: sys
+  Table: sqlalchemy.Table
+  tabulate: tabulate.tabulate
+  TASK_QUEUE: farmbase_workflows.pest_alert.TASK_QUEUE
+  tempfile: tempfile
+  Template: pywa_async.types.Template
+  text: sqlalchemy.text
+  TEXT: sqlalchemy.TEXT
+  Text: sqlalchemy.Text
+  TextResponse: farmwise.schema.TextResponse
+  timedelta: datetime.timedelta
+  TimeStampMixin: farmbase.models.TimeStampMixin
+  TLSConfig: temporalio.service.TLSConfig
+  to_shape: geoalchemy2.shape.to_shape
+  Token: models.token.Token
+  Topic: topic.models.Topic
+  topic_router: farmbase.topic.views.router
+  TopicCreate: models.TopicCreate
+  TopicPagination: models.TopicPagination
+  TopicRead: models.TopicRead
+  TopicUpdate: schemas.TopicUpdate
+  tqdm: tqdm.tqdm
+  traceback: traceback
+  triage_agent: triage_agent.triage_agent
+  "true": sqlalchemy.sql.expression.true
+  TSVECTOR: sqlalchemy.dialects.postgresql.TSVECTOR
+  TSVectorType: sqlalchemy_utils.TSVectorType
+  TYPE_CHECKING: typing.TYPE_CHECKING
+  types: pywa_async.types
+  TypeVar: typing.TypeVar
+  Uncertainty: models.uncertainty.Uncertainty
+  Union: typing.Union
+  UniqueConstraint: sqlalchemy.UniqueConstraint
+  UNSET: types.UNSET
+  Unset: types.Unset
+  unsubscribe_contact_from_topic: service.unsubscribe_contact_from_topic
+  update: service.update
+  update_contact: farmwise.tools.farmbase.update_contact
+  update_crop: farmbase.agronomy.service.update_crop
+  update_crop_cycle: farmbase.agronomy.service.update_crop_cycle
+  update_event: farmbase.agronomy.service.update_event
+  update_farmbetter_user: farmwise.tools.farmbetter.update_farmbetter_user
+  update_instance: service.update_instance
+  update_market: service.update_market
+  update_pathogen: farmbase.agronomy.service.update_pathogen
+  update_subscription: service.update_subscription
+  update_topic: service.update_topic
+  update_user: farmwise.farmbetter.users.update_user
+  upload_bytes_to_gcs: farmwise.storage.upload_bytes_to_gcs
+  URL: sqlalchemy.engine.url.URL
+  UserContext: farmwise.context.UserContext
+  UserDict: collections.UserDict
+  UserInput: farmwise.schema.UserInput
+  UTC: datetime.UTC
+  uuid: uuid
+  uuid1: uuid.uuid1
+  ValidationError: pydantic.ValidationError
+  validators: farmbase.validators
+  warnings: warnings
+  WateringLevel: farmbase.agronomy.models.WateringLevel
+  weather: farmbase_workflows.weather
+  WeatherActivities: farmbase_workflows.weather.activities.WeatherActivities
+  WeatherForecastWorkflow: farmbase_workflows.weather.workflows.WeatherForecastWorkflow
+  WhatsApp: pywa_async.WhatsApp
+  WhatsAppActivities: farmbase_workflows.whatsapp.activities.WhatsAppActivities
+  WKBElement: geoalchemy2.WKBElement
+  WKTElement: geoalchemy2.WKTElement
+  Worker: temporalio.worker.Worker
+  workflow: temporalio.workflow
+  workflow_router: farmbase.workflow.views.router
+  WorkflowFailureError: temporalio.client.WorkflowFailureError
+  xr: xarray
+
+functions:
+  __contains__:
+    type: sync
+    module: libs.isdasoil-api-client.src.isdasoil_api_client.models.soil_data
+    args: [self, key]
+    params:
+      returns: bool
+  __delitem__:
+    type: sync
+    module: libs.isdasoil-api-client.src.isdasoil_api_client.models.soil_data
+    args: [self, key]
+    params:
+      returns: None
+  __getitem__:
+    type: sync
+    module: libs.isdasoil-api-client.src.isdasoil_api_client.models.soil_data
+    args: [self, key]
+    params:
+      returns: Any
+  __init__:
+    type: sync
+    module: apps.farmbase.src.farmbase
+    args: [self, path]
+  __iter__:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugins.base.manager
+    args: [self]
+  __len__:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugins.base.manager
+    args: [self]
+  __repr__:
+    type: sync
+    module: apps.farmbase.src.farmbase.agronomy.models
+    args: [self]
+    params:
+      returns: str
+  __setitem__:
+    type: sync
+    module: libs.isdasoil-api-client.src.isdasoil_api_client.models.soil_data
+    args: [self, key, value]
+    params:
+      returns: None
+  _apply_handoff_filters:
+    type: sync
+    module: apps.farmwise.src.farmwise.agent
+    args: [functions, initial_data]
+    params:
+      returns: HandoffInputData
+  _build_response:
+    type: sync
+    module: libs.farmbase-client.src.farmbase_client.api.agronomy.agronomy_list_crop_cycles
+    params:
+      returns: Response[Union]
+  _find_class:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [name]
+  _get_contact:
+    type: sync
+    module: apps.farmbase-workflows.src.farmbase_workflows.weather.activities
+    args: [contact, farm]
+  _get_git_revision:
+    type: sync
+    module: apps.farmbase.src.farmbase
+    args: [path]
+  _get_kwargs:
+    type: sync
+    module: libs.farmbase-client.src.farmbase_client.api.agronomy.agronomy_list_crop_cycles
+    params:
+      returns: dict
+  _get_schema_names:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [sync_conn]
+  _id_str:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [self]
+    params:
+      returns: str
+  _parse_response:
+    type: sync
+    module: libs.farmbase-client.src.farmbase_client.api.agronomy.agronomy_list_crop_cycles
+    params:
+      returns: Optional[Union]
+  _parse_uncertainty:
+    type: sync
+    module: libs.isdasoil-api-client.src.isdasoil_api_client.models.soil_data
+    args: [data]
+    params:
+      returns: Union
+  _parse_unit:
+    type: sync
+    module: libs.isdasoil-api-client.src.isdasoil_api_client.models.soil_property_metadata
+    args: [data]
+    params:
+      returns: Union
+  _read_clr:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.gaez.views
+    args: [gcs_path]
+  _repr_attrs_str:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [self]
+    params:
+      returns: str
+  _send_event_message:
+    type: async
+    module: apps.farmbase-workflows.src.farmbase_workflows.crop_cycle.workflows
+    args: [self, contact, event, retry_policy]
+  _to_contact_read:
+    type: sync
+    module: apps.farmbase.src.farmbase.contact.views
+    args: [contact]
+    params:
+      returns: ContactRead
+  _to_market_price_read:
+    type: sync
+    module: apps.farmbase.src.farmbase.market.views
+    args: [market_price]
+    params:
+      returns: MarketPriceRead
+  add_memory:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.memory.views
+    args: [db_session, organization, contact_id, memory_create]
+  add_security_headers:
+    type: async
+    module: apps.farmbase.src.farmbase.main
+    args: [request, call_next]
+  additional_keys:
+    type: sync
+    module: libs.isdasoil-api-client.src.isdasoil_api_client.models.soil_data
+    args: [self]
+    params:
+      returns: list[str]
+  aez_classification:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.gaez.views
+    args: [latitude, longitude]
+  all:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugins.base.manager
+    args: [self, version, plugin_type]
+  asyncio:
+    type: async
+    module: libs.farmbase-client.src.farmbase_client.api.agronomy.agronomy_list_crop_cycles
+    params:
+      returns: Optional[Union]
+  asyncio_detailed:
+    type: async
+    module: libs.farmbase-client.src.farmbase_client.api.agronomy.agronomy_list_crop_cycles
+    params:
+      returns: Response[Union]
+  authenticate_user_or_machine:
+    type: sync
+    module: apps.farmbase.src.farmbase.auth
+    args: [api_key_result, user]
+  available_courses:
+    type: tool
+    module: apps.farmwise.src.farmwise.tools.courses
+    args: [_]
+    params:
+      returns: list[AvailableCourse]
+  batch_load_market_prices:
+    type: async
+    module: dev.scripts.kamis.upload_kamis
+    args: [df, batch_size]
+  broken:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.models
+    args: [self]
+  chat_opened:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.handlers
+    args: [client, chat_opened]
+  configuration:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.models
+    args: [self, configuration]
+  configuration_schema:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.models
+    args: [self]
+  contact_init_flow:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.flows
+  count:
+    type: async
+    module: apps.farmbase.src.farmbase.commodity.service
+    params:
+      returns: int
+  count_events_by_category:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session]
+    params:
+      returns: dict
+  count_market_prices:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: int
+  count_markets:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: int
+  count_markets_near_location:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: int
+  count_pathogens_by_class:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session]
+    params:
+      returns: dict
+  count_subscriptions:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: int
+  count_topics:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: int
+  create:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.service
+    params:
+      returns: Contact
+  create_commodity:
+    type: async
+    module: apps.farmbase.src.farmbase.commodity.views
+    args: [db_session, commodity_in]
+  create_consent:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.service
+    params:
+      returns: ContactConsent
+  create_contact:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.views
+    args: [db_session, organization, contact_in]
+  create_contact_consent:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.views
+    args: [db_session, contact_id, consent_in]
+  create_crop:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, crop_data]
+    params:
+      returns: Crop
+  create_crop_cycle:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, cycle_data, stages_data, events_data]
+    params:
+      returns: CropCycle
+  create_db_engine:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [async_, echo]
+  create_event:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, event_data]
+    params:
+      returns: Event
+  create_farm:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.views
+    args: [db_session, farm_in]
+  create_farm_contact:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.views
+    args: [db_session, farm_contact_in]
+  create_farmbetter_user:
+    type: tool
+    module: apps.farmwise.src.farmwise.tools.farmbetter
+    args: [wrapper, user]
+    params:
+      returns: GqUserModelDto
+  create_instance:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: PluginInstance
+  create_market:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: Market
+  create_market_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.market.views
+    args: [db_session, market_in]
+  create_market_price:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: MarketPrice
+  create_message:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.message.views
+    args: [db_session, contact_id, message_in]
+  create_new_crop:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, crop_data]
+    params:
+      returns: CropRead
+  create_new_crop_cycle:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, cycle_data, stages_data, events_data]
+    params:
+      returns: CropCycleRead
+  create_new_event:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, event_data]
+    params:
+      returns: EventRead
+  create_new_pathogen:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, pathogen_data]
+    params:
+      returns: PathogenRead
+  create_note:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.note.service
+    params:
+      returns: Note
+  create_pathogen:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, pathogen_data]
+    params:
+      returns: Pathogen
+  create_plugin_event:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: PluginEvent
+  create_plugin_instance:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.views
+    args: [db_session, plugin_instance_in]
+  create_product:
+    type: async
+    module: apps.farmbase.src.farmbase.products.views
+    args: [db_session, product_in]
+  create_run_result:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.runresult.views
+    args: [contact_id, db_session, run_result_in]
+  create_subscription:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Subscription
+  create_subscription_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, subscription_in]
+  create_topic:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Topic
+  create_topic_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, topic_in]
+  crop_cycle_worker:
+    type: sync
+    module: apps.farmbase-workflows.src.farmbase_workflows.crop_cycle.worker
+    args: [client, wa]
+  crop_pathogen_diagnosis_agent_instructions:
+    type: sync
+    module: apps.farmwise.src.farmwise.agent.crop_pathogen_diagnosis_agent
+    args: [ctx, agent]
+    params:
+      returns: str
+  crop_suitability_agent_instructions:
+    type: sync
+    module: apps.farmwise.src.farmwise.agent.crop_suitability_agent
+    args: [ctx, agent]
+    params:
+      returns: str
+  custom_generate_unique_id:
+    type: sync
+    module: apps.farmbase.src.farmbase.main
+    args: [route]
+    params:
+      returns: str
+  data_collection_consent:
+    type: tool
+    module: apps.farmwise.src.farmwise.tools.farmbase
+    args: [wrapper]
+    params:
+      returns: ContactConsentRead
+  database_init:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+  db_session_middleware:
+    type: async
+    module: apps.farmbase.src.farmbase.main
+    args: [request, call_next]
+  delete:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.service
+    params:
+      returns: None
+  delete_all_memories:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.memory.views
+    args: [organization, contact_id]
+  delete_commodity:
+    type: async
+    module: apps.farmbase.src.farmbase.commodity.views
+    args: [db_session, commodity_id]
+  delete_contact:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.views
+    args: [db_session, contact_id]
+  delete_crop:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, host_id]
+    params:
+      returns: bool
+  delete_crop_cycle:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, cycle_id]
+    params:
+      returns: bool
+  delete_event:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, event_id]
+    params:
+      returns: bool
+  delete_existing_crop:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, crop_id]
+    params:
+      returns: None
+  delete_existing_crop_cycle:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, cycle_id]
+    params:
+      returns: None
+  delete_existing_event:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, event_id]
+    params:
+      returns: None
+  delete_existing_pathogen:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, pathogen_id]
+    params:
+      returns: None
+  delete_farm:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.views
+    args: [db_session, farm_id]
+  delete_farm_contact:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.views
+    args: [db_session, farm_contact_id]
+  delete_instance:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+  delete_market:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: None
+  delete_market_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.market.views
+    args: [db_session, market_id]
+  delete_market_price:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: None
+  delete_memory:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.memory.views
+    args: [memory_id]
+  delete_message:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.message.views
+    args: [db_session, contact_id, message_id]
+  delete_note:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.note.service
+    params:
+      returns: None
+  delete_pathogen:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, pathogen_id]
+    params:
+      returns: bool
+  delete_plugin_instances:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.views
+    args: [db_session, plugin_instance_id]
+  delete_product:
+    type: async
+    module: apps.farmbase.src.farmbase.products.views
+    args: [db_session, product_id]
+  delete_subscription:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: None
+  delete_subscription_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, contact_id, topic_id]
+  delete_topic:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: None
+  delete_topic_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, topic_id]
+  dict:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [self]
+    params:
+      returns: dict
+  downgrade_database:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+    args: [tag, sql, revision, revision_type]
+  drop_database:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+  elevation:
+    type: tool
+    module: apps.farmwise.src.farmwise.tools.tools
+    args: [_, latitude, longitude]
+    params:
+      returns: float
+  ensure_unique_default_per_project:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [target, value, oldvalue, initiator]
+  ensure_valid_buttons:
+    type: sync
+    module: apps.farmwise.src.farmwise.whatsapp.responses
+    args: [buttons]
+  ensure_valid_section_list:
+    type: sync
+    module: apps.farmwise.src.farmwise.whatsapp.responses
+    args: [section_list]
+  entrypoint:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+  farm_registration_agent_instructions:
+    type: sync
+    module: apps.farmwise.src.farmwise.agent.field_registration_agent
+    args: [ctx, agent]
+    params:
+      returns: str
+  farmbase_cli:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+  farmbase_database:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+  farmbase_server:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+  fetch_contact:
+    type: sync
+    module: apps.farmbase.src.farmbase.marketplace.models
+    args: [self, tenant_session_factory]
+    params:
+      returns: Contact | None
+  fetch_editor:
+    type: sync
+    module: apps.farmbase.src.farmbase.marketplace.models
+    args: [self, factory]
+  fetch_reporter:
+    type: sync
+    module: apps.farmbase.src.farmbase.marketplace.models
+    args: [self, factory]
+  find_nearby_farms:
+    type: async
+    module: apps.farmbase-workflows.src.farmbase_workflows.pest_alert.activities
+    args: [self, note_details, radius_km]
+    params:
+      returns: list[FarmWithContacts]
+  find_spec:
+    type: sync
+    module: apps.farmbase.src.farmbase
+    args: [self, fullname, path, target]
+  first:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugins.base.manager
+    args: [self, func_name]
+  format_market_snapshot_csv:
+    type: sync
+    module: apps.farmwise.src.farmwise.tools.farmbase
+    args: [snapshot]
+  from_dict:
+    type: sync
+    module: libs.isdasoil-api-client.src.isdasoil_api_client.models.soil_data
+    args: [cls, src_dict]
+    params:
+      returns: T
+  generate_alert_message:
+    type: async
+    module: apps.farmbase-workflows.src.farmbase_workflows.pest_alert.activities
+    args: [self, note_details]
+    params:
+      returns: AlertMessage
+  generate_slug:
+    type: sync
+    module: apps.farmbase.src.farmbase.organization.models
+    args: [target, value, oldvalue, initiator]
+  get:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.service
+  get_active_instance:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: Optional[PluginInstance]
+  get_active_instance_by_slug:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: Optional[PluginInstance]
+  get_active_instances:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: Optional[PluginInstance]
+  get_aez_raster:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.gaez.views
+  get_all:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.service
+    params:
+      returns: Sequence[Contact]
+  get_all_agent_info:
+    type: sync
+    module: apps.farmwise.src.farmwise.agent
+    params:
+      returns: list[AgentInfo]
+  get_all_crop_cycles:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, pagination, crop_id, koppen_classification]
+    params:
+      returns: Sequence[CropCycle]
+  get_all_crops:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, pagination, cultivation_type, labor_level]
+    params:
+      returns: Sequence[Crop]
+  get_all_events:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, pagination, event_category, crop_id, importance]
+    params:
+      returns: Sequence[Event]
+  get_all_events_for_plugin:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: List[Optional[PluginEvent]]
+  get_all_market_prices:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: Sequence[MarketPrice]
+  get_all_markets:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: Sequence[Market]
+  get_all_memories:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.memory.views
+    args: [organization, contact_id]
+  get_all_pathogens:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, pagination, pathogen_class, severity, crop_id, is_activated]
+    params:
+      returns: Sequence[Pathogen]
+  get_all_subscriptions:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Sequence[Subscription]
+  get_all_topics:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Sequence[Topic]
+  get_all_with_location:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.service
+    params:
+      returns: Sequence[tuple]
+  get_by_id:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.message.service
+  get_by_name:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.service
+    params:
+      returns: Optional[Contact]
+  get_by_name_or_default:
+    type: async
+    module: apps.farmbase.src.farmbase.organization.service
+    params:
+      returns: Organization
+  get_by_name_or_raise:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.service
+    params:
+      returns: Contact
+  get_by_phone_number:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.service
+    params:
+      returns: Optional[Contact]
+  get_by_slug:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: Plugin
+  get_by_slug_or_raise:
+    type: async
+    module: apps.farmbase.src.farmbase.organization.service
+    params:
+      returns: Organization
+  get_by_type:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: List[Optional[Plugin]]
+  get_by_whatsapp_id:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.message.service
+  get_class_by_tablename:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [table_fullname]
+    params:
+      returns: Any
+  get_class_map:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.gaez.views
+  get_commodities:
+    type: async
+    module: apps.farmbase.src.farmbase.commodity.views
+    args: [db_session, page, items_per_page]
+  get_commodity:
+    type: async
+    module: apps.farmbase.src.farmbase.commodity.views
+    args: [db_session, commodity_id]
+  get_contact:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.views
+    args: [db_session, contact_id]
+  get_contact_by_phone:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.views
+    args: [db_session, phone]
+  get_contact_subscriptions:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, contact_id, page, items_per_page]
+  get_contacts:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.views
+    args: [db_session, query_params]
+  get_contacts_with_location:
+    type: async
+    module: apps.farmbase-workflows.src.farmbase_workflows.weather.activities
+    args: [self]
+  get_core_tables:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.manage
+  get_crop:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, host_id]
+    params:
+      returns: Optional[Crop]
+  get_crop_cycle:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, cycle_id]
+    params:
+      returns: Optional[CropCycle]
+  get_crop_cycle_detail:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, cycle_id]
+    params:
+      returns: CropCycleRead
+  get_crop_cycle_events:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, cycle_id]
+    params:
+      returns: List[CropCycleEventRead]
+  get_crop_cycle_events_by_time:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, cycle_id, start_day, end_day]
+    params:
+      returns: List[CropCycleEventRead]
+  get_crop_cycle_events_by_time_range:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, cycle_id, start_day, end_day]
+    params:
+      returns: Sequence[CropCycleEvent]
+  get_crop_cycle_events_for_crop_cycle:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, cycle_id]
+    params:
+      returns: Sequence[CropCycleEvent]
+  get_crop_cycle_stages:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, cycle_id]
+    params:
+      returns: List[CropCycleStageRead]
+  get_crop_cycle_stages_for_crop_cycle:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, cycle_id]
+    params:
+      returns: Sequence[CropCycleStage]
+  get_crop_cycles_for_crop:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, crop_id, koppen_classification]
+    params:
+      returns: Sequence[CropCycle]
+  get_crop_cycles_for_crop_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, crop_id, koppen_classification]
+    params:
+      returns: List[CropCycleRead]
+  get_crop_detail:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, crop_id]
+    params:
+      returns: CropRead
+  get_crop_summary:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, crop_id]
+    params:
+      returns: dict
+  get_crop_summary_info:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, crop_id]
+    params:
+      returns: dict
+  get_current_user:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugins.farmbase_core.plugin
+    args: [self, request]
+  get_db:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [request]
+    params:
+      returns: AsyncSession
+  get_default:
+    type: async
+    module: apps.farmbase.src.farmbase.organization.service
+    params:
+      returns: Optional[Organization]
+  get_default_or_raise:
+    type: async
+    module: apps.farmbase.src.farmbase.organization.service
+    params:
+      returns: Organization
+  get_enabled_instances_by_type:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: List[Optional[PluginInstance]]
+  get_event:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, event_id]
+    params:
+      returns: Optional[Event]
+  get_event_counts_by_category:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session]
+    params:
+      returns: dict
+  get_event_detail:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, event_id]
+    params:
+      returns: EventRead
+  get_events_for_crop:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, crop_id, event_category, start_day, end_day]
+    params:
+      returns: Sequence[Event]
+  get_events_for_crop_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, crop_id, event_category, start_day, end_day]
+    params:
+      returns: EventSearchResponse
+  get_farm:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.views
+    args: [db_session, farm_id]
+  get_farm_contact:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.views
+    args: [db_session, farm_contact_id]
+  get_farmbetter_user:
+    type: tool
+    module: apps.farmwise.src.farmwise.tools.farmbetter
+    args: [wrapper, user_id, email, country_code, national_number]
+    params:
+      returns: GqUserModelDto
+  get_growing_period_raster:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.gaez.views
+  get_instance:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: Optional[PluginInstance]
+  get_isda_token:
+    type: async
+    module: apps.farmwise.src.farmwise.tools.tools
+  get_latest:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.runresult.service
+    params:
+      returns: RunResult
+  get_maize_data:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.crops.views
+  get_maize_varieties:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.crops.views
+    args: [altitude, growing_period]
+    params:
+      returns: Any
+  get_market:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: Optional[Market]
+  get_market_by_name:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: Optional[Market]
+  get_market_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.market.views
+    args: [db_session, market_id]
+  get_market_price:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: Optional[MarketPrice]
+  get_market_price_snapshot:
+    type: tool
+    module: apps.farmwise.src.farmwise.tools.farmbase
+    args: [_, market_id]
+    params:
+      returns: str
+  get_market_prices:
+    type: async
+    module: apps.farmbase.src.farmbase.market.views
+    args: [db_session, market_id, commodity_id, page, items_per_page]
+  get_market_prices_by_commodity:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: Sequence[MarketPrice]
+  get_market_prices_by_market:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: Sequence[MarketPrice]
+  get_market_snapshot:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: Sequence[MarketPrice]
+  get_market_snapshot_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.market.views
+    args: [db_session, market_id]
+  get_markets:
+    type: tool
+    module: apps.farmwise.src.farmwise.tools.farmbase
+    args: [_, latitude, longitude]
+    params:
+      returns: MarketPagination
+  get_markets_near_location:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: Sequence[Market]
+  get_memory:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.memory.views
+    args: [memory_id]
+  get_message:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.message.views
+    args: [db_session, contact_id, message_id]
+  get_message_by_whatsapp_id:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.message.views
+    args: [db_session, contact_id, whatsapp_message_id]
+  get_model_name_by_tablename:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [table_fullname]
+    params:
+      returns: str
+  get_note:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.note.service
+    params:
+      returns: Optional[Note]
+  get_or_create:
+    type: async
+    module: apps.farmbase.src.farmbase.organization.service
+    params:
+      returns: Organization
+  get_or_create_agent_by_name:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.runresult.service
+    params:
+      returns: Agent
+  get_organization_path:
+    type: sync
+    module: apps.farmbase.src.farmbase.api
+    args: [organization]
+  get_organizations:
+    type: async
+    module: apps.farmbase.src.farmbase.organization.views
+    args: [db_session, query_params]
+  get_path_params_from_request:
+    type: sync
+    module: apps.farmbase.src.farmbase.main
+    args: [request]
+    params:
+      returns: dict
+  get_path_template:
+    type: sync
+    module: apps.farmbase.src.farmbase.main
+    args: [request]
+    params:
+      returns: str
+  get_pathogen:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, pathogen_id]
+    params:
+      returns: Optional[Pathogen]
+  get_pathogen_counts_by_class:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session]
+    params:
+      returns: dict
+  get_pathogen_detail:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, pathogen_id]
+    params:
+      returns: PathogenRead
+  get_plugin_event_by_id:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: Optional[PluginEvent]
+  get_plugin_event_by_slug:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: Optional[PluginEvent]
+  get_plugin_events:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.views
+    args: [common]
+  get_plugin_instance:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.views
+    args: [db_session, plugin_instance_id]
+  get_plugin_instances:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.views
+    args: [common]
+  get_plugins:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.views
+    args: [common]
+  get_preventive_events_for_pathogen:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, pathogen_id, crop_id]
+    params:
+      returns: Sequence[Event]
+  get_preventive_events_for_pathogen_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, pathogen_id, crop_id]
+    params:
+      returns: List[EventRead]
+  get_product:
+    type: async
+    module: apps.farmbase.src.farmbase.products.views
+    args: [db_session, product_id]
+  get_recent_notes:
+    type: async
+    module: apps.farmbase-workflows.src.farmbase_workflows.pest_alert.activities
+    args: [self]
+    params:
+      returns: list[AlertDetails]
+  get_request_id:
+    type: sync
+    module: apps.farmbase.src.farmbase.main
+    params:
+      returns: Optional[str]
+  get_revision:
+    type: sync
+    module: apps.farmbase.src.farmbase
+  get_schema_names:
+    type: async
+    module: apps.farmbase.src.farmbase.database.core
+    args: [_engine]
+    params:
+      returns: list[str]
+  get_soil_property:
+    type: async
+    module: apps.farmwise.src.farmwise.tools.tools
+    args: [client, lat, lon, property_, depth]
+  get_subscription:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Optional[Subscription]
+  get_subscription_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, contact_id, topic_id]
+  get_subscriptions:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, page, items_per_page, contact_id, topic_id]
+  get_subscriptions_by_contact:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Sequence[Subscription]
+  get_subscriptions_by_topic:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Sequence[Subscription]
+  get_suitability_raster:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.gaez.views
+  get_table_name_by_class_instance:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [class_instance]
+    params:
+      returns: str
+  get_temporal_client:
+    type: async
+    module: apps.farmbase.src.farmbase.workflow.views
+    params:
+      returns: Client
+  get_tenant_schemas:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.revisions.tenant.env
+    args: [connection]
+  get_tenant_tables:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.manage
+  get_topic:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Optional[Topic]
+  get_topic_by_name:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Optional[Topic]
+  get_topic_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, topic_id]
+  get_topics:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, page, items_per_page]
+  get_user_id:
+    type: sync
+    module: apps.farmbase.src.farmbase.contact.memory.views
+    args: [organization, contact_id]
+  get_version:
+    type: sync
+    module: apps.farmbase.src.farmbase
+  get_weather_forecast:
+    type: async
+    module: apps.farmbase-workflows.src.farmbase_workflows.weather.activities
+    args: [self, contact]
+    params:
+      returns: ForecastDetails
+  growing_period:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.gaez.views
+    args: [latitude, longitude]
+  head_database:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+    args: [revision_type]
+  healthcheck:
+    type: sync
+    module: apps.farmbase.src.farmbase.api
+  history_database:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+    args: [revision_type]
+  image_handler:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.handlers
+    args: [_, msg]
+  include_object:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.revisions.core.env
+    args: [object, name, type_, reflected, compare_to]
+  init_database:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.manage
+    args: [engine]
+  init_schema:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.manage
+  install_plugin_events:
+    type: sync
+    module: apps.farmbase.src.farmbase.common.utils.cli
+    args: [api]
+  install_plugins:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+    args: [force]
+  instance:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.models
+    args: [self]
+  is_docker:
+    type: sync
+    module: apps.farmbase.src.farmbase
+  list_crop_cycles:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, pagination, crop_id, koppen_classification]
+    params:
+      returns: CropCyclePagination
+  list_crops:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, pagination, cultivation_type, labor_level]
+    params:
+      returns: CropPagination
+  list_events:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, pagination, event_category, crop_id, importance]
+    params:
+      returns: EventPagination
+  list_farm_contacts:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.views
+    args: [db_session, query_params]
+  list_farms:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.views
+    args: [db_session, query_params]
+  list_messages:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.message.views
+    args: [db_session, contact_id, message_type, limit, offset]
+  list_notes:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.note.views
+    args: [db_session, query_params]
+  list_pathogens:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, pagination, pathogen_class, severity, crop_id, is_activated]
+    params:
+      returns: PathogenPagination
+  list_plugins:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+  list_products:
+    type: async
+    module: apps.farmbase.src.farmbase.products.views
+    args: [db_session, query_params]
+  load:
+    type: async
+    module: dev.scripts.kamis.upload_kamis
+  load_all_excels_to_dataframe:
+    type: sync
+    module: dev.scripts.kamis.upload_kamis
+    args: [from_date, directory_path]
+  load_crop_cycle_data:
+    type: sync
+    module: dev.scripts.load_agronomy_data
+    args: [session, cycle_data, crop_id, koppen_classification, verbose]
+    params:
+      returns: int
+  load_crops_data:
+    type: sync
+    module: dev.scripts.load_agronomy_data
+    args: [session, crops_data, verbose]
+    params:
+      returns: int
+  load_events_data:
+    type: sync
+    module: dev.scripts.load_agronomy_data
+    args: [session, events_data, verbose]
+    params:
+      returns: int
+  load_json_file:
+    type: sync
+    module: dev.scripts.load_agronomy_data
+    args: [file_path]
+    params:
+      returns: Dict
+  load_market_prices:
+    type: async
+    module: dev.scripts.kamis.upload_kamis
+    args: [df]
+  load_pathogens_data:
+    type: sync
+    module: dev.scripts.load_agronomy_data
+    args: [session, pathogens_data, verbose]
+    params:
+      returns: int
+  location_handler:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.handlers
+    args: [_, msg]
+  main:
+    type: sync
+    module: dev.scripts.load_agronomy_data
+  maize_maturity_category:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.crops.views
+    args: [growing_season_days]
+  maize_varieties:
+    type: tool
+    module: apps.farmwise.src.farmwise.tools.tools
+    args: [_, altitude, growing_period_days]
+    params:
+      returns: CropVarietiesResponse
+  maize_variety_selector_instructions:
+    type: sync
+    module: apps.farmwise.src.farmwise.agent.maize_variety_selector
+    args: [ctx, agent]
+    params:
+      returns: str
+  market_price_agent_instructions:
+    type: sync
+    module: apps.farmwise.src.farmwise.agent.market_price_agent
+    args: [ctx, agent]
+    params:
+      returns: str
+  memory_history:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.memory.views
+    args: [memory_id]
+  memory_instance:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.memory.views
+    params:
+      returns: AsyncMemory
+  merge_revisions:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+    args: [revisions, revision_type, message]
+  message_handler:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.handlers
+    args: [_, msg]
+  message_status_handler:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.handlers
+    args: [_, status]
+  on_activity_callback_selection:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.handlers
+    args: [_, sel]
+  on_callback_button:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.handlers
+    args: [_, btn]
+  on_callback_selection:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.handlers
+    args: [_, sel]
+  on_command:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.handlers
+    args: [client, msg]
+  on_course_callback_selection:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.handlers
+    args: [client, sel]
+  on_handoff:
+    type: async
+    module: apps.farmwise.src.farmwise.agent
+    args: [ctx, input_data]
+  onboarding_agent_instructions:
+    type: sync
+    module: apps.farmwise.src.farmwise.agent.onboarding_agent
+    args: [ctx, agent]
+    params:
+      returns: str
+  open_raster_from_gcs:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.gaez.views
+    args: [path]
+  patch:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.service
+    params:
+      returns: Contact
+  patch_contact:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.views
+    args: [db_session, contact_id, contact_in]
+  pest_alert:
+    type: async
+    module: apps.farmbase.src.farmbase.workflow.views
+  pest_alert_worker:
+    type: sync
+    module: apps.farmbase-workflows.src.farmbase_workflows.pest_alert.worker
+    args: [client, wa]
+  plugins_group:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+  populate_commodities:
+    type: async
+    module: dev.scripts.kamis.upload_kamis
+    args: [_com]
+  populate_markets:
+    type: async
+    module: dev.scripts.kamis.upload_kamis
+    args: [_markets]
+  populate_static_data:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.manage
+    args: [session]
+  process_revision_directives:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.revisions.core.env
+    args: [context, revision, directives]
+  refetch_db_session:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [organization_slug]
+    params:
+      returns: Session
+  register:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugins.base.manager
+    args: [self, cls]
+  reset_memory:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.memory.views
+  resolve_attr:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [obj, attr, default]
+  resolve_table_name:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.core
+    args: [name]
+  revision_database:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+    args: [message, autogenerate, revision_type, sql, head, splice, branch_label, version_path, rev_id]
+  run:
+    type: async
+    module: apps.farmbase-workflows.src.farmbase_workflows.weather.workflows
+    args: [self]
+  run_migrations_online:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.revisions.core.env
+  search_memories:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.memory.views
+    args: [organization, contact_id, search_req]
+  search_pathogens_by_crop:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, crop_id, pathogen_class, severity]
+    params:
+      returns: Sequence[Pathogen]
+  search_pathogens_for_crop:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, crop_id, pathogen_class, severity]
+    params:
+      returns: PathogenSearchResponse
+  send_audio_reply:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.responses
+    args: [response, msg]
+  send_responses:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.responses
+    args: [response_events, msg]
+  send_text_reply:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.responses
+    args: [response, msg]
+  send_whatsapp_message:
+    type: async
+    module: apps.farmbase-workflows.src.farmbase_workflows.whatsapp.activities
+    args: [self, contact, message]
+  send_whatsapp_template:
+    type: async
+    module: apps.farmbase-workflows.src.farmbase_workflows.whatsapp.activities
+    args: [self, contact, template_name, header, body_values]
+  serialize_location:
+    type: sync
+    module: apps.farmbase.src.farmbase.farm.models
+    args: [self, location]
+  session_for_tenant:
+    type: sync
+    module: apps.farmbase.src.farmbase.marketplace.models
+    args: [tenant_key]
+    params:
+      returns: Session
+  shell:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+    args: [ipython_args]
+  show_config:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+  show_routes:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+  show_secrets_encoder:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.models
+    args: [obj]
+  soil_advisory_instructions:
+    type: sync
+    module: apps.farmwise.src.farmwise.agent.soil_advisory_agent
+    args: [ctx, agent]
+    params:
+      returns: str
+  soil_properties:
+    type: tool
+    module: apps.farmwise.src.farmwise.tools.tools
+    args: [_, latitude, longitude]
+    params:
+      returns: dict
+  split_price_column:
+    type: sync
+    module: dev.scripts.kamis.upload_kamis
+    args: [df, column, prefix]
+  stamp_database:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+    args: [revision, revision_type, tag, sql]
+  subscribe_contact_to_topic:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Subscription
+  subscribe_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, contact_id, topic_id]
+  suitability_index:
+    type: sync
+    module: apps.farmbase.src.farmbase.data.gaez.views
+    args: [latitude, longitude]
+  summarize_forecast:
+    type: async
+    module: apps.farmbase-workflows.src.farmbase_workflows.weather.activities
+    args: [self, forecast]
+    params:
+      returns: ForecastSummary
+  sync:
+    type: sync
+    module: libs.farmbase-client.src.farmbase_client.api.agronomy.agronomy_list_crop_cycles
+    params:
+      returns: Optional[Union]
+  sync_detailed:
+    type: sync
+    module: libs.farmbase-client.src.farmbase_client.api.agronomy.agronomy_list_crop_cycles
+    params:
+      returns: Response[Union]
+  to_dict:
+    type: sync
+    module: libs.isdasoil-api-client.src.isdasoil_api_client.models.soil_data
+    args: [self]
+    params:
+      returns: dict
+  to_farm_read:
+    type: sync
+    module: apps.farmbase.src.farmbase.farm.models
+    args: [self]
+    params:
+      returns: FarmRead
+  triage_agent_instructions:
+    type: sync
+    module: apps.farmwise.src.farmwise.agent.triage_agent
+    args: [ctx, agent]
+    params:
+      returns: str
+  uninstall_plugins:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+    args: [plugins]
+  unregister:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugins.base.manager
+    args: [self, cls]
+  unsubscribe_contact_from_topic:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: None
+  unsubscribe_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, contact_id, topic_id]
+  update:
+    type: async
+    module: apps.farmbase.src.farmbase.products.service
+    params:
+      returns: Product
+  update_commodity:
+    type: async
+    module: apps.farmbase.src.farmbase.commodity.views
+    args: [db_session, commodity_id, commodity_in]
+  update_contact:
+    type: tool
+    module: apps.farmwise.src.farmwise.tools.farmbase
+    args: [wrapper, contact_in]
+    params:
+      returns: ContactRead
+  update_crop:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, host_id, crop_data]
+    params:
+      returns: Optional[Crop]
+  update_crop_cycle:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, cycle_id, cycle_data, stages_data, events_data]
+    params:
+      returns: Optional[CropCycle]
+  update_event:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, event_id, event_data]
+    params:
+      returns: Optional[Event]
+  update_existing_crop:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, crop_id, crop_data]
+    params:
+      returns: CropRead
+  update_existing_crop_cycle:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, cycle_id, cycle_data, stages_data, events_data]
+    params:
+      returns: CropCycleRead
+  update_existing_event:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, event_id, event_data]
+    params:
+      returns: EventRead
+  update_existing_pathogen:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.views
+    args: [session, pathogen_id, pathogen_data]
+    params:
+      returns: PathogenRead
+  update_farm:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.views
+    args: [db_session, farm_id, farm_in]
+  update_farm_contact:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.views
+    args: [db_session, farm_contact_id, farm_contact_in]
+  update_farmbetter_user:
+    type: tool
+    module: apps.farmwise.src.farmwise.tools.farmbetter
+    args: [wrapper, user]
+    params:
+      returns: GqUserModelDto
+  update_instance:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.service
+    params:
+      returns: PluginInstance
+  update_market:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: Market
+  update_market_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.market.views
+    args: [db_session, market_id, market_in]
+  update_market_price:
+    type: async
+    module: apps.farmbase.src.farmbase.market.service
+    params:
+      returns: MarketPrice
+  update_memory:
+    type: async
+    module: apps.farmbase.src.farmbase.contact.memory.views
+    args: [memory_id, updated_memory]
+  update_note:
+    type: async
+    module: apps.farmbase.src.farmbase.farm.note.service
+    params:
+      returns: Note
+  update_pathogen:
+    type: async
+    module: apps.farmbase.src.farmbase.agronomy.service
+    args: [session, pathogen_id, pathogen_data]
+    params:
+      returns: Optional[Pathogen]
+  update_plugin_instance:
+    type: sync
+    module: apps.farmbase.src.farmbase.plugin.views
+    args: [db_session, plugin_instance_id, plugin_instance_in]
+  update_product:
+    type: async
+    module: apps.farmbase.src.farmbase.products.views
+    args: [db_session, product_id, product_in]
+  update_subscription:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Subscription
+  update_subscription_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, contact_id, topic_id, subscription_in]
+  update_topic:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.service
+    params:
+      returns: Topic
+  update_topic_endpoint:
+    type: async
+    module: apps.farmbase.src.farmbase.topic.views
+    args: [db_session, topic_id, topic_in]
+  upgrade_database:
+    type: sync
+    module: apps.farmbase.src.farmbase.cli
+    args: [tag, sql, revision, revision_type]
+  validate_location:
+    type: sync
+    module: apps.farmbase.src.farmbase.farm.models
+    args: [cls, data]
+    params:
+      returns: Any
+  validate_name:
+    type: sync
+    module: apps.farmbase.src.farmbase.contact.schemas
+    args: [cls, v]
+  verify_api_key:
+    type: sync
+    module: apps.farmbase.src.farmbase.auth
+    args: [api_key]
+  version_schema:
+    type: sync
+    module: apps.farmbase.src.farmbase.database.manage
+    args: [script_location]
+  voice_handler:
+    type: async
+    module: apps.farmwise.src.farmwise.whatsapp.handlers
+    args: [_, msg]
+  weather_forecast:
+    type: async
+    module: apps.farmbase.src.farmbase.workflow.views
+  weather_worker:
+    type: sync
+    module: apps.farmbase-workflows.src.farmbase_workflows.weather.worker
+    args: [client, wa]
+
+variables:
+  LOG_MODULE_IMPORTS:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [apps.farmbase.src.farmbase]
+  OAUTHLIB_INSECURE_TRANSPORT:
+    type: env
+    params:
+      caller: [os.environ]
+
+files:
+  ./:
+    type: pattern
+    actions: [read]
+    params:
+      patterns: ['*.json']
+      caller: [main]
+  .git:
+    type: literal
+    actions: [read]
+    params:
+      caller: [os.path.join]
+      path: [path]
+  .tif:
+    type: literal
+    actions: [write]
+    params:
+      caller: [tempfile.NamedTemporaryFile]
+      delete: "False"
+  _dir:
+    type: literal
+    actions: [read]
+    params:
+      caller: [Path(args.dir)]
+  args.dir:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  crop_cycle_dir:
+    type: variable
+    actions: [read]
+    params:
+      caller: [crop_cycle_dir.glob]
+  crops.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [main]
+      path: [_dir]
+  directory_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [os.listdir]
+  events.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [main]
+      path: [_dir]
+  file_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open, json.load]
+      alias: [f]
+  gcs_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [fs.open]
+  path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [os.path.exists, fs.open]
+  pathogen:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Pathogen()]
+  pathogens.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [main]
+      path: [_dir]
+
+networks:
+  api.isda-africa.com:
+    type: api
+    actions: [GET]
+    urls: [/]
+    protocols: [https]
+    ports: ["443"]
+    params:
+      caller: [IsdaClient]
